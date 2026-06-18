@@ -1,0 +1,106 @@
+// Fable como cerebro del Orquestador: redacta el brief (JSON estricto) y el build-prompt (texto).
+// Llama a la Anthropic Messages API por fetch (mismo patrón probado en supabase/functions/analyze-lead),
+// con prompt caching en el system. NO usamos Fable para "conducir" Lovable: eso va por el MCP
+// (ver lovable.ts), donde la calidad la pone el build-prompt y las llamadas son deterministas.
+//
+// Modelo: claude-opus-4-8 por defecto (configurable con ORQUESTADOR_MODEL). Routing de coste: la
+// arquitectura usa Opus 4.8 donde su calidad manda (brief y, sobre todo, build-prompt).
+
+const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
+const FABLE_MODEL = process.env.ORQUESTADOR_MODEL ?? "claude-sonnet-4-6";
+
+interface AnthropicResponse {
+  content?: { type?: string; text?: string }[];
+  error?: { message?: string };
+}
+
+// Saca un array de textos de reseña del raw_json del scraper (formato flexible).
+// Misma lógica que analyze-lead para mantener coherencia entre la Edge Fn de prueba y el Orquestador.
+export function extractReviews(raw: unknown): string[] {
+  if (!raw || typeof raw !== "object") return [];
+  const r = (raw as Record<string, unknown>).reviews;
+  if (!Array.isArray(r)) return [];
+  return r
+    .map((item) => {
+      if (typeof item === "string") return item;
+      if (item && typeof item === "object") {
+        const o = item as Record<string, unknown>;
+        return String(o.text ?? o.review ?? o.comment ?? o.snippet ?? "");
+      }
+      return "";
+    })
+    .filter((t) => t.trim().length > 0)
+    .slice(0, 15);
+}
+
+// Claude debe devolver JSON puro, pero por si acaso quitamos vallas ```json y recortamos al objeto.
+export function extractJson<T = Record<string, unknown>>(text: string): T {
+  let t = text.trim();
+  t = t.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+  const start = t.indexOf("{");
+  const end = t.lastIndexOf("}");
+  if (start === -1 || end === -1) throw new Error("respuesta de Fable sin JSON");
+  return JSON.parse(t.slice(start, end + 1)) as T;
+}
+
+// Llamada base a Fable. Devuelve el texto del primer bloque de la respuesta.
+async function callFable(
+  systemPrompt: string,
+  input: unknown,
+  maxTokens = 2000,
+): Promise<string> {
+  const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+  if (!ANTHROPIC_API_KEY) {
+    throw new Error(
+      "Falta ANTHROPIC_API_KEY en el entorno del Orquestador (raíz .env). " +
+        "Es la API key de runtime, NO el plan Max.",
+    );
+  }
+
+  const res = await fetch(ANTHROPIC_API, {
+    method: "POST",
+    headers: {
+      "x-api-key": ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: FABLE_MODEL,
+      max_tokens: maxTokens,
+      system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
+      messages: [
+        { role: "user", content: typeof input === "string" ? input : JSON.stringify(input) },
+      ],
+    }),
+  });
+
+  const data = (await res.json()) as AnthropicResponse;
+  if (!res.ok) {
+    throw new Error(`Fable devolvió ${res.status}: ${data?.error?.message ?? "error"}`);
+  }
+  const text = data.content?.find((c) => c.type === "text")?.text ?? data.content?.[0]?.text ?? "";
+  if (!text) throw new Error("Fable devolvió una respuesta vacía");
+  return text;
+}
+
+// Fable → JSON estricto (brief, outreach). Parsea con try/catch implícito en extractJson.
+export async function fableJson<T = Record<string, unknown>>(
+  systemPrompt: string,
+  input: unknown,
+  maxTokens = 2000,
+): Promise<T> {
+  const text = await callFable(systemPrompt, input, maxTokens);
+  return extractJson<T>(text);
+}
+
+// Fable → texto plano (el build-prompt para Lovable). Salida = texto, no JSON.
+export async function fableText(
+  systemPrompt: string,
+  input: unknown,
+  maxTokens = 2000,
+): Promise<string> {
+  const text = await callFable(systemPrompt, input, maxTokens);
+  return text.trim();
+}
+
+export { FABLE_MODEL };

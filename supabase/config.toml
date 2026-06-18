@@ -1,0 +1,13 @@
+# Config mínima de Supabase CLI para WebForge.
+# project_id es solo una etiqueta local; el proyecto real se enlaza con `supabase link`.
+project_id = "webforge"
+
+# ingest-leads se llama desde el panel (con tu sesión) y desde el webhook del scraper
+# (con la cabecera x-ingest-secret). La autorización la hace la propia función, así que
+# desactivamos la verificación de JWT de la pasarela para permitir el webhook.
+[functions.ingest-leads]
+verify_jwt = false
+
+# analyze-lead se llama desde el panel con tu sesión; la función valida el usuario por su cuenta.
+[functions.analyze-lead]
+verify_jwt = false

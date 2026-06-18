@@ -1,0 +1,22 @@
+{
+  "name": "webforge-orquestador",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "WebForge — Orquestador diario. Brief + build-prompt con Fable y construcción de webs en Lovable vía su MCP. Ver ARQUITECTURA_webforge_v2.md sec. 9.",
+  "scripts": {
+    "start": "tsx run.ts",
+    "auth": "tsx lovable-auth.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dry-run": "tsx run.ts --dry-run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}
