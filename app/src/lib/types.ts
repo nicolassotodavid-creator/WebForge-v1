@@ -41,6 +41,11 @@ export interface Lead {
   status: LeadStatus;
   created_at: string;
   updated_at: string;
+  // Scoring de la web ACTUAL del negocio (la de raw_json). Ver 0007_lead_site_score.sql.
+  // Null hasta que el Orquestador (barrido diario) o el botón manual la analizan.
+  site_score: number | null;
+  site_analysis: SiteAnalysis | null;
+  site_analyzed_at: string | null;
 }
 
 export interface BriefService {

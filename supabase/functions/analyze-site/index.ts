@@ -1,9 +1,12 @@
-// analyze-site — analiza la web construida en Lovable con Claude y devuelve recomendaciones.
-// Input: { lead_id }. Requiere que el lead tenga un site con live_url.
-// Usa el brief + intenta traer el HTML de la página para dar feedback real.
+// analyze-site — analiza la web que el negocio YA tiene (la de raw_json) con Claude y la puntúa.
+// Input: { lead_id }. Requiere que el lead tenga una URL de web propia en raw_json.
+// Es el equivalente MANUAL del barrido diario del Orquestador (score-existing-sites.ts):
+// ambos escriben en `leads.site_*` para que manual y automático coincidan.
+// NO analiza la web que construimos nosotros (eso lo hace el Orquestador y vive en `sites`).
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { ANALYSIS_PROMPT } from "../_shared/prompts.ts";
+import { getWebsiteUrl } from "../_shared/website.ts";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -43,49 +46,38 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Cuerpo no válido." }, 400);
   }
 
-  // Cargar lead, brief y site
-  const [{ data: lead }, { data: brief }, { data: site }] = await Promise.all([
-    supabase.from("leads").select("*").eq("id", leadId).maybeSingle(),
-    supabase.from("briefs").select("*").eq("lead_id", leadId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("sites").select("id,live_url,status").eq("lead_id", leadId).not("live_url", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-  ]);
-
+  // Cargar lead y sacar la URL de su web actual desde raw_json (mismo criterio que el panel).
+  const { data: lead } = await supabase.from("leads").select("*").eq("id", leadId).maybeSingle();
   if (!lead) return jsonResponse({ error: "Lead no encontrado." }, 404);
-  if (!site?.live_url) return jsonResponse({ error: "Este lead aún no tiene web con URL en vivo." }, 409);
+
+  const url = getWebsiteUrl(lead.raw_json);
+  if (!url) return jsonResponse({ error: "Este negocio no tiene una web propia para analizar." }, 409);
 
   // Intentar traer el HTML de la página
   let htmlSnippet = "";
   try {
-    const pageRes = await fetch(site.live_url, {
+    const pageRes = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; WebForge-Analyzer/1.0)" },
       signal: AbortSignal.timeout(10000),
     });
     if (pageRes.ok) {
       const html = await pageRes.text();
       // Extraer solo texto relevante (quitar scripts/styles, limitar a 4000 chars)
-      const clean = html
+      htmlSnippet = html
         .replace(/<script[\s\S]*?<\/script>/gi, "")
         .replace(/<style[\s\S]*?<\/style>/gi, "")
         .replace(/<[^>]+>/g, " ")
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 4000);
-      htmlSnippet = clean;
     }
   } catch (_e) {
-    // Si no se puede traer la página, seguimos solo con el brief
+    // Si no se puede traer la página, seguimos solo con los metadatos del negocio
   }
 
   const payload = {
     negocio: { nombre: lead.name, categoria: lead.category, ciudad: lead.city, valoracion: lead.rating, reseñas: lead.review_count },
-    brief: brief ? {
-      resumen: brief.business_summary,
-      tono: brief.tone,
-      propuestas_valor: brief.value_props,
-      hero_copy: brief.hero_copy,
-      servicios: brief.services,
-    } : null,
-    live_url: site.live_url,
+    url,
     contenido_pagina: htmlSnippet || "(no disponible — la página bloquea el scraping)",
   };
 
@@ -116,23 +108,21 @@ Deno.serve(async (req: Request) => {
   // Parsear JSON de Claude
   let analysis: Record<string, unknown>;
   try {
-    let t = analysisText.trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+    const t = analysisText.trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
     const start = t.indexOf("{"); const end = t.lastIndexOf("}");
     analysis = JSON.parse(t.slice(start, end + 1));
   } catch (_e) {
     return jsonResponse({ error: "Claude no devolvió JSON válido.", raw: analysisText.slice(0, 300) }, 422);
   }
 
-  // Persistir en `sites` para que el score sea visible en el panel sin re-analizar
+  // Persistir en `leads` para que el score sea visible en el panel sin re-analizar
   // (best-effort: si falla la escritura, seguimos devolviendo el análisis al usuario).
-  if (site.id) {
-    const score = typeof analysis.score === "number" ? analysis.score : null;
-    const { error: persistErr } = await supabase
-      .from("sites")
-      .update({ score, analysis, analyzed_at: new Date().toISOString() })
-      .eq("id", site.id);
-    if (persistErr) console.error(`No se pudo guardar el análisis: ${persistErr.message}`);
-  }
+  const score = typeof analysis.score === "number" ? analysis.score : null;
+  const { error: persistErr } = await supabase
+    .from("leads")
+    .update({ site_score: score, site_analysis: analysis, site_analyzed_at: new Date().toISOString() })
+    .eq("id", leadId);
+  if (persistErr) console.error(`No se pudo guardar el análisis: ${persistErr.message}`);
 
-  return jsonResponse({ ok: true, analysis, live_url: site.live_url });
+  return jsonResponse({ ok: true, analysis, url });
 });

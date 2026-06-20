@@ -23,22 +23,31 @@ export interface SiteAnalysis {
   improvements: { area: string; issue: string; fix: string }[];
 }
 
+interface AnalyzeLead {
+  name: string;
+  category?: string | null;
+  city?: string | null;
+  rating?: number | null;
+  review_count?: number | null;
+}
+
+interface AnalyzeBrief {
+  business_summary?: string | null;
+  tone?: string | null;
+  value_props?: unknown;
+  hero_copy?: string | null;
+  services?: unknown;
+}
+
 interface AnalyzeInput {
-  lead: {
-    name: string;
-    category?: string | null;
-    city?: string | null;
-    rating?: number | null;
-    review_count?: number | null;
-  };
-  brief: {
-    business_summary?: string | null;
-    tone?: string | null;
-    value_props?: unknown;
-    hero_copy?: string | null;
-    services?: unknown;
-  } | null;
+  lead: AnalyzeLead;
+  brief: AnalyzeBrief | null;
   liveUrl: string;
+}
+
+interface AnalyzeExistingInput {
+  lead: AnalyzeLead;
+  url: string;
 }
 
 // Baja el HTML de la página y lo deja en texto plano recortado a 4000 chars.
@@ -63,14 +72,15 @@ async function fetchPageSnippet(url: string): Promise<string> {
   }
 }
 
-// Analiza la web construida y devuelve el JSON estricto del scoring.
-// Lanza si falta la API key, si Claude devuelve error o si la respuesta no es JSON válido;
-// el caller (processBuild) lo trata como no crítico (la web ya está publicada).
-export async function analyzeSite({ lead, brief, liveUrl }: AnalyzeInput): Promise<SiteAnalysis> {
+// Núcleo compartido: baja el HTML de `url`, lo manda a Claude con ANALYSIS_PROMPT y devuelve
+// el JSON estricto del scoring. Lo usan tanto el análisis de la web construida (analyzeSite)
+// como el de la web ACTUAL del negocio (analyzeExistingSite). `brief` es opcional (null para
+// la web del negocio, que no tiene brief nuestro).
+async function analyzeUrl(lead: AnalyzeLead, brief: AnalyzeBrief | null, url: string): Promise<SiteAnalysis> {
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
   if (!ANTHROPIC_API_KEY) throw new Error("Falta ANTHROPIC_API_KEY en el entorno del Orquestador.");
 
-  const htmlSnippet = await fetchPageSnippet(liveUrl);
+  const htmlSnippet = await fetchPageSnippet(url);
 
   const payload = {
     negocio: {
@@ -89,7 +99,7 @@ export async function analyzeSite({ lead, brief, liveUrl }: AnalyzeInput): Promi
           servicios: brief.services,
         }
       : null,
-    live_url: liveUrl,
+    url,
     contenido_pagina: htmlSnippet || "(no disponible — la página bloquea el scraping)",
   };
 
@@ -114,4 +124,17 @@ export async function analyzeSite({ lead, brief, liveUrl }: AnalyzeInput): Promi
   const text = data.content?.find((c) => c.type === "text")?.text ?? data.content?.[0]?.text ?? "";
   if (!text) throw new Error("Claude devolvió una respuesta vacía");
   return extractJson<SiteAnalysis>(text);
+}
+
+// Analiza la web CONSTRUIDA por nosotros (live_url). La llama processBuild justo tras publicar
+// en Lovable; el resultado se guarda en `sites`. No crítico: la web ya está publicada.
+export async function analyzeSite({ lead, brief, liveUrl }: AnalyzeInput): Promise<SiteAnalysis> {
+  return analyzeUrl(lead, brief, liveUrl);
+}
+
+// Analiza la web ACTUAL del negocio (la de raw_json, el globo del panel). La usa el barrido
+// diario del Orquestador y el botón manual; el resultado se guarda en `leads.site_*`.
+// Sin brief: es la web del negocio, no nuestra propuesta.
+export async function analyzeExistingSite({ lead, url }: AnalyzeExistingInput): Promise<SiteAnalysis> {
+  return analyzeUrl(lead, null, url);
 }

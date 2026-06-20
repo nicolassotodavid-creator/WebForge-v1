@@ -19,6 +19,7 @@ import { BRIEF_PROMPT, BUILD_PROMPT } from "../supabase/functions/_shared/prompt
 import { fableJson, fableText, extractReviews, ORQUESTADOR_MODEL } from "./fable.ts";
 import { lovableBuild } from "./lovable.ts";
 import { analyzeSite } from "./analyze.ts";
+import { scoreExistingSites } from "./score-existing-sites.ts";
 import { rehostScreenshot } from "./preview.ts";
 import { sendFollowupEmail, getLiveUrl, supabase as supabaseFollowup } from "./followup-mailer.ts";
 
@@ -397,6 +398,18 @@ async function run() {
     }
   } else {
     // Modo normal: dos pasadas independientes.
+
+    // PASO 0 — Scoring de la web ACTUAL de cada negocio (señal de prospección, se ve en el panel).
+    if (DRY_RUN) {
+      console.log("\n── PASO 0: DRY-RUN — no se puntúan webs actuales (gasta tokens y escribe en leads).");
+    } else {
+      try {
+        const { scored, skipped, failed } = await scoreExistingSites(supabase);
+        console.log(`\n── PASO 0: webs actuales puntuadas: ${scored} · sin URL: ${skipped} · fallidas: ${failed}`);
+      } catch (e) {
+        console.error(`── PASO 0: barrido de scoring falló: ${e instanceof Error ? e.message : e}`);
+      }
+    }
 
     // PASADA 1 — Briefs (leads 'new' → 'analyzed')
     const newLeads = await selectLeadsByStatus("new");
