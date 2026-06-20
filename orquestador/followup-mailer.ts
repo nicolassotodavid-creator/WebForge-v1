@@ -128,6 +128,12 @@ export async function sendFollowupEmail(
     .single();
 
   if (insErr || !msg) {
+    // 23505 = violación de UNIQUE(lead_id, email_number): otra ejecución solapada ya insertó
+    // este email. Es el guard de idempotencia funcionando — no es un error real.
+    if (insErr?.code === "23505") {
+      console.log(`  · [followup] Email ${emailNumber} para lead ${lead.id} ya existe (carrera) — omitido.`);
+      return;
+    }
     console.error(`  ✗ [followup] No se pudo guardar draft para lead ${lead.id}: ${insErr?.message}`);
     return;
   }

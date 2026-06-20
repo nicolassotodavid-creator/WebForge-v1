@@ -1,5 +1,5 @@
 // get-booking-info — datos PÚBLICOS para la landing /book/:leadId.
-// Sin auth. Devuelve: { business_name, category, city, live_url }.
+// Sin auth. Devuelve: { business_name, category, city, live_url, preview_image_url }.
 // El panel usa la service key; aquí usamos la service key porque es un edge function
 // (los secrets nunca llegan al browser).
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -43,7 +43,7 @@ Deno.serve(async (req: Request) => {
 
   const { data: site } = await supabase
     .from("sites")
-    .select("live_url")
+    .select("live_url, preview_image_url")
     .eq("lead_id", lead_id)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -54,5 +54,6 @@ Deno.serve(async (req: Request) => {
     category: lead.category ?? null,
     city: lead.city ?? null,
     live_url: site?.live_url ?? null,
+    preview_image_url: site?.preview_image_url ?? null,
   });
 });

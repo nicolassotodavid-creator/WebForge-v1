@@ -6,7 +6,6 @@ import {
   Loader2,
   Check,
   X,
-  RotateCcw,
   ExternalLink,
   Globe,
   Bot,
@@ -15,7 +14,7 @@ import {
   Copy,
   Send,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import type { Brief, Lead, Site } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -64,9 +63,7 @@ export default function LeadDetail() {
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
   const [site, setSite] = useState<Site | null>(null);
-  const [qaBusy, setQaBusy] = useState<
-    null | "approve" | "reject" | "regenerate"
-  >(null);
+  const [qaBusy, setQaBusy] = useState<null | "approve" | "reject">(null);
   const [qaError, setQaError] = useState<string | null>(null);
   const [buildQueuing, setBuildQueuing] = useState(false);
   const [buildQueueError, setBuildQueueError] = useState<string | null>(null);
@@ -108,7 +105,7 @@ export default function LeadDetail() {
       if (error) throw error;
       if (data?.analysis) setAnalysis(data.analysis);
     } catch (e) {
-      setAnalysisError(e instanceof Error ? e.message : "Error al analizar la web.");
+      setAnalysisError(await edgeFunctionErrorMessage(e, "Error al analizar la web."));
     } finally {
       setAnalyzing(false);
     }
@@ -158,6 +155,19 @@ export default function LeadDetail() {
     loadAll();
   }, [loadAll]);
 
+  // Polling automático mientras el build está en curso (cada 8 s).
+  // Se activa cuando el lead está en build_queued o cuando la web existe
+  // pero aún está en estado queued/building.
+  useEffect(() => {
+    const isBuildingLead = lead?.status === "build_queued";
+    const isBuildingSite = site?.status === "queued" || site?.status === "building";
+    if (!isBuildingLead && !isBuildingSite) return;
+    const interval = setInterval(() => {
+      loadAll();
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [lead?.status, site?.status, loadAll]);
+
   async function generateBrief() {
     setGenerating(true);
     setGenError(null);
@@ -165,19 +175,7 @@ export default function LeadDetail() {
       const { data, error } = await supabase.functions.invoke("analyze-lead", {
         body: { lead_id: id },
       });
-      if (error) {
-        let msg = error.message;
-        const ctx = (error as { context?: Response }).context;
-        if (ctx && typeof ctx.json === "function") {
-          try {
-            const j = await ctx.json();
-            if (j?.error) msg = j.error;
-          } catch {
-            /* ignore */
-          }
-        }
-        throw new Error(msg);
-      }
+      if (error) throw error;
       const result = data as { brief?: Brief };
       if (result?.brief) setBrief(result.brief);
       // Recargar el lead para reflejar el nuevo estado (analyzed).
@@ -188,7 +186,7 @@ export default function LeadDetail() {
         .maybeSingle();
       setLead(leadData as Lead | null);
     } catch (e) {
-      setGenError(e instanceof Error ? e.message : "No se pudo generar el brief.");
+      setGenError(await edgeFunctionErrorMessage(e, "No se pudo generar el brief."));
     } finally {
       setGenerating(false);
     }
@@ -201,22 +199,14 @@ export default function LeadDetail() {
       const { data, error } = await supabase.functions.invoke("generate-outreach", {
         body: { lead_id: id },
       });
-      if (error) {
-        // Extraer el mensaje real del cuerpo JSON del error (igual que generateBrief)
-        const ctx = (error as { context?: Response }).context;
-        let msg = error.message;
-        if (ctx && typeof ctx.json === "function") {
-          try { const j = await ctx.json(); if (j?.error) msg = j.error; } catch { /* ignore */ }
-        }
-        throw new Error(msg);
-      }
+      if (error) throw error;
       if (data?.message) {
         setOutreachMsg(data.message);
         setEditedBody(data.message.body);
         setEditingBody(false);
       }
     } catch (e) {
-      setOutreachError(e instanceof Error ? e.message : "Error al generar el mensaje.");
+      setOutreachError(await edgeFunctionErrorMessage(e, "Error al generar el mensaje."));
     } finally {
       setGeneratingOutreach(false);
     }
@@ -235,21 +225,14 @@ export default function LeadDetail() {
       const { error } = await supabase.functions.invoke("send-email", {
         body: { message_id: outreachMsg.id },
       });
-      if (error) {
-        const ctx = (error as { context?: Response }).context;
-        let msg = error.message;
-        if (ctx && typeof ctx.json === "function") {
-          try { const j = await ctx.json(); if (j?.error) msg = j.error; } catch { /* ignore */ }
-        }
-        throw new Error(msg);
-      }
+      if (error) throw error;
       setSendEmailDone(true);
       setOutreachMsg({ ...outreachMsg, status: "sent" });
       // Actualizar estado del lead a 'contacted'
       const { data: leadData } = await supabase.from("leads").select("*").eq("id", id).maybeSingle();
       setLead(leadData as Lead | null);
     } catch (e) {
-      setSendEmailError(e instanceof Error ? e.message : "Error al enviar el email.");
+      setSendEmailError(await edgeFunctionErrorMessage(e, "Error al enviar el email."));
     } finally {
       setSendingEmail(false);
     }
@@ -293,19 +276,12 @@ export default function LeadDetail() {
     }
   }
 
-  async function runQaAction(action: "approve" | "reject" | "regenerate") {
+  async function runQaAction(action: "approve" | "reject") {
     if (!site || !lead) return;
     if (
       action === "reject" &&
       !window.confirm(
         "¿Rechazar esta web? El lead pasará a «Rechazado» y no se contactará.",
-      )
-    )
-      return;
-    if (
-      action === "regenerate" &&
-      !window.confirm(
-        "¿Regenerar la web? Se descarta la versión actual y el orquestador construirá una nueva.",
       )
     )
       return;
@@ -324,7 +300,7 @@ export default function LeadDetail() {
           .update({ status: "approved", updated_at: nowIso })
           .eq("id", lead.id);
         if (e2) throw e2;
-      } else if (action === "reject") {
+      } else {
         const { error: e1 } = await supabase
           .from("sites")
           .update({ status: "rejected" })
@@ -333,21 +309,6 @@ export default function LeadDetail() {
         const { error: e2 } = await supabase
           .from("leads")
           .update({ status: "rejected", updated_at: nowIso })
-          .eq("id", lead.id);
-        if (e2) throw e2;
-      } else {
-        // Regenerar = descartar la versión actual y reencolar el build.
-        // PUNTO DE COORDINACIÓN con el orquestador: dejamos el lead en 'new', que es el
-        // estado que recoge su query documentada (eq('status','new')). Si el orquestador
-        // adopta otro disparador de re-build, cambiar solo estas dos líneas.
-        const { error: e1 } = await supabase
-          .from("sites")
-          .update({ status: "rejected" })
-          .eq("id", site.id);
-        if (e1) throw e1;
-        const { error: e2 } = await supabase
-          .from("leads")
-          .update({ status: "new", updated_at: nowIso })
           .eq("id", lead.id);
         if (e2) throw e2;
       }
@@ -671,7 +632,7 @@ export default function LeadDetail() {
           <CardTitle className="text-lg">Web · QA</CardTitle>
           <CardDescription>
             Revisa la web construida en Lovable y decide: aprobar (queda lista para
-            contactar), rechazar o regenerar.
+            contactar) o rechazar. Si quieres cambios, edítala en Lovable y vuelve a revisar.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -689,7 +650,7 @@ export default function LeadDetail() {
               </div>
               <p className="text-sm text-amber-700">
                 El orquestador está generando el build-prompt y construyendo la web.
-                Puede tardar varios minutos. Recarga la página para ver el resultado.
+                Puede tardar varios minutos. Esta página se actualiza sola cada 8 segundos.
               </p>
               <p className="text-xs font-mono text-amber-600 bg-amber-100 rounded px-2 py-1 inline-block">
                 npm start -- --lead {lead.id}
@@ -714,10 +675,25 @@ export default function LeadDetail() {
             )}
 
           {site && site.status === "failed" && (
-            <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              La construcción falló{site.notes ? `: ${site.notes}` : ""}. Puedes
-              regenerarla abajo.
-            </p>
+            <div className="space-y-2 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <p>
+                La construcción falló{site.notes ? `: ${site.notes}` : ""}. El lead vuelve a
+                «Brief listo»: pulsa «Construir web en Lovable» arriba para reintentar
+                {site.lovable_project_id
+                  ? ", o ábrela en Lovable para arreglarla a mano."
+                  : "."}
+              </p>
+              {site.lovable_project_id && (
+                <a
+                  href={`https://lovable.dev/projects/${site.lovable_project_id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={buttonVariants({ variant: "outline", size: "sm" })}
+                >
+                  <ExternalLink className="h-4 w-4" /> Editar en Lovable
+                </a>
+              )}
+            </div>
           )}
 
           {site && site.live_url && (
@@ -811,20 +787,11 @@ export default function LeadDetail() {
                   )}
                   Rechazar
                 </Button>
-                <Button
-                  onClick={() => runQaAction("regenerate")}
-                  disabled={qaBusy !== null}
-                  variant="outline"
-                  size="sm"
-                >
-                  {qaBusy === "regenerate" ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <RotateCcw className="h-4 w-4" />
-                  )}
-                  Regenerar
-                </Button>
               </div>
+              <p className="text-xs text-muted-foreground">
+                ¿No te convence? Edítala en Lovable (botón «Editar en Lovable» arriba) y
+                vuelve a revisar; cuando esté lista, apruébala.
+              </p>
 
               {site.status === "approved" && (
                 <p className="text-sm text-muted-foreground">

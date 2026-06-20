@@ -1,0 +1,5 @@
+.vercel
+
+# Artefactos temporales de Vite al transpilar vite.config.ts
+vite.config.ts.timestamp-*.mjs
+dist
