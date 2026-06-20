@@ -58,8 +58,7 @@ SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN npx supabase functions deploy \
   send-email \
   track-event \
   ingest-leads \
-  run-scrape \
-  check-iframe
+  run-scrape
 
 # 4. Verificar
 echo ""

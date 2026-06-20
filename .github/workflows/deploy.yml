@@ -33,6 +33,5 @@ jobs:
             track-event \
             ingest-leads \
             run-scrape \
-            check-iframe \
             --project-ref khscikqchvjxyvoaruas \
             --use-api
