@@ -102,19 +102,23 @@ export function phone9(raw: Record<string, unknown>): string | null {
   return p.length >= 9 ? p.slice(-9) : null;
 }
 
-// ¿La página es del negocio? Prueba fuerte: aparece su teléfono. Si no hay teléfono, exige
-// que aparezcan ≥2 tokens DISTINTIVOS del nombre (no genéricos) para evitar falsos positivos.
-export function verifyOwnership(html: string, phone: string | null, toks: string[]): boolean {
+// ¿La página es del negocio?
+//  - Si el lead TIENE teléfono, la prueba ES el teléfono: tiene que aparecer en la página.
+//    (El "match por nombre" es CIRCULAR en dominios adivinados — el dominio se construye desde
+//    el nombre, así que cualquier página de ese dominio "contiene el nombre". Por eso, con un
+//    nombre genérico como "Taller mecánico 24 horas" caía en mecanico24horas.com de Bogotá.)
+//  - Si el lead NO tiene teléfono, solo aceptamos match por nombre cuando `allowNameOnly` (lo usa
+//    la búsqueda DDG, que es un hallazgo independiente; NUNCA el dominio adivinado).
+export function verifyOwnership(
+  html: string, phone: string | null, toks: string[], allowNameOnly = false,
+): boolean {
   if (!html) return false;
-  if (phone) {
-    const digits = html.replace(/\D/g, "");
-    if (digits.includes(phone)) return true;
-  }
+  if (phone) return html.replace(/\D/g, "").includes(phone);
+  if (!allowNameOnly) return false;
   const text = stripAccents(html.toLowerCase());
   const distinctive = toks.filter((t) => t.length >= 4 && !GENERIC.has(t));
   if (!distinctive.length) return false;
-  const hits = distinctive.filter((t) => text.includes(t)).length;
-  return hits >= Math.min(2, distinctive.length);
+  return distinctive.filter((t) => text.includes(t)).length >= Math.min(2, distinctive.length);
 }
 
 // ---------- helpers de red ----------
@@ -185,7 +189,9 @@ async function discoverWebsite(
   const phone = phone9(raw);
   const toks = nameTokens(name, city);
 
-  // 1) Adivinar dominios desde el nombre (rápido, alta precisión con verificación por teléfono).
+  // 1) Adivinar dominios desde el nombre. Solo se acepta si el TELÉFONO del lead aparece en la
+  //    página (sin allowNameOnly): el dominio se construye desde el nombre, así que verificar por
+  //    nombre sería circular. Si el lead no tiene teléfono, esta vía no puede confirmar nada.
   for (const url of candidateUrls(name, city)) {
     const html = await fetchText(url);
     if (html && verifyOwnership(html, phone, toks)) {
@@ -193,11 +199,13 @@ async function discoverWebsite(
     }
   }
 
-  // 2) Fallback: buscar en DuckDuckGo y verificar cada candidato igual.
+  // 2) Fallback: buscar en DuckDuckGo (hallazgo INDEPENDIENTE del nombre). Verifica por teléfono
+  //    si lo hay; si no, acepta match fuerte por nombre (allowNameOnly) porque el dominio no lo
+  //    elegimos nosotros.
   const q = `${name} ${city ?? ""}`.trim();
   for (const origin of await ddgDomains(q)) {
     const html = await fetchText(origin);
-    if (html && verifyOwnership(html, phone, toks)) {
+    if (html && verifyOwnership(html, phone, toks, true)) {
       return { origin, how: `búsqueda DDG (${new URL(origin).hostname})` };
     }
   }
@@ -216,8 +224,13 @@ function selfTest(): void {
   check(cu.includes("https://procars.es"), "candidateUrls debe incluir procars.es (sin genérico inicial)");
   check(phone9({ phoneUnformatted: "+34697445564" }) === "697445564", "phone9 saca los 9 finales");
   check(verifyOwnership("llama al 697 44 55 64 hoy", "697445564", []), "verifyOwnership pasa con el teléfono en la página");
-  check(!verifyOwnership("otra empresa cualquiera", "697445564", ["zzzz"]), "verifyOwnership falla sin teléfono ni nombre");
-  check(verifyOwnership("Bienvenido a Procars Reparaciones", null, ["procars", "reparaciones"]), "verifyOwnership pasa con 2 tokens distintivos");
+  check(!verifyOwnership("otra empresa cualquiera", "697445564", ["zzzz"]), "verifyOwnership falla si el teléfono NO está, aunque el lead tenga teléfono");
+  // Caso Bogotá: nombre genérico coincide pero el teléfono del lead NO está → debe rechazar.
+  check(!verifyOwnership("Mecánico 24 Horas Bogotá, servicio a domicilio", "691201837", ["mecanico", "horas"]), "verifyOwnership rechaza match por nombre cuando hay teléfono y no aparece");
+  // Dominio adivinado sin teléfono en el lead: no se puede confirmar por nombre (circular).
+  check(!verifyOwnership("Bienvenido a Procars Reparaciones", null, ["procars", "reparaciones"]), "verifyOwnership (domain-guess) NO acepta solo-nombre");
+  // DDG sin teléfono: sí acepta match fuerte por nombre (allowNameOnly).
+  check(verifyOwnership("Bienvenido a Procars Reparaciones", null, ["procars", "reparaciones"], true), "verifyOwnership (DDG) acepta 2 tokens distintivos cuando no hay teléfono");
   check(nameTokens("TALLERES PRO CARS VALENCIA", "Valencia").join(",") === "talleres,pro,cars", "nameTokens quita la ciudad");
   console.log(`\nself-test: ${ok} OK, ${fail} fallos`);
   process.exit(fail ? 1 : 0);
