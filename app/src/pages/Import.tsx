@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { Search, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { parseCsv } from "@/lib/csv";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,7 +79,7 @@ export default function Import() {
       if (error) throw error;
       setScrapeResult(data as ScrapeResult);
     } catch (e) {
-      setScrapeError(e instanceof Error ? e.message : "Error al buscar en Google.");
+      setScrapeError(await edgeFunctionErrorMessage(e, "Error al buscar en Google."));
     } finally {
       setScraping(false);
     }
@@ -143,7 +143,7 @@ export default function Import() {
       setResult(data as IngestResult);
     } catch (e) {
       setError(
-        (e instanceof Error ? e.message : "Error llamando a ingest-leads.") +
+        (await edgeFunctionErrorMessage(e, "Error llamando a ingest-leads.")) +
           " · Comprueba que la función ingest-leads está desplegada en tu Supabase.",
       );
     } finally {
@@ -261,6 +261,14 @@ export default function Import() {
                 Email visible
               </label>
             </div>
+
+            {scrapeRequireEmail && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {scrapeOnlyNoWeb
+                  ? '⚠️ «Solo sin web propia» + «Email visible» casi nunca devuelve nada: el email se saca de la web del negocio, así que sin web no hay email. Desmarca una de las dos.'
+                  : 'ℹ️ Con «Email visible» se visita la web de cada negocio para extraer el correo: tarda más. Si da timeout, baja el máximo (p. ej. 10).'}
+              </p>
+            )}
           </div>
           <Button onClick={handleScrape} disabled={scraping}>
             {scraping ? (

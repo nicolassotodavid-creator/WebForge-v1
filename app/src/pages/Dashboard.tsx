@@ -103,6 +103,27 @@ export default function Dashboard() {
     return c;
   }, [leads]);
 
+  // IDs del último lote scrapeado. Al insertar, todas las filas de un lote comparten
+  // created_at (un único upsert en ingest-leads), así que el lote más reciente = las
+  // creadas dentro de una ventana corta respecto a la más nueva (la ventana absorbe el
+  // posible desfase entre el upsert con place_id y el insert sin él). Es por LOTE, no por
+  // antigüedad: siempre se resalta el último, sea de hoy o de hace días.
+  const latestBatchIds = useMemo(() => {
+    const ids = new Set<string>();
+    let maxTs = 0;
+    for (const l of leads) {
+      const t = new Date(l.created_at).getTime();
+      if (Number.isFinite(t) && t > maxTs) maxTs = t;
+    }
+    if (maxTs === 0) return ids;
+    const WINDOW_MS = 2 * 60 * 1000;
+    for (const l of leads) {
+      const t = new Date(l.created_at).getTime();
+      if (Number.isFinite(t) && maxTs - t <= WINDOW_MS) ids.add(l.id);
+    }
+    return ids;
+  }, [leads]);
+
   const filtered = useMemo(() => {
     let result = leads.filter((l) => {
       if (statusFilter !== "all" && l.status !== statusFilter) return false;
@@ -312,7 +333,17 @@ export default function Dashboard() {
                     onClick={() => navigate(`/leads/${l.id}`)}
                   >
                     <TableCell>
-                      <div className="font-medium">{l.name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{l.name}</span>
+                        {latestBatchIds.has(l.id) && (
+                          <span
+                            title="Del último lote scrapeado"
+                            className="inline-flex items-center rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase leading-none tracking-wide text-emerald-600 dark:text-emerald-400"
+                          >
+                            Nuevo
+                          </span>
+                        )}
+                      </div>
                       <div className="text-xs text-muted-foreground">
                         {l.category ?? "—"}
                       </div>

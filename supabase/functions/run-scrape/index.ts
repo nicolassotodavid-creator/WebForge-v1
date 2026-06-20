@@ -53,6 +53,7 @@ Deno.serve(async (req: Request) => {
   let language = "es";
   let maxReviews = 5;
   let onlyWithoutWebsite = true;
+  let countryCode = "es"; // España por defecto: el producto es para negocios locales españoles.
   // Filtros de calidad post-scrape
   let minRating = 0;          // ej: 4.5 — excluye negocios con peor nota
   let categoryKeyword = "";   // ej: "mecánico" — filtra por categoryName de Google Maps
@@ -72,9 +73,15 @@ Deno.serve(async (req: Request) => {
     if (body?.categoryKeyword) categoryKeyword = String(body.categoryKeyword).trim().toLowerCase();
     if (body?.requirePhone !== undefined) requirePhone = Boolean(body.requirePhone);
     if (body?.requireEmail !== undefined) requireEmail = Boolean(body.requireEmail);
+    if (body?.countryCode) countryCode = String(body.countryCode).trim().toLowerCase();
   } catch (_e) {
     return jsonResponse({ error: "Cuerpo no válido." }, 400);
   }
+
+  // scrapeContacts (Email visible) visita la web de cada negocio para sacar el email:
+  // es ~3-5x más lento. Para no agotar el límite de ~150s de la Edge Function, bajamos
+  // el tope de resultados en esa ruta. Sin email, el tope normal (hasta 60) se mantiene.
+  if (requireEmail) max = Math.min(max, 10);
 
   // --- Llamada a Apify (síncrona) ---
   const apifyUrl =
@@ -86,7 +93,12 @@ Deno.serve(async (req: Request) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        searchStringsArray: [`${query} ${city}`],
+        // El término va separado de la ubicación: así Google Maps geolocaliza bien.
+        // Antes se concatenaba ("clinica dental valencia") y devolvía negocios de otros
+        // países (p. ej. Valencia, México). countryCode + city lo fijan a España.
+        searchStringsArray: [query],
+        countryCode,
+        city,
         maxCrawledPlacesPerSearch: max,
         language,
         maxReviews,
@@ -94,6 +106,10 @@ Deno.serve(async (req: Request) => {
         scrapeReviewsPersonalData: false,
         skipClosedPlaces: true,
         includeWebResults: false,
+        // El email NO viene en los datos de Google Maps: hay que visitar la web del
+        // negocio. scrapeContacts lo activa, pero es más lento y caro, así que solo lo
+        // encendemos cuando el operador pide "Email visible". Sin web propia → sin email.
+        scrapeContacts: requireEmail,
       }),
       // Edge Functions tienen un límite de 150s; Apify tiene timeout=120 por encima.
     });
