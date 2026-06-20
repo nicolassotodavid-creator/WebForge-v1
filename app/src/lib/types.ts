@@ -108,6 +108,14 @@ export type SiteStatus =
   | "rejected"
   | "delivered";
 
+// Resultado del scoring IA de la web (analyze-site / orquestador). Ver 0002_site_scoring.sql.
+export interface SiteAnalysis {
+  score: number;
+  summary: string;
+  strengths: string[];
+  improvements: { area: string; issue: string; fix: string }[];
+}
+
 export interface Site {
   id: string;
   lead_id: string;
@@ -120,6 +128,10 @@ export interface Site {
   created_at: string;
   built_at: string | null;
   approved_at: string | null;
+  // Scoring automático de la web (null hasta que se analiza).
+  score: number | null;
+  analysis: SiteAnalysis | null;
+  analyzed_at: string | null;
 }
 
 export const SITE_STATUS_LABELS: Record<SiteStatus, string> = {

@@ -3,6 +3,7 @@
 // Usa el brief + intenta traer el HTML de la página para dar feedback real.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { ANALYSIS_PROMPT } from "../_shared/prompts.ts";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -10,22 +11,6 @@ function jsonResponse(body: unknown, status = 200): Response {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 }
-
-const ANALYSIS_PROMPT = `Eres un experto en diseño web, copywriting y conversión para negocios locales.
-Te paso los datos de un negocio, su brief de marketing y el HTML de su landing page (si está disponible).
-Analiza la web y devuelve un JSON estricto con esta estructura:
-
-{
-  "score": <número 1-10 de calidad general>,
-  "summary": "<resumen ejecutivo en 2-3 frases>",
-  "strengths": ["<punto fuerte 1>", "<punto fuerte 2>", ...],
-  "improvements": [
-    { "area": "<área: Copy|CTA|Estructura|Social proof|SEO|Diseño>", "issue": "<problema concreto>", "fix": "<solución accionable>" },
-    ...
-  ]
-}
-
-Sé directo y específico. Máximo 3 fortalezas y 5 mejoras. Solo JSON, sin texto extra.`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -62,7 +47,7 @@ Deno.serve(async (req: Request) => {
   const [{ data: lead }, { data: brief }, { data: site }] = await Promise.all([
     supabase.from("leads").select("*").eq("id", leadId).maybeSingle(),
     supabase.from("briefs").select("*").eq("lead_id", leadId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("sites").select("live_url,status").eq("lead_id", leadId).not("live_url", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("sites").select("id,live_url,status").eq("lead_id", leadId).not("live_url", "is", null).order("created_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
   if (!lead) return jsonResponse({ error: "Lead no encontrado." }, 404);
@@ -136,6 +121,17 @@ Deno.serve(async (req: Request) => {
     analysis = JSON.parse(t.slice(start, end + 1));
   } catch (_e) {
     return jsonResponse({ error: "Claude no devolvió JSON válido.", raw: analysisText.slice(0, 300) }, 422);
+  }
+
+  // Persistir en `sites` para que el score sea visible en el panel sin re-analizar
+  // (best-effort: si falla la escritura, seguimos devolviendo el análisis al usuario).
+  if (site.id) {
+    const score = typeof analysis.score === "number" ? analysis.score : null;
+    const { error: persistErr } = await supabase
+      .from("sites")
+      .update({ score, analysis, analyzed_at: new Date().toISOString() })
+      .eq("id", site.id);
+    if (persistErr) console.error(`No se pudo guardar el análisis: ${persistErr.message}`);
   }
 
   return jsonResponse({ ok: true, analysis, live_url: site.live_url });

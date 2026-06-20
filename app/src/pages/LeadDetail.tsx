@@ -148,7 +148,10 @@ export default function LeadDetail() {
     if (leadErr) setError(leadErr.message);
     else setLead(leadData as Lead | null);
     setBrief((briefData as Brief | null) ?? null);
-    setSite((siteData as Site | null) ?? null);
+    const loadedSite = (siteData as Site | null) ?? null;
+    setSite(loadedSite);
+    // Hidratar el análisis guardado para mostrarlo sin tener que re-analizar.
+    setAnalysis(loadedSite?.analysis ?? null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setOutreachMsg((outreachData as any) ?? null);
     setLoading(false);
@@ -859,6 +862,11 @@ export default function LeadDetail() {
                       <span className="text-3xl font-bold">{analysis.score}<span className="text-lg text-muted-foreground">/10</span></span>
                       <p className="text-sm text-muted-foreground">{analysis.summary}</p>
                     </div>
+                    {site?.analyzed_at && (
+                      <p className="text-xs text-muted-foreground">
+                        Analizado el {new Date(site.analyzed_at).toLocaleString("es-ES")}
+                      </p>
+                    )}
 
                     {analysis.strengths?.length > 0 && (
                       <div className="space-y-1">

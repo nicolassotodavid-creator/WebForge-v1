@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-type SortKey = "name" | "city" | "rating" | "status" | "created_at";
+type SortKey = "name" | "city" | "rating" | "status" | "created_at" | "score";
 type SortDir = "asc" | "desc";
 
 /** Extrae la URL del sitio web actual del lead desde raw_json (campo del scraper). */
@@ -33,9 +33,17 @@ function getWebsiteUrl(raw: unknown): string | null {
   return typeof url === "string" && url.startsWith("http") ? url : null;
 }
 
+/** Color del badge de score: verde (buena), ámbar (revisar), rojo (floja). */
+function scoreClasses(score: number): string {
+  if (score >= 8) return "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
+  if (score >= 6) return "bg-amber-500/15 text-amber-600 dark:text-amber-400";
+  return "bg-red-500/15 text-red-600 dark:text-red-400";
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [scores, setScores] = useState<Record<string, number>>({}); // lead_id -> score de su web
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,16 +88,30 @@ export default function Dashboard() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase
-      .from("leads")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) {
-      setError(error.message);
+    const [leadsRes, sitesRes] = await Promise.all([
+      supabase.from("leads").select("*").order("created_at", { ascending: false }),
+      // Scores de las webs ya analizadas (orden desc → nos quedamos con el más reciente por lead).
+      supabase
+        .from("sites")
+        .select("lead_id, score, created_at")
+        .not("score", "is", null)
+        .order("created_at", { ascending: false }),
+    ]);
+    if (leadsRes.error) {
+      setError(leadsRes.error.message);
       setLeads([]);
     } else {
-      setLeads((data as Lead[]) ?? []);
+      setLeads((leadsRes.data as Lead[]) ?? []);
     }
+    // Si la migración 0002 aún no está aplicada, la query de scores falla: lo ignoramos
+    // (el dashboard sigue funcionando, solo no muestra scores).
+    const map: Record<string, number> = {};
+    if (!sitesRes.error) {
+      for (const row of (sitesRes.data as { lead_id: string; score: number | null }[] | null) ?? []) {
+        if (row.lead_id && row.score != null && !(row.lead_id in map)) map[row.lead_id] = row.score;
+      }
+    }
+    setScores(map);
     setLoading(false);
   }, []);
 
@@ -155,13 +177,14 @@ export default function Dashboard() {
       else if (sortKey === "rating") { va = a.rating ?? 0; vb = b.rating ?? 0; }
       else if (sortKey === "status") { va = a.status ?? ""; vb = b.status ?? ""; }
       else if (sortKey === "created_at") { va = a.created_at ?? ""; vb = b.created_at ?? ""; }
+      else if (sortKey === "score") { va = scores[a.id] ?? -1; vb = scores[b.id] ?? -1; }
       if (va < vb) return sortDir === "asc" ? -1 : 1;
       if (va > vb) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
 
     return result;
-  }, [leads, statusFilter, city, category, onlyNoWeb, search, sortKey, sortDir]);
+  }, [leads, scores, statusFilter, city, category, onlyNoWeb, search, sortKey, sortDir]);
 
   return (
     <div className="space-y-6">
@@ -312,6 +335,13 @@ export default function Dashboard() {
                   <TableHead>Web</TableHead>
                   <TableHead
                     className="cursor-pointer select-none"
+                    onClick={() => handleSort("score")}
+                    title="Score IA de la web construida (1-10)"
+                  >
+                    Score<SortIcon col="score" />
+                  </TableHead>
+                  <TableHead
+                    className="cursor-pointer select-none"
                     onClick={() => handleSort("status")}
                   >
                     Estado<SortIcon col="status" />
@@ -380,6 +410,21 @@ export default function Dashboard() {
                       )}
                     </TableCell>
                     <TableCell>
+                      {scores[l.id] != null ? (
+                        <span
+                          className={cn(
+                            "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold",
+                            scoreClasses(scores[l.id]),
+                          )}
+                          title="Score IA de la web (1-10)"
+                        >
+                          {scores[l.id]}/10
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <StatusBadge status={l.status} />
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
@@ -401,7 +446,7 @@ export default function Dashboard() {
                 {!loading && filtered.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={9}
                       className="py-10 text-center text-muted-foreground"
                     >
                       {leads.length === 0
@@ -414,7 +459,7 @@ export default function Dashboard() {
                 {loading && (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={9}
                       className="py-10 text-center text-muted-foreground"
                     >
                       Cargando…

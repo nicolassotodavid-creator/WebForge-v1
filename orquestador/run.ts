@@ -18,6 +18,7 @@ import { createClient } from "@supabase/supabase-js";
 import { BRIEF_PROMPT, BUILD_PROMPT } from "../supabase/functions/_shared/prompts.ts";
 import { fableJson, fableText, extractReviews, FABLE_MODEL } from "./fable.ts";
 import { lovableBuild } from "./lovable.ts";
+import { analyzeSite } from "./analyze.ts";
 import { sendFollowupEmail, getLiveUrl, supabase as supabaseFollowup } from "./followup-mailer.ts";
 
 const BATCH = Number(process.env.BATCH_SIZE ?? 5);
@@ -170,6 +171,21 @@ async function processBuild(lead: Lead): Promise<"ok" | "dry" | "failed"> {
       .update({ status: "site_built", updated_at: new Date().toISOString() })
       .eq("id", lead.id).in("status", ["build_queued"]);
     console.log(`  ✓ web publicada: ${liveUrl}`);
+
+    // Scoring automático de la web (Haiku, ~medio céntimo). Best-effort: si falla,
+    // la web ya está publicada — solo nos quedamos sin score, no revertimos nada.
+    try {
+      const analysis = await analyzeSite({ lead, brief, liveUrl });
+      await supabase.from("sites").update({
+        score: typeof analysis.score === "number" ? analysis.score : null,
+        analysis,
+        analyzed_at: new Date().toISOString(),
+      }).eq("id", site.id);
+      console.log(`  · scoring: ${analysis.score}/10 — ${analysis.summary?.slice(0, 80) ?? ""}`);
+    } catch (e) {
+      console.error(`  · scoring falló (no crítico): ${e instanceof Error ? e.message : e}`);
+    }
+
     return "ok";
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

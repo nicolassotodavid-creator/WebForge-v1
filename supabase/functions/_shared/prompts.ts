@@ -80,3 +80,23 @@ Según el canal:
     links). Menciona el sector o tipo de negocio concreto y por qué quieres conectar. Tono profesional
     pero humano. La live_url se comparte en el mensaje de seguimiento cuando acepten — NO la pongas aquí.
 `;
+
+// ANALYSIS: puntúa la web YA construida (no el negocio). Lo usan dos sitios con el MISMO prompt:
+//  - analyze-site (Edge Function, botón manual del panel)
+//  - el Orquestador (orquestador/analyze.ts), automático justo tras construir la web.
+// Devuelve JSON estricto. Modelo: Haiku 4.5 (barato, ~medio céntimo por web).
+export const ANALYSIS_PROMPT = `Eres un experto en diseño web, copywriting y conversión para negocios locales.
+Te paso los datos de un negocio, su brief de marketing y el HTML de su landing page (si está disponible).
+Analiza la web y devuelve un JSON estricto con esta estructura:
+
+{
+  "score": <número 1-10 de calidad general>,
+  "summary": "<resumen ejecutivo en 2-3 frases>",
+  "strengths": ["<punto fuerte 1>", "<punto fuerte 2>", ...],
+  "improvements": [
+    { "area": "<área: Copy|CTA|Estructura|Social proof|SEO|Diseño>", "issue": "<problema concreto>", "fix": "<solución accionable>" },
+    ...
+  ]
+}
+
+Sé directo y específico. Máximo 3 fortalezas y 5 mejoras. Solo JSON, sin texto extra.`;
