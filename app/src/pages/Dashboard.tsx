@@ -607,21 +607,41 @@ export default function Dashboard() {
                         "—"
                       )}
                     </TableCell>
-                    <TableCell>
-                      {l.has_website ? (
-                        <a
-                          href={getWebsiteUrl(l) ?? "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                          title="Ver web actual"
-                          onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center text-blue-500 hover:text-blue-700"
-                        >
-                          <Globe className="h-4 w-4" />
-                        </a>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">No</span>
-                      )}
+                    <TableCell className="max-w-[180px]">
+                      {(() => {
+                        const url = getWebsiteUrl(l);
+                        if (url) {
+                          let host = url;
+                          try {
+                            host = new URL(url).hostname.replace(/^www\./, "");
+                          } catch {
+                            /* URL rara: mostramos la cadena tal cual */
+                          }
+                          return (
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              title={url}
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex max-w-full items-center gap-1.5 text-xs text-blue-500 hover:text-blue-700"
+                            >
+                              <Globe className="h-3.5 w-3.5 shrink-0" />
+                              <span className="truncate">{host}</span>
+                            </a>
+                          );
+                        }
+                        return l.has_website ? (
+                          <span
+                            className="text-xs text-muted-foreground"
+                            title="Marcada con web, pero sin URL real detectada (solo RRSS/Maps)"
+                          >
+                            Sí
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">No</span>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       {l.site_score != null ? (
