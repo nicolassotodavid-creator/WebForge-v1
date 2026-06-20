@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox, Eye, EyeOff, MessageCircle, Facebook } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -47,6 +47,17 @@ function readSavedFilters(): SavedFilters {
   }
 }
 
+/** Abre el lead en pestaña nueva con un <a> real (a prueba de bloqueadores de popup). */
+function openLead(id: string) {
+  const a = document.createElement("a");
+  a.href = `/leads/${id}`;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 /** Web real del lead. Mismo criterio que el backend (_shared/website.ts): rechaza redes/mapas.
  *  Prioridad: website_url (descubierta por el Orquestador) > raw_json del scrape. */
 function isRealWeb(v: unknown): v is string {
@@ -85,6 +96,12 @@ export default function Dashboard() {
   const [sortKey, setSortKey] = useState<SortKey>(saved.sortKey ?? "created_at");
   const [sortDir, setSortDir] = useState<SortDir>(saved.sortDir ?? "desc");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Bandeja: selección en lote + fila enfocada por teclado.
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [focusIdx, setFocusIdx] = useState(-1);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   // Persistir la vista (búsqueda, filtros y orden) para que sobreviva al refresco.
   useEffect(() => {
@@ -127,10 +144,8 @@ export default function Dashboard() {
     setDeletingId(null);
   };
 
-  // Favorito: toggle optimista. Si Supabase falla (p.ej. migración 0008 sin aplicar), revierte.
-  const toggleFavorite = async (e: React.MouseEvent, lead: Lead) => {
-    e.stopPropagation();
-    const next = !lead.is_favorite;
+  // Favorito y visto: núcleo (optimista con revert) + wrapper para el click.
+  const setFavorite = async (lead: Lead, next: boolean) => {
     setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, is_favorite: next } : l)));
     const { error } = await supabase.from("leads").update({ is_favorite: next }).eq("id", lead.id);
     if (error) {
@@ -138,17 +153,65 @@ export default function Dashboard() {
       alert("No se pudo actualizar el favorito: " + error.message);
     }
   };
-
-  // Visto/no-visto manual: toggle optimista con revert.
-  const toggleSeen = async (e: React.MouseEvent, lead: Lead) => {
+  const toggleFavorite = (e: React.MouseEvent, lead: Lead) => {
     e.stopPropagation();
-    const next = lead.seen_at ? null : new Date().toISOString();
+    setFavorite(lead, !lead.is_favorite);
+  };
+
+  const setSeen = async (lead: Lead, seen: boolean) => {
+    const next = seen ? new Date().toISOString() : null;
     setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, seen_at: next } : l)));
     const { error } = await supabase.from("leads").update({ seen_at: next }).eq("id", lead.id);
     if (error) {
       setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, seen_at: lead.seen_at } : l)));
       alert("No se pudo actualizar 'visto': " + error.message);
     }
+  };
+  const toggleSeen = (e: React.MouseEvent, lead: Lead) => {
+    e.stopPropagation();
+    setSeen(lead, !lead.seen_at);
+  };
+
+  // ── Selección múltiple ──────────────────────────────────────────────────────
+  const toggleSelect = (id: string) =>
+    setSelected((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  const clearSelection = () => setSelected(new Set());
+
+  const bulkUpdate = async (patch: Partial<Lead>, label: string) => {
+    const ids = [...selected];
+    if (!ids.length) return;
+    setBulkBusy(true);
+    const snapshot = leads;
+    setLeads((prev) => prev.map((l) => (selected.has(l.id) ? { ...l, ...patch } : l)));
+    const { error } = await supabase.from("leads").update(patch).in("id", ids);
+    setBulkBusy(false);
+    if (error) {
+      setLeads(snapshot);
+      alert(`No se pudo ${label}: ` + error.message);
+    }
+  };
+  const bulkSeen = (seen: boolean) =>
+    bulkUpdate({ seen_at: seen ? new Date().toISOString() : null }, seen ? "marcar como visto" : "marcar como no visto");
+  const bulkFavorite = (fav: boolean) =>
+    bulkUpdate({ is_favorite: fav }, fav ? "marcar favorito" : "quitar favorito");
+  const bulkDelete = async () => {
+    const ids = [...selected];
+    if (!ids.length) return;
+    if (!confirm(`¿Eliminar ${ids.length} lead${ids.length > 1 ? "s" : ""}?`)) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from("leads").delete().in("id", ids);
+    setBulkBusy(false);
+    if (error) {
+      alert("Error al eliminar: " + error.message);
+      return;
+    }
+    setLeads((prev) => prev.filter((l) => !selected.has(l.id)));
+    clearSelection();
   };
 
   const load = useCallback(async () => {
@@ -259,6 +322,64 @@ export default function Dashboard() {
     return result;
   }, [leads, statusFilter, view, city, category, search, sortKey, sortDir]);
 
+  // Atajos de teclado estilo bandeja (se ignoran si escribes en un input).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      const typing =
+        !!t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
+      if (typing) {
+        if (e.key === "Escape") t!.blur();
+        return;
+      }
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (e.key === "/") { e.preventDefault(); searchRef.current?.focus(); return; }
+      if (e.key === "Escape") { setSelected(new Set()); setFocusIdx(-1); return; }
+
+      const n = filtered.length;
+      if (!n) return;
+      const lead = focusIdx >= 0 && focusIdx < n ? filtered[focusIdx] : null;
+
+      switch (e.key) {
+        case "j":
+        case "ArrowDown":
+          e.preventDefault();
+          setFocusIdx((i) => Math.min((i < 0 ? -1 : i) + 1, n - 1));
+          break;
+        case "k":
+        case "ArrowUp":
+          e.preventDefault();
+          setFocusIdx((i) => (i <= 0 ? 0 : i - 1));
+          break;
+        case "x":
+          if (lead) { e.preventDefault(); toggleSelect(lead.id); }
+          break;
+        case "f":
+          if (lead && flagsSupported) { e.preventDefault(); setFavorite(lead, !lead.is_favorite); }
+          break;
+        case "e":
+          if (lead && flagsSupported) { e.preventDefault(); setSeen(lead, !lead.seen_at); }
+          break;
+        case "Enter":
+        case "o":
+          if (lead) { e.preventDefault(); openLead(lead.id); }
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered, focusIdx, flagsSupported]);
+
+  // Mantener la fila enfocada visible.
+  useEffect(() => {
+    if (focusIdx < 0) return;
+    document
+      .querySelector(`[data-row-idx="${focusIdx}"]`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [focusIdx]);
+
   const chips: { key: ViewFilter; label: string; star?: boolean }[] = flagsSupported
     ? [
         { key: "all", label: "Todos" },
@@ -271,9 +392,18 @@ export default function Dashboard() {
         { key: "noweb", label: "Sin web" },
       ];
 
-  const colCount = flagsSupported ? 12 : 11;
+  const colCount = flagsSupported ? 13 : 12;
   const filtersActive =
     statusFilter !== "all" || city || category || view !== "all" || search;
+  const selectedCount = selected.size;
+  const allVisibleSelected = filtered.length > 0 && filtered.every((l) => selected.has(l.id));
+  const someVisibleSelected = filtered.some((l) => selected.has(l.id));
+  const toggleSelectAll = () =>
+    setSelected((prev) =>
+      filtered.length > 0 && filtered.every((l) => prev.has(l.id))
+        ? new Set<string>()
+        : new Set(filtered.map((l) => l.id)),
+    );
 
   return (
     <div className="space-y-6">
@@ -367,6 +497,7 @@ export default function Dashboard() {
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            ref={searchRef}
             placeholder="Buscar negocio, ciudad, teléfono…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -414,7 +545,50 @@ export default function Dashboard() {
             Limpiar filtros
           </Button>
         )}
+        <span className="ml-auto hidden text-xs text-muted-foreground lg:inline">
+          Atajos: <kbd className="font-sans">j/k</kbd> mover · <kbd className="font-sans">f</kbd> ★ ·{" "}
+          <kbd className="font-sans">e</kbd> visto · <kbd className="font-sans">x</kbd> sel ·{" "}
+          <kbd className="font-sans">↵</kbd> abrir · <kbd className="font-sans">/</kbd> buscar
+        </span>
       </div>
+
+      {/* Barra de acciones en lote */}
+      {selectedCount > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2">
+          <span className="text-sm font-medium tabular-nums">
+            {selectedCount} seleccionado{selectedCount > 1 ? "s" : ""}
+          </span>
+          <div className="mx-1 h-4 w-px bg-border" />
+          {flagsSupported && (
+            <>
+              <Button size="sm" variant="ghost" disabled={bulkBusy} onClick={() => bulkSeen(true)}>
+                <Eye className="h-4 w-4" /> Visto
+              </Button>
+              <Button size="sm" variant="ghost" disabled={bulkBusy} onClick={() => bulkSeen(false)}>
+                <EyeOff className="h-4 w-4" /> No visto
+              </Button>
+              <Button size="sm" variant="ghost" disabled={bulkBusy} onClick={() => bulkFavorite(true)}>
+                <Star className="h-4 w-4" /> Favorito
+              </Button>
+              <Button size="sm" variant="ghost" disabled={bulkBusy} onClick={() => bulkFavorite(false)}>
+                <Star className="h-4 w-4" /> Quitar ★
+              </Button>
+            </>
+          )}
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={bulkBusy}
+            onClick={bulkDelete}
+            className="text-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" /> Eliminar
+          </Button>
+          <Button size="sm" variant="ghost" className="ml-auto" onClick={clearSelection}>
+            Limpiar selección
+          </Button>
+        </div>
+      )}
 
       {/* Estados de error / carga / vacío */}
       {error && (
@@ -439,6 +613,18 @@ export default function Dashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-9 pr-0">
+                    <input
+                      type="checkbox"
+                      aria-label="Seleccionar todo"
+                      className="h-4 w-4 align-middle accent-primary"
+                      checked={allVisibleSelected}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someVisibleSelected && !allVisibleSelected;
+                      }}
+                      onChange={toggleSelectAll}
+                    />
+                  </TableHead>
                   {flagsSupported && <TableHead className="w-9" />}
                   <TableHead
                     className="cursor-pointer select-none"
@@ -485,24 +671,30 @@ export default function Dashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((l) => {
+                {filtered.map((l, idx) => {
                   const unseen = flagsSupported && !l.seen_at;
+                  const isSelected = selected.has(l.id);
+                  const focused = idx === focusIdx;
                   return (
                   <TableRow
                     key={l.id}
-                    className="group cursor-pointer"
-                    onClick={() => {
-                      // Click de enlace real: abre pestaña nueva en primer plano y
-                      // ningún bloqueador de popups lo frena (a diferencia de window.open).
-                      const a = document.createElement("a");
-                      a.href = `/leads/${l.id}`;
-                      a.target = "_blank";
-                      a.rel = "noopener noreferrer";
-                      document.body.appendChild(a);
-                      a.click();
-                      a.remove();
-                    }}
+                    data-row-idx={idx}
+                    onClick={() => openLead(l.id)}
+                    className={cn(
+                      "group cursor-pointer",
+                      isSelected && "bg-primary/5",
+                      focused && "bg-accent/60 ring-1 ring-inset ring-primary/40",
+                    )}
                   >
+                    <TableCell className="w-9 pr-0" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        aria-label={`Seleccionar ${l.name}`}
+                        className="h-4 w-4 align-middle accent-primary"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(l.id)}
+                      />
+                    </TableCell>
                     {flagsSupported && (
                       <TableCell className="w-9 pr-0">
                         <button
@@ -700,6 +892,9 @@ export default function Dashboard() {
                   leads.length === 0 &&
                   Array.from({ length: 6 }).map((_, i) => (
                     <TableRow key={`sk-${i}`} className="hover:bg-transparent">
+                      <TableCell className="w-9 pr-0">
+                        <div className="h-4 w-4 animate-pulse rounded bg-muted" />
+                      </TableCell>
                       <TableCell>
                         <div className="h-4 w-32 animate-pulse rounded bg-muted" />
                         <div className="mt-1.5 h-3 w-20 animate-pulse rounded bg-muted/60" />
