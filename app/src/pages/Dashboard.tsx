@@ -481,8 +481,15 @@ export default function Dashboard() {
                     key={l.id}
                     className="group cursor-pointer"
                     onClick={() => {
-                      const w = window.open(`/leads/${l.id}`, "_blank");
-                      if (w) w.opener = null;
+                      // Click de enlace real: abre pestaña nueva en primer plano y
+                      // ningún bloqueador de popups lo frena (a diferencia de window.open).
+                      const a = document.createElement("a");
+                      a.href = `/leads/${l.id}`;
+                      a.target = "_blank";
+                      a.rel = "noopener noreferrer";
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
                     }}
                   >
                     {flagsSupported && (
