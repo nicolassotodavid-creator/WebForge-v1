@@ -88,6 +88,22 @@ function deriveHasWebsite(o: RawLead): boolean {
   return true;
 }
 
+// Guard geográfico: el actor a veces devuelve negocios de otros países (p.ej. "Valencia
+// Automotive" en Nuevo México con la búsqueda vieja "talleres valencia"). Si el resultado trae
+// countryCode/country y NO es España, lo descartamos. Sin ese dato (CSV/manual) no filtramos,
+// para no perder importaciones legítimas.
+const NON_ES_NAME = /\b(usa|united states|estados unidos|mexico|méxico|france|francia|portugal|italia|italy|deutschland|germany|reino unido|united kingdom)\b/i;
+function inSpain(o: RawLead): boolean {
+  const cc = s(pick(o, ["countryCode", "country_code"]));
+  if (cc) {
+    const v = cc.trim().toUpperCase();
+    if (v !== "ES" && v !== "ESP" && v !== "ESPAÑA" && v !== "SPAIN") return false;
+  }
+  const country = s(pick(o, ["country"]));
+  if (country && NON_ES_NAME.test(country)) return false;
+  return true;
+}
+
 // Primer string que casa `rx` dentro de un valor anidado (string/array/objeto).
 function findMatch(v: unknown, rx: RegExp): string | null {
   if (typeof v === "string") {
@@ -308,8 +324,12 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Cuerpo no válido (JSON o CSV mal formado)." }, 400);
   }
 
+  // --- Filtro geográfico (descartar fuera de España) ---
+  const inEs = rawLeads.filter(inSpain);
+  const skippedOutsideEs = rawLeads.length - inEs.length;
+
   // --- Normalizar (descartar sin nombre) ---
-  const normalized = rawLeads
+  const normalized = inEs
     .map((o) => normalizeLead(o, defaultSource))
     .filter((l) => l.name);
 
@@ -347,7 +367,8 @@ Deno.serve(async (req: Request) => {
     normalized: normalized.length,
     inserted,
     upserted,
-    skipped_no_name: rawLeads.length - normalized.length,
+    skipped_no_name: inEs.length - normalized.length,
+    skipped_outside_es: skippedOutsideEs,
     errors,
   });
 });
