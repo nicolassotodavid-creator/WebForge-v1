@@ -1,13 +1,14 @@
-// Fable como cerebro del Orquestador: redacta el brief (JSON estricto) y el build-prompt (texto).
-// Llama a la Anthropic Messages API por fetch (mismo patrón probado en supabase/functions/analyze-lead),
-// con prompt caching en el system. NO usamos Fable para "conducir" Lovable: eso va por el MCP
+// Cerebro del Orquestador: redacta el brief (JSON estricto) y el build-prompt (texto).
+// Llama a la Anthropic Messages API por fetch (mismo patrón que supabase/functions/analyze-lead),
+// con prompt caching en el system. NO conduce Lovable: eso va por el MCP
 // (ver lovable.ts), donde la calidad la pone el build-prompt y las llamadas son deterministas.
 //
-// Modelo: claude-opus-4-8 por defecto (configurable con ORQUESTADOR_MODEL). Routing de coste: la
-// arquitectura usa Opus 4.8 donde su calidad manda (brief y, sobre todo, build-prompt).
+// Modelo: claude-sonnet-4-6 por defecto (build-prompt + briefs complejos).
+// Para extracciones a volumen se puede bajar a claude-haiku-4-5-20251001
+// sobreescribiendo ORQUESTADOR_MODEL en el .env.
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
-const FABLE_MODEL = process.env.ORQUESTADOR_MODEL ?? "claude-sonnet-4-6";
+const ORQUESTADOR_MODEL = process.env.ORQUESTADOR_MODEL ?? "claude-sonnet-4-6";
 
 interface AnthropicResponse {
   content?: { type?: string; text?: string }[];
@@ -39,12 +40,12 @@ export function extractJson<T = Record<string, unknown>>(text: string): T {
   t = t.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
   const start = t.indexOf("{");
   const end = t.lastIndexOf("}");
-  if (start === -1 || end === -1) throw new Error("respuesta de Fable sin JSON");
+  if (start === -1 || end === -1) throw new Error("respuesta de Claude sin JSON válido");
   return JSON.parse(t.slice(start, end + 1)) as T;
 }
 
-// Llamada base a Fable. Devuelve el texto del primer bloque de la respuesta.
-async function callFable(
+// Llamada base al orquestador. Devuelve el texto del primer bloque de la respuesta.
+async function callClaude(
   systemPrompt: string,
   input: unknown,
   maxTokens = 2000,
@@ -65,7 +66,7 @@ async function callFable(
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      model: FABLE_MODEL,
+      model: ORQUESTADOR_MODEL,
       max_tokens: maxTokens,
       system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
       messages: [
@@ -76,31 +77,31 @@ async function callFable(
 
   const data = (await res.json()) as AnthropicResponse;
   if (!res.ok) {
-    throw new Error(`Fable devolvió ${res.status}: ${data?.error?.message ?? "error"}`);
+    throw new Error(`Claude API devolvió ${res.status}: ${data?.error?.message ?? "error"}`);
   }
   const text = data.content?.find((c) => c.type === "text")?.text ?? data.content?.[0]?.text ?? "";
-  if (!text) throw new Error("Fable devolvió una respuesta vacía");
+  if (!text) throw new Error("Claude devolvió una respuesta vacía");
   return text;
 }
 
-// Fable → JSON estricto (brief, outreach). Parsea con try/catch implícito en extractJson.
+// Claude → JSON estricto (brief, outreach). Parsea con try/catch implícito en extractJson.
 export async function fableJson<T = Record<string, unknown>>(
   systemPrompt: string,
   input: unknown,
   maxTokens = 2000,
 ): Promise<T> {
-  const text = await callFable(systemPrompt, input, maxTokens);
+  const text = await callClaude(systemPrompt, input, maxTokens);
   return extractJson<T>(text);
 }
 
-// Fable → texto plano (el build-prompt para Lovable). Salida = texto, no JSON.
+// Claude → texto plano (el build-prompt para Lovable). Salida = texto, no JSON.
 export async function fableText(
   systemPrompt: string,
   input: unknown,
   maxTokens = 2000,
 ): Promise<string> {
-  const text = await callFable(systemPrompt, input, maxTokens);
+  const text = await callClaude(systemPrompt, input, maxTokens);
   return text.trim();
 }
 
-export { FABLE_MODEL };
+export { ORQUESTADOR_MODEL };
