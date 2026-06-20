@@ -258,17 +258,15 @@ export default function Import() {
                   onChange={(e) => setScrapeRequireEmail(e.target.checked)}
                   className="h-4 w-4"
                 />
-                Email visible
+                Solo con email
               </label>
             </div>
 
-            {scrapeRequireEmail && (
-              <p className="text-xs text-amber-600 dark:text-amber-400">
-                {scrapeOnlyNoWeb
-                  ? '⚠️ «Solo sin web propia» + «Email visible» casi nunca devuelve nada: el email se saca de la web del negocio, así que sin web no hay email. Desmarca una de las dos.'
-                  : 'ℹ️ Con «Email visible» se visita la web de cada negocio para extraer el correo: tarda más. Si da timeout, baja el máximo (p. ej. 10).'}
-              </p>
-            )}
+            <p className="text-xs text-muted-foreground">
+              ℹ️ El email se extrae automáticamente en cada búsqueda (se visita la web/redes de
+              cada negocio), por eso tarda algo más y el máximo se limita a 20. Marca «Solo con
+              email» si quieres descartar los negocios de los que no se haya podido sacar correo.
+            </p>
           </div>
           <Button onClick={handleScrape} disabled={scraping}>
             {scraping ? (

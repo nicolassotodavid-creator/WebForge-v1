@@ -36,12 +36,45 @@ function pick(o: RawLead, keys: string[]): unknown {
   return undefined;
 }
 
+// Descarta correos basura típicos del HTML (assets, ejemplos, trackers).
+const EMAIL_RX = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+function isJunkEmail(e: string): boolean {
+  const x = e.toLowerCase();
+  return (
+    /\.(png|jpe?g|gif|webp|svg|css|js)$/.test(x) ||
+    /(example|sentry|wixpress|\.wix|godaddy|placeholder|yourdomain|email@|user@|name@)/.test(x)
+  );
+}
+function pickEmail(v: unknown): string | null {
+  if (typeof v === "string") {
+    const m = v.match(EMAIL_RX);
+    if (m && !isJunkEmail(m[0])) return m[0].toLowerCase();
+    return null;
+  }
+  if (Array.isArray(v)) {
+    for (const item of v) {
+      const e = pickEmail(item);
+      if (e) return e;
+    }
+  } else if (v && typeof v === "object") {
+    for (const val of Object.values(v as Record<string, unknown>)) {
+      const e = pickEmail(val);
+      if (e) return e;
+    }
+  }
+  return null;
+}
+
 function firstEmail(o: RawLead): string | null {
   const direct = s(pick(o, ["email", "Email", "correo"]));
-  if (direct) return direct;
+  if (direct && !isJunkEmail(direct)) return direct.toLowerCase();
   const emails = o["emails"] ?? o["email_1"];
-  if (Array.isArray(emails) && emails.length) return s(emails[0]);
-  return null;
+  const fromList = pickEmail(emails);
+  if (fromList) return fromList;
+  // Apify (scrapeContacts) mete los contactos enriquecidos en `leadsEnrichment`.
+  // Buscamos cualquier email válido ahí dentro (solo ese campo: no tocamos reseñas
+  // ni webResults para no colar correos de terceros).
+  return pickEmail(o["leadsEnrichment"]);
 }
 
 function deriveHasWebsite(o: RawLead): boolean {

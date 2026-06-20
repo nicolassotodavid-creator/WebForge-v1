@@ -78,10 +78,14 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Cuerpo no válido." }, 400);
   }
 
-  // scrapeContacts (Email visible) visita la web de cada negocio para sacar el email:
-  // es ~3-5x más lento. Para no agotar el límite de ~150s de la Edge Function, bajamos
-  // el tope de resultados en esa ruta. Sin email, el tope normal (hasta 60) se mantiene.
-  if (requireEmail) max = Math.min(max, 10);
+  // El email es la pieza accionable del canal "local" (CLAUDE.md), así que SIEMPRE
+  // enriquecemos contactos: Apify visita la web/redes de cada negocio y trae el email
+  // cuando existe (campo `emails` / `leadsEnrichment`). `requireEmail` ya NO controla esto;
+  // pasa a ser solo un filtro opcional ("quédate solo con los que tienen email").
+  // scrapeContacts es ~3-5x más lento, así que bajamos el tope de resultados para no
+  // agotar el límite de ~150s de la Edge Function.
+  const scrapeContacts = true;
+  max = Math.min(max, 20);
 
   // --- Llamada a Apify (síncrona) ---
   const apifyUrl =
@@ -106,10 +110,10 @@ Deno.serve(async (req: Request) => {
         scrapeReviewsPersonalData: false,
         skipClosedPlaces: true,
         includeWebResults: false,
-        // El email NO viene en los datos de Google Maps: hay que visitar la web del
-        // negocio. scrapeContacts lo activa, pero es más lento y caro, así que solo lo
-        // encendemos cuando el operador pide "Email visible". Sin web propia → sin email.
-        scrapeContacts: requireEmail,
+        // El email NO viene en los datos de Google Maps: hay que visitar la web/redes del
+        // negocio. scrapeContacts lo activa para CADA resultado, tenga o no web propia
+        // (Apify también rastrea las redes enlazadas). Siempre encendido: ver nota arriba.
+        scrapeContacts,
       }),
       // Edge Functions tienen un límite de 150s; Apify tiene timeout=120 por encima.
     });
