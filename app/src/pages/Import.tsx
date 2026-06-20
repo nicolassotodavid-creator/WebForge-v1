@@ -33,6 +33,7 @@ interface ScrapeResult {
   partial?: boolean;
   run_status?: string;
   errors?: string[];
+  notes?: string[];
 }
 
 /**
@@ -109,7 +110,9 @@ export default function Import() {
           categoryKeyword: scrapeCategoryKeyword.trim() || undefined,
           minRating: scrapeMinRating > 0 ? scrapeMinRating : undefined,
           requirePhone: scrapeRequirePhone || undefined,
-          requireEmail: scrapeRequireEmail || undefined,
+          // En modo "Solo sin web" no se extraen correos en caliente, así que «Solo con email»
+          // no aplica: lo dejamos fuera (el backend también lo ignora por seguridad).
+          requireEmail: (!scrapeOnlyNoWeb && scrapeRequireEmail) || undefined,
         },
       });
       if (error) throw error;
@@ -287,10 +290,14 @@ export default function Import() {
                 />
                 Teléfono visible
               </label>
-              <label className="flex items-center gap-2 text-sm">
+              <label
+                className={`flex items-center gap-2 text-sm ${scrapeOnlyNoWeb ? "opacity-40" : ""}`}
+                title={scrapeOnlyNoWeb ? "No aplica con «Solo sin web»: el email lo rellena el backfill después." : undefined}
+              >
                 <input
                   type="checkbox"
-                  checked={scrapeRequireEmail}
+                  checked={!scrapeOnlyNoWeb && scrapeRequireEmail}
+                  disabled={scrapeOnlyNoWeb}
                   onChange={(e) => setScrapeRequireEmail(e.target.checked)}
                   className="h-4 w-4"
                 />
@@ -298,11 +305,20 @@ export default function Import() {
               </label>
             </div>
 
-            <p className="text-xs text-muted-foreground">
-              ℹ️ El email se extrae automáticamente en cada búsqueda (se visita la web/redes de
-              cada negocio), por eso tarda algo más y el máximo efectivo se limita a 12. Marca «Solo
-              con email» si quieres descartar los negocios de los que no se haya podido sacar correo.
-            </p>
+            {scrapeOnlyNoWeb ? (
+              <p className="text-xs text-muted-foreground">
+                🔍 En «Solo sin web» el scrape va a por <strong>profundidad</strong> (hasta 40) y es
+                rápido: Google ordena por prominencia, así que los negocios sin web caen abajo y hay
+                que barrer hondo para llegar a ellos. El email no se extrae aquí (por eso «Solo con
+                email» no aplica) — lo rellena el Orquestador después descubriendo su web/redes.
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                ℹ️ Sin «Solo sin web», el email se extrae en cada búsqueda (se visita la web/redes de
+                cada negocio): tarda más y el máximo efectivo baja a 12. Marca «Solo con email» para
+                descartar los negocios de los que no se haya podido sacar correo.
+              </p>
+            )}
           </div>
           <Button onClick={handleScrape} disabled={scraping}>
             {scraping ? (
@@ -357,6 +373,9 @@ export default function Import() {
                   Apify cortó por tiempo, así que esto es lo que dio tiempo a traer. Repite la
                   búsqueda o baja el máximo de resultados para completar.
                 </p>
+              )}
+              {scrapeResult.notes && scrapeResult.notes.length > 0 && (
+                <p className="text-sm text-muted-foreground">ℹ️ {scrapeResult.notes.join(" · ")}</p>
               )}
               {scrapeResult.errors && scrapeResult.errors.length > 0 && (
                 <p className="text-sm text-destructive">Avisos: {scrapeResult.errors.join(" · ")}</p>

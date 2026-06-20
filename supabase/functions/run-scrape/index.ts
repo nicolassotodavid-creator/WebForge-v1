@@ -78,17 +78,33 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Cuerpo no válido." }, 400);
   }
 
-  // El email es la pieza accionable del canal "local" (CLAUDE.md), así que SIEMPRE
-  // enriquecemos contactos: con scrapeContacts el actor crawlea la `website` de la ficha y, si
-  // tiene email visible, lo devuelve en el array `emails` (lo lee ingest-leads). NO siempre lo
-  // encuentra: si en Maps figura su Instagram en vez de su web, no saca nada — ese hueco lo
-  // cubre el Orquestador (backfill-emails.ts) descubriendo la web real. `requireEmail` ya NO
-  // controla esto; pasa a ser solo un filtro opcional ("quédate solo con los que tienen email").
-  // scrapeContacts es ~3-5x más lento, así que bajamos el tope de resultados para que el
-  // run quepa en RUN_TIMEOUT (~100s) y casi nunca se corte. Aun si se corta, el rescate de
-  // parciales (ver abajo) conserva lo scrapeado; este tope solo reduce la frecuencia.
-  const scrapeContacts = true;
-  max = Math.min(max, 12);
+  // scrapeContacts hace que el actor visite la web/redes de CADA ficha para sacar el email.
+  // Es lo que ralentiza el run (3-5x) y provoca los TIMED-OUT que recortan la profundidad.
+  //
+  // La clave: si buscas "Solo sin web", el email NO es la prioridad. Esos negocios (los
+  // prospectos reales del producto) son pequeños y caen ABAJO en Maps, que ordena por
+  // prominencia; lo que necesitas es PROFUNDIDAD (max alto) para llegar a ellos antes de que
+  // el run se corte. Y para saber si un negocio TIENE web NO hace falta scrapeContacts: el
+  // campo `website` viene en la ficha de Maps igual. Así que en este modo lo apagamos: el run
+  // es rápido, cabe un tope mayor sin timeout, y el email de esos leads lo rellena después el
+  // Orquestador (backfill-emails.ts) descubriendo su web/redes reales. No se pierde nada.
+  //
+  // Si NO filtras por "sin web" (quieres cualquier negocio), ahí sí lo encendemos: el email es
+  // la pieza accionable del canal local (CLAUDE.md) y compensa ir más lento, con tope 12.
+  const scrapeContacts = !onlyWithoutWebsite;
+  max = Math.min(max, scrapeContacts ? 12 : 40);
+
+  // requireEmail filtra por email YA scrapeado. En modo "sin web" no scrapeamos contactos, así
+  // que no habría emails y el filtro dejaría el pipeline en 0 (justo el autosabotaje que
+  // queremos evitar). Lo ignoramos y avisamos: el correo llega luego por backfill, el lead no
+  // se descarta por no tenerlo todavía.
+  const notes: string[] = [];
+  if (requireEmail && !scrapeContacts) {
+    requireEmail = false;
+    notes.push(
+      "«Solo con email» se ignoró: en modo «Solo sin web» el scrape va a por profundidad y no extrae correos en caliente (los rellena el backfill del Orquestador después).",
+    );
+  }
 
   // --- Llamada a Apify (asíncrona, con rescate de parciales) ---
   // Antes usábamos run-sync-get-dataset-items con timeout=120: si el run se pasaba de
@@ -241,6 +257,7 @@ Deno.serve(async (req: Request) => {
       partial,
       run_status: runStatus,
       errors: warn,
+      notes,
     });
   }
 
@@ -303,5 +320,6 @@ Deno.serve(async (req: Request) => {
     partial,
     run_status: runStatus,
     errors: ingestResult.errors ?? [],
+    notes,
   });
 });
