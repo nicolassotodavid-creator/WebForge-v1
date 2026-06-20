@@ -36,34 +36,37 @@ interface ScrapeResult {
 }
 
 /**
- * Traduce el embudo del scrape (encontrados → sin web → tras filtros → insertados) a una
- * frase clara. Resuelve la confusión de "dijo que encontró N pero no aparece ninguno":
- * casi siempre es un filtro que se los come, no un fallo. Devuelve null si todo fue bien
- * (entraron negocios nuevos).
+ * Resumen en una frase de QUÉ hizo el scrape, que sale SIEMPRE (no solo cuando falla).
+ * Traduce el embudo encontrados → sin web → tras filtros → nuevos a lenguaje claro, para
+ * que nunca te quedes con "encontró N" sin saber por qué no aparece nadie en el pipeline.
+ * tone: "ok" = entraron negocios nuevos (verde) · "warn" = 0 nuevos, con el motivo (ámbar).
  */
-function scrapeNotice(r: ScrapeResult): string | null {
+function scrapeSummary(r: ScrapeResult): { tone: "ok" | "warn"; text: string } {
   const found = r.found ?? 0;
   const sinWeb = r.without_website ?? 0;
   const trasFiltros = r.after_filters ?? sinWeb;
   const nuevos = r.inserted ?? 0;
   const actualizados = r.upserted ?? 0;
+  const plural = (n: number) => (n === 1 ? "" : "s");
 
   if (found === 0) {
-    return "Google no devolvió ningún negocio para esa búsqueda. Prueba otro término o ciudad.";
+    return { tone: "warn", text: "Google no devolvió ningún negocio. Prueba otro término o ciudad, o sube el máximo de resultados." };
   }
-  if (trasFiltros === 0) {
-    if (sinWeb === 0) {
-      return `Se encontraron ${found} negocios, pero todos tienen web → con «Solo sin web» activado no pasa ninguno al pipeline. Las webs salen en los más prominentes: sube el máximo de resultados (los pequeños sin web caen más abajo) o desactiva el filtro.`;
-    }
-    return `Se encontraron ${found} negocios y ${sinWeb} sin web, pero los filtros de calidad (categoría / rating / teléfono / email) descartaron el resto. Afloja esos filtros.`;
+  if (nuevos > 0) {
+    const extra = actualizados > 0 ? ` (+${actualizados} que ya existían, actualizados)` : "";
+    return { tone: "ok", text: `${nuevos} negocio${plural(nuevos)} nuevo${plural(nuevos)} en el pipeline${extra}. De ${found} encontrado${plural(found)}, ${sinWeb} sin web.` };
   }
-  if (nuevos === 0 && actualizados > 0) {
-    return `Los ${actualizados} negocios que pasaron el filtro ya estaban en el pipeline: se actualizaron, no son nuevos. No verás filas nuevas, pero están ahí.`;
+  // A partir de aquí: 0 nuevos. Hay que decir el motivo.
+  if (actualizados > 0) {
+    return { tone: "warn", text: `Ningún negocio NUEVO: los ${actualizados} que pasaron ya estaban en el pipeline (se actualizaron). De ${found} encontrado${plural(found)}, ${sinWeb} sin web.` };
   }
-  if (nuevos === 0 && actualizados === 0) {
-    return `Pasaron ${trasFiltros} el filtro pero no se insertó ninguno. Revisa los avisos de abajo.`;
+  if (trasFiltros === 0 && sinWeb === 0) {
+    return { tone: "warn", text: `0 al pipeline. Los ${found} encontrado${plural(found)} tienen web y «Solo sin web» los descartó todos. Las webs salen en los negocios más prominentes: sube el máximo (los pequeños sin web caen más abajo) o desactiva «Solo sin web».` };
   }
-  return null;
+  if (trasFiltros === 0 && sinWeb > 0) {
+    return { tone: "warn", text: `0 al pipeline. ${sinWeb} sin web, pero los filtros de calidad (categoría / rating / teléfono / email) descartaron el resto. Afloja esos filtros.` };
+  }
+  return { tone: "warn", text: `0 insertados de ${trasFiltros} que pasaron el filtro. Revisa los avisos de abajo.` };
 }
 
 export default function Import() {
@@ -313,6 +316,19 @@ export default function Import() {
           )}
           {scrapeResult && (
             <div className="rounded-md border p-4 space-y-3">
+              {(() => {
+                const sm = scrapeSummary(scrapeResult);
+                const cls =
+                  sm.tone === "ok"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-400"
+                    : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-400";
+                return (
+                  <p className={`rounded-md border p-2.5 text-sm font-medium ${cls}`}>
+                    {sm.tone === "ok" ? "✅ " : "⚠️ "}
+                    {sm.text}
+                  </p>
+                );
+              })()}
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-5 text-center">
                 <div className="rounded-md bg-muted p-2">
                   <div className="text-2xl font-bold">{scrapeResult.found ?? 0}</div>
@@ -335,11 +351,6 @@ export default function Import() {
                   <div className="text-xs text-muted-foreground">Con email</div>
                 </div>
               </div>
-              {scrapeNotice(scrapeResult) && (
-                <p className="rounded-md border border-amber-200 bg-amber-50 p-2.5 text-sm text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-400">
-                  ⚠️ {scrapeNotice(scrapeResult)}
-                </p>
-              )}
               {scrapeResult.partial && (
                 <p className="text-sm text-amber-600 dark:text-amber-500">
                   ⚠️ Resultados parciales: el scrape no terminó ({scrapeResult.run_status ?? "TIMED-OUT"}).
