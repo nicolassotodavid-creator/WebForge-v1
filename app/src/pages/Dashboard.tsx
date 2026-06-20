@@ -480,7 +480,10 @@ export default function Dashboard() {
                   <TableRow
                     key={l.id}
                     className="group cursor-pointer"
-                    onClick={() => window.open(`/leads/${l.id}`, "_blank", "noopener")}
+                    onClick={() => {
+                      const w = window.open(`/leads/${l.id}`, "_blank");
+                      if (w) w.opener = null;
+                    }}
                   >
                     {flagsSupported && (
                       <TableCell className="w-9 pr-0">
