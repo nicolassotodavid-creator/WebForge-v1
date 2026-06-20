@@ -1,18 +1,18 @@
 import { Badge } from "@/components/ui/badge";
 import { STATUS_LABELS, type LeadStatus } from "@/lib/types";
 
-type Variant = "default" | "secondary" | "destructive" | "outline";
+type Variant = "default" | "secondary" | "destructive" | "outline" | "success";
 
 const VARIANT: Record<LeadStatus, Variant> = {
   new: "secondary",
-  analyzed: "secondary",
+  analyzed: "default",
   build_queued: "outline",
   site_built: "default",
-  approved: "default",
+  approved: "success",
   contacted: "default",
   viewed: "default",
-  booked: "default",
-  won: "default",
+  booked: "success",
+  won: "success",
   rejected: "destructive",
   lost: "destructive",
   nurture: "outline",

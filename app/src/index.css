@@ -2,50 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ────────────────────────────────────────────────────────────────────────────
+   WebForge · sistema de diseño "Linear/Raycast"
+   - Dark-first (el panel arranca en oscuro; el tema claro queda pulido también).
+   - Color en OKLCH, anclado a un índigo eléctrico (hue 274–277) como acento.
+   - El tema se aplica con la clase .dark en <html> (ver script inline en index.html).
+   ──────────────────────────────────────────────────────────────────────────── */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    --primary: 0 0% 12%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 12%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 94%;
-    --accent-foreground: 0 0% 12%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89%;
-    --input: 0 0% 89%;
-    --ring: 0 0% 12%;
-    --radius: 0.5rem;
+    /* Tema claro (Stripe/Notion-limpio): fondo casi blanco con un punto frío. */
+    --background: 0.99 0.003 277;
+    --foreground: 0.21 0.022 277;
+
+    --card: 1 0 0;
+    --card-foreground: 0.21 0.022 277;
+
+    --popover: 1 0 0;
+    --popover-foreground: 0.21 0.022 277;
+
+    --primary: 0.55 0.195 274;
+    --primary-foreground: 0.99 0.004 274;
+
+    --secondary: 0.971 0.006 277;
+    --secondary-foreground: 0.27 0.02 277;
+
+    --muted: 0.968 0.006 277;
+    --muted-foreground: 0.498 0.02 277;
+
+    --accent: 0.962 0.009 277;
+    --accent-foreground: 0.27 0.02 277;
+
+    --destructive: 0.585 0.21 25;
+    --destructive-foreground: 0.99 0.004 25;
+
+    --success: 0.62 0.16 150;
+    --warning: 0.74 0.15 75;
+
+    --border: 0.922 0.006 277;
+    --input: 0.905 0.008 277;
+    --ring: 0.55 0.195 274;
+
+    --radius: 0.625rem;
+
+    /* Halo de acento para fondos ambientales (login, headers). */
+    --glow: 0.62 0.2 277;
   }
 
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 0 0% 95%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 0 0% 18%;
-    --accent-foreground: 0 0% 95%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 95%;
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 0 0% 70%;
+    /* Tema oscuro (hero): casi-negro con tinte violeta muy leve. */
+    --background: 0.166 0.007 277;
+    --foreground: 0.968 0.004 277;
+
+    --card: 0.205 0.009 277;
+    --card-foreground: 0.968 0.004 277;
+
+    --popover: 0.205 0.009 277;
+    --popover-foreground: 0.968 0.004 277;
+
+    --primary: 0.645 0.18 274;
+    --primary-foreground: 0.99 0.006 274;
+
+    --secondary: 0.245 0.01 277;
+    --secondary-foreground: 0.968 0.004 277;
+
+    --muted: 0.245 0.01 277;
+    --muted-foreground: 0.712 0.014 277;
+
+    --accent: 0.275 0.012 277;
+    --accent-foreground: 0.98 0.004 277;
+
+    --destructive: 0.62 0.2 23;
+    --destructive-foreground: 0.99 0.006 23;
+
+    --success: 0.72 0.16 152;
+    --warning: 0.82 0.15 80;
+
+    --border: 0.278 0.011 277;
+    --input: 0.305 0.012 277;
+    --ring: 0.645 0.18 274;
+
+    --glow: 0.645 0.2 277;
   }
 }
 
@@ -53,8 +90,64 @@
   * {
     @apply border-border;
   }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1, "cv05" 1;
+  }
+
+  /* Titulares afilados: tracking negativo controlado (suelo -0.04em de la skill). */
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: oklch(var(--glow) / 0.32);
+    color: oklch(var(--foreground));
+  }
+
+  /* Scroll del tema oscuro: discreto, no reinventado (solo color, ancho nativo fino). */
+  .dark * {
+    scrollbar-color: oklch(var(--border)) transparent;
+  }
+}
+
+/* Materiales premium reutilizables ─────────────────────────────────────────── */
+@layer components {
+  /* Borde "hairline" luminoso: 1px que capta luz arriba (estilo Linear). */
+  .hairline {
+    box-shadow:
+      inset 0 1px 0 0 oklch(1 0 0 / 0.06),
+      inset 0 0 0 1px oklch(1 0 0 / 0.02);
+  }
+
+  /* Superficie ambiental con halo radial del acento (login / hero del panel). */
+  .ambient {
+    background:
+      radial-gradient(60rem 40rem at 50% -10%, oklch(var(--glow) / 0.18), transparent 60%),
+      radial-gradient(40rem 30rem at 85% 110%, oklch(var(--glow) / 0.10), transparent 55%),
+      oklch(var(--background));
+  }
+}
+
+/* Motion reducido: no negociable. Crossfade/instantáneo en lugar de coreografía. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

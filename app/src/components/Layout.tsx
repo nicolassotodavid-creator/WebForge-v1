@@ -15,8 +15,8 @@ const navItems = [
 function useDarkMode() {
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem("theme");
-    if (saved) return saved === "dark";
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    // Dark-first: si el operador no ha elegido, arrancamos en oscuro.
+    return saved ? saved === "dark" : true;
   });
 
   useEffect(() => {
@@ -38,12 +38,19 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="border-b bg-background">
+    <div className="relative min-h-screen bg-background">
+      {/* Glow ambiental fijo en la parte superior — profundidad sin ruido. */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(48rem_18rem_at_50%_-5rem,oklch(var(--glow)/0.12),transparent)]"
+      />
+
+      <header className="sticky top-0 z-sticky border-b border-border/70 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
-          <div className="flex items-center gap-2 font-semibold">
-            <span className="grid h-7 w-7 place-items-center rounded-md bg-primary text-primary-foreground text-xs">
+          <div className="flex items-center gap-2.5 font-semibold tracking-tight">
+            <span className="relative grid h-7 w-7 place-items-center rounded-lg bg-primary text-[0.7rem] font-bold text-primary-foreground shadow-glow-sm">
               WF
+              <span className="absolute inset-0 rounded-lg ring-1 ring-inset ring-white/15" />
             </span>
             WebForge
           </div>
@@ -55,8 +62,10 @@ export default function Layout() {
                 end={item.end}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-                    isActive && "bg-accent text-foreground",
+                    "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
                   )
                 }
               >
@@ -65,7 +74,7 @@ export default function Layout() {
               </NavLink>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2">
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {session?.user?.email}
             </span>
