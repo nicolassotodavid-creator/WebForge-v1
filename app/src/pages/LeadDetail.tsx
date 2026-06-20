@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft,
+  Star,
   Sparkles,
   Loader2,
   Check,
@@ -13,8 +14,11 @@ import {
   Mail,
   Copy,
   Send,
+  MessageCircle,
+  Facebook,
 } from "lucide-react";
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
+import { waLink } from "@/lib/contact";
 import type { Brief, Lead, Site } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -160,6 +164,33 @@ export default function LeadDetail() {
   useEffect(() => {
     loadAll();
   }, [loadAll]);
+
+  // Auto-marcar "visto" al abrir el lead (como un email). Fire-and-forget; si la columna
+  // seen_at no existe aún (migración 0008 sin aplicar) o falla, no rompe nada.
+  useEffect(() => {
+    if (lead && "seen_at" in lead && !lead.seen_at) {
+      void supabase
+        .from("leads")
+        .update({ seen_at: new Date().toISOString() })
+        .eq("id", lead.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lead?.id, lead?.seen_at]);
+
+  // Favorito: toggle optimista desde el detalle (coherente con el Dashboard).
+  async function toggleFavorite() {
+    if (!lead) return;
+    const next = !lead.is_favorite;
+    setLead({ ...lead, is_favorite: next });
+    const { error } = await supabase
+      .from("leads")
+      .update({ is_favorite: next })
+      .eq("id", lead.id);
+    if (error) {
+      setLead({ ...lead, is_favorite: !next });
+      alert("No se pudo actualizar el favorito: " + error.message);
+    }
+  }
 
   // Polling automático mientras el build está en curso (cada 8 s).
   // Se activa cuando el lead está en build_queued o cuando la web existe
@@ -345,15 +376,20 @@ export default function LeadDetail() {
 
   const reviews = getReviews(lead.raw_json);
 
-  // Extraer website URL del raw_json de Apify (campo website / url / web / site / domain)
+  // Web real del negocio. Mismo criterio que el backend (_shared/website.ts): rechaza
+  // redes/mapas. Prioridad: website_url (descubierta por el Orquestador) > raw_json del scrape.
+  function isRealWeb(v: unknown): v is string {
+    if (typeof v !== "string" || !/^https?:\/\//i.test(v.trim())) return false;
+    return !/google\.|maps\.|facebook\.|fb\.me|instagram\.|twitter\.|x\.com|linkedin\.|wa\.me|whatsapp|youtube\.|youtu\.be|tiktok\.|t\.me|pinterest\./i.test(v);
+  }
   function getWebsiteUrl(raw: unknown): string | null {
+    const wu = lead?.website_url;
+    if (isRealWeb(wu)) return wu.trim();
     if (!raw || typeof raw !== "object") return null;
     const o = raw as Record<string, unknown>;
-    for (const key of ["website", "url", "web", "site", "domain"]) {
+    for (const key of ["website", "websiteUrl", "url", "web", "site", "domain"]) {
       const v = o[key];
-      if (typeof v === "string" && v.trim() && /^https?:\/\//i.test(v.trim())) {
-        if (!/google\.|maps\.|facebook\.|instagram\./i.test(v)) return v.trim();
-      }
+      if (isRealWeb(v)) return v.trim();
     }
     return null;
   }
@@ -370,7 +406,20 @@ export default function LeadDetail() {
           <h1 className="text-2xl font-semibold tracking-tight">{lead.name}</h1>
           <p className="text-muted-foreground">{lead.category ?? "—"}</p>
         </div>
-        <StatusBadge status={lead.status} />
+        <div className="flex items-center gap-3">
+          {"is_favorite" in lead && (
+            <button
+              onClick={toggleFavorite}
+              title={lead.is_favorite ? "Quitar de favoritos" : "Marcar favorito"}
+              className="rounded-md p-1.5 text-muted-foreground transition-colors hover:text-amber-500"
+            >
+              <Star
+                className={`h-5 w-5 ${lead.is_favorite ? "fill-amber-400 text-amber-400" : ""}`}
+              />
+            </button>
+          )}
+          <StatusBadge status={lead.status} />
+        </div>
       </div>
 
       <Card>
@@ -406,7 +455,42 @@ export default function LeadDetail() {
             );
           })()}
           <Field label="Teléfono" value={lead.phone} />
-          <Field label="WhatsApp" value={lead.whatsapp} />
+          <div>
+            <div className="text-xs text-muted-foreground">WhatsApp</div>
+            {(() => {
+              const wa = waLink(lead);
+              return wa ? (
+                <a
+                  href={wa}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-0.5 inline-flex items-center gap-1 text-sm text-green-600 hover:underline"
+                  title={lead.whatsapp ? "WhatsApp" : "Móvil con WhatsApp probable"}
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  {wa.replace("https://wa.me/", "")}
+                </a>
+              ) : (
+                <div className="text-sm">—</div>
+              );
+            })()}
+          </div>
+          <div>
+            <div className="text-xs text-muted-foreground">Facebook</div>
+            {lead.facebook ? (
+              <a
+                href={lead.facebook}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-0.5 inline-flex items-center gap-1 text-sm text-blue-600 hover:underline break-all"
+              >
+                <Facebook className="h-3.5 w-3.5 shrink-0" />
+                Ver página
+              </a>
+            ) : (
+              <div className="text-sm">—</div>
+            )}
+          </div>
           <div>
             <div className="text-xs text-muted-foreground">Email</div>
             {editingEmail ? (

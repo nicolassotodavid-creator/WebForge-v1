@@ -24,6 +24,7 @@ export interface Lead {
   category: string | null;
   phone: string | null;
   whatsapp: string | null;
+  facebook: string | null; // URL de Facebook (ver 0010_lead_facebook.sql)
   email: string | null;
   address: string | null;
   city: string | null;
@@ -32,6 +33,9 @@ export interface Lead {
   rating: number | null;
   review_count: number | null;
   has_website: boolean | null;
+  // Web real descubierta cuando Google Maps solo enlaza RRSS o no trae web (ver
+  // 0009_lead_website_url.sql). Tiene prioridad sobre raw_json.website en el panel.
+  website_url: string | null;
   raw_json: unknown;
   source: string | null;
   segment: LeadSegment;
@@ -46,6 +50,10 @@ export interface Lead {
   site_score: number | null;
   site_analysis: SiteAnalysis | null;
   site_analyzed_at: string | null;
+  // Bandeja del operador (ver 0008_lead_flags.sql). Independientes del status `viewed`
+  // del pipeline (ese es del cliente). seen_at null = no visto.
+  is_favorite: boolean;
+  seen_at: string | null;
 }
 
 export interface BriefService {

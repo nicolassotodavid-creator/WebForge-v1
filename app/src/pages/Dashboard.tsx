@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox, Eye, EyeOff } from "lucide-react";
+import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox, Eye, EyeOff, MessageCircle, Facebook } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
   PIPELINE_ORDER,
@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { waLink } from "@/lib/contact";
 
 type SortKey = "name" | "city" | "rating" | "status" | "created_at" | "score";
 type SortDir = "asc" | "desc";
@@ -46,12 +47,21 @@ function readSavedFilters(): SavedFilters {
   }
 }
 
-/** Extrae la URL del sitio web actual del lead desde raw_json (campo del scraper). */
-function getWebsiteUrl(raw: unknown): string | null {
+/** Web real del lead. Mismo criterio que el backend (_shared/website.ts): rechaza redes/mapas.
+ *  Prioridad: website_url (descubierta por el Orquestador) > raw_json del scrape. */
+function isRealWeb(v: unknown): v is string {
+  if (typeof v !== "string" || !/^https?:\/\//i.test(v.trim())) return false;
+  return !/google\.|maps\.|facebook\.|fb\.me|instagram\.|twitter\.|x\.com|linkedin\.|wa\.me|whatsapp|youtube\.|youtu\.be|tiktok\.|t\.me|pinterest\./i.test(v);
+}
+function getWebsiteUrl(lead: { website_url?: string | null; raw_json?: unknown }): string | null {
+  if (isRealWeb(lead.website_url)) return lead.website_url.trim();
+  const raw = lead.raw_json;
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
-  const url = r.website ?? r.websiteUrl ?? r.url ?? r.website_url ?? r.web ?? r.site ?? r.domain ?? null;
-  return typeof url === "string" && url.startsWith("http") ? url : null;
+  for (const k of ["website", "websiteUrl", "url", "web", "site", "domain"]) {
+    if (isRealWeb(r[k])) return (r[k] as string).trim();
+  }
+  return null;
 }
 
 /** Color del badge de score: verde (buena), ámbar (revisar), rojo (floja). */
@@ -261,7 +271,7 @@ export default function Dashboard() {
         { key: "noweb", label: "Sin web" },
       ];
 
-  const colCount = flagsSupported ? 11 : 10;
+  const colCount = flagsSupported ? 12 : 11;
   const filtersActive =
     statusFilter !== "all" || city || category || view !== "all" || search;
 
@@ -444,6 +454,7 @@ export default function Dashboard() {
                   </TableHead>
                   <TableHead>Teléfono</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>Contacto</TableHead>
                   <TableHead
                     className="cursor-pointer select-none"
                     onClick={() => handleSort("rating")}
@@ -549,6 +560,41 @@ export default function Dashboard() {
                       )}
                     </TableCell>
                     <TableCell>
+                      {(() => {
+                        const wa = waLink(l);
+                        if (!wa && !l.facebook)
+                          return <span className="text-xs text-muted-foreground">—</span>;
+                        return (
+                          <div className="flex items-center gap-1.5">
+                            {wa && (
+                              <a
+                                href={wa}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                title={`WhatsApp: ${wa.replace("https://wa.me/", "")}`}
+                                className="text-green-600 hover:text-green-700"
+                              >
+                                <MessageCircle className="h-4 w-4" />
+                              </a>
+                            )}
+                            {l.facebook && (
+                              <a
+                                href={l.facebook}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                title="Facebook"
+                                className="text-blue-600 hover:text-blue-700"
+                              >
+                                <Facebook className="h-4 w-4" />
+                              </a>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </TableCell>
+                    <TableCell>
                       {l.rating != null ? (
                         <span className="inline-flex items-center gap-1">
                           <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
@@ -564,7 +610,7 @@ export default function Dashboard() {
                     <TableCell>
                       {l.has_website ? (
                         <a
-                          href={getWebsiteUrl(l.raw_json) ?? "#"}
+                          href={getWebsiteUrl(l) ?? "#"}
                           target="_blank"
                           rel="noreferrer"
                           title="Ver web actual"
@@ -646,6 +692,9 @@ export default function Dashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="h-4 w-28 animate-pulse rounded bg-muted" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-12 animate-pulse rounded bg-muted" />
                       </TableCell>
                       <TableCell>
                         <div className="h-4 w-14 animate-pulse rounded bg-muted" />

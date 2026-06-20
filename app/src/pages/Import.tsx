@@ -30,6 +30,8 @@ interface ScrapeResult {
   inserted?: number;
   upserted?: number;
   with_email?: number;
+  partial?: boolean;
+  run_status?: string;
   errors?: string[];
 }
 
@@ -44,7 +46,7 @@ export default function Import() {
   // Opción C — scraper
   const [scrapeQuery, setScrapeQuery] = useState("");
   const [scrapeCity, setScrapeCity] = useState("");
-  const [scrapeMax, setScrapeMax] = useState(20);
+  const [scrapeMax, setScrapeMax] = useState(12);
   const [scrapeOnlyNoWeb, setScrapeOnlyNoWeb] = useState(true);
   // Filtros de calidad
   const [scrapeCategoryKeyword, setScrapeCategoryKeyword] = useState("");
@@ -189,7 +191,7 @@ export default function Import() {
             <Input
               type="number"
               min={1}
-              max={60}
+              max={12}
               value={scrapeMax}
               onChange={(e) => setScrapeMax(Number(e.target.value))}
               className="max-w-[90px]"
@@ -264,8 +266,8 @@ export default function Import() {
 
             <p className="text-xs text-muted-foreground">
               ℹ️ El email se extrae automáticamente en cada búsqueda (se visita la web/redes de
-              cada negocio), por eso tarda algo más y el máximo se limita a 20. Marca «Solo con
-              email» si quieres descartar los negocios de los que no se haya podido sacar correo.
+              cada negocio), por eso tarda algo más y el máximo efectivo se limita a 12. Marca «Solo
+              con email» si quieres descartar los negocios de los que no se haya podido sacar correo.
             </p>
           </div>
           <Button onClick={handleScrape} disabled={scraping}>
@@ -302,6 +304,13 @@ export default function Import() {
                   <div className="text-xs text-muted-foreground">Con email</div>
                 </div>
               </div>
+              {scrapeResult.partial && (
+                <p className="text-sm text-amber-600 dark:text-amber-500">
+                  ⚠️ Resultados parciales: el scrape no terminó ({scrapeResult.run_status ?? "TIMED-OUT"}).
+                  Apify cortó por tiempo, así que esto es lo que dio tiempo a traer. Repite la
+                  búsqueda o baja el máximo de resultados para completar.
+                </p>
+              )}
               {scrapeResult.errors && scrapeResult.errors.length > 0 && (
                 <p className="text-sm text-destructive">Avisos: {scrapeResult.errors.join(" · ")}</p>
               )}
