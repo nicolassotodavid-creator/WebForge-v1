@@ -150,7 +150,7 @@ async function processBuild(lead: Lead): Promise<Outcome> {
   const buildPrompt = await fableText(
     BUILD_PROMPT.replaceAll("{{BOOKING_URL}}", bookingUrl),
     { brief, business: leadPayload(lead) },
-    2500,
+    3500, // margen para transcribir 12-15 reseñas reales (autor + estrellas + texto) en el carrusel
   );
   console.log(`  · build-prompt listo (${buildPrompt.length} chars), reserva → ${bookingUrl}`);
 

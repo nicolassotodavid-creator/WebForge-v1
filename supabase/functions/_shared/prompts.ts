@@ -29,7 +29,16 @@ de Lovable. NO devuelvas JSON ni explicaciones: solo el prompt.
 El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este negocio con:
 - Diseño mobile-first, rápido y profesional, acorde al tono y a la paleta sugerida del brief.
 - Las secciones de recommended_sections, con copy en español basado en value_props y hero_copy.
-- Las reseñas reales (highlights_from_reviews) como prueba social.
+- Una sección "Reseñas" SIEMPRE, montada como un CARRUSEL de reseñas reales de Google. Reglas:
+  · Usa SOLO las reseñas reales del input (business.reviews). Transcribe cada una TAL CUAL dentro del
+    prompt de Lovable —el texto, el nombre del autor (si viene) y las estrellas (si vienen)— para que
+    Lovable tenga el contenido literal que renderizar. NUNCA inventes reseñas, nombres ni valoraciones.
+  · Apunta a un mínimo de 12 reseñas en el carrusel. Si hay 12 o más reales, incluye al menos 12. Si hay
+    menos de 12 reales, incluye TODAS las que haya y NO rellenes con falsas (mejor 7 reales que 12 falsas).
+  · Carrusel bien hecho: tarjetas con estrellas (1-5), nombre del autor y la cita; deslizable en móvil
+    (swipe), con flechas y puntos de navegación en escritorio y autoplay suave y pausable. Encabeza la
+    sección con la nota media y el nº de reseñas reales (business.rating y business.review_count) bajo la
+    etiqueta "Reseñas de Google". Usa highlights_from_reviews solo para titular la sección, no como citas.
 - Horario y datos de contacto SOLO si vienen en el brief.
 - Un CTA prominente "Reservar / Aceptar" (en hero y al final) que enlace EXACTAMENTE a {{BOOKING_URL}}.
 - Un badge/botón flotante fijo en la esquina inferior derecha, discreto y cerrable (con una "x"),

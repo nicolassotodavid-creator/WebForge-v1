@@ -15,22 +15,37 @@ interface AnthropicResponse {
   error?: { message?: string };
 }
 
-// Saca un array de textos de reseña del raw_json del scraper (formato flexible).
-// Misma lógica que analyze-lead para mantener coherencia entre la Edge Fn de prueba y el Orquestador.
-export function extractReviews(raw: unknown): string[] {
+// Una reseña real del scraper, normalizada. Conservamos autor y estrellas (no solo el texto)
+// para poder pintar un carrusel de reseñas creíble: el build-prompt las transcribe literalmente.
+export interface Review {
+  author: string | null; // nombre del reseñador, si Google lo expone
+  rating: number | null;  // estrellas 1-5, si vienen
+  text: string;           // cuerpo de la reseña (siempre presente; las vacías se descartan)
+}
+
+// Saca las reseñas reales del raw_json del scraper (formato flexible de compass/crawler-google-places).
+// A diferencia de la copia text-only de analyze-lead (que solo puntúa la web), aquí guardamos autor y
+// estrellas para alimentar el carrusel de reseñas de la web. Tope 15 (las más recientes primero).
+export function extractReviews(raw: unknown): Review[] {
   if (!raw || typeof raw !== "object") return [];
   const r = (raw as Record<string, unknown>).reviews;
   if (!Array.isArray(r)) return [];
   return r
-    .map((item) => {
-      if (typeof item === "string") return item;
+    .map((item): Review => {
+      if (typeof item === "string") return { author: null, rating: null, text: item };
       if (item && typeof item === "object") {
         const o = item as Record<string, unknown>;
-        return String(o.text ?? o.review ?? o.comment ?? o.snippet ?? "");
+        const text = String(o.text ?? o.review ?? o.comment ?? o.snippet ?? "");
+        const author = o.name ?? o.author ?? o.reviewerName ?? o.user ?? null;
+        const rawRating = o.stars ?? o.rating ?? o.score ?? null;
+        const rating = typeof rawRating === "number"
+          ? rawRating
+          : (rawRating != null && !Number.isNaN(Number(rawRating)) ? Number(rawRating) : null);
+        return { author: author != null ? String(author) : null, rating, text };
       }
-      return "";
+      return { author: null, rating: null, text: "" };
     })
-    .filter((t) => t.trim().length > 0)
+    .filter((rev) => rev.text.trim().length > 0)
     .slice(0, 15);
 }
 
