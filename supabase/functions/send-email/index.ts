@@ -22,7 +22,6 @@ Deno.serve(async (req: Request) => {
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   const FROM_EMAIL = Deno.env.get("FROM_EMAIL");
-  const BOOKING_BASE = Deno.env.get("BOOKING_BASE"); // base de /book (para el enlace de compra en seguimientos)
   if (!SUPABASE_URL || !SERVICE_KEY) {
     return jsonResponse(
       { error: "Faltan SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY en el entorno." },
@@ -113,13 +112,9 @@ Deno.serve(async (req: Request) => {
   // Versión texto plano (fallback para clientes sin HTML). El cuerpo ya trae la firma.
   const textBody = msg.body;
 
-  // Enlace suave de compra: solo en seguimientos (Email 2/3). El Email 1 en frío va limpio.
-  const bookingUrl =
-    BOOKING_BASE && Number(msg.email_number) >= 2
-      ? `${BOOKING_BASE.replace(/\/$/, "")}/${msg.lead_id}`
-      : null;
-
-  const htmlBody = renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject, bookingUrl });
+  // El cuerpo ya trae la CTA única → /book (la inyectan generate-outreach y cron-followups),
+  // así que aquí NO se añade ningún enlace de compra aparte: una sola CTA en los 3 emails.
+  const htmlBody = renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject });
 
   // --- Envío vía Resend (HTML + texto plano como fallback) ---
   let resendId: string | null = null;

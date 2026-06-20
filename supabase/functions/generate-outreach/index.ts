@@ -6,6 +6,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { OUTREACH_PROMPT } from "../_shared/prompts.ts";
+import { bookingLink } from "../_shared/emailTemplate.ts";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
@@ -34,23 +35,34 @@ function getSubject(hasWebsite: boolean, emailNumber: number): string {
 }
 
 // Templates literales para Email 2 y 3 (sin IA — son 3 líneas, no merece la pena).
+// `link` va SOLO en su propia línea para que la plantilla lo renderice como botón "Ver la web →".
 function buildTemplateBody(
   emailNumber: 2 | 3,
   hasWebsite: boolean,
   nombre: string,
-  liveUrl: string,
+  link: string,
 ): string {
   if (emailNumber === 2) {
-    return `Hola ${nombre},\nSolo por si no lo viste.\n\n${liveUrl}\n\nNico`;
+    return `Hola ${nombre},\nSolo por si no lo viste.\n\n${link}\n\nNico`;
   }
   // Email 3
   const verb = hasWebsite ? "lo dejo caer" : "la doy de baja";
   return (
     `Hola ${nombre},\n` +
-    `Esta semana ${verb} — tengo otros negocios esperando y no puedo tenerlo activo indefinidamente.\n\n` +
-    `Por si acaso: ${liveUrl}\n\n` +
-    `Nico`
+    `Esta semana ${verb} — tengo otros negocios esperando y no puedo tenerlo activo indefinidamente.\n` +
+    `Por si acaso, aquí la tienes:\n\n${link}\n\nNico`
   );
+}
+
+// Footer de contacto OPCIONAL para email. Si el secreto WHATSAPP_NUMBER está
+// configurado (solo dígitos, formato internacional, p.ej. 34600000000) añade una
+// línea bajo la firma para que el prospecto pueda responder por WhatsApp además de
+// por email. Vacío o canal != 'email' => no añade nada (apagado por defecto, y nunca
+// en LinkedIn, que va por nota de conexión).
+function withWhatsappFooter(body: string, channel: string): string {
+  const raw = (Deno.env.get("WHATSAPP_NUMBER") ?? "").replace(/\D/g, "");
+  if (channel !== "email" || raw.length < 8) return body;
+  return `${body}\nWhatsApp: https://wa.me/${raw}`;
 }
 
 Deno.serve(async (req: Request) => {
@@ -206,11 +218,16 @@ Deno.serve(async (req: Request) => {
   const subject = getSubject(hasWebsite, emailNumber);
   const nombre = lead.contact_name ?? lead.name;
 
+  // TODOS los emails llevan UNA sola CTA → la página de venta /book (no la web cruda de Lovable):
+  // /book ya muestra la captura de la web + la oferta + el pago (decisión de funnel del operador).
+  // Si no hay BOOKING_BASE configurado, cae a la live_url para no dejar el email sin enlace.
+  const emailLink = bookingLink(Deno.env.get("BOOKING_BASE"), leadId) ?? liveUrl!;
+
   // ─────────────────────────────────────────────────────────────────────────────
   // EMAIL 2 y 3: templates literales, sin IA
   // ─────────────────────────────────────────────────────────────────────────────
   if (emailNumber === 2 || emailNumber === 3) {
-    const bodyText = buildTemplateBody(emailNumber, hasWebsite, nombre, liveUrl!);
+    const bodyText = buildTemplateBody(emailNumber, hasWebsite, nombre, emailLink);
 
     const { data: inserted, error: insErr } = await supabase
       .from("outreach_messages")
@@ -218,7 +235,7 @@ Deno.serve(async (req: Request) => {
         lead_id: leadId,
         channel,
         subject: channel === "email" ? subject : null,
-        body: bodyText,
+        body: withWhatsappFooter(bodyText, channel),
         status: "draft",
         generated_by_model: "template",
         email_number: emailNumber,
@@ -237,7 +254,7 @@ Deno.serve(async (req: Request) => {
     segment,
     channel,
     has_website: hasWebsite,
-    live_url: liveUrl,
+    live_url: emailLink,
     business: { name: lead.name, category: lead.category, city: lead.city },
     contact: { name: lead.contact_name ?? null, role: lead.contact_role ?? null },
     brief: brief
@@ -302,7 +319,7 @@ Deno.serve(async (req: Request) => {
       lead_id: leadId,
       channel,
       subject: channel === "email" ? subject : null,
-      body: bodyText,
+      body: withWhatsappFooter(bodyText, channel),
       status: "draft",
       generated_by_model: ANTHROPIC_MODEL,
       email_number: 1,

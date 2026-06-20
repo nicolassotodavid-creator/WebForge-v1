@@ -27,6 +27,12 @@ export function bodyToHtml(text: string): string {
     .join("");
 }
 
+// Enlace a la página de venta /book de un lead. `base` = BOOKING_BASE (con o sin barra final).
+// Devuelve null si no hay base configurada → los llamadores caen entonces a la live_url cruda.
+export function bookingLink(base: string | null | undefined, leadId: string): string | null {
+  return base ? `${base.replace(/\/$/, "")}/${leadId}` : null;
+}
+
 export interface RenderEmailOptions {
   bodyText: string;
   trackingPixelUrl?: string | null;

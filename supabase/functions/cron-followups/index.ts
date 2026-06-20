@@ -3,7 +3,7 @@
 // Email 3: Email 2 enviado hace 3+ días sin apertura y sin Email 3.
 // Lógica idéntica al PASO 3 del orquestador Node — ahora vive en la nube.
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { renderEmail } from "../_shared/emailTemplate.ts";
+import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -25,16 +25,16 @@ function getSubject(hasWebsite: boolean): string {
   return `Re: ${base}`;
 }
 
-function buildBody(emailNumber: 2 | 3, hasWebsite: boolean, nombre: string, liveUrl: string): string {
+// `link` va SOLO en su propia línea para que la plantilla lo renderice como botón "Ver la web →".
+function buildBody(emailNumber: 2 | 3, hasWebsite: boolean, nombre: string, link: string): string {
   if (emailNumber === 2) {
-    return `Hola ${nombre},\nSolo por si no lo viste.\n\n${liveUrl}\n\nNico`;
+    return `Hola ${nombre},\nSolo por si no lo viste.\n\n${link}\n\nNico`;
   }
   const verb = hasWebsite ? "lo dejo caer" : "la doy de baja";
   return (
     `Hola ${nombre},\n` +
-    `Esta semana ${verb} — tengo otros negocios esperando y no puedo tenerlo activo indefinidamente.\n\n` +
-    `Por si acaso: ${liveUrl}\n\n` +
-    `Nico`
+    `Esta semana ${verb} — tengo otros negocios esperando y no puedo tenerlo activo indefinidamente.\n` +
+    `Por si acaso, aquí la tienes:\n\n${link}\n\nNico`
   );
 }
 
@@ -47,7 +47,9 @@ async function sendFollowup(
   const hasWebsite = lead.has_website === true;
   const nombre = lead.contact_name ?? lead.name;
   const subject = getSubject(hasWebsite);
-  const bodyText = buildBody(emailNumber, hasWebsite, nombre, liveUrl);
+  // Una sola CTA → la página de venta /book (cae a la web cruda si no hay BOOKING_BASE).
+  const link = bookingLink(BOOKING_BASE, lead.id) ?? liveUrl;
+  const bodyText = buildBody(emailNumber, hasWebsite, nombre, link);
 
   const { data: msg, error: insErr } = await supabase
     .from("outreach_messages")
@@ -72,9 +74,6 @@ async function sendFollowup(
     `${SUPABASE_URL}/functions/v1/track-event` +
     `?lead_id=${encodeURIComponent(lead.id)}&type=email_opened&message_id=${encodeURIComponent(msg.id)}`;
 
-  // Enlace suave de compra (solo seguimientos): Email 2/3 sí lo llevan.
-  const bookingUrl = BOOKING_BASE ? `${BOOKING_BASE.replace(/\/$/, "")}/${lead.id}` : null;
-
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
@@ -82,7 +81,7 @@ async function sendFollowup(
       from: `Nico <${FROM_EMAIL}>`,
       to: [lead.email],
       subject,
-      html: renderEmail({ bodyText, trackingPixelUrl, subject, bookingUrl }),
+      html: renderEmail({ bodyText, trackingPixelUrl, subject }),
       text: bodyText,
     }),
   });
