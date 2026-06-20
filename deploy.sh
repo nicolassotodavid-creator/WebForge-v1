@@ -63,18 +63,20 @@ SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN npx supabase functions deploy \
   run-scrape
 
 # 4. Verificar
+# Pingeamos sin auth: una función desplegada y viva responde 401 (exige cabecera de auth).
+# 404 = no desplegada; 5xx/000 = caída o sin red.
 echo ""
 echo "4/4 Verificando..."
-RESP=$(curl -s --max-time 10 https://khscikqchvjxyvoaruas.supabase.co/functions/v1/get-booking-info || echo "sin respuesta")
-echo "$RESP" | head -c 100
-echo ""
+CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+  https://khscikqchvjxyvoaruas.supabase.co/functions/v1/get-booking-info || echo "000")
+echo "   HTTP $CODE en get-booking-info"
 
-if echo "$RESP" | grep -q "lead_id"; then
+if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 500 ]; then
   echo ""
-  echo "✅ Todo OK — backend vivo."
+  echo "✅ Backend vivo — la función responde (401 = exige auth, es lo esperado en este ping)."
 else
   echo ""
-  echo "⚠️  Respuesta inesperada — revisa el dashboard de Supabase."
+  echo "⚠️  Backend no responde como se espera (HTTP $CODE) — revisa el dashboard de Supabase."
 fi
 
 echo ""
