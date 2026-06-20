@@ -20,3 +20,25 @@ export const supabase = createClient(
   url || "https://placeholder.supabase.co",
   anonKey || "placeholder-anon-key",
 );
+
+// Extrae el mensaje real de un error de supabase.functions.invoke().
+// Los errores de Edge Functions traen el cuerpo JSON en `error.context` (un Response),
+// donde suele venir `{ error: "..." }`. Si no, usamos error.message o el texto de respaldo.
+export async function edgeFunctionErrorMessage(
+  error: unknown,
+  fallback: string,
+): Promise<string> {
+  if (!error) return fallback;
+  let msg =
+    error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  const ctx = (error as { context?: unknown }).context;
+  if (ctx && typeof (ctx as Response).json === "function") {
+    try {
+      const body = await (ctx as Response).json();
+      if (body?.error) msg = String(body.error);
+    } catch {
+      /* cuerpo no-JSON: nos quedamos con msg */
+    }
+  }
+  return msg || fallback;
+}
