@@ -32,6 +32,9 @@ El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este n
 - Las reseñas reales (highlights_from_reviews) como prueba social.
 - Horario y datos de contacto SOLO si vienen en el brief.
 - Un CTA prominente "Reservar / Aceptar" (en hero y al final) que enlace EXACTAMENTE a {{BOOKING_URL}}.
+- Un badge/botón flotante fijo en la esquina inferior derecha, discreto y cerrable (con una "x"),
+  con el texto "✦ ¿Te gusta esta web? Te la dejo lista por 397€ — Contrátala", que enlace a
+  {{BOOKING_URL}}. Visible durante todo el scroll, sin tapar el contenido ni el CTA principal.
 - Sin texto de relleno tipo lorem ipsum ni datos inventados.
 
 Devuelve solo el prompt para Lovable.

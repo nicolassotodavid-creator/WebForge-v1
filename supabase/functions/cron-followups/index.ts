@@ -3,11 +3,13 @@
 // Email 3: Email 2 enviado hace 3+ días sin apertura y sin Email 3.
 // Lógica idéntica al PASO 3 del orquestador Node — ahora vive en la nube.
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { renderEmail } from "../_shared/emailTemplate.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL");
+const BOOKING_BASE = Deno.env.get("BOOKING_BASE"); // base de la página de contratación (/book)
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -34,40 +36,6 @@ function buildBody(emailNumber: 2 | 3, hasWebsite: boolean, nombre: string, live
     `Por si acaso: ${liveUrl}\n\n` +
     `Nico`
   );
-}
-
-function buildHtml(body: string, subject: string, trackingPixel: string): string {
-  const paragraphs = body
-    .split(/\n{2,}/)
-    .map((para) => {
-      const lines = para.split("\n").filter((l) => l.trim());
-      const rendered = lines.map((line) => {
-        const urlMatch = line.trim().match(/^(https?:\/\/[^\s]+)$/);
-        if (urlMatch) {
-          return `<a href="${urlMatch[1]}" style="display:inline-block;background:#111827;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:600;margin:8px 0;">Ver la web →</a>`;
-        }
-        return line;
-      });
-      const isButton = rendered.some((l) => l.startsWith("<a "));
-      if (isButton) return `<p style="margin:16px 0;">${rendered.join("<br>")}</p>`;
-      return `<p style="margin:0 0 16px;color:#1a1a1a;font-size:15px;line-height:1.6;">${rendered.join("<br>")}</p>`;
-    })
-    .join("");
-
-  return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>${subject}</title></head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;background:#f4f4f5;">
-<tr><td align="center">
-<table width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#fff;border-radius:10px;padding:36px 32px;">
-<tr><td>
-${paragraphs}
-<hr style="border:none;border-top:1px solid #e5e7eb;margin:28px 0 20px;">
-<p style="margin:0;color:#374151;font-size:14px;"><strong>Nico</strong><br>
-<span style="color:#6b7280;font-size:13px;">Diseño webs para negocios locales</span></p>
-</td></tr></table>
-<p style="margin:16px 0 0;color:#9ca3af;font-size:12px;">Has recibido este email porque alguien encontró tu negocio en Google y quiso compartir algo contigo.</p>
-${trackingPixel}
-</td></tr></table></body></html>`;
 }
 
 async function sendFollowup(
@@ -103,16 +71,18 @@ async function sendFollowup(
   const trackingPixelUrl =
     `${SUPABASE_URL}/functions/v1/track-event` +
     `?lead_id=${encodeURIComponent(lead.id)}&type=email_opened&message_id=${encodeURIComponent(msg.id)}`;
-  const trackingPixel = `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`;
+
+  // Enlace suave de compra (solo seguimientos): Email 2/3 sí lo llevan.
+  const bookingUrl = BOOKING_BASE ? `${BOOKING_BASE.replace(/\/$/, "")}/${lead.id}` : null;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: FROM_EMAIL,
+      from: `Nico <${FROM_EMAIL}>`,
       to: [lead.email],
       subject,
-      html: buildHtml(bodyText, subject, trackingPixel),
+      html: renderEmail({ bodyText, trackingPixelUrl, subject, bookingUrl }),
       text: bodyText,
     }),
   });

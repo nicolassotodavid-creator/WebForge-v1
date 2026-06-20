@@ -12,6 +12,18 @@ verify_jwt = false
 [functions.analyze-lead]
 verify_jwt = false
 
+# cron-followups la invoca pg_cron (net.http_post) con Authorization: Bearer <service_role_key>.
+# La función exige que el token sea exactamente la service key, así que desactivamos el JWT de
+# la pasarela y dejamos que la función haga su propia autorización (igual que ingest-leads).
+[functions.cron-followups]
+verify_jwt = false
+
+# score-sites la invoca pg_cron (0012) y run-scrape, ambos con Authorization: Bearer
+# <service_role_key>. Igual que cron-followups: la propia función exige que el token sea la
+# service key, así que desactivamos el JWT de la pasarela.
+[functions.score-sites]
+verify_jwt = false
+
 # Funciones públicas: llamadas desde la landing /book sin sesión de usuario
 [functions.get-booking-info]
 verify_jwt = false

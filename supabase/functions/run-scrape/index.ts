@@ -275,6 +275,24 @@ Deno.serve(async (req: Request) => {
     return e && String(e).includes("@");
   }).length;
 
+  // Puntúa la web actual de los leads recién entrados, EN SEGUNDO PLANO (no bloquea la
+  // respuesta del scrape). Así el Score aparece a los pocos minutos sin esperar al cron.
+  // Best-effort y blindado: si falla, NUNCA rompe el scrape. Backstop: pg_cron (0012) re-barre
+  // cada 15 min y cubre también los leads importados a mano.
+  try {
+    const scorePromise = fetch(`${SUPABASE_URL}/functions/v1/score-sites`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_KEY}` },
+      body: JSON.stringify({ limit: 8 }),
+    }).catch(() => {});
+    // EdgeRuntime es global en Supabase Edge Functions; mantiene viva la tarea tras responder.
+    // deno-lint-ignore no-explicit-any
+    const er = (globalThis as any).EdgeRuntime;
+    if (er?.waitUntil) er.waitUntil(scorePromise);
+  } catch (_e) {
+    // El scoring es opcional; el scrape ya está hecho.
+  }
+
   return jsonResponse({
     found,
     without_website: withoutWebsite,

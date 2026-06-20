@@ -5,6 +5,7 @@
 // Secrets SOLO en servidor.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { renderEmail } from "../_shared/emailTemplate.ts";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -21,6 +22,7 @@ Deno.serve(async (req: Request) => {
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   const FROM_EMAIL = Deno.env.get("FROM_EMAIL");
+  const BOOKING_BASE = Deno.env.get("BOOKING_BASE"); // base de /book (para el enlace de compra en seguimientos)
   if (!SUPABASE_URL || !SERVICE_KEY) {
     return jsonResponse(
       { error: "Faltan SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY en el entorno." },
@@ -99,85 +101,25 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "El lead no tiene email; no se puede enviar." }, 422);
   }
 
-  // --- Construir HTML del email ---
-  const WHATSAPP_NUMBER = "34600782211";
-
-  // Pixel de seguimiento de apertura (1×1 GIF, llamada pública a track-event GET).
+  // --- Construir HTML del email (plantilla compartida _shared/emailTemplate.ts) ---
+  // Pixel de seguimiento de apertura (1×1, llamada pública a track-event GET).
   // Permite saber si el lead abrió el email antes de enviar el Email 3.
   const trackingPixelUrl =
     `${SUPABASE_URL}/functions/v1/track-event` +
     `?lead_id=${encodeURIComponent(msg.lead_id)}` +
     `&type=email_opened` +
     `&message_id=${encodeURIComponent(messageId)}`;
-  const trackingPixel = `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`;
 
-  // Convertir el body de texto plano a HTML: párrafos separados por línea en blanco,
-  // URLs en su propia línea se convierten en botón CTA, resto en texto.
-  function bodyToHtml(text: string): string {
-    const paragraphs = text.split(/\n{2,}/);
-    return paragraphs.map((para) => {
-      const lines = para.split("\n").filter((l) => l.trim());
-      const rendered = lines.map((line) => {
-        const urlMatch = line.trim().match(/^(https?:\/\/[^\s]+)$/);
-        if (urlMatch) {
-          return `<a href="${urlMatch[1]}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:600;margin:8px 0;">Ver la web →</a>`;
-        }
-        return line;
-      });
-      const isButton = rendered.some((l) => l.startsWith("<a "));
-      if (isButton) return `<p style="margin:16px 0;text-align:left;">${rendered.join("<br>")}</p>`;
-      return `<p style="margin:0 0 16px;color:#1a1a1a;font-size:15px;line-height:1.6;">${rendered.join("<br>")}</p>`;
-    }).join("");
-  }
-
-  // Versión texto plano (fallback para clientes sin HTML)
+  // Versión texto plano (fallback para clientes sin HTML). El cuerpo ya trae la firma.
   const textBody = msg.body;
 
-  const htmlBody = `<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>${msg.subject}</title>
-</head>
-<body style="margin:0;padding:0;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f4f4f5;padding:32px 16px;">
-    <tr>
-      <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:540px;background:#ffffff;border-radius:10px;padding:36px 32px;box-sizing:border-box;">
-          <tr>
-            <td>
-              ${bodyToHtml(textBody)}
+  // Enlace suave de compra: solo en seguimientos (Email 2/3). El Email 1 en frío va limpio.
+  const bookingUrl =
+    BOOKING_BASE && Number(msg.email_number) >= 2
+      ? `${BOOKING_BASE.replace(/\/$/, "")}/${msg.lead_id}`
+      : null;
 
-              <!-- WhatsApp CTA -->
-              <table cellpadding="0" cellspacing="0" role="presentation" style="margin-top:8px;">
-                <tr>
-                  <td>
-                    <a href="https://wa.me/${WHATSAPP_NUMBER}" style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:600;">
-                      💬 Escribirme por WhatsApp
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Separador -->
-              <hr style="border:none;border-top:1px solid #e5e7eb;margin:28px 0 20px;">
-
-              <!-- Firma -->
-              <p style="margin:0;color:#374151;font-size:14px;line-height:1.5;">
-                <strong>Nico</strong><br>
-                <span style="color:#6b7280;font-size:13px;">Diseño webs para negocios locales</span>
-              </p>
-            </td>
-          </tr>
-        </table>
-        <p style="margin:16px 0 0;color:#9ca3af;font-size:12px;">Has recibido este email porque alguien encontró tu negocio en Google y quiso compartir algo contigo.</p>
-        ${trackingPixel}
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+  const htmlBody = renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject, bookingUrl });
 
   // --- Envío vía Resend (HTML + texto plano como fallback) ---
   let resendId: string | null = null;
@@ -189,7 +131,7 @@ Deno.serve(async (req: Request) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: FROM_EMAIL,
+        from: `Nico <${FROM_EMAIL}>`,
         to: [lead.email],
         subject: msg.subject,
         html: htmlBody,

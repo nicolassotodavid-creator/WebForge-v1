@@ -58,6 +58,8 @@ SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN npx supabase functions deploy \
   analyze-site \
   generate-outreach \
   send-email \
+  cron-followups \
+  score-sites \
   track-event \
   ingest-leads \
   run-scrape

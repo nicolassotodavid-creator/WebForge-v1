@@ -28,6 +28,7 @@ jobs:
             stripe-webhook \
             analyze-lead \
             analyze-site \
+            score-sites \
             generate-outreach \
             send-email \
             track-event \
