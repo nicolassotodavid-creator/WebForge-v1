@@ -6,7 +6,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
-const PRECIO_CENTS = 29700; // 297 €
+const PRECIO_CENTS = 39700; // 397 € (IVA incluido)
 const PLAN = "web-starter";
 const PRODUCT_NAME = "Web profesional a medida";
 const PRODUCT_DESC = "Web one-page mobile-first, lista para publicar. Primer mes de soporte incluido.";

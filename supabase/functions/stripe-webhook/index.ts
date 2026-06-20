@@ -1,6 +1,6 @@
 // stripe-webhook — Recibe eventos de Stripe y actualiza DB.
 // checkout.session.completed → booking.paid, lead.status='won', evento 'booking_paid'.
-// También crea contacto + factura en Holded y la marca como cobrada.
+// También crea contacto + factura BORRADOR en Holded (revisión manual: no la emite ni la cobra).
 // IMPORTANTE: este endpoint no lleva CORS (no lo llama el browser, lo llama Stripe).
 // Verificación HMAC-SHA256 de la firma (Stripe-Signature header).
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -54,14 +54,17 @@ async function upsertHoldedContact(
   return created.id;
 }
 
-/** Crea factura en borrador en Holded. No la emite ni la cobra — revisión manual obligatoria. */
+/** Crea factura en borrador en Holded a partir del total cobrado (IVA incluido).
+ *  No la emite ni la cobra — revisión manual obligatoria. */
 async function createDraftHoldedInvoice(
   apiKey: string,
   contactId: string,
   leadName: string,
-  amountEuros: number,
+  totalCents: number, // total cobrado por Stripe, IVA incluido (céntimos)
 ): Promise<string> {
   const dateNum = Math.floor(Date.now() / 1000);
+  // El precio de Stripe lleva el IVA incluido → desglosamos la base imponible.
+  const baseEuros = Math.round(totalCents / 1.21) / 100;
 
   const invoice = await holdedRequest("/invoices/v1/invoices", "POST", apiKey, {
     contactId,
@@ -73,7 +76,7 @@ async function createDraftHoldedInvoice(
       {
         name: `Web profesional a medida — ${leadName}`,
         units: 1,
-        subtotal: amountEuros,
+        subtotal: baseEuros,
         tax: 21,
       },
     ],
@@ -203,7 +206,7 @@ Deno.serve(async (req: Request) => {
               HOLDED_API_KEY,
               contactId,
               lead?.name ?? "Cliente",
-              297, // base sin IVA (€)
+              Number(session.amount_total ?? 0), // total cobrado (IVA incl.) en céntimos
             );
             // Guardar el id de la factura borrador para referencia
             await supabase.from("events").insert({
