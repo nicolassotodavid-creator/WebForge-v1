@@ -327,6 +327,7 @@ export default function Dashboard() {
                     Ciudad<SortIcon col="city" />
                   </TableHead>
                   <TableHead>Teléfono</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead
                     className="cursor-pointer select-none"
                     onClick={() => handleSort("rating")}
@@ -381,6 +382,20 @@ export default function Dashboard() {
                     </TableCell>
                     <TableCell>{l.city ?? "—"}</TableCell>
                     <TableCell>{l.phone ?? "—"}</TableCell>
+                    <TableCell className="max-w-[200px]">
+                      {l.email ? (
+                        <a
+                          href={`mailto:${l.email}`}
+                          onClick={(e) => e.stopPropagation()}
+                          title={l.email}
+                          className="block truncate text-xs text-blue-500 hover:text-blue-700"
+                        >
+                          {l.email}
+                        </a>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       {l.rating != null ? (
                         <span className="inline-flex items-center gap-1">
@@ -466,6 +481,9 @@ export default function Dashboard() {
                         <div className="h-4 w-24 animate-pulse rounded bg-muted" />
                       </TableCell>
                       <TableCell>
+                        <div className="h-4 w-28 animate-pulse rounded bg-muted" />
+                      </TableCell>
+                      <TableCell>
                         <div className="h-4 w-14 animate-pulse rounded bg-muted" />
                       </TableCell>
                       <TableCell>
@@ -488,7 +506,7 @@ export default function Dashboard() {
 
                 {!loading && filtered.length === 0 && (
                   <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={9} className="py-16 text-center">
+                    <TableCell colSpan={10} className="py-16 text-center">
                       <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
                         <div className="grid h-12 w-12 place-items-center rounded-full border border-border bg-muted/50 text-muted-foreground">
                           <Inbox className="h-5 w-5" />
