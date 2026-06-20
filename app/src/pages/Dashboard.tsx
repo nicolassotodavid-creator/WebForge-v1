@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox } from "lucide-react";
+import { Link } from "react-router-dom";
+import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox, Eye, EyeOff } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
   PIPELINE_ORDER,
@@ -24,6 +24,27 @@ import { cn } from "@/lib/utils";
 
 type SortKey = "name" | "city" | "rating" | "status" | "created_at" | "score";
 type SortDir = "asc" | "desc";
+type ViewFilter = "all" | "unseen" | "favorites" | "noweb";
+
+/** Filtros persistidos entre recargas (la vista no se pierde al refrescar). */
+const FILTERS_KEY = "wf:dashboard:filters";
+type SavedFilters = Partial<{
+  search: string;
+  statusFilter: LeadStatus | "all";
+  city: string;
+  category: string;
+  view: ViewFilter;
+  sortKey: SortKey;
+  sortDir: SortDir;
+}>;
+function readSavedFilters(): SavedFilters {
+  try {
+    const raw = localStorage.getItem(FILTERS_KEY);
+    return raw ? (JSON.parse(raw) as SavedFilters) : {};
+  } catch {
+    return {};
+  }
+}
 
 /** Extrae la URL del sitio web actual del lead desde raw_json (campo del scraper). */
 function getWebsiteUrl(raw: unknown): string | null {
@@ -41,19 +62,31 @@ function scoreClasses(score: number): string {
 }
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [statusFilter, setStatusFilter] = useState<LeadStatus | "all">("all");
-  const [city, setCity] = useState("");
-  const [category, setCategory] = useState("");
-  const [onlyNoWeb, setOnlyNoWeb] = useState(false);
-  const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("created_at");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [saved] = useState(readSavedFilters);
+  const [statusFilter, setStatusFilter] = useState<LeadStatus | "all">(saved.statusFilter ?? "all");
+  const [city, setCity] = useState(saved.city ?? "");
+  const [category, setCategory] = useState(saved.category ?? "");
+  const [view, setView] = useState<ViewFilter>(saved.view ?? "all");
+  const [search, setSearch] = useState(saved.search ?? "");
+  const [sortKey, setSortKey] = useState<SortKey>(saved.sortKey ?? "created_at");
+  const [sortDir, setSortDir] = useState<SortDir>(saved.sortDir ?? "desc");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Persistir la vista (búsqueda, filtros y orden) para que sobreviva al refresco.
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        FILTERS_KEY,
+        JSON.stringify({ search, statusFilter, city, category, view, sortKey, sortDir }),
+      );
+    } catch {
+      /* almacenamiento no disponible: ignorar */
+    }
+  }, [search, statusFilter, city, category, view, sortKey, sortDir]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -84,6 +117,30 @@ export default function Dashboard() {
     setDeletingId(null);
   };
 
+  // Favorito: toggle optimista. Si Supabase falla (p.ej. migración 0008 sin aplicar), revierte.
+  const toggleFavorite = async (e: React.MouseEvent, lead: Lead) => {
+    e.stopPropagation();
+    const next = !lead.is_favorite;
+    setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, is_favorite: next } : l)));
+    const { error } = await supabase.from("leads").update({ is_favorite: next }).eq("id", lead.id);
+    if (error) {
+      setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, is_favorite: !next } : l)));
+      alert("No se pudo actualizar el favorito: " + error.message);
+    }
+  };
+
+  // Visto/no-visto manual: toggle optimista con revert.
+  const toggleSeen = async (e: React.MouseEvent, lead: Lead) => {
+    e.stopPropagation();
+    const next = lead.seen_at ? null : new Date().toISOString();
+    setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, seen_at: next } : l)));
+    const { error } = await supabase.from("leads").update({ seen_at: next }).eq("id", lead.id);
+    if (error) {
+      setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, seen_at: lead.seen_at } : l)));
+      alert("No se pudo actualizar 'visto': " + error.message);
+    }
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -106,11 +163,28 @@ export default function Dashboard() {
     load();
   }, [load]);
 
+  // ¿La migración 0008 está aplicada? Si las columnas no existen, `select *` no las trae y
+  // ocultamos la UI de bandeja (degradación limpia, sin marcar todo como "no visto").
+  const flagsSupported = useMemo(
+    () => leads.some((l) => "is_favorite" in l || "seen_at" in l),
+    [leads],
+  );
+
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
     for (const l of leads) c[l.status] = (c[l.status] ?? 0) + 1;
     return c;
   }, [leads]);
+
+  const viewCounts = useMemo(
+    () => ({
+      all: leads.length,
+      unseen: leads.filter((l) => !l.seen_at).length,
+      favorites: leads.filter((l) => l.is_favorite).length,
+      noweb: leads.filter((l) => !l.has_website).length,
+    }),
+    [leads],
+  );
 
   // IDs del último lote scrapeado. Al insertar, todas las filas de un lote comparten
   // created_at (un único upsert en ingest-leads), así que el lote más reciente = las
@@ -136,6 +210,9 @@ export default function Dashboard() {
   const filtered = useMemo(() => {
     let result = leads.filter((l) => {
       if (statusFilter !== "all" && l.status !== statusFilter) return false;
+      if (view === "unseen" && l.seen_at) return false;
+      if (view === "favorites" && !l.is_favorite) return false;
+      if (view === "noweb" && l.has_website) return false;
       if (city && !(l.city ?? "").toLowerCase().includes(city.toLowerCase()))
         return false;
       if (
@@ -143,7 +220,6 @@ export default function Dashboard() {
         !(l.category ?? "").toLowerCase().includes(category.toLowerCase())
       )
         return false;
-      if (onlyNoWeb && l.has_website) return false;
       if (search) {
         const q = search.toLowerCase();
         const matches =
@@ -171,7 +247,23 @@ export default function Dashboard() {
     });
 
     return result;
-  }, [leads, statusFilter, city, category, onlyNoWeb, search, sortKey, sortDir]);
+  }, [leads, statusFilter, view, city, category, search, sortKey, sortDir]);
+
+  const chips: { key: ViewFilter; label: string; star?: boolean }[] = flagsSupported
+    ? [
+        { key: "all", label: "Todos" },
+        { key: "unseen", label: "No vistos" },
+        { key: "favorites", label: "Favoritos", star: true },
+        { key: "noweb", label: "Sin web" },
+      ]
+    : [
+        { key: "all", label: "Todos" },
+        { key: "noweb", label: "Sin web" },
+      ];
+
+  const colCount = flagsSupported ? 11 : 10;
+  const filtersActive =
+    statusFilter !== "all" || city || category || view !== "all" || search;
 
   return (
     <div className="space-y-6">
@@ -228,6 +320,38 @@ export default function Dashboard() {
         })}
       </div>
 
+      {/* Chips de vista rápida (bandeja) */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {chips.map((c) => {
+          const active = view === c.key;
+          return (
+            <button
+              key={c.key}
+              onClick={() => setView(c.key)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                active
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border/70 text-muted-foreground hover:bg-accent hover:text-foreground",
+              )}
+            >
+              {c.star && (
+                <Star className={cn("h-3.5 w-3.5", active && "fill-current")} />
+              )}
+              {c.label}
+              <span
+                className={cn(
+                  "tabular-nums text-xs",
+                  active ? "text-primary/70" : "text-muted-foreground/70",
+                )}
+              >
+                {viewCounts[c.key]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Buscador + Filtros */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative">
@@ -265,16 +389,7 @@ export default function Dashboard() {
           onChange={(e) => setCategory(e.target.value)}
           className="max-w-[160px]"
         />
-        <label className="flex items-center gap-2 text-sm whitespace-nowrap">
-          <input
-            type="checkbox"
-            checked={onlyNoWeb}
-            onChange={(e) => setOnlyNoWeb(e.target.checked)}
-            className="h-4 w-4 accent-primary"
-          />
-          Solo sin web
-        </label>
-        {(statusFilter !== "all" || city || category || onlyNoWeb || search) && (
+        {filtersActive && (
           <Button
             variant="ghost"
             size="sm"
@@ -282,7 +397,7 @@ export default function Dashboard() {
               setStatusFilter("all");
               setCity("");
               setCategory("");
-              setOnlyNoWeb(false);
+              setView("all");
               setSearch("");
             }}
           >
@@ -314,6 +429,7 @@ export default function Dashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  {flagsSupported && <TableHead className="w-9" />}
                   <TableHead
                     className="cursor-pointer select-none"
                     onClick={() => handleSort("name")}
@@ -358,15 +474,41 @@ export default function Dashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((l) => (
+                {filtered.map((l) => {
+                  const unseen = flagsSupported && !l.seen_at;
+                  return (
                   <TableRow
                     key={l.id}
                     className="group cursor-pointer"
-                    onClick={() => navigate(`/leads/${l.id}`)}
+                    onClick={() => window.open(`/leads/${l.id}`, "_blank", "noopener")}
                   >
+                    {flagsSupported && (
+                      <TableCell className="w-9 pr-0">
+                        <button
+                          onClick={(e) => toggleFavorite(e, l)}
+                          title={l.is_favorite ? "Quitar de favoritos" : "Marcar favorito"}
+                          className="rounded p-1 text-muted-foreground transition-colors hover:text-amber-500"
+                        >
+                          <Star
+                            className={cn(
+                              "h-4 w-4",
+                              l.is_favorite && "fill-amber-400 text-amber-400",
+                            )}
+                          />
+                        </button>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{l.name}</span>
+                        {unseen && (
+                          <span
+                            title="No visto"
+                            className="h-2 w-2 shrink-0 rounded-full bg-primary"
+                          />
+                        )}
+                        <span className={cn(unseen ? "font-semibold" : "font-medium")}>
+                          {l.name}
+                        </span>
                         {latestBatchIds.has(l.id) && (
                           <span
                             title="Del último lote scrapeado"
@@ -454,17 +596,29 @@ export default function Dashboard() {
                       {new Date(l.created_at).toLocaleDateString("es-ES")}
                     </TableCell>
                     <TableCell>
-                      <button
-                        onClick={(e) => handleDelete(e, l.id)}
-                        disabled={deletingId === l.id}
-                        className="rounded p-1 text-muted-foreground transition-colors hover:text-destructive disabled:opacity-50"
-                        title="Eliminar lead"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-0.5">
+                        {flagsSupported && (
+                          <button
+                            onClick={(e) => toggleSeen(e, l)}
+                            title={l.seen_at ? "Marcar como no visto" : "Marcar como visto"}
+                            className="rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
+                          >
+                            {l.seen_at ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => handleDelete(e, l.id)}
+                          disabled={deletingId === l.id}
+                          className="rounded p-1 text-muted-foreground transition-colors hover:text-destructive disabled:opacity-50"
+                          title="Eliminar lead"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
 
                 {loading &&
                   leads.length === 0 &&
@@ -506,7 +660,7 @@ export default function Dashboard() {
 
                 {!loading && filtered.length === 0 && (
                   <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={10} className="py-16 text-center">
+                    <TableCell colSpan={colCount} className="py-16 text-center">
                       <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
                         <div className="grid h-12 w-12 place-items-center rounded-full border border-border bg-muted/50 text-muted-foreground">
                           <Inbox className="h-5 w-5" />
