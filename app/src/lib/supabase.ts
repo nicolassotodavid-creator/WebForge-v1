@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, FunctionsHttpError } from "@supabase/supabase-js";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -20,3 +20,29 @@ export const supabase = createClient(
   url || "https://placeholder.supabase.co",
   anonKey || "placeholder-anon-key",
 );
+
+// `supabase.functions.invoke` lanza un FunctionsHttpError cuyo .message es siempre el
+// genérico "Edge Function returned a non-2xx status code". El motivo real (p. ej.
+// "Falta APIFY_TOKEN_2", "No autorizado", "Apify devolvió 4xx…") viaja en el cuerpo
+// JSON de la respuesta, accesible vía error.context. Este helper lo extrae para que el
+// operador vea el error real en pantalla en lugar del genérico.
+export async function edgeFunctionErrorMessage(
+  error: unknown,
+  fallback = "Error llamando a la Edge Function.",
+): Promise<string> {
+  if (error instanceof FunctionsHttpError) {
+    try {
+      const body = await error.context.json();
+      const msg = body?.error ?? body?.message;
+      if (msg) return String(msg);
+    } catch {
+      try {
+        const txt = await error.context.text();
+        if (txt) return txt.slice(0, 300);
+      } catch {
+        /* sin cuerpo legible */
+      }
+    }
+  }
+  return error instanceof Error ? error.message : fallback;
+}

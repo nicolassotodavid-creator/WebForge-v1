@@ -1,8 +1,8 @@
 // /book/:leadId — Página PÚBLICA (sin auth).
 import { useState, useEffect, FormEvent } from "react";
 import { useParams } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
-import { Loader2, ExternalLink, CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react";
+import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
+import { Loader2, ExternalLink, CheckCircle2, ArrowRight, ShieldCheck, Monitor } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -11,68 +11,86 @@ interface BookingInfo {
   category: string | null;
   city: string | null;
   live_url: string | null;
+  // Captura re-hospedada de la web (Supabase Storage). Se muestra como preview estático
+  // en vez de embeber la web viva: nunca se bloquea y escala a clicks ilimitados.
+  preview_image_url: string | null;
 }
 
 const PRECIO = "297 €";
 const LORA = "Lora, Georgia, serif";
 const INTER = "Inter, system-ui, sans-serif";
 
+// ── componente ───────────────────────────────────────────────────────────────
+
 export default function Book() {
   const { leadId } = useParams<{ leadId: string }>();
 
-  const [info, setInfo] = useState<BookingInfo | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [info, setInfo]         = useState<BookingInfo | null>(null);
+  const [loading, setLoading]   = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [iframeOk, setIframeOk] = useState(true);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [empresa, setEmpresa] = useState("");
-  const [nif, setNif] = useState("");
+  const [name,      setName]      = useState("");
+  const [email,     setEmail]     = useState("");
+  const [phone,     setPhone]     = useState("");
+  const [empresa,   setEmpresa]   = useState("");
+  const [nif,       setNif]       = useState("");
   const [direccion, setDireccion] = useState("");
-  const [ciudad, setCiudad] = useState("");
+  const [ciudad,    setCiudad]    = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError,  setFormError]  = useState<string | null>(null);
 
+  // ── cargar datos del lead ──
   useEffect(() => {
     if (!leadId) { setLoadError("Enlace no válido."); setLoading(false); return; }
+
     if (leadId === "preview") {
-      setInfo({ business_name: "Talleres YuriCar", category: "Taller mecánico", city: "Valencia", live_url: "https://yuricars-landing-joy.lovable.app" });
+      setInfo({
+        business_name: "Talleres YuriCar",
+        category: "Taller mecánico",
+        city: "Valencia",
+        live_url: "https://yuricars-landing-joy.lovable.app",
+        preview_image_url: null,
+      });
       setLoading(false);
       return;
     }
+
     supabase.functions.invoke("get-booking-info", { body: { lead_id: leadId } })
       .then(({ data, error }) => {
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
         setInfo(data as BookingInfo);
-        supabase.functions.invoke("track-event", { body: { lead_id: leadId, type: "demo_viewed" } }).catch(() => {});
+        supabase.functions.invoke("track-event", {
+          body: { lead_id: leadId, type: "demo_viewed" },
+        }).catch(() => {});
       })
       .catch((e: Error) => setLoadError(e.message))
       .finally(() => setLoading(false));
   }, [leadId]);
 
+  // ── pago ──
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!name.trim() || !email.trim()) { setFormError("Nombre y email son obligatorios."); return; }
     setSubmitting(true); setFormError(null);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { lead_id: leadId, contact: { name, email, phone }, fiscal: { empresa, nif, direccion, ciudad } },
+        body: {
+          lead_id: leadId,
+          contact: { name, email, phone },
+          fiscal:  { empresa, nif, direccion, ciudad },
+        },
       });
       if (error) throw error;
       const url = (data as { checkout_url?: string })?.checkout_url;
       if (url) { window.location.href = url; }
       else throw new Error("No se recibió la URL de pago.");
     } catch (e: unknown) {
-      let msg = e instanceof Error ? e.message : "Error al procesar el pago.";
-      const ctx = (e as { context?: Response }).context;
-      if (ctx && typeof ctx.json === "function") { try { const j = await ctx.json(); if (j?.error) msg = j.error; } catch { /* ignore */ } }
-      setFormError(msg);
+      setFormError(await edgeFunctionErrorMessage(e, "Error al procesar el pago."));
     } finally { setSubmitting(false); }
   }
 
+  // ── renders de estado ──
   if (loading) return (
     <div className="grid min-h-screen place-items-center" style={{ backgroundColor: "#FAF8F4" }}>
       <Loader2 className="h-6 w-6 animate-spin" style={{ color: "#78716C" }} />
@@ -88,6 +106,7 @@ export default function Book() {
     </div>
   );
 
+  // ── render principal ──
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#FAF8F4", fontFamily: INTER }}>
 
@@ -111,13 +130,20 @@ export default function Book() {
       </div>
 
       {/* ── BODY: dos columnas en desktop ── */}
-      <div className="book-grid" style={{ maxWidth: "72rem", margin: "0 auto", padding: "2.5rem 1.5rem", display: "grid", gridTemplateColumns: "minmax(0,1.4fr) minmax(0,1fr)", gap: "2rem", alignItems: "start" }}>
-
+      <div
+        className="book-grid"
+        style={{
+          maxWidth: "72rem", margin: "0 auto", padding: "2.5rem 1.5rem",
+          display: "grid", gridTemplateColumns: "minmax(0,1.4fr) minmax(0,1fr)",
+          gap: "2rem", alignItems: "start",
+        }}
+      >
         {/* ── COLUMNA IZQUIERDA — preview + qué incluye ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
 
-          {/* Preview iframe */}
+          {/* Preview: captura estática de la web (o fallback si aún no hay) */}
           <div style={{ background: "white", borderRadius: "1rem", border: "1px solid #E7E5E4", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+
             {/* Barra browser falsa */}
             <div style={{ background: "#F5F5F4", borderBottom: "1px solid #E7E5E4", padding: "0.6rem 1rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
               <div style={{ display: "flex", gap: "0.35rem" }}>
@@ -130,19 +156,18 @@ export default function Book() {
               </span>
             </div>
 
-            {/* iframe o fallback */}
-            {info?.live_url && iframeOk ? (
-              <iframe
-                src={info.live_url}
-                title="Vista previa de tu web"
-                style={{ width: "100%", height: "520px", border: "none", display: "block" }}
-                onError={() => setIframeOk(false)}
-              />
-            ) : (
-              <div style={{ padding: "3rem 2rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
-                <p style={{ color: "#44403C", fontWeight: 600 }}>Tu web está publicada y funcionando.</p>
-                <p style={{ color: "#A8A29E", fontSize: "0.875rem" }}>Ábrela en una pestaña nueva para verla completa.</p>
+            {/* Contenido del preview: captura estática scrolleable, o fallback si aún no hay */}
+            {info?.preview_image_url ? (
+              <div style={{ height: "520px", overflowY: "auto", background: "white" }}>
+                <img
+                  src={info.preview_image_url}
+                  alt={`Vista previa de la web de ${info.business_name}`}
+                  loading="lazy"
+                  style={{ width: "100%", display: "block" }}
+                />
               </div>
+            ) : (
+              <WebPreviewFallback liveUrl={info?.live_url ?? null} businessName={info?.business_name ?? null} />
             )}
 
             {/* Botón ver web */}
@@ -152,7 +177,12 @@ export default function Book() {
                   href={info.live_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem", color: "#44403C", fontWeight: 500, textDecoration: "none", padding: "0.4rem 0.875rem", border: "1px solid #D6D3D1", borderRadius: "0.5rem", background: "white", transition: "background 0.15s" }}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                    fontSize: "0.8rem", color: "#44403C", fontWeight: 500, textDecoration: "none",
+                    padding: "0.4rem 0.875rem", border: "1px solid #D6D3D1", borderRadius: "0.5rem",
+                    background: "white",
+                  }}
                 >
                   Abrir en pantalla completa <ExternalLink style={{ width: "0.875rem", height: "0.875rem" }} />
                 </a>
@@ -181,7 +211,7 @@ export default function Book() {
           </div>
         </div>
 
-        {/* ── COLUMNA DERECHA — sticky: quién soy, garantía, precio, form ── */}
+        {/* ── COLUMNA DERECHA — sticky ── */}
         <div className="book-sticky" style={{ display: "flex", flexDirection: "column", gap: "1.25rem", position: "sticky", top: "1.5rem" }}>
 
           {/* Quién soy */}
@@ -191,7 +221,10 @@ export default function Book() {
                 src="https://unavatar.io/nicolassotodavid@gmail.com"
                 alt="Nico"
                 style={{ width: "3.25rem", height: "3.25rem", borderRadius: "50%", objectFit: "cover", border: "1px solid #E7E5E4", flexShrink: 0 }}
-                onError={(e) => { (e.target as HTMLImageElement).src = "https://ui-avatars.com/api/?name=Nico+Soto&background=1C1917&color=FAFAF9&size=52"; }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "https://ui-avatars.com/api/?name=Nico+Soto&background=1C1917&color=FAFAF9&size=52";
+                }}
               />
               <div>
                 <p style={{ fontFamily: LORA, fontSize: "1rem", fontWeight: 600, color: "#1C1917" }}>Nico Soto</p>
@@ -277,7 +310,9 @@ export default function Book() {
               </div>
 
               {formError && (
-                <p style={{ fontSize: "0.8rem", color: "#DC2626", background: "#FEF2F2", borderRadius: "0.5rem", padding: "0.75rem 1rem" }}>{formError}</p>
+                <p style={{ fontSize: "0.8rem", color: "#DC2626", background: "#FEF2F2", borderRadius: "0.5rem", padding: "0.75rem 1rem" }}>
+                  {formError}
+                </p>
               )}
 
               <button
@@ -304,22 +339,96 @@ export default function Book() {
           {/* Dudas */}
           <div style={{ textAlign: "center", paddingBottom: "2rem" }}>
             <p style={{ fontSize: "0.75rem", color: "#A8A29E" }}>¿Tienes dudas antes de pagar?</p>
-            <a href="mailto:nicolassotodavid@gmail.com"
-              style={{ fontSize: "0.75rem", color: "#57534E", textDecoration: "underline", textUnderlineOffset: "3px" }}>
-              nicolassotodavid@gmail.com
+            <a
+              href="mailto:hola@nico-soto.es"
+              style={{ fontSize: "0.75rem", color: "#57534E", textDecoration: "underline", textUnderlineOffset: "3px" }}
+            >
+              hola@nico-soto.es
             </a>
           </div>
 
         </div>
       </div>
 
-      {/* Responsive: en móvil las columnas se apilan */}
+      {/* Responsive */}
       <style>{`
         @media (max-width: 768px) {
           .book-grid { grid-template-columns: 1fr !important; }
           .book-sticky { position: static !important; }
         }
       `}</style>
+    </div>
+  );
+}
+
+// ── Fallback cuando aún no hay captura de la web ─────────────────────────────
+
+function WebPreviewFallback({
+  liveUrl,
+  businessName,
+}: {
+  liveUrl: string | null;
+  businessName: string | null;
+}) {
+  const LORA = "Lora, Georgia, serif";
+  const INTER = "Inter, system-ui, sans-serif";
+
+  return (
+    <div
+      style={{
+        height: "520px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "1.5rem",
+        padding: "2rem",
+        background: "linear-gradient(135deg, #FAF8F4 0%, #F5F5F0 100%)",
+        textAlign: "center",
+      }}
+    >
+      {/* Icono decorativo */}
+      <div
+        style={{
+          width: "4rem", height: "4rem", borderRadius: "1rem",
+          background: "#1C1917", display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+        }}
+      >
+        <Monitor style={{ width: "2rem", height: "2rem", color: "#FAFAF9" }} />
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <p style={{ fontFamily: LORA, fontSize: "1.15rem", fontWeight: 600, color: "#1C1917" }}>
+          {businessName ? `La web de ${businessName} está lista.` : "Tu web está publicada y funcionando."}
+        </p>
+        <p style={{ fontFamily: INTER, fontSize: "0.875rem", color: "#78716C", lineHeight: 1.6, maxWidth: "22rem" }}>
+          Ábrela en una pestaña nueva para verla al 100 %. Está construida para verse perfecta en móvil y ordenador.
+        </p>
+      </div>
+
+      {liveUrl && (
+        <a
+          href={liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "0.5rem",
+            padding: "0.75rem 1.5rem", borderRadius: "0.75rem",
+            background: "#1C1917", color: "white",
+            fontSize: "0.875rem", fontWeight: 600, fontFamily: INTER,
+            textDecoration: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          }}
+        >
+          Ver mi web <ExternalLink style={{ width: "0.875rem", height: "0.875rem" }} />
+        </a>
+      )}
+
+      {liveUrl && (
+        <p style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#A8A29E" }}>
+          {liveUrl.replace(/^https?:\/\//, "")}
+        </p>
+      )}
     </div>
   );
 }

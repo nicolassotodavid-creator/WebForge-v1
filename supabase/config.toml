@@ -11,3 +11,13 @@ verify_jwt = false
 # analyze-lead se llama desde el panel con tu sesión; la función valida el usuario por su cuenta.
 [functions.analyze-lead]
 verify_jwt = false
+
+# Funciones públicas: llamadas desde la landing /book sin sesión de usuario
+[functions.get-booking-info]
+verify_jwt = false
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.track-event]
+verify_jwt = false

@@ -16,12 +16,19 @@
 import "./env.ts"; // debe ir el PRIMERO: carga ../.env antes de evaluar el resto
 import { createClient } from "@supabase/supabase-js";
 import { BRIEF_PROMPT, BUILD_PROMPT } from "../supabase/functions/_shared/prompts.ts";
-import { fableJson, fableText, extractReviews, FABLE_MODEL } from "./fable.ts";
+import { fableJson, fableText, extractReviews, ORQUESTADOR_MODEL } from "./fable.ts";
 import { lovableBuild } from "./lovable.ts";
+import { rehostScreenshot } from "./preview.ts";
 import { sendFollowupEmail, getLiveUrl, supabase as supabaseFollowup } from "./followup-mailer.ts";
 
 const BATCH = Number(process.env.BATCH_SIZE ?? 5);
 const BOOKING_BASE = process.env.BOOKING_BASE ?? "";
+// Un build se considera abandonado pasado este tiempo: permite re-reclamar el lead si el
+// proceso anterior murió a mitad. > BUILD_DEADLINE_MS de lovable.ts (15 min).
+const BUILD_LOCK_STALE_MS = Number(process.env.BUILD_LOCK_STALE_MS ?? 20 * 60 * 1000);
+
+// Resultado de procesar un lead. 'skip' = no se hizo nada (ya reclamado por otro proceso).
+type Outcome = "ok" | "dry" | "failed" | "skip";
 
 // --- args ---
 const args = process.argv.slice(2);
@@ -84,7 +91,7 @@ function leadPayload(lead: Lead) {
 // ─── PASO 1: Generar brief (barato — Haiku/Fable) ──────────────────────────────
 // Lee leads 'new', genera el brief y los pasa a 'analyzed'.
 // El operador revisa el brief en el panel y decide si encolar el build.
-async function processBrief(lead: Lead): Promise<"ok" | "dry" | "failed"> {
+async function processBrief(lead: Lead): Promise<Outcome> {
   console.log(`\n▶ [BRIEF] ${lead.id} — ${lead.name} (${lead.city ?? "?"})`);
 
   const brief = await fableJson<Brief>(BRIEF_PROMPT, leadPayload(lead));
@@ -106,7 +113,7 @@ async function processBrief(lead: Lead): Promise<"ok" | "dry" | "failed"> {
     services: brief.services ?? null,
     suggested_palette: brief.suggested_palette ?? null,
     hero_copy: brief.hero_copy ?? null,
-    model_used: FABLE_MODEL,
+    model_used: ORQUESTADOR_MODEL,
   });
   await supabase.from("leads")
     .update({ status: "analyzed", updated_at: new Date().toISOString() })
@@ -119,7 +126,7 @@ async function processBrief(lead: Lead): Promise<"ok" | "dry" | "failed"> {
 // ─── PASO 2: Construir web en Lovable (caro — gasta créditos) ──────────────────
 // Solo se ejecuta cuando el operador ha aprobado el brief desde el panel
 // y el lead está en 'build_queued'.
-async function processBuild(lead: Lead): Promise<"ok" | "dry" | "failed"> {
+async function processBuild(lead: Lead): Promise<Outcome> {
   console.log(`\n▶ [BUILD] ${lead.id} — ${lead.name} (${lead.city ?? "?"})`);
 
   // Recuperar el brief guardado
@@ -151,33 +158,87 @@ async function processBuild(lead: Lead): Promise<"ok" | "dry" | "failed"> {
     return "dry";
   }
 
-  const description = `Web ${lead.name}`.slice(0, 80);
-  const { data: site, error: siteErr } = await supabase.from("sites")
-    .insert({ lead_id: lead.id, build_prompt: buildPrompt, status: "building" })
-    .select().single();
-  if (siteErr || !site) throw new Error(`No se pudo crear la fila en 'sites': ${siteErr?.message}`);
+  // --- Claim atómico (#2): evita que dos ticks del cron solapados construyan el mismo lead
+  //     (= doble gasto de créditos Lovable). El UPDATE condicional sobre build_lock_at sólo
+  //     afecta filas si el lock está libre o caducado; en una carrera, exactamente un proceso
+  //     gana (Postgres serializa los UPDATE sobre la misma fila). ---
+  const nowIso = new Date().toISOString();
+  const staleIso = new Date(Date.now() - BUILD_LOCK_STALE_MS).toISOString();
+  const { data: claimed, error: claimErr } = await supabase.from("leads")
+    .update({ build_lock_at: nowIso })
+    .eq("id", lead.id)
+    .eq("status", "build_queued")
+    .or(`build_lock_at.is.null,build_lock_at.lt.${staleIso}`)
+    .select("id");
+  if (claimErr) throw new Error(`No se pudo reclamar el lead para build: ${claimErr.message}`);
+  if (!claimed || claimed.length === 0) {
+    console.log("  · lead ya en construcción por otro proceso (lock activo) — saltando.");
+    return "skip";
+  }
+
+  // --- Reanudar build huérfano (#3): si un intento previo creó el proyecto en Lovable pero
+  //     falló DESPUÉS (deploy/red), reutilizamos ESE proyecto en vez de crear otro (créditos).
+  //     Reusamos también su fila en `sites`. ---
+  const { data: resumable } = await supabase.from("sites")
+    .select("id, lovable_project_id")
+    .eq("lead_id", lead.id)
+    .not("lovable_project_id", "is", null)
+    .in("status", ["building", "failed"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let siteId: string;
+  let resumeProjectId: string | undefined;
+  if (resumable?.lovable_project_id) {
+    siteId = resumable.id as string;
+    resumeProjectId = resumable.lovable_project_id as string;
+    await supabase.from("sites")
+      .update({ status: "building", build_prompt: buildPrompt, notes: null })
+      .eq("id", siteId);
+    console.log(`  · reanudando sobre proyecto Lovable existente (${resumeProjectId})`);
+  } else {
+    const { data: site, error: siteErr } = await supabase.from("sites")
+      .insert({ lead_id: lead.id, build_prompt: buildPrompt, status: "building" })
+      .select().single();
+    if (siteErr || !site) throw new Error(`No se pudo crear la fila en 'sites': ${siteErr?.message}`);
+    siteId = site.id as string;
+  }
 
   try {
     console.log("  · construyendo en Lovable (puede tardar varios minutos)…");
-    const { projectId, liveUrl } = await lovableBuild(buildPrompt, description);
+    const description = `Web ${lead.name}`.slice(0, 80);
+    const { projectId, liveUrl, isPreview, screenshotUrl } = await lovableBuild(buildPrompt, description, {
+      slugSuffix: lead.id.slice(0, 6),
+      resumeProjectId,
+      // Persistir el projectId EN CUANTO existe: si un fallo posterior aborta, el próximo
+      // intento reanuda en vez de recrear (no se duplica el gasto de créditos).
+      onProjectCreated: async (pid) => {
+        await supabase.from("sites").update({ lovable_project_id: pid }).eq("id", siteId);
+      },
+    });
+    const previewImageUrl = await rehostScreenshot(supabase, lead.id, screenshotUrl);
     await supabase.from("sites").update({
       lovable_project_id: projectId,
       live_url: liveUrl,
+      preview_image_url: previewImageUrl,
       status: "built",
       built_at: new Date().toISOString(),
-    }).eq("id", site.id);
+      notes: isPreview ? "URL de preview (no publicada) — re-deploy pendiente" : null,
+    }).eq("id", siteId);
     await supabase.from("leads")
-      .update({ status: "site_built", updated_at: new Date().toISOString() })
+      .update({ status: "site_built", build_lock_at: null, updated_at: new Date().toISOString() })
       .eq("id", lead.id).in("status", ["build_queued"]);
     console.log(`  ✓ web publicada: ${liveUrl}`);
     return "ok";
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    await supabase.from("sites").update({ status: "failed", notes: msg.slice(0, 1000) }).eq("id", site.id);
-    // Revertir a 'analyzed' para que el operador pueda reintentar desde el panel.
+    await supabase.from("sites").update({ status: "failed", notes: msg.slice(0, 1000) }).eq("id", siteId);
+    // Revertir a 'analyzed' SOLO si el lead sigue en 'build_queued' (#4): no pisar una acción
+    // del operador hecha durante el build. Liberamos el lock para permitir el reintento.
     await supabase.from("leads")
-      .update({ status: "analyzed", updated_at: new Date().toISOString() })
-      .eq("id", lead.id);
+      .update({ status: "analyzed", build_lock_at: null, updated_at: new Date().toISOString() })
+      .eq("id", lead.id).in("status", ["build_queued"]);
     console.error(`  ✗ build falló (revertido a 'analyzed'): ${msg}`);
     return "failed";
   }
@@ -289,9 +350,9 @@ async function selectSingleLead(id: string): Promise<Lead[]> {
 }
 
 async function run() {
-  console.log(`WebForge Orquestador — modelo ${FABLE_MODEL}${DRY_RUN ? " (DRY-RUN)" : ""}`);
+  console.log(`WebForge Orquestador — modelo ${ORQUESTADOR_MODEL}${DRY_RUN ? " (DRY-RUN)" : ""}`);
 
-  const tally = { ok: 0, dry: 0, failed: 0 };
+  const tally: Record<Outcome, number> = { ok: 0, dry: 0, failed: 0, skip: 0 };
 
   if (ONLY_LEAD) {
     // Modo prueba: procesa un lead concreto según su estado actual.
@@ -360,7 +421,7 @@ async function run() {
     await processFollowups();
   }
 
-  console.log(`\nResumen: ${tally.ok} ok · ${tally.dry} dry · ${tally.failed} fallidos.`);
+  console.log(`\nResumen: ${tally.ok} ok · ${tally.dry} dry · ${tally.skip} saltados · ${tally.failed} fallidos.`);
 }
 
 run().catch((e) => {

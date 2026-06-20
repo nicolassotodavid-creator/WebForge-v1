@@ -8,7 +8,10 @@
     "start": "tsx run.ts",
     "auth": "tsx lovable-auth.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "dry-run": "tsx run.ts --dry-run"
+    "dry-run": "tsx run.ts --dry-run",
+    "check-yuricar": "tsx check-yuricar.ts",
+    "fix-yuricar": "tsx check-yuricar.ts --fix",
+    "backfill-previews": "tsx backfill-previews.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
