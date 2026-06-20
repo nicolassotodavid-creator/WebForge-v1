@@ -51,7 +51,7 @@ Deno.serve(async (req: Request) => {
   let query: string, city: string;
   let max = 20;
   let language = "es";
-  let maxReviews = 5;
+  let maxReviews = 15; // material suficiente para el carrusel de reseñas de la web (mín. 12 reales)
   let onlyWithoutWebsite = true;
   let countryCode = "es"; // España por defecto: el producto es para negocios locales españoles.
   // Filtros de calidad post-scrape
@@ -67,7 +67,7 @@ Deno.serve(async (req: Request) => {
     if (!query || !city) return jsonResponse({ error: "Faltan query y city." }, 400);
     if (body?.max !== undefined) max = Math.min(Number(body.max) || 20, 60); // tope duro 60
     if (body?.language) language = String(body.language);
-    if (body?.maxReviews !== undefined) maxReviews = Number(body.maxReviews) || 5;
+    if (body?.maxReviews !== undefined) maxReviews = Number(body.maxReviews) || 15;
     if (body?.onlyWithoutWebsite !== undefined) onlyWithoutWebsite = Boolean(body.onlyWithoutWebsite);
     if (body?.minRating !== undefined) minRating = Number(body.minRating) || 0;
     if (body?.categoryKeyword) categoryKeyword = String(body.categoryKeyword).trim().toLowerCase();
