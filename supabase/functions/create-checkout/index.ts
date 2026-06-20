@@ -41,7 +41,7 @@ Deno.serve(async (req: Request) => {
   let body: {
     lead_id?: string;
     contact?: { name?: string; email?: string; phone?: string };
-    fiscal?: { empresa?: string; nif?: string; direccion?: string; ciudad?: string };
+    fiscal?: { empresa?: string; nif?: string; direccion?: string; cp?: string; ciudad?: string; provincia?: string };
   };
   try { body = await req.json(); }
   catch { return jsonResponse({ error: "JSON inválido." }, 400); }
@@ -51,8 +51,8 @@ Deno.serve(async (req: Request) => {
   if (!contact?.name?.trim() || !contact?.email?.trim()) {
     return jsonResponse({ error: "Faltan campos obligatorios: contact.name, contact.email." }, 400);
   }
-  if (!fiscal?.empresa?.trim() || !fiscal?.nif?.trim() || !fiscal?.direccion?.trim() || !fiscal?.ciudad?.trim()) {
-    return jsonResponse({ error: "Faltan datos fiscales para la factura (empresa, nif, dirección, ciudad)." }, 400);
+  if (!fiscal?.empresa?.trim() || !fiscal?.nif?.trim() || !fiscal?.direccion?.trim() || !fiscal?.cp?.trim() || !fiscal?.ciudad?.trim()) {
+    return jsonResponse({ error: "Faltan datos fiscales para la factura (empresa, nif, dirección, CP, ciudad)." }, 400);
   }
 
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
@@ -91,7 +91,9 @@ Deno.serve(async (req: Request) => {
     "metadata[fiscal_empresa]": fiscal!.empresa!.trim(),
     "metadata[fiscal_nif]": fiscal!.nif!.trim(),
     "metadata[fiscal_direccion]": fiscal!.direccion!.trim(),
+    "metadata[fiscal_cp]": fiscal!.cp!.trim(),
     "metadata[fiscal_ciudad]": fiscal!.ciudad!.trim(),
+    "metadata[fiscal_provincia]": fiscal!.provincia?.trim() ?? "",
     success_url: `${APP_URL}/gracias?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${APP_URL}/book/${lead_id}`,
   });

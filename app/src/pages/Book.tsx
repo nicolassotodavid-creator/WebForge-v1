@@ -31,7 +31,9 @@ export default function Book() {
   const [empresa, setEmpresa] = useState("");
   const [nif, setNif] = useState("");
   const [direccion, setDireccion] = useState("");
+  const [cp, setCp] = useState("");
   const [ciudad, setCiudad] = useState("");
+  const [provincia, setProvincia] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -59,7 +61,7 @@ export default function Book() {
     setSubmitting(true); setFormError(null);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { lead_id: leadId, contact: { name, email, phone }, fiscal: { empresa, nif, direccion, ciudad } },
+        body: { lead_id: leadId, contact: { name, email, phone }, fiscal: { empresa, nif, direccion, cp, ciudad, provincia } },
       });
       if (error) throw error;
       const url = (data as { checkout_url?: string })?.checkout_url;
@@ -266,9 +268,21 @@ export default function Book() {
                     <Label htmlFor="b-dir" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>Dirección fiscal</Label>
                     <Input id="b-dir" value={direccion} onChange={e => setDireccion(e.target.value)} placeholder="Calle Mayor 1, 1º" required autoComplete="street-address" style={{ marginTop: "0.3rem" }} />
                   </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.45fr) minmax(0, 1fr)", gap: "0.75rem" }}>
+                    <div>
+                      <Label htmlFor="b-cp" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>CP</Label>
+                      <Input id="b-cp" value={cp} onChange={e => setCp(e.target.value)} placeholder="46001" required inputMode="numeric" autoComplete="postal-code" style={{ marginTop: "0.3rem" }} />
+                    </div>
+                    <div>
+                      <Label htmlFor="b-ciudad" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>Ciudad</Label>
+                      <Input id="b-ciudad" value={ciudad} onChange={e => setCiudad(e.target.value)} placeholder="Valencia" required autoComplete="address-level2" style={{ marginTop: "0.3rem" }} />
+                    </div>
+                  </div>
                   <div>
-                    <Label htmlFor="b-ciudad" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>Ciudad y CP</Label>
-                    <Input id="b-ciudad" value={ciudad} onChange={e => setCiudad(e.target.value)} placeholder="46001 Valencia" required autoComplete="address-level2" style={{ marginTop: "0.3rem" }} />
+                    <Label htmlFor="b-provincia" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>
+                      Provincia <span style={{ color: "#A8A29E", fontWeight: 400 }}>(opcional)</span>
+                    </Label>
+                    <Input id="b-provincia" value={provincia} onChange={e => setProvincia(e.target.value)} placeholder="Valencia" autoComplete="address-level1" style={{ marginTop: "0.3rem" }} />
                   </div>
                 </div>
               </div>

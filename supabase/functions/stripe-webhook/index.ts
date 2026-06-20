@@ -29,7 +29,7 @@ async function holdedRequest(
 /** Crea o reutiliza contacto en Holded. Devuelve el contactId. */
 async function upsertHoldedContact(
   apiKey: string,
-  fiscal: { empresa: string; nif: string; direccion: string; ciudad: string; email: string },
+  fiscal: { empresa: string; nif: string; direccion: string; cp: string; ciudad: string; provincia: string; email: string },
 ): Promise<string> {
   // Buscar por NIF primero
   const search = await holdedRequest(
@@ -47,6 +47,8 @@ async function upsertHoldedContact(
     email: fiscal.email,
     address: fiscal.direccion,
     city: fiscal.ciudad,
+    postalCode: fiscal.cp,
+    province: fiscal.provincia,
     country: "ES",
     type: "client",
   }) as { id: string };
@@ -199,7 +201,9 @@ Deno.serve(async (req: Request) => {
               empresa: metadata.fiscal_empresa ?? lead?.name ?? "Cliente",
               nif: metadata.fiscal_nif,
               direccion: metadata.fiscal_direccion ?? "",
+              cp: metadata.fiscal_cp ?? "",
               ciudad: metadata.fiscal_ciudad ?? "",
+              provincia: metadata.fiscal_provincia ?? "",
               email: customerEmail,
             });
             const invoiceId = await createDraftHoldedInvoice(
