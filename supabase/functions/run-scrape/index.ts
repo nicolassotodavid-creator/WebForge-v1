@@ -79,49 +79,94 @@ Deno.serve(async (req: Request) => {
   }
 
   // El email es la pieza accionable del canal "local" (CLAUDE.md), así que SIEMPRE
-  // enriquecemos contactos: Apify visita la web/redes de cada negocio y trae el email
-  // cuando existe (campo `emails` / `leadsEnrichment`). `requireEmail` ya NO controla esto;
-  // pasa a ser solo un filtro opcional ("quédate solo con los que tienen email").
-  // scrapeContacts es ~3-5x más lento, así que bajamos el tope de resultados para no
-  // agotar el límite de ~150s de la Edge Function.
+  // enriquecemos contactos: con scrapeContacts el actor crawlea la `website` de la ficha y, si
+  // tiene email visible, lo devuelve en el array `emails` (lo lee ingest-leads). NO siempre lo
+  // encuentra: si en Maps figura su Instagram en vez de su web, no saca nada — ese hueco lo
+  // cubre el Orquestador (backfill-emails.ts) descubriendo la web real. `requireEmail` ya NO
+  // controla esto; pasa a ser solo un filtro opcional ("quédate solo con los que tienen email").
+  // scrapeContacts es ~3-5x más lento, así que bajamos el tope de resultados para que el
+  // run quepa en RUN_TIMEOUT (~100s) y casi nunca se corte. Aun si se corta, el rescate de
+  // parciales (ver abajo) conserva lo scrapeado; este tope solo reduce la frecuencia.
   const scrapeContacts = true;
-  max = Math.min(max, 20);
+  max = Math.min(max, 12);
 
-  // --- Llamada a Apify (síncrona) ---
-  const apifyUrl =
-    `https://api.apify.com/v2/acts/compass~crawler-google-places/run-sync-get-dataset-items?token=${APIFY_TOKEN}&timeout=120`;
+  // --- Llamada a Apify (asíncrona, con rescate de parciales) ---
+  // Antes usábamos run-sync-get-dataset-items con timeout=120: si el run se pasaba de
+  // tiempo, Apify respondía 400 (run-failed / TIMED-OUT) y se perdían TODOS los
+  // resultados, aunque ya hubiera scrapeado parte. scrapeContacts visita la web/redes de
+  // cada negocio (3-5x más lento), así que con max=20 el run rebasaba 120s a menudo.
+  // Ahora: lanzamos el run, esperamos a estado terminal (o a que Apify lo aborte por
+  // timeout) y SIEMPRE leemos el dataset — un run TIMED-OUT igual deja sus parciales.
+  const ACTOR = "compass~crawler-google-places";
+  const RUN_TIMEOUT = 100;        // s — Apify aborta el actor aquí; deja headroom para leer el dataset bajo el límite ~150s de la Edge Function.
+  const WALL_BUDGET_MS = 110_000; // tope de espera total antes de rescatar parciales.
+  const TERMINAL = new Set(["SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"]);
+
+  const runInput = {
+    // El término va separado de la ubicación: así Google Maps geolocaliza bien.
+    // Antes se concatenaba ("clinica dental valencia") y devolvía negocios de otros
+    // países (p. ej. Valencia, México). countryCode + city lo fijan a España.
+    searchStringsArray: [query],
+    countryCode,
+    city,
+    maxCrawledPlacesPerSearch: max,
+    language,
+    maxReviews,
+    reviewsSort: "newest",
+    scrapeReviewsPersonalData: false,
+    skipClosedPlaces: true,
+    includeWebResults: false,
+    // El email NO viene en los datos de Google Maps: hay que visitar la web/redes del
+    // negocio. scrapeContacts lo activa para CADA resultado, tenga o no web propia
+    // (Apify también rastrea las redes enlazadas). Siempre encendido: ver nota arriba.
+    scrapeContacts,
+  };
 
   let items: Record<string, unknown>[] = [];
+  let runStatus = "RUNNING";
   try {
-    const res = await fetch(apifyUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        // El término va separado de la ubicación: así Google Maps geolocaliza bien.
-        // Antes se concatenaba ("clinica dental valencia") y devolvía negocios de otros
-        // países (p. ej. Valencia, México). countryCode + city lo fijan a España.
-        searchStringsArray: [query],
-        countryCode,
-        city,
-        maxCrawledPlacesPerSearch: max,
-        language,
-        maxReviews,
-        reviewsSort: "newest",
-        scrapeReviewsPersonalData: false,
-        skipClosedPlaces: true,
-        includeWebResults: false,
-        // El email NO viene en los datos de Google Maps: hay que visitar la web/redes del
-        // negocio. scrapeContacts lo activa para CADA resultado, tenga o no web propia
-        // (Apify también rastrea las redes enlazadas). Siempre encendido: ver nota arriba.
-        scrapeContacts,
-      }),
-      // Edge Functions tienen un límite de 150s; Apify tiene timeout=120 por encima.
-    });
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      return jsonResponse({ error: `Apify devolvió ${res.status}: ${txt.slice(0, 300)}` }, 502);
+    // 1. Lanzar el run (asíncrono). `timeout` aborta el actor; no esperamos a que acabe aquí.
+    const startRes = await fetch(
+      `https://api.apify.com/v2/acts/${ACTOR}/runs?token=${APIFY_TOKEN}&timeout=${RUN_TIMEOUT}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(runInput),
+      },
+    );
+    if (!startRes.ok) {
+      const txt = await startRes.text().catch(() => "");
+      return jsonResponse({ error: `Apify no aceptó el run (${startRes.status}): ${txt.slice(0, 300)}` }, 502);
     }
-    items = await res.json();
+    const startJson = await startRes.json();
+    const runId = String(startJson?.data?.id ?? "");
+    const datasetId = String(startJson?.data?.defaultDatasetId ?? "");
+    runStatus = String(startJson?.data?.status ?? "RUNNING");
+    if (!runId || !datasetId) {
+      return jsonResponse({ error: "Apify no devolvió runId/datasetId." }, 502);
+    }
+
+    // 2. Esperar a estado terminal. `waitForFinish` bloquea hasta 20s por llamada; el actor
+    //    se aborta solo a los RUN_TIMEOUT s, así que el bucle converge sin colgarse.
+    const startedAt = Date.now();
+    while (!TERMINAL.has(runStatus) && (Date.now() - startedAt) < WALL_BUDGET_MS) {
+      const pollRes = await fetch(
+        `https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_TOKEN}&waitForFinish=20`,
+      );
+      if (!pollRes.ok) break; // si falla el poll, salimos y rescatamos lo que haya en el dataset.
+      const pollJson = await pollRes.json().catch(() => null);
+      runStatus = String(pollJson?.data?.status ?? runStatus);
+    }
+
+    // 3. Leer el dataset SIEMPRE: incluye los parciales aunque el run acabara TIMED-OUT.
+    const itemsRes = await fetch(
+      `https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_TOKEN}&format=json`,
+    );
+    if (!itemsRes.ok) {
+      const txt = await itemsRes.text().catch(() => "");
+      return jsonResponse({ error: `Apify devolvió ${itemsRes.status} al leer el dataset: ${txt.slice(0, 300)}` }, 502);
+    }
+    items = await itemsRes.json();
     if (!Array.isArray(items)) {
       return jsonResponse({ error: "Apify no devolvió un array.", raw: String(items).slice(0, 200) }, 502);
     }
@@ -132,6 +177,9 @@ Deno.serve(async (req: Request) => {
     );
   }
 
+  // partial = el run no terminó con éxito (TIMED-OUT, abortado…), así que los datos pueden
+  // estar incompletos. Lo propagamos para que la UI lo avise en vez de fingir que está todo.
+  const partial = runStatus !== "SUCCEEDED";
   const found = items.length;
 
   // --- Filtro "sin web" ---
@@ -180,7 +228,20 @@ Deno.serve(async (req: Request) => {
   const afterQualityFilters = filtered.length;
 
   if (filtered.length === 0) {
-    return jsonResponse({ found, without_website: 0, inserted: 0, upserted: 0, with_email: 0, errors: [] });
+    const warn = partial
+      ? [`El run de Apify no terminó (${runStatus}): resultados parciales o vacíos. Repite la búsqueda o baja el máximo de resultados.`]
+      : [];
+    return jsonResponse({
+      found,
+      without_website: 0,
+      after_filters: 0,
+      inserted: 0,
+      upserted: 0,
+      with_email: 0,
+      partial,
+      run_status: runStatus,
+      errors: warn,
+    });
   }
 
   // --- Pasar a ingest-leads via server-to-server ---
@@ -221,6 +282,8 @@ Deno.serve(async (req: Request) => {
     inserted: ingestResult.inserted ?? 0,
     upserted: ingestResult.upserted ?? 0,
     with_email: withEmail,
+    partial,
+    run_status: runStatus,
     errors: ingestResult.errors ?? [],
   });
 });

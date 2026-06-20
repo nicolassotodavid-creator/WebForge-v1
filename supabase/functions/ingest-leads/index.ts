@@ -68,12 +68,15 @@ function pickEmail(v: unknown): string | null {
 function firstEmail(o: RawLead): string | null {
   const direct = s(pick(o, ["email", "Email", "correo"]));
   if (direct && !isJunkEmail(direct)) return direct.toLowerCase();
+  // Con scrapeContacts=true, el actor (compass~crawler-google-places) devuelve los contactos
+  // enriquecidos en el array de nivel superior `emails` (crawleando la `website` de la ficha).
+  // OJO: solo trae email si esa web tiene uno visible Y la web es la real del negocio — si en
+  // Maps figura su Instagram, no saca nada (eso lo resuelve backfill-emails.ts descubriendo la
+  // web real). `leadsEnrichment` va SIEMPRE vacío en este build: se mantiene como fallback
+  // defensivo por si un build futuro lo repuebla, pero hoy no aporta.
   const emails = o["emails"] ?? o["email_1"];
   const fromList = pickEmail(emails);
   if (fromList) return fromList;
-  // Apify (scrapeContacts) mete los contactos enriquecidos en `leadsEnrichment`.
-  // Buscamos cualquier email válido ahí dentro (solo ese campo: no tocamos reseñas
-  // ni webResults para no colar correos de terceros).
   return pickEmail(o["leadsEnrichment"]);
 }
 
@@ -83,6 +86,62 @@ function deriveHasWebsite(o: RawLead): boolean {
   // Ignorar enlaces a Google/Maps que no son una web propia
   if (/google\.|maps\.|facebook\.|instagram\./i.test(ws)) return false;
   return true;
+}
+
+// Primer string que casa `rx` dentro de un valor anidado (string/array/objeto).
+function findMatch(v: unknown, rx: RegExp): string | null {
+  if (typeof v === "string") {
+    const m = v.match(rx);
+    return m ? m[0] : null;
+  }
+  if (Array.isArray(v)) {
+    for (const item of v) {
+      const r = findMatch(item, rx);
+      if (r) return r;
+    }
+  } else if (v && typeof v === "object") {
+    for (const val of Object.values(v as Record<string, unknown>)) {
+      const r = findMatch(val, rx);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+const FB_RX = /https?:\/\/(?:www\.|m\.)?facebook\.com\/[A-Za-z0-9._%\-/?=&]+/i;
+// Botones de compartir / pixel: NO son la página del negocio.
+const FB_BAD = /facebook\.com\/(sharer|dialog|plugins|tr(\b|\/)|sharer\.php)/i;
+function firstFacebook(o: RawLead): string | null {
+  const direct = s(pick(o, ["facebook", "facebookUrl", "facebook_url"]));
+  if (direct && FB_RX.test(direct) && !FB_BAD.test(direct)) return direct;
+  // Apify mete las redes en leadsEnrichment.facebooks[] (o similar)
+  for (const key of ["facebooks", "leadsEnrichment"]) {
+    const found = findMatch(o[key], FB_RX);
+    if (found && !FB_BAD.test(found)) return found;
+  }
+  // A veces el "website" del negocio ES su Facebook
+  const ws = s(pick(o, ["website", "url", "site", "web"]));
+  if (ws && FB_RX.test(ws) && !FB_BAD.test(ws)) return ws;
+  return null;
+}
+
+// Solo WhatsApp EXPLÍCITO (wa.me / api.whatsapp.com / campo whatsapp). La derivación
+// "móvil español = WhatsApp" se hace en el frontend, no se persiste como dato asumido.
+const WA_RX = /(?:wa\.me\/|api\.whatsapp\.com\/send\?phone=)\+?\d[\d ]{6,}/i;
+function firstWhatsapp(o: RawLead): string | null {
+  const direct = s(pick(o, ["whatsapp", "whatsApp", "whatsapp_number"]));
+  if (direct) {
+    const d = direct.replace(/\D/g, "");
+    if (d.length >= 7) return d;
+  }
+  for (const key of ["leadsEnrichment", "website", "url"]) {
+    const found = findMatch(o[key], WA_RX);
+    if (found) {
+      const d = found.replace(/\D/g, "");
+      if (d.length >= 7) return d;
+    }
+  }
+  return null;
 }
 
 function normalizeLead(o: RawLead, defaultSource: string) {
@@ -98,7 +157,8 @@ function normalizeLead(o: RawLead, defaultSource: string) {
         "telefono",
       ]),
     ),
-    whatsapp: s(pick(o, ["whatsapp", "whatsApp", "whatsapp_number"])),
+    whatsapp: firstWhatsapp(o),
+    facebook: firstFacebook(o),
     email: firstEmail(o),
     address: s(pick(o, ["address", "formattedAddress", "street", "direccion"])),
     city: s(pick(o, ["city", "town", "locality", "ciudad"])),

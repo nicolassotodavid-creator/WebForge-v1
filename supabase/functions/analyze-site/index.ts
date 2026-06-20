@@ -6,7 +6,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { ANALYSIS_PROMPT } from "../_shared/prompts.ts";
-import { getWebsiteUrl } from "../_shared/website.ts";
+import { resolveWebsite } from "../_shared/website.ts";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -50,7 +50,9 @@ Deno.serve(async (req: Request) => {
   const { data: lead } = await supabase.from("leads").select("*").eq("id", leadId).maybeSingle();
   if (!lead) return jsonResponse({ error: "Lead no encontrado." }, 404);
 
-  const url = getWebsiteUrl(lead.raw_json);
+  // Web real: la descubierta (website_url) tiene prioridad sobre la del scrape (raw_json),
+  // que puede ser su Instagram. Así el análisis nunca apunta a una red social.
+  const url = resolveWebsite(lead);
   if (!url) return jsonResponse({ error: "Este negocio no tiene una web propia para analizar." }, 409);
 
   // Intentar traer el HTML de la página

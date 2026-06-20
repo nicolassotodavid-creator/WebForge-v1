@@ -3,7 +3,7 @@
 // una nota 1-10 (Haiku 4.5, ~medio céntimo/web). Es ORIENTATIVO y de prospección: nota baja =
 // web floja = buen candidato. NO toca el gate humano ni la web que construimos nosotros (`sites`).
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getWebsiteUrl } from "../supabase/functions/_shared/website.ts";
+import { resolveWebsite } from "../supabase/functions/_shared/website.ts";
 import { analyzeExistingSite } from "./analyze.ts";
 
 // Tope de webs por corrida (acota coste/tiempo del cron). Override con SITE_SCORE_BATCH.
@@ -17,6 +17,7 @@ interface LeadRow {
   rating: number | null;
   review_count: number | null;
   raw_json: unknown;
+  website_url: string | null;
 }
 
 export interface SweepResult {
@@ -29,7 +30,7 @@ export async function scoreExistingSites(supabase: SupabaseClient): Promise<Swee
   // Leads con web propia y sin analizar, los más antiguos primero. Tope por corrida.
   const { data, error } = await supabase
     .from("leads")
-    .select("id,name,category,city,rating,review_count,raw_json")
+    .select("id,name,category,city,rating,review_count,raw_json,website_url")
     .eq("has_website", true)
     .is("site_analyzed_at", null)
     .order("created_at", { ascending: true })
@@ -40,7 +41,8 @@ export async function scoreExistingSites(supabase: SupabaseClient): Promise<Swee
   const result: SweepResult = { scored: 0, skipped: 0, failed: 0 };
 
   for (const lead of leads) {
-    const url = getWebsiteUrl(lead.raw_json);
+    // Prefiere la web real descubierta (website_url) sobre raw_json (que puede ser su Instagram).
+    const url = resolveWebsite(lead);
 
     // has_website=true pero sin URL parseable: lo marcamos analizado para no re-escanearlo cada día.
     if (!url) {
