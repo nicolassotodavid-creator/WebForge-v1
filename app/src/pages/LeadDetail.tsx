@@ -104,6 +104,8 @@ export default function LeadDetail() {
       });
       if (error) throw error;
       if (data?.analysis) setAnalysis(data.analysis);
+      // Recargar el lead para reflejar site_analyzed_at y la versión persistida del análisis.
+      await loadAll();
     } catch (e) {
       setAnalysisError(await edgeFunctionErrorMessage(e, "Error al analizar la web."));
     } finally {
@@ -147,8 +149,9 @@ export default function LeadDetail() {
     setBrief((briefData as Brief | null) ?? null);
     const loadedSite = (siteData as Site | null) ?? null;
     setSite(loadedSite);
-    // Hidratar el análisis guardado para mostrarlo sin tener que re-analizar.
-    setAnalysis(loadedSite?.analysis ?? null);
+    // Hidratar el análisis de la web ACTUAL del negocio (leads.site_analysis) para mostrarlo
+    // sin tener que re-analizar. Es la nota de prospección, no la de la web que construimos.
+    setAnalysis((leadData as Lead | null)?.site_analysis ?? null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setOutreachMsg((outreachData as any) ?? null);
     setLoading(false);
@@ -456,6 +459,88 @@ export default function LeadDetail() {
             </div>
           </div>
           <Field label="Origen" value={lead.source} />
+        </CardContent>
+      </Card>
+
+      {/* Web actual del negocio — análisis IA de prospección (la de raw_json, no la que construimos) */}
+      <Card>
+        <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+          <div>
+            <CardTitle className="text-lg">Web actual del negocio</CardTitle>
+            <CardDescription>
+              Claude puntúa la web que el negocio YA tiene. Nota baja = web floja = buen candidato.
+            </CardDescription>
+          </div>
+          {websiteUrl && (
+            <Button onClick={runAnalysis} disabled={analyzing} variant="outline" size="sm">
+              {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+              {analyzing ? "Analizando…" : analysis ? "Re-analizar" : "Analizar web actual"}
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {!websiteUrl ? (
+            <p className="text-sm text-muted-foreground">
+              No se detecta web propia de este negocio — es de los mejores candidatos a contactar.
+            </p>
+          ) : (
+            <>
+              {analysisError && <p className="text-sm text-destructive">{analysisError}</p>}
+
+              {!analysis && !analysisError && (
+                <p className="text-sm text-muted-foreground">
+                  {lead.site_analyzed_at
+                    ? "Sin nota guardada para esta web."
+                    : "Aún sin analizar. Se hace solo en el barrido diario, o pulsa «Analizar web actual»."}
+                </p>
+              )}
+
+              {analysis && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl font-bold">
+                      {analysis.score}<span className="text-lg text-muted-foreground">/10</span>
+                    </span>
+                    <p className="text-sm text-muted-foreground">{analysis.summary}</p>
+                  </div>
+                  {lead.site_analyzed_at && (
+                    <p className="text-xs text-muted-foreground">
+                      Analizado el {new Date(lead.site_analyzed_at).toLocaleString("es-ES")}
+                    </p>
+                  )}
+
+                  {analysis.strengths?.length > 0 && (
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Puntos fuertes</p>
+                      <ul className="space-y-1">
+                        {analysis.strengths.map((s, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                            {s}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {analysis.improvements?.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Mejoras sugeridas</p>
+                      {analysis.improvements.map((imp, i) => (
+                        <div key={i} className="rounded-md border p-3 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">{imp.area}</Badge>
+                            <p className="text-sm font-medium">{imp.issue}</p>
+                          </div>
+                          <p className="text-xs text-muted-foreground">→ {imp.fix}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -806,66 +891,6 @@ export default function LeadDetail() {
                 </p>
               )}
 
-              {/* Análisis IA */}
-              <div className="border-t pt-4 mt-2 space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-medium">Análisis IA</p>
-                    <p className="text-xs text-muted-foreground">Claude revisa la web y sugiere mejoras.</p>
-                  </div>
-                  <Button onClick={runAnalysis} disabled={analyzing} variant="outline" size="sm">
-                    {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
-                    {analyzing ? "Analizando…" : analysis ? "Re-analizar" : "Analizar con IA"}
-                  </Button>
-                </div>
-
-                {analysisError && (
-                  <p className="text-sm text-destructive">{analysisError}</p>
-                )}
-
-                {analysis && (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl font-bold">{analysis.score}<span className="text-lg text-muted-foreground">/10</span></span>
-                      <p className="text-sm text-muted-foreground">{analysis.summary}</p>
-                    </div>
-                    {site?.analyzed_at && (
-                      <p className="text-xs text-muted-foreground">
-                        Analizado el {new Date(site.analyzed_at).toLocaleString("es-ES")}
-                      </p>
-                    )}
-
-                    {analysis.strengths?.length > 0 && (
-                      <div className="space-y-1">
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Puntos fuertes</p>
-                        <ul className="space-y-1">
-                          {analysis.strengths.map((s, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm">
-                              <Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                              {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {analysis.improvements?.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Mejoras sugeridas</p>
-                        {analysis.improvements.map((imp, i) => (
-                          <div key={i} className="rounded-md border p-3 space-y-1">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="secondary" className="text-xs">{imp.area}</Badge>
-                              <p className="text-sm font-medium">{imp.issue}</p>
-                            </div>
-                            <p className="text-xs text-muted-foreground">→ {imp.fix}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
           )}
         </CardContent>

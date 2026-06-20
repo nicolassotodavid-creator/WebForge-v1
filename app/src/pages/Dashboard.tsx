@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search } from "lucide-react";
+import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
   PIPELINE_ORDER,
@@ -43,7 +43,6 @@ function scoreClasses(score: number): string {
 export default function Dashboard() {
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [scores, setScores] = useState<Record<string, number>>({}); // lead_id -> score de su web
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,30 +87,18 @@ export default function Dashboard() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const [leadsRes, sitesRes] = await Promise.all([
-      supabase.from("leads").select("*").order("created_at", { ascending: false }),
-      // Scores de las webs ya analizadas (orden desc → nos quedamos con el más reciente por lead).
-      supabase
-        .from("sites")
-        .select("lead_id, score, created_at")
-        .not("score", "is", null)
-        .order("created_at", { ascending: false }),
-    ]);
+    // El score de la web ACTUAL del negocio vive en `leads.site_score` (lo escribe el Orquestador
+    // o el botón manual). No hay que cruzar con `sites`: la nota es del lead.
+    const leadsRes = await supabase
+      .from("leads")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (leadsRes.error) {
       setError(leadsRes.error.message);
       setLeads([]);
     } else {
       setLeads((leadsRes.data as Lead[]) ?? []);
     }
-    // Si la migración 0002 aún no está aplicada, la query de scores falla: lo ignoramos
-    // (el dashboard sigue funcionando, solo no muestra scores).
-    const map: Record<string, number> = {};
-    if (!sitesRes.error) {
-      for (const row of (sitesRes.data as { lead_id: string; score: number | null }[] | null) ?? []) {
-        if (row.lead_id && row.score != null && !(row.lead_id in map)) map[row.lead_id] = row.score;
-      }
-    }
-    setScores(map);
     setLoading(false);
   }, []);
 
@@ -177,26 +164,31 @@ export default function Dashboard() {
       else if (sortKey === "rating") { va = a.rating ?? 0; vb = b.rating ?? 0; }
       else if (sortKey === "status") { va = a.status ?? ""; vb = b.status ?? ""; }
       else if (sortKey === "created_at") { va = a.created_at ?? ""; vb = b.created_at ?? ""; }
-      else if (sortKey === "score") { va = scores[a.id] ?? -1; vb = scores[b.id] ?? -1; }
+      else if (sortKey === "score") { va = a.site_score ?? -1; vb = b.site_score ?? -1; }
       if (va < vb) return sortDir === "asc" ? -1 : 1;
       if (va > vb) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
 
     return result;
-  }, [leads, scores, statusFilter, city, category, onlyNoWeb, search, sortKey, sortDir]);
+  }, [leads, statusFilter, city, category, onlyNoWeb, search, sortKey, sortDir]);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Pipeline de captación. {leads.length} leads en total.
+          <p className="text-sm text-muted-foreground">
+            Pipeline de captación ·{" "}
+            <span className="font-medium text-foreground tabular-nums">
+              {leads.length}
+            </span>{" "}
+            leads en total
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Link to="/import" className={buttonVariants({ variant: "default" })}>
+            <Upload className="h-4 w-4" />
             Importar leads
           </Link>
           <Button variant="outline" size="icon" onClick={load} title="Recargar">
@@ -214,12 +206,21 @@ export default function Dashboard() {
               key={s}
               onClick={() => setStatusFilter(active ? "all" : s)}
               className={cn(
-                "rounded-lg border bg-card p-3 text-left transition-colors hover:bg-accent",
-                active && "ring-2 ring-ring",
+                "group rounded-xl border p-3 text-left transition-all duration-150 hover:-translate-y-0.5 hover:shadow-elevated",
+                active
+                  ? "border-primary/40 bg-primary/5 ring-1 ring-primary/30"
+                  : "border-border/70 bg-card hover:border-border",
               )}
             >
-              <div className="text-2xl font-semibold">{counts[s] ?? 0}</div>
-              <div className="text-xs text-muted-foreground">
+              <div
+                className={cn(
+                  "text-2xl font-semibold tabular-nums tracking-tight transition-colors",
+                  active ? "text-primary" : "text-foreground",
+                )}
+              >
+                {counts[s] ?? 0}
+              </div>
+              <div className="mt-0.5 text-xs text-muted-foreground">
                 {STATUS_LABELS[s]}
               </div>
             </button>
@@ -243,7 +244,7 @@ export default function Dashboard() {
           onChange={(e) =>
             setStatusFilter(e.target.value as LeadStatus | "all")
           }
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-sm transition-[color,box-shadow,border-color] duration-150 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30"
         >
           <option value="all">Todos los estados</option>
           {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -269,7 +270,7 @@ export default function Dashboard() {
             type="checkbox"
             checked={onlyNoWeb}
             onChange={(e) => setOnlyNoWeb(e.target.checked)}
-            className="h-4 w-4"
+            className="h-4 w-4 accent-primary"
           />
           Solo sin web
         </label>
@@ -336,7 +337,7 @@ export default function Dashboard() {
                   <TableHead
                     className="cursor-pointer select-none"
                     onClick={() => handleSort("score")}
-                    title="Score IA de la web construida (1-10)"
+                    title="Score IA de la web actual del negocio (1-10). Ordena ascendente para ver las webs más flojas (mejores candidatos)."
                   >
                     Score<SortIcon col="score" />
                   </TableHead>
@@ -410,18 +411,25 @@ export default function Dashboard() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {scores[l.id] != null ? (
+                      {l.site_score != null ? (
                         <span
                           className={cn(
                             "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold",
-                            scoreClasses(scores[l.id]),
+                            scoreClasses(l.site_score),
                           )}
-                          title="Score IA de la web (1-10)"
+                          title="Score IA de la web actual del negocio (1-10). Bajo = web floja = buen candidato."
                         >
-                          {scores[l.id]}/10
+                          {l.site_score}/10
+                        </span>
+                      ) : !l.has_website ? (
+                        <span
+                          className="inline-flex items-center rounded-full bg-sky-500/15 px-2 py-0.5 text-xs font-semibold text-sky-600 dark:text-sky-400"
+                          title="No tiene web propia — el mejor candidato a contactar."
+                        >
+                          Sin web
                         </span>
                       ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
+                        <span className="text-xs text-muted-foreground" title="Web propia aún sin analizar">—</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -443,26 +451,80 @@ export default function Dashboard() {
                   </TableRow>
                 ))}
 
-                {!loading && filtered.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={9}
-                      className="py-10 text-center text-muted-foreground"
-                    >
-                      {leads.length === 0
-                        ? "Aún no hay leads. Ve a «Importar leads» para añadir los primeros."
-                        : "Ningún lead coincide con los filtros."}
-                    </TableCell>
-                  </TableRow>
-                )}
+                {loading &&
+                  leads.length === 0 &&
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <TableRow key={`sk-${i}`} className="hover:bg-transparent">
+                      <TableCell>
+                        <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+                        <div className="mt-1.5 h-3 w-20 animate-pulse rounded bg-muted/60" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-20 animate-pulse rounded bg-muted" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-14 animate-pulse rounded bg-muted" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-6 animate-pulse rounded bg-muted" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-5 w-12 animate-pulse rounded-full bg-muted" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-5 w-20 animate-pulse rounded-full bg-muted" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-16 animate-pulse rounded bg-muted" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-4 animate-pulse rounded bg-muted" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
 
-                {loading && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={9}
-                      className="py-10 text-center text-muted-foreground"
-                    >
-                      Cargando…
+                {!loading && filtered.length === 0 && (
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={9} className="py-16 text-center">
+                      <div className="mx-auto flex max-w-sm flex-col items-center gap-3">
+                        <div className="grid h-12 w-12 place-items-center rounded-full border border-border bg-muted/50 text-muted-foreground">
+                          <Inbox className="h-5 w-5" />
+                        </div>
+                        {leads.length === 0 ? (
+                          <>
+                            <p className="text-sm font-medium text-foreground">
+                              Aún no hay leads
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Importa los primeros negocios para arrancar el
+                              pipeline de captación.
+                            </p>
+                            <Link
+                              to="/import"
+                              className={cn(
+                                buttonVariants({ variant: "outline", size: "sm" }),
+                                "mt-1",
+                              )}
+                            >
+                              <Upload className="h-4 w-4" />
+                              Importar leads
+                            </Link>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm font-medium text-foreground">
+                              Ningún lead coincide
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Prueba a ajustar la búsqueda o a limpiar los
+                              filtros activos.
+                            </p>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 )}
