@@ -1,7 +1,7 @@
 // /book/:leadId — Página PÚBLICA (sin auth).
 import { useState, useEffect, FormEvent } from "react";
 import { useParams } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
+import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { Loader2, ExternalLink, CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,7 @@ interface BookingInfo {
   live_url: string | null;
 }
 
-const PRECIO = "297 €";
+const PRECIO = "397 €";
 const LORA = "Lora, Georgia, serif";
 const INTER = "Inter, system-ui, sans-serif";
 
@@ -66,10 +66,7 @@ export default function Book() {
       if (url) { window.location.href = url; }
       else throw new Error("No se recibió la URL de pago.");
     } catch (e: unknown) {
-      let msg = e instanceof Error ? e.message : "Error al procesar el pago.";
-      const ctx = (e as { context?: Response }).context;
-      if (ctx && typeof ctx.json === "function") { try { const j = await ctx.json(); if (j?.error) msg = j.error; } catch { /* ignore */ } }
-      setFormError(msg);
+      setFormError(await edgeFunctionErrorMessage(e, "Error al procesar el pago."));
     } finally { setSubmitting(false); }
   }
 
@@ -223,7 +220,7 @@ export default function Book() {
             <div>
               <p style={{ fontSize: "0.65rem", color: "#78716C", textTransform: "uppercase", letterSpacing: "0.12em" }}>Precio</p>
               <p style={{ fontFamily: LORA, fontSize: "2.5rem", fontWeight: 600, color: "#FAFAF9", lineHeight: 1.1, marginTop: "0.25rem" }}>{PRECIO}</p>
-              <p style={{ fontSize: "0.75rem", color: "#78716C", marginTop: "0.3rem" }}>pago único · sin permanencia</p>
+              <p style={{ fontSize: "0.75rem", color: "#78716C", marginTop: "0.3rem" }}>pago único · IVA incluido · sin permanencia</p>
             </div>
             <div style={{ fontSize: "0.75rem", color: "#A8A29E", textAlign: "right", lineHeight: 2 }}>
               <div>✓ Web a medida</div>

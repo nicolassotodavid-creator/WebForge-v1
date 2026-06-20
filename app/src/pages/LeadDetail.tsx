@@ -15,7 +15,7 @@ import {
   Copy,
   Send,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import type { Brief, Lead, Site } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -108,7 +108,7 @@ export default function LeadDetail() {
       if (error) throw error;
       if (data?.analysis) setAnalysis(data.analysis);
     } catch (e) {
-      setAnalysisError(e instanceof Error ? e.message : "Error al analizar la web.");
+      setAnalysisError(await edgeFunctionErrorMessage(e, "Error al analizar la web."));
     } finally {
       setAnalyzing(false);
     }
@@ -168,19 +168,7 @@ export default function LeadDetail() {
       const { data, error } = await supabase.functions.invoke("analyze-lead", {
         body: { lead_id: id },
       });
-      if (error) {
-        let msg = error.message;
-        const ctx = (error as { context?: Response }).context;
-        if (ctx && typeof ctx.json === "function") {
-          try {
-            const j = await ctx.json();
-            if (j?.error) msg = j.error;
-          } catch {
-            /* ignore */
-          }
-        }
-        throw new Error(msg);
-      }
+      if (error) throw error;
       const result = data as { brief?: Brief };
       if (result?.brief) setBrief(result.brief);
       // Recargar el lead para reflejar el nuevo estado (analyzed).
@@ -191,7 +179,7 @@ export default function LeadDetail() {
         .maybeSingle();
       setLead(leadData as Lead | null);
     } catch (e) {
-      setGenError(e instanceof Error ? e.message : "No se pudo generar el brief.");
+      setGenError(await edgeFunctionErrorMessage(e, "No se pudo generar el brief."));
     } finally {
       setGenerating(false);
     }
@@ -204,22 +192,14 @@ export default function LeadDetail() {
       const { data, error } = await supabase.functions.invoke("generate-outreach", {
         body: { lead_id: id },
       });
-      if (error) {
-        // Extraer el mensaje real del cuerpo JSON del error (igual que generateBrief)
-        const ctx = (error as { context?: Response }).context;
-        let msg = error.message;
-        if (ctx && typeof ctx.json === "function") {
-          try { const j = await ctx.json(); if (j?.error) msg = j.error; } catch { /* ignore */ }
-        }
-        throw new Error(msg);
-      }
+      if (error) throw error;
       if (data?.message) {
         setOutreachMsg(data.message);
         setEditedBody(data.message.body);
         setEditingBody(false);
       }
     } catch (e) {
-      setOutreachError(e instanceof Error ? e.message : "Error al generar el mensaje.");
+      setOutreachError(await edgeFunctionErrorMessage(e, "Error al generar el mensaje."));
     } finally {
       setGeneratingOutreach(false);
     }
@@ -238,21 +218,14 @@ export default function LeadDetail() {
       const { error } = await supabase.functions.invoke("send-email", {
         body: { message_id: outreachMsg.id },
       });
-      if (error) {
-        const ctx = (error as { context?: Response }).context;
-        let msg = error.message;
-        if (ctx && typeof ctx.json === "function") {
-          try { const j = await ctx.json(); if (j?.error) msg = j.error; } catch { /* ignore */ }
-        }
-        throw new Error(msg);
-      }
+      if (error) throw error;
       setSendEmailDone(true);
       setOutreachMsg({ ...outreachMsg, status: "sent" });
       // Actualizar estado del lead a 'contacted'
       const { data: leadData } = await supabase.from("leads").select("*").eq("id", id).maybeSingle();
       setLead(leadData as Lead | null);
     } catch (e) {
-      setSendEmailError(e instanceof Error ? e.message : "Error al enviar el email.");
+      setSendEmailError(await edgeFunctionErrorMessage(e, "Error al enviar el email."));
     } finally {
       setSendingEmail(false);
     }
