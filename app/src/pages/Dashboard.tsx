@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox, Eye, EyeOff, MessageCircle, Facebook } from "lucide-react";
+import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox, Eye, EyeOff, MessageCircle, Facebook, Check } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
   PIPELINE_ORDER,
@@ -87,10 +87,35 @@ function scoreClasses(score: number): string {
   return "bg-red-500/15 text-red-600 dark:text-red-400";
 }
 
+/** Fecha + hora corta en es-ES para tooltips ("21 jun, 14:32"). "" si no hay fecha. */
+function fmtWhen(iso: string | null): string {
+  if (!iso) return "";
+  return new Date(iso).toLocaleString("es-ES", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/** Estado agregado del email de contacto por lead (derivado de outreach_messages). */
+type LeadEmailState = {
+  sent: boolean;
+  opened: boolean;
+  replied: boolean;
+  lastSentAt: string | null;
+  lastOpenedAt: string | null;
+  count: number; // nº de emails enviados (no borradores)
+};
+
 export default function Dashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Estado del email de contacto por lead (enviado/abierto/respondido). Map vacío y
+  // outreachSupported=false si la query falla (p. ej. migración 0003 sin aplicar).
+  const [outreachByLead, setOutreachByLead] = useState<Map<string, LeadEmailState>>(new Map());
+  const [outreachSupported, setOutreachSupported] = useState(false);
 
   const [saved] = useState(readSavedFilters);
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "all">(saved.statusFilter ?? "all");
@@ -224,15 +249,51 @@ export default function Dashboard() {
     setError(null);
     // El score de la web ACTUAL del negocio vive en `leads.site_score` (lo escribe el Orquestador
     // o el botón manual). No hay que cruzar con `sites`: la nota es del lead.
-    const leadsRes = await supabase
-      .from("leads")
-      .select("*")
-      .order("created_at", { ascending: false });
+    // En paralelo: estado del email de contacto por lead (enviado/abierto/respondido).
+    const [leadsRes, outreachRes] = await Promise.all([
+      supabase.from("leads").select("*").order("created_at", { ascending: false }),
+      supabase
+        .from("outreach_messages")
+        .select("lead_id,status,sent_at,opened_at"),
+    ]);
     if (leadsRes.error) {
       setError(leadsRes.error.message);
       setLeads([]);
     } else {
       setLeads((leadsRes.data as Lead[]) ?? []);
+    }
+    // Agregamos los mensajes por lead. Si la query falla (columna opened_at inexistente,
+    // RLS, etc.) ocultamos la columna en vez de romper el Dashboard.
+    if (outreachRes.error || !outreachRes.data) {
+      setOutreachSupported(false);
+      setOutreachByLead(new Map());
+    } else {
+      const map = new Map<string, LeadEmailState>();
+      for (const m of outreachRes.data as Array<{
+        lead_id: string | null;
+        status: string | null;
+        sent_at: string | null;
+        opened_at: string | null;
+      }>) {
+        if (!m.lead_id) continue;
+        const cur =
+          map.get(m.lead_id) ??
+          { sent: false, opened: false, replied: false, lastSentAt: null, lastOpenedAt: null, count: 0 };
+        const wasSent = m.status === "sent" || m.status === "replied" || !!m.sent_at;
+        if (wasSent) {
+          cur.sent = true;
+          cur.count += 1;
+          if (m.sent_at && (!cur.lastSentAt || m.sent_at > cur.lastSentAt)) cur.lastSentAt = m.sent_at;
+        }
+        if (m.opened_at) {
+          cur.opened = true;
+          if (!cur.lastOpenedAt || m.opened_at > cur.lastOpenedAt) cur.lastOpenedAt = m.opened_at;
+        }
+        if (m.status === "replied") cur.replied = true;
+        map.set(m.lead_id, cur);
+      }
+      setOutreachByLead(map);
+      setOutreachSupported(true);
     }
     setLoading(false);
   }, []);
@@ -387,7 +448,7 @@ export default function Dashboard() {
         { key: "noweb", label: "Sin web" },
       ];
 
-  const colCount = flagsSupported ? 13 : 12;
+  const colCount = (flagsSupported ? 13 : 12) + (outreachSupported ? 1 : 0);
   const filtersActive =
     statusFilter !== "all" || city || category || view !== "all" || search;
   const selectedCount = selected.size;
@@ -656,6 +717,11 @@ export default function Dashboard() {
                   >
                     Estado<SortIcon col="status" />
                   </TableHead>
+                  {outreachSupported && (
+                    <TableHead title="Email de contacto: enviado / abierto / respondido">
+                      Email
+                    </TableHead>
+                  )}
                   <TableHead
                     className="cursor-pointer select-none"
                     onClick={() => handleSort("created_at")}
@@ -855,6 +921,49 @@ export default function Dashboard() {
                     <TableCell>
                       <StatusBadge status={l.status} />
                     </TableCell>
+                    {outreachSupported && (
+                      <TableCell>
+                        {(() => {
+                          const o = outreachByLead.get(l.id);
+                          if (!o || !o.sent)
+                            return <span className="text-xs text-muted-foreground">—</span>;
+                          return (
+                            <div className="flex items-center gap-1.5">
+                              {o.replied ? (
+                                <span
+                                  className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400"
+                                  title="El lead respondió al email"
+                                >
+                                  <MessageCircle className="h-3 w-3" /> Respondió
+                                </span>
+                              ) : o.opened ? (
+                                <span
+                                  className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400"
+                                  title={`Abierto ${fmtWhen(o.lastOpenedAt)}`}
+                                >
+                                  <Eye className="h-3 w-3" /> Abierto
+                                </span>
+                              ) : (
+                                <span
+                                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground"
+                                  title={`Enviado ${fmtWhen(o.lastSentAt)} · sin abrir aún`}
+                                >
+                                  <Check className="h-3 w-3" /> Enviado
+                                </span>
+                              )}
+                              {o.count > 1 && (
+                                <span
+                                  className="text-[10px] text-muted-foreground"
+                                  title={`${o.count} emails enviados`}
+                                >
+                                  ×{o.count}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
+                    )}
                     <TableCell className="text-xs text-muted-foreground">
                       {new Date(l.created_at).toLocaleDateString("es-ES")}
                     </TableCell>

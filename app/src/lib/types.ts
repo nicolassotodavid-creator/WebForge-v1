@@ -156,3 +156,23 @@ export const SITE_STATUS_LABELS: Record<SiteStatus, string> = {
   rejected: "Rechazada",
   delivered: "Entregada",
 };
+
+// ===== OUTREACH (emails / notas de contacto) =====
+// Refleja `outreach_messages` (0001_init.sql) + el tracking de la migración
+// 0003_followup_tracking.sql (email_number, opened_at).
+export type OutreachStatus = "draft" | "sent" | "replied" | "bounced";
+
+export interface OutreachMessage {
+  id: string;
+  lead_id: string;
+  channel: string; // 'email' | 'linkedin'
+  subject: string | null;
+  body: string;
+  status: OutreachStatus | string;
+  // 1 = gancho · 2 = recordatorio día 4 · 3 = cierre día 7 (0003).
+  email_number: number | null;
+  sent_at: string | null;
+  // Cuándo abrió el lead el email (pixel de seguimiento). null = no abierto.
+  opened_at: string | null;
+  created_at: string;
+}
