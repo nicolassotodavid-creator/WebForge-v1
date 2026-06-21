@@ -287,10 +287,14 @@ Deno.serve(async (req: Request) => {
       } catch (payoutErr) {
         // No romper el webhook: Stripe necesita 200 y reintenta.
         console.error("payout.paid error (no crítico):", payoutErr);
-        await supabase.from("events").insert({
-          type: "payout_error",
-          payload: { payout_id: payoutId, error: String(payoutErr) },
-        });
+        try {
+          await supabase.from("events").insert({
+            type: "payout_error",
+            payload: { payout_id: payoutId, error: String(payoutErr) },
+          });
+        } catch (insertErr) {
+          console.error("payout_error insert falló:", insertErr);
+        }
       }
     }
   }
