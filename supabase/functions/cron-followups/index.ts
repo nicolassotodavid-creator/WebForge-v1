@@ -30,11 +30,10 @@ function buildBody(emailNumber: 2 | 3, hasWebsite: boolean, nombre: string, link
   if (emailNumber === 2) {
     return `Hola ${nombre},\nSolo por si no lo viste.\n\n${link}\n\nNico`;
   }
-  const verb = hasWebsite ? "lo dejo caer" : "la doy de baja";
   return (
     `Hola ${nombre},\n` +
-    `Esta semana ${verb} — tengo otros negocios esperando y no puedo tenerlo activo indefinidamente.\n` +
-    `Por si acaso, aquí la tienes:\n\n${link}\n\nNico`
+    `Es el último email que te mando. ${hasWebsite ? "Voy a retirar tu web" : "Voy a darla de baja"} en las próximas 48 h — tengo otros negocios esperando y no puedo mantenerla activa indefinidamente.\n` +
+    `Si la quieres activa, es ahora o la suelto:\n\n${link}\n\nNico`
   );
 }
 
