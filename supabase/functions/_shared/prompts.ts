@@ -82,15 +82,16 @@ Según el canal:
     Nunca: "¡Oportunidad única para tu negocio!" ni signos de exclamación vacíos.
   · "body": 5-8 frases en dos párrafos cortos. Estructura:
       Párrafo 1 — Por qué me fijé en ellos (detalle real del brief o la reseña citada).
-      Párrafo 2 — Qué hice (les construí una web de muestra), el link (live_url) y la invitación suave a verla.
+      Párrafo 2 — Qué hice (les construí una web de muestra) y la invitación suave a verla.
     Cierra con algo como "Si te gusta hablamos, si no, sin problema." — quita presión.
-    El link debe aparecer solo, en su propia línea, sin texto envolvente tipo "haz clic aquí".
 
 - channel 'linkedin' (segment 'b2b', profesionales y empresas):
   · "subject": null.
   · "body": nota de conexión MUY corta (máx 280 caracteres), sin links (LinkedIn penaliza solicitudes con
     links). Menciona el sector o tipo de negocio concreto y por qué quieres conectar. Tono profesional
     pero humano. La live_url se comparte en el mensaje de seguimiento cuando acepten — NO la pongas aquí.
+
+No incluyas links ni URLs en el cuerpo del email. El sistema los añade automáticamente.
 `;
 
 // ANALYSIS: puntúa la web YA construida (no el negocio). Lo usan dos sitios con el MISMO prompt:

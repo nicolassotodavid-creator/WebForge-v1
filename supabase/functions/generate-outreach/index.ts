@@ -218,9 +218,11 @@ Deno.serve(async (req: Request) => {
   const subject = getSubject(hasWebsite, emailNumber);
   const nombre = lead.contact_name ?? lead.name;
 
-  // TODOS los emails llevan UNA sola CTA → la página de venta /book (no la web cruda de Lovable):
-  // /book ya muestra la captura de la web + la oferta + el pago (decisión de funnel del operador).
-  // Si no hay BOOKING_BASE configurado, cae a la live_url para no dejar el email sin enlace.
+  // Seguimientos (Email 2/3): UNA sola CTA → la página de venta /book (no la web cruda de Lovable).
+  // /book ya muestra la captura de la web + la oferta + el pago. Si no hay BOOKING_BASE, cae a la
+  // live_url para no dejar el email sin enlace.
+  // Email 1 (frío) es la excepción: enseña SOLO la web construida (liveUrl), sin CTA de compra
+  // — doctrina "que abran el link, no que compren todavía". El link lo añade el sistema, no la IA.
   const emailLink = bookingLink(Deno.env.get("BOOKING_BASE"), leadId) ?? liveUrl!;
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -254,7 +256,7 @@ Deno.serve(async (req: Request) => {
     segment,
     channel,
     has_website: hasWebsite,
-    live_url: emailLink,
+    live_url: liveUrl,
     business: { name: lead.name, category: lead.category, city: lead.city },
     contact: { name: lead.contact_name ?? null, role: lead.contact_role ?? null },
     brief: brief
@@ -313,13 +315,18 @@ Deno.serve(async (req: Request) => {
   }
 
   // El subject lo pone el template (no Claude), así siempre coincide con la secuencia.
+  // La IA ya no coloca el enlace (ver OUTREACH_PROMPT). En email lo añade el sistema aquí,
+  // solo en su propia línea, para que el template lo renderice como botón "Ver la web →".
+  // Email 1 enseña la web construida (liveUrl), sin CTA de compra. En LinkedIn no va link.
+  const finalBody = channel === "email" ? `${bodyText}\n\n${liveUrl}` : bodyText;
+
   const { data: inserted, error: insErr } = await supabase
     .from("outreach_messages")
     .insert({
       lead_id: leadId,
       channel,
       subject: channel === "email" ? subject : null,
-      body: withWhatsappFooter(bodyText, channel),
+      body: withWhatsappFooter(finalBody, channel),
       status: "draft",
       generated_by_model: ANTHROPIC_MODEL,
       email_number: 1,
