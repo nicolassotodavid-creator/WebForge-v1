@@ -170,7 +170,11 @@ Deno.serve(async (req: Request) => {
       // Marcar booking como pagado
       await supabase
         .from("bookings")
-        .update({ stripe_payment_status: "paid", status: "paid" })
+        .update({
+          stripe_payment_status: "paid",
+          status: "paid",
+          stripe_payment_intent: String(session.payment_intent ?? "") || null,
+        })
         .eq("stripe_session_id", sessionId);
 
       if (leadId) {
@@ -212,6 +216,11 @@ Deno.serve(async (req: Request) => {
               lead?.name ?? "Cliente",
               Number(session.amount_total ?? 0), // total cobrado (IVA incl.) en céntimos
             );
+            // Guardar el id de la factura borrador en el booking
+            await supabase
+              .from("bookings")
+              .update({ holded_invoice_id: invoiceId })
+              .eq("stripe_session_id", sessionId);
             // Guardar el id de la factura borrador para referencia
             await supabase.from("events").insert({
               lead_id: leadId,
