@@ -16,6 +16,7 @@ import {
   Send,
   MessageCircle,
   Facebook,
+  RefreshCw,
 } from "lucide-react";
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { waLink } from "@/lib/contact";
@@ -191,19 +192,6 @@ export default function LeadDetail() {
       alert("No se pudo actualizar el favorito: " + error.message);
     }
   }
-
-  // Polling automático mientras el build está en curso (cada 8 s).
-  // Se activa cuando el lead está en build_queued o cuando la web existe
-  // pero aún está en estado queued/building.
-  useEffect(() => {
-    const isBuildingLead = lead?.status === "build_queued";
-    const isBuildingSite = site?.status === "queued" || site?.status === "building";
-    if (!isBuildingLead && !isBuildingSite) return;
-    const interval = setInterval(() => {
-      loadAll();
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [lead?.status, site?.status, loadAll]);
 
   async function generateBrief() {
     setGenerating(true);
@@ -821,12 +809,19 @@ export default function LeadDetail() {
                 <p className="text-sm font-medium text-amber-900">Construyendo en Lovable…</p>
               </div>
               <p className="text-sm text-amber-700">
-                El orquestador está generando el build-prompt y construyendo la web.
-                Puede tardar varios minutos. Esta página se actualiza sola cada 8 segundos.
+                El orquestador construye la web cuando se ejecuta. Lánzalo en el servidor
+                con el comando de abajo; tarda varios minutos. Pulsa «Actualizar» para
+                comprobar si ya está lista.
               </p>
               <p className="text-xs font-mono text-amber-600 bg-amber-100 rounded px-2 py-1 inline-block">
                 npm start -- --lead {lead.id}
               </p>
+              <div>
+                <Button variant="outline" size="sm" onClick={() => loadAll()}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Actualizar
+                </Button>
+              </div>
             </div>
           )}
 
