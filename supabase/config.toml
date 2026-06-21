@@ -33,3 +33,9 @@ verify_jwt = false
 
 [functions.track-event]
 verify_jwt = false
+
+# stripe-webhook lo llama Stripe directamente (no el browser), sin JWT de Supabase: solo la
+# cabecera Stripe-Signature. La propia función verifica esa firma (HMAC-SHA256), así que
+# desactivamos el JWT de la pasarela; si no, Stripe recibiría 401 y el webhook nunca correría.
+[functions.stripe-webhook]
+verify_jwt = false
