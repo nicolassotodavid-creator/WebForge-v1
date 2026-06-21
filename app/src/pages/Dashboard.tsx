@@ -22,10 +22,15 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { waLink } from "@/lib/contact";
+import {
+  matchesBaseFilters,
+  matchesView,
+  type LeadFilterState,
+  type ViewFilter,
+} from "@/lib/leadFilters";
 
 type SortKey = "name" | "city" | "rating" | "status" | "created_at" | "score";
 type SortDir = "asc" | "desc";
-type ViewFilter = "all" | "unseen" | "favorites" | "noweb";
 
 /** Filtros persistidos entre recargas (la vista no se pierde al refrescar). */
 const FILTERS_KEY = "wf:dashboard:filters";
@@ -249,15 +254,25 @@ export default function Dashboard() {
     return c;
   }, [leads]);
 
-  const viewCounts = useMemo(
-    () => ({
-      all: leads.length,
-      unseen: leads.filter((l) => !l.seen_at).length,
-      favorites: leads.filter((l) => l.is_favorite).length,
-      noweb: leads.filter((l) => !l.has_website).length,
-    }),
-    [leads],
+  // Filtros que NO dependen de la pestaña de vista. Tanto la tabla como los
+  // contadores de las pestañas parten de aquí, así el número de cada pestaña
+  // coincide siempre con lo que verás al pulsarla.
+  const filterState = useMemo<LeadFilterState>(
+    () => ({ statusFilter, city, category, search }),
+    [statusFilter, city, category, search],
   );
+
+  // Contadores de pestañas calculados sobre el MISMO conjunto base que la tabla
+  // (respetan estado/ciudad/categoría/búsqueda), no sobre todos los leads.
+  const viewCounts = useMemo(() => {
+    const base = leads.filter((l) => matchesBaseFilters(l, filterState));
+    return {
+      all: base.length,
+      unseen: base.filter((l) => matchesView(l, "unseen")).length,
+      favorites: base.filter((l) => matchesView(l, "favorites")).length,
+      noweb: base.filter((l) => matchesView(l, "noweb")).length,
+    };
+  }, [leads, filterState]);
 
   // IDs del último lote scrapeado. Al insertar, todas las filas de un lote comparten
   // created_at (un único upsert en ingest-leads), así que el lote más reciente = las
@@ -281,29 +296,9 @@ export default function Dashboard() {
   }, [leads]);
 
   const filtered = useMemo(() => {
-    let result = leads.filter((l) => {
-      if (statusFilter !== "all" && l.status !== statusFilter) return false;
-      if (view === "unseen" && l.seen_at) return false;
-      if (view === "favorites" && !l.is_favorite) return false;
-      if (view === "noweb" && l.has_website) return false;
-      if (city && !(l.city ?? "").toLowerCase().includes(city.toLowerCase()))
-        return false;
-      if (
-        category &&
-        !(l.category ?? "").toLowerCase().includes(category.toLowerCase())
-      )
-        return false;
-      if (search) {
-        const q = search.toLowerCase();
-        const matches =
-          (l.name ?? "").toLowerCase().includes(q) ||
-          (l.city ?? "").toLowerCase().includes(q) ||
-          (l.category ?? "").toLowerCase().includes(q) ||
-          (l.phone ?? "").toLowerCase().includes(q);
-        if (!matches) return false;
-      }
-      return true;
-    });
+    let result = leads.filter(
+      (l) => matchesBaseFilters(l, filterState) && matchesView(l, view),
+    );
 
     result = [...result].sort((a, b) => {
       let va: string | number = "";
@@ -320,7 +315,7 @@ export default function Dashboard() {
     });
 
     return result;
-  }, [leads, statusFilter, view, city, category, search, sortKey, sortDir]);
+  }, [leads, filterState, view, sortKey, sortDir]);
 
   // Atajos de teclado estilo bandeja (se ignoran si escribes en un input).
   useEffect(() => {
