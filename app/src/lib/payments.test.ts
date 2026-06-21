@@ -5,6 +5,7 @@ import {
   computeKpis,
   formatEuros,
   holdedInvoiceUrl,
+  paymentDate,
   type Booking,
 } from "./payments.ts";
 
@@ -20,6 +21,7 @@ const base: Booking = {
   status: "paid", stripe_payment_status: "paid",
   stripe_payout_id: null, payout_arrival_date: null,
   bank_confirmed_at: null, holded_invoice_id: null,
+  paid_at: null,
   created_at: "2026-06-10T10:00:00.000Z", leads: null,
 };
 
@@ -43,8 +45,32 @@ assertEq(k.pendienteBanco, 79400, "pendienteBanco = a+c (paid sin confirmar)");
 assertEq(k.confirmadoBanco, 39700, "confirmadoBanco = b");
 assertEq(k.total, 119100, "total = a+b+c (todos los paid)");
 
+// paymentDate helper: paid_at toma precedencia sobre created_at
+assertEq(
+  paymentDate({ ...base, paid_at: "2026-06-15T08:00:00.000Z", created_at: "2026-05-01T00:00:00Z" }),
+  "2026-06-15T08:00:00.000Z",
+  "paymentDate devuelve paid_at cuando existe",
+);
+assertEq(
+  paymentDate({ ...base, paid_at: null, created_at: "2026-06-01T00:00:00Z" }),
+  "2026-06-01T00:00:00Z",
+  "paymentDate devuelve created_at cuando paid_at es null",
+);
+
+// KPI cobradoMes usa paid_at, no created_at
+const setWithPaidAt: Booking[] = [
+  // created_at mayo, paid_at junio → debe contarse en cobradoMes
+  { ...base, id: "e", deposit_amount: 10000, created_at: "2026-05-20T00:00:00Z", paid_at: "2026-06-10T00:00:00Z" },
+  // created_at junio, paid_at null → fallback a created_at (junio) → sí cuenta
+  { ...base, id: "f", deposit_amount: 5000, created_at: "2026-06-05T00:00:00Z", paid_at: null },
+  // created_at junio, paid_at mayo → NO debe contarse (mes distinto)
+  { ...base, id: "g", deposit_amount: 8000, created_at: "2026-06-01T00:00:00Z", paid_at: "2026-05-15T00:00:00Z" },
+];
+const k2 = computeKpis(setWithPaidAt, now);
+assertEq(k2.cobradoMes, 15000, "cobradoMes usa paid_at: e(paid_at=jun)+f(fallback=jun), no g(paid_at=may)");
+
 // formato y url
-assertEq(formatEuros(39700).replace(/ /g, " "), "397,00 €", "formatEuros 39700");
+assertEq(formatEuros(39700).replace(/ /g, " "), "397,00 €", "formatEuros 39700");
 assertEq(holdedInvoiceUrl("inv_9"), "https://app.holded.com/doc/invoice/inv_9", "holded url");
 
 console.log(failures === 0 ? "\nTODO OK" : `\n${failures} FALLO(S)`);

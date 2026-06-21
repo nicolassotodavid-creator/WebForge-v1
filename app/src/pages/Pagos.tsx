@@ -11,6 +11,7 @@ import {
   computeKpis,
   formatEuros,
   holdedInvoiceUrl,
+  paymentDate,
 } from "@/lib/payments";
 
 const BANK_LABEL: Record<BankState, string> = {
@@ -26,7 +27,7 @@ const BANK_VARIANT: Record<BankState, "secondary" | "default" | "outline" | "suc
   confirmed: "success",
 };
 
-const COLS = "id, lead_id, name, deposit_amount, status, stripe_payment_status, stripe_payout_id, payout_arrival_date, bank_confirmed_at, holded_invoice_id, created_at, leads(name)";
+const COLS = "id, lead_id, name, deposit_amount, status, stripe_payment_status, stripe_payout_id, payout_arrival_date, bank_confirmed_at, holded_invoice_id, paid_at, created_at, leads(name)";
 
 function fmtDate(iso: string | null): string {
   if (!iso) return "—";
@@ -131,7 +132,7 @@ export default function Pagos() {
                   <tr key={b.id} className="border-t border-border/60">
                     <td className="px-3 py-2">{b.leads?.name ?? b.name ?? "—"}</td>
                     <td className="px-3 py-2">{formatEuros(b.deposit_amount ?? 0)}</td>
-                    <td className="px-3 py-2">{b.status === "paid" ? fmtDate(b.created_at) : "—"}</td>
+                    <td className="px-3 py-2">{b.status === "paid" ? fmtDate(paymentDate(b)) : "—"}</td>
                     <td className="px-3 py-2">
                       <Badge variant={b.status === "paid" ? "success" : "secondary"}>
                         {b.status === "paid" ? "Pagado" : "Pendiente"}

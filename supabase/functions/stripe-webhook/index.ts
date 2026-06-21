@@ -176,6 +176,7 @@ Deno.serve(async (req: Request) => {
           stripe_payment_status: "paid",
           status: "paid",
           stripe_payment_intent: String(session.payment_intent ?? "") || null,
+          paid_at: new Date().toISOString(),
         })
         .eq("stripe_session_id", sessionId);
 

@@ -13,11 +13,17 @@ export interface Booking {
   payout_arrival_date: string | null; // 'YYYY-MM-DD'
   bank_confirmed_at: string | null;    // ISO timestamptz
   holded_invoice_id: string | null;
+  paid_at: string | null;               // ISO — timestamptz del webhook (null en filas antiguas)
   created_at: string;                  // ISO
   leads?: { name: string | null } | null; // join con leads
 }
 
 export type BankState = "pending" | "with_stripe" | "in_transit" | "confirmed";
+
+/** Fecha de pago efectiva: paid_at si existe, si no created_at (fallback para filas antiguas). */
+export function paymentDate(b: Booking): string {
+  return b.paid_at ?? b.created_at;
+}
 
 /** Estado de la llegada al banco, derivado del booking. */
 export function deriveBankState(b: Booking): BankState {
@@ -43,7 +49,7 @@ export function computeKpis(bookings: Booking[], now: Date): Kpis {
     return d.getUTCFullYear() === now.getUTCFullYear() && d.getUTCMonth() === now.getUTCMonth();
   };
   return {
-    cobradoMes: paid.filter((b) => sameMonth(b.created_at)).reduce((s, b) => s + cents(b), 0),
+    cobradoMes: paid.filter((b) => sameMonth(paymentDate(b))).reduce((s, b) => s + cents(b), 0),
     pendienteBanco: paid.filter((b) => !b.bank_confirmed_at).reduce((s, b) => s + cents(b), 0),
     confirmadoBanco: paid.filter((b) => b.bank_confirmed_at).reduce((s, b) => s + cents(b), 0),
     total: paid.reduce((s, b) => s + cents(b), 0),
