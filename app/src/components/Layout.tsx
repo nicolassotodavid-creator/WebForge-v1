@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Upload, Settings as SettingsIcon, LogOut, Moon, Sun, Wallet } from "lucide-react";
+import { LayoutDashboard, Upload, Settings as SettingsIcon, LogOut, Moon, Sun, Wallet, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useSession } from "@/hooks/useSession";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/pagos", label: "Pagos", icon: Wallet, end: false },
+  { to: "/emails", label: "Emails", icon: Mail, end: false },
   { to: "/import", label: "Importar", icon: Upload, end: false },
   { to: "/settings", label: "Ajustes", icon: SettingsIcon, end: false },
 ];
