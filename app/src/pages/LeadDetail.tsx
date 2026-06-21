@@ -17,10 +17,12 @@ import {
   MessageCircle,
   Facebook,
   RefreshCw,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { waLink } from "@/lib/contact";
-import type { Brief, Lead, Site } from "@/lib/types";
+import type { Brief, Lead, Site, OutreachMessage } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -50,6 +52,17 @@ function getReviews(raw: unknown): string[] {
     .slice(0, 6);
 }
 
+/** Fecha + hora corta en es-ES ("21 jun, 14:32"). "" si no hay fecha. */
+function fmtWhen(iso: string | null): string {
+  if (!iso) return "";
+  return new Date(iso).toLocaleString("es-ES", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 function Field({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div>
@@ -73,10 +86,12 @@ export default function LeadDetail() {
   const [buildQueuing, setBuildQueuing] = useState(false);
   const [buildQueueError, setBuildQueueError] = useState<string | null>(null);
 
-  // Outreach
+  // Outreach: `outreachMsg` = mensaje más reciente (el que se compone/envía).
+  // `outreachHistory` = todos los mensajes del lead, para el timeline de seguimiento.
   const [outreachMsg, setOutreachMsg] = useState<{
     id: string; channel: string; subject: string | null; body: string; status: string;
   } | null>(null);
+  const [outreachHistory, setOutreachHistory] = useState<OutreachMessage[]>([]);
   const [generatingOutreach, setGeneratingOutreach] = useState(false);
   const [outreachError, setOutreachError] = useState<string | null>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
@@ -143,11 +158,9 @@ export default function LeadDetail() {
         .maybeSingle(),
       supabase
         .from("outreach_messages")
-        .select("id,channel,subject,body,status")
+        .select("id,lead_id,channel,subject,body,status,email_number,sent_at,opened_at,created_at")
         .eq("lead_id", id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
+        .order("created_at", { ascending: false }),
     ]);
     if (leadErr) setError(leadErr.message);
     else setLead(leadData as Lead | null);
@@ -157,9 +170,22 @@ export default function LeadDetail() {
     // Hidratar el análisis de la web ACTUAL del negocio (leads.site_analysis) para mostrarlo
     // sin tener que re-analizar. Es la nota de prospección, no la de la web que construimos.
     setAnalysis((leadData as Lead | null)?.site_analysis ?? null);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setOutreachMsg((outreachData as any) ?? null);
+    const msgs = (outreachData as OutreachMessage[] | null) ?? [];
+    setOutreachHistory(msgs);
+    // El más reciente (orden desc) alimenta el panel de composición/envío.
+    setOutreachMsg(msgs[0] ?? null);
     setLoading(false);
+  }, [id]);
+
+  // Refresca solo el historial de outreach (sin el flicker de loadAll) tras enviar un email,
+  // para que el timeline de seguimiento muestre el sent_at real que escribe el backend.
+  const reloadOutreach = useCallback(async () => {
+    const { data } = await supabase
+      .from("outreach_messages")
+      .select("id,lead_id,channel,subject,body,status,email_number,sent_at,opened_at,created_at")
+      .eq("lead_id", id)
+      .order("created_at", { ascending: false });
+    setOutreachHistory((data as OutreachMessage[] | null) ?? []);
   }, [id]);
 
   useEffect(() => {
@@ -253,6 +279,8 @@ export default function LeadDetail() {
       if (error) throw error;
       setSendEmailDone(true);
       setOutreachMsg({ ...outreachMsg, status: "sent" });
+      // Refrescar el timeline de seguimiento con el sent_at real del backend.
+      await reloadOutreach();
       // Actualizar estado del lead a 'contacted'
       const { data: leadData } = await supabase.from("leads").select("*").eq("id", id).maybeSingle();
       setLead(leadData as Lead | null);
@@ -1002,6 +1030,49 @@ export default function LeadDetail() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Seguimiento: emails realmente enviados, con estado de apertura/respuesta.
+                Los borradores aún sin enviar se gestionan en el panel de composición de abajo. */}
+            {outreachHistory.some((m) => m.sent_at || m.status === "sent" || m.status === "replied") && (
+              <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Seguimiento de emails
+                </p>
+                <ul className="space-y-1.5">
+                  {outreachHistory
+                    .filter((m) => m.sent_at || m.status === "sent" || m.status === "replied")
+                    .slice()
+                    .sort((a, b) => (a.sent_at ?? "").localeCompare(b.sent_at ?? ""))
+                    .map((m) => (
+                      <li key={m.id} className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
+                        <span className="font-medium">Email {m.email_number ?? 1}</span>
+                        <span className="inline-flex items-center gap-1 text-xs text-green-600">
+                          <Check className="h-3.5 w-3.5" />
+                          Enviado{m.sent_at ? ` ${fmtWhen(m.sent_at)}` : ""}
+                        </span>
+                        {m.opened_at ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-blue-600">
+                            <Eye className="h-3.5 w-3.5" /> Abierto {fmtWhen(m.opened_at)}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                            <EyeOff className="h-3.5 w-3.5" /> Sin abrir
+                          </span>
+                        )}
+                        {m.status === "replied" && (
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
+                            <MessageCircle className="h-3.5 w-3.5" /> Respondió
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                </ul>
+                <p className="text-[11px] text-muted-foreground">
+                  La apertura se detecta con un píxel de seguimiento (puede no registrarse si el
+                  cliente bloquea imágenes). «Respondió» se marca manualmente.
+                </p>
+              </div>
+            )}
+
             {outreachError && (
               <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{outreachError}</p>
             )}
