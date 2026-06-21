@@ -1,9 +1,11 @@
 // stripe-webhook — Recibe eventos de Stripe y actualiza DB.
 // checkout.session.completed → booking.paid, lead.status='won', evento 'booking_paid'.
 // También crea contacto + factura BORRADOR en Holded (revisión manual: no la emite ni la cobra).
+// payout.paid → pre-rellena stripe_payout_id y payout_arrival_date en bookings (conciliación bancaria).
 // IMPORTANTE: este endpoint no lleva CORS (no lo llama el browser, lo llama Stripe).
 // Verificación HMAC-SHA256 de la firma (Stripe-Signature header).
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { extractPaymentIntents } from "./payout-utils.ts";
 
 // ── Holded API ──────────────────────────────────────────────────────────────
 const HOLDED_BASE = "https://api.holded.com/api";
@@ -170,7 +172,12 @@ Deno.serve(async (req: Request) => {
       // Marcar booking como pagado
       await supabase
         .from("bookings")
-        .update({ stripe_payment_status: "paid", status: "paid" })
+        .update({
+          stripe_payment_status: "paid",
+          status: "paid",
+          stripe_payment_intent: String(session.payment_intent ?? "") || null,
+          paid_at: new Date().toISOString(),
+        })
         .eq("stripe_session_id", sessionId);
 
       if (leadId) {
@@ -212,6 +219,11 @@ Deno.serve(async (req: Request) => {
               lead?.name ?? "Cliente",
               Number(session.amount_total ?? 0), // total cobrado (IVA incl.) en céntimos
             );
+            // Guardar el id de la factura borrador en el booking
+            await supabase
+              .from("bookings")
+              .update({ holded_invoice_id: invoiceId })
+              .eq("stripe_session_id", sessionId);
             // Guardar el id de la factura borrador para referencia
             await supabase.from("events").insert({
               lead_id: leadId,
@@ -227,6 +239,62 @@ Deno.serve(async (req: Request) => {
               payload: { error: String(holdedErr) },
             });
           }
+        }
+      }
+    }
+  }
+
+  // --- Procesar payout.paid (conciliación con el banco) ---
+  if (event.type === "payout.paid") {
+    const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY") ?? "";
+    const payout = event.data.object as { id?: string; arrival_date?: number };
+    const payoutId = String(payout.id ?? "");
+
+    if (STRIPE_SECRET_KEY && payoutId) {
+      const arrival = payout.arrival_date
+        ? new Date(payout.arrival_date * 1000).toISOString().slice(0, 10)
+        : null;
+      try {
+        // Recorrer las balance transactions (charges) del payout, con paginación.
+        let startingAfter: string | undefined;
+        const paymentIntents: string[] = [];
+        do {
+          const params = new URLSearchParams({
+            payout: payoutId,
+            type: "charge",
+            limit: "100",
+            "expand[]": "data.source",
+          });
+          if (startingAfter) params.set("starting_after", startingAfter);
+          const res = await fetch(`https://api.stripe.com/v1/balance_transactions?${params}`, {
+            headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` },
+          });
+          if (!res.ok) throw new Error(`Stripe balance_transactions → ${res.status}: ${await res.text()}`);
+          const page = await res.json() as {
+            data?: Array<{ id: string; source?: { payment_intent?: string } | null }>;
+            has_more?: boolean;
+          };
+          paymentIntents.push(...extractPaymentIntents(page));
+          startingAfter = page.has_more && page.data?.length ? page.data[page.data.length - 1].id : undefined;
+        } while (startingAfter);
+
+        // Marcar cada booking de ese payout (pre-relleno; el operador confirma luego).
+        for (const pi of paymentIntents) {
+          await supabase
+            .from("bookings")
+            .update({ stripe_payout_id: payoutId, payout_arrival_date: arrival })
+            .eq("stripe_payment_intent", pi);
+        }
+      } catch (payoutErr) {
+        // No romper el webhook: Stripe necesita 200 y reintenta.
+        console.error("payout.paid error (no crítico):", payoutErr);
+        try {
+          await supabase.from("events").insert({
+            type: "payout_error",
+            payload: { payout_id: payoutId, error: String(payoutErr) },
+          });
+        } catch (insertErr) {
+          console.error("payout_error insert falló:", insertErr);
         }
       }
     }
