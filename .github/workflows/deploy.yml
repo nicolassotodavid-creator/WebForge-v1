@@ -31,6 +31,7 @@ jobs:
             score-sites \
             generate-outreach \
             send-email \
+            cron-followups \
             track-event \
             ingest-leads \
             run-scrape \
