@@ -218,11 +218,10 @@ Deno.serve(async (req: Request) => {
   const subject = getSubject(hasWebsite, emailNumber);
   const nombre = lead.contact_name ?? lead.name;
 
-  // Seguimientos (Email 2/3): UNA sola CTA → la página de venta /book (no la web cruda de Lovable).
-  // /book ya muestra la captura de la web + la oferta + el pago. Si no hay BOOKING_BASE, cae a la
-  // live_url para no dejar el email sin enlace.
-  // Email 1 (frío) es la excepción: enseña SOLO la web construida (liveUrl), sin CTA de compra
-  // — doctrina "que abran el link, no que compren todavía". El link lo añade el sistema, no la IA.
+  // TODOS los emails (1, 2 y 3) llevan UNA sola CTA → la página de venta /book (no la web cruda):
+  // /book muestra la captura de la web + la oferta + el botón de pago, así el prospecto puede COMPRAR.
+  // Si no hay BOOKING_BASE configurado, cae a la live_url para no dejar el email sin enlace.
+  // El enlace lo añade el sistema (no la IA): en frío la copy es suave, pero aterriza en /book.
   const emailLink = bookingLink(Deno.env.get("BOOKING_BASE"), leadId) ?? liveUrl!;
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -317,8 +316,9 @@ Deno.serve(async (req: Request) => {
   // El subject lo pone el template (no Claude), así siempre coincide con la secuencia.
   // La IA ya no coloca el enlace (ver OUTREACH_PROMPT). En email lo añade el sistema aquí,
   // solo en su propia línea, para que el template lo renderice como botón "Ver la web →".
-  // Email 1 enseña la web construida (liveUrl), sin CTA de compra. En LinkedIn no va link.
-  const finalBody = channel === "email" ? `${bodyText}\n\n${liveUrl}` : bodyText;
+  // Destino = /book (emailLink): la página de venta donde el prospecto ve la web y COMPRA.
+  // En LinkedIn no va link (lo penaliza; la web va en el mensaje de seguimiento).
+  const finalBody = channel === "email" ? `${bodyText}\n\n${emailLink}` : bodyText;
 
   const { data: inserted, error: insErr } = await supabase
     .from("outreach_messages")
