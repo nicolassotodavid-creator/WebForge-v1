@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  EMAIL 1 · DISEÑO DEFINITIVO (el que SÍ queremos enviar)                    ║
+  ╠══════════════════════════════════════════════════════════════════════════╣
+  ║  Este es el diseño bueno: captura de la web enmarcada en un mini-navegador  ║
+  ║  + DOS botones (primario "Ver la web entera" → la web; secundario           ║
+  ║  "Activar mi web" → /book). Origen: scripts/test-email1.ts (que está en     ║
+  ║  .gitignore y NUNCA se commiteó). Esto es la copia VERSIONADA y canónica.   ║
+  ║                                                                            ║
+  ║  Placeholders a sustituir al renderizar:                                    ║
+  ║    {{SUBJECT}}   asunto del email                                           ║
+  ║    {{INTRO_HTML}} párrafos personalizados (los redacta la IA)               ║
+  ║    {{WEB_URL}}   URL en vivo de la web (live_url) — botón "Ver la web"      ║
+  ║    {{PREVIEW}}   URL pública de la captura (bucket site-previews/<lead>.png)║
+  ║    {{BOOK_URL}}  URL de venta /book/<lead_id> — botón "Activar mi web"      ║
+  ║                                                                            ║
+  ║  Pendiente: portar este HTML a _shared/emailTemplate.ts (renderEmail) para  ║
+  ║  que producción (send-email) salga ASÍ, no con el botón pelado.             ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>{{SUBJECT}}</title>
+</head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,'Segoe UI',Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;">
+    <tr><td align="center" style="padding:32px 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:540px;">
+        <tr><td style="color:#1a1a1a;font-size:16px;line-height:1.6;">
+
+          <!-- Párrafos personalizados (IA). Ejemplo del estilo correcto: -->
+          <p style="margin:0 0 18px;">Hola,</p>
+          <p style="margin:0 0 18px;">Me topé con <strong>Talleres YuriCar</strong> buscando talleres en València y me llamó la atención lo bien que habláis a vuestros clientes: hay reseñas que destacan la rapidez en la entrega y ese &ldquo;trato amable y cercano&rdquo; que no todos los talleres tienen. En un sector donde la gente suele llegar de mal humor porque el coche se ha roto, eso es oro.</p>
+          <p style="margin:0 0 22px;">Por eso os monté una web de muestra. Nada de complicaciones: clara, rápida y que refleje lo que ya hacéis bien. Échale un vistazo:</p>
+          <!-- En producción este bloque = {{INTRO_HTML}} -->
+
+          <!-- Captura enmarcada (mini-navegador), clicable -> la web -->
+          <a href="{{WEB_URL}}" style="text-decoration:none;color:inherit;display:block;margin:0 0 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #E7E5E4;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(17,24,39,0.10);">
+              <tr><td style="background:#F5F5F4;padding:10px 14px;border-bottom:1px solid #E7E5E4;font-size:13px;color:#C4C0BB;letter-spacing:3px;line-height:1;">&#9679;&nbsp;&#9679;&nbsp;&#9679;</td></tr>
+              <tr><td style="font-size:0;line-height:0;">
+                <img src="{{PREVIEW}}" width="540" alt="Vista previa de tu web" style="display:block;width:100%;height:auto;border:0;" />
+              </td></tr>
+            </table>
+          </a>
+
+          <!-- CTA primaria: ver la web -->
+          <p style="margin:0 0 30px;text-align:center;">
+            <a href="{{WEB_URL}}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:14px 30px;border-radius:9px;font-size:15px;font-weight:600;">Ver la web entera &rarr;</a>
+          </p>
+
+          <!-- Soft sell + CTA secundaria: activar/pagar -->
+          <p style="margin:0 0 16px;color:#57534E;font-size:15px;line-height:1.6;">Si te convence, te la dejo publicada y lista &mdash; con tu dominio, las reseñas de Google y todo en marcha. Pago único, sin permanencia.</p>
+          <p style="margin:0 0 30px;text-align:center;">
+            <a href="{{BOOK_URL}}" style="display:inline-block;background:#ffffff;color:#111827;text-decoration:none;padding:13px 28px;border-radius:9px;font-size:15px;font-weight:600;border:1.5px solid #111827;">Activar mi web &rarr;</a>
+          </p>
+
+          <p style="margin:0 0 18px;color:#1a1a1a;">Si te gusta hablamos, si no, sin problema.</p>
+          <p style="margin:0;color:#1a1a1a;">Nico<br><span style="color:#78716C;font-size:14px;">Diseño webs para negocios locales.</span></p>
+
+          <hr style="border:none;border-top:1px solid #eeeeee;margin:28px 0 16px;">
+          <p style="margin:0;color:#9ca3af;font-size:13px;line-height:1.5;">Si no te encaja, respóndeme y no vuelvo a escribir.</p>
+
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
