@@ -103,22 +103,30 @@ async function main() {
 
   const bookLink = BOOKING_BASE ? `${BOOKING_BASE.replace(/\/$/, "")}/${lead.id}` : null;
 
-  // Los 3 emails llevan UNA sola CTA → la página de venta /book. Replicamos lo que hacen
-  // generate-outreach / cron-followups sustituyendo la live_url por el enlace de /book en el cuerpo.
-  let linkDestino = liveUrl;
-  if (bookLink) {
-    bodyText = bodyText.includes(liveUrl)
-      ? bodyText.split(liveUrl).join(bookLink)
-      : `${bodyText.trimEnd()}\n\n${bookLink}`;
-    linkDestino = bookLink;
+  let html: string;
+  let linkInfo: string;
+  if (N === 1) {
+    // Email 1 → diseño SHOWCASE: captura enmarcada + "Ver la web entera" (→ web) +
+    // "Activar mi web" (→ /book). El cuerpo se deja tal cual; renderEmail inserta el
+    // bloque donde el cuerpo menciona la web (la línea-URL).
+    const previewImageUrl = `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/site-previews/${lead.id}.png`;
+    html = renderEmail({ bodyText, trackingPixelUrl: null, subject, webUrl: liveUrl, previewImageUrl, bookingUrl: bookLink });
+    linkInfo = `captura=${previewImageUrl}\n            Ver la web → ${liveUrl}\n            Activar mi web → ${bookLink ?? "(sin BOOKING_BASE)"}`;
+  } else {
+    // Email 2/3 → diseño simple: una CTA → /book (sustituye la live_url del cuerpo).
+    if (bookLink) {
+      bodyText = bodyText.includes(liveUrl)
+        ? bodyText.split(liveUrl).join(bookLink)
+        : `${bodyText.trimEnd()}\n\n${bookLink}`;
+    }
+    html = renderEmail({ bodyText, trackingPixelUrl: null, subject });
+    linkInfo = bookLink ?? liveUrl;
   }
-
-  const html = renderEmail({ bodyText, trackingPixelUrl: null, subject });
 
   console.log(`Lead:       ${lead.name} (${lead.id})  has_website=${hasWebsite}  status=${lead.status}`);
   console.log(`Email:      ${N}  ·  fuente del cuerpo: ${source}`);
   console.log(`Asunto:     ${subject}${subjectNote}`);
-  console.log(`Enlace CTA: ${linkDestino}`);
+  console.log(`Enlace CTA: ${linkInfo}`);
   console.log(`---- cuerpo (texto) ----\n${bodyText}\n------------------------`);
 
   if (DRY_RUN) {
