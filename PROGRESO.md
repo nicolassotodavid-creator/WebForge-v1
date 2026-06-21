@@ -90,8 +90,8 @@ Comprobaciones: `npm run build` y `npm run lint`.
   usará la cabecera `x-ingest-secret`.
 - `analyze-lead` es la función **de prueba** del brief; en producción el brief lo hará el
   Orquestador con el **mismo** `_shared/prompts.ts`.
-- Routing de modelos: **Haiku 4.5** para extracción/brief; **Fable 5** para build-prompt y conducir
-  Lovable (Fase 3); Sonnet 4.6 alternativa.
+- Routing de modelos: **Haiku 4.5** para extracción/brief; **Sonnet 4.6** para build-prompt y conducir
+  Lovable (Fase 3).
 - Reglas duras de `CLAUDE.md` siguen vigentes: secrets SOLO en servidor; webs de cliente en Lovable
   vía MCP desde el Orquestador (no Edge Function, no plantillas); front público no inserta en DB
   directo; salidas de Claude en JSON estricto; gate de QA obligatorio.
@@ -112,8 +112,8 @@ Implementado y verificado por compilación en `orquestador/`:
 - `run.ts` — flujo por lead: brief → `briefs` → `analyzed`; build-prompt; construir en Lovable →
   `sites` (`live_url`) → `site_built`. Idempotente (no regresa estados), maneja errores por lead (un
   fallo no rompe el lote), y tiene **modo prueba** (`--lead <id>`) y **dry-run** (sin gastar créditos).
-- `fable.ts` — Fable (`claude-fable-5`) vía Anthropic API con prompt caching: `fableJson` (brief) y
-  `fableText` (build-prompt). Reutiliza `extractReviews`/`extractJson` de la Fase 2.
+- `llm.ts` — Sonnet 4.6 (`claude-sonnet-4-6`) vía Anthropic API con prompt caching: `llmJson` (brief) y
+  `llmText` (build-prompt). Reutiliza `extractReviews`/`extractJson` de la Fase 2.
 - `lovable.ts` — puente al MCP de Lovable.
 - `package.json` + `tsconfig.json` + `env.ts` (carga la raíz `.env`). `npm install` y `tsc` en verde.
 

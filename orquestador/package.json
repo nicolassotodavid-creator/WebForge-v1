@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "type": "module",
-  "description": "WebForge — Orquestador diario. Brief + build-prompt con Fable y construcción de webs en Lovable vía su MCP. Ver ARQUITECTURA_webforge_v2.md sec. 9.",
+  "description": "WebForge — Orquestador diario. Brief + build-prompt con Sonnet 4.6 y construcción de webs en Lovable vía su MCP. Ver ARQUITECTURA_webforge_v2.md sec. 9.",
   "scripts": {
     "start": "tsx run.ts",
     "auth": "tsx lovable-auth.ts",

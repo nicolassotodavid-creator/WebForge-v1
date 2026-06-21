@@ -1,12 +1,12 @@
 # Orquestador
 
-Agente diario que, para cada lead, redacta el brief y el build-prompt con **Fable** y **construye la
+Agente diario que, para cada lead, redacta el brief y el build-prompt con **Sonnet 4.6** y **construye la
 web de cliente en Lovable vía su MCP**, guardando la `live_url` en Supabase. Ver
 `ARQUITECTURA_webforge_v2.md` sec. 9. Es la **Fase 3**.
 
 ## Cómo funciona (resumen)
 
-Por cada lead: `brief` (Fable → JSON) → `build-prompt` (Fable → texto) → **Claude Code conduce el MCP
+Por cada lead: `brief` (Sonnet 4.6 → JSON) → `build-prompt` (Sonnet 4.6 → texto) → **Claude Code conduce el MCP
 de Lovable** (`list_workspaces → create_project → deploy_project`) → `sites.live_url` → lead
 `site_built`. El resto (QA, contacto por email/LinkedIn) son fases posteriores.
 
@@ -17,7 +17,7 @@ El **OAuth del MCP de Lovable solo admite clientes concretos**: ChatGPT, Claude 
 no puede autenticarse contra Lovable. Por eso `lovable.ts` invoca **Claude Code en modo headless**
 (`claude -p`), que sí sostiene la sesión OAuth. La arquitectura ya lo contemplaba ("Agent SDK **o
 Claude Code en modo no-interactivo**"). El brief y el build-prompt sí van por la Anthropic API directa
-(`fable.ts`), que es más barato y determinista.
+(`llm.ts`), que es más barato y determinista.
 
 ---
 
@@ -88,7 +88,7 @@ La máquina debe tener Claude Code instalado y el MCP de Lovable ya autenticado 
 
 | Variable | Obligatoria | Por defecto | Para qué |
 |---|---|---|---|
-| `ANTHROPIC_API_KEY` | sí | — | Fable (brief y build-prompt) vía Anthropic API |
+| `ANTHROPIC_API_KEY` | sí | — | Sonnet 4.6 (brief y build-prompt) vía Anthropic API |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | sí | — | Leer leads y escribir briefs/sites |
 | `BOOKING_BASE` | sí | — | Base del CTA de reserva (`/book/:leadId`) |
 | `BATCH_SIZE` | no | 5 | Webs por ejecución del lote |

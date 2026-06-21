@@ -1,6 +1,6 @@
-# Prompt para Fable — Construir la captación de leads (scraper Google Maps vía Apify)
+# Prompt para Claude Code — Construir la captación de leads (scraper Google Maps vía Apify)
 
-> Copia TODO el bloque de abajo y pégalo en un chat nuevo de Claude Code (Fable), con la carpeta
+> Copia TODO el bloque de abajo y pégalo en un chat nuevo de Claude Code, con la carpeta
 > `webforge` abierta. Construye solo esta pieza, de punta a punta.
 
 ---

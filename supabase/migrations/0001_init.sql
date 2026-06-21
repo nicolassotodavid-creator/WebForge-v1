@@ -19,7 +19,7 @@ create table if not exists leads (
 create index if not exists idx_leads_status on leads (status);
 create index if not exists idx_leads_city_cat on leads (city, category);
 
--- BRIEFS: salida del análisis (Fable/Haiku)
+-- BRIEFS: salida del análisis (Sonnet 4.6/Haiku)
 create table if not exists briefs (
   id uuid primary key default gen_random_uuid(),
   lead_id uuid references leads(id) on delete cascade,

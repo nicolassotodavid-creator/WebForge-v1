@@ -4,12 +4,12 @@ Sistema de captación **outbound**: construye una web a medida (Lovable conducid
 MCP) ANTES de contactar, te deja revisarla, y dispara el contacto para que acepten y paguen. Dos
 públicos: **negocios locales** (→ email) y **clientes B2B** (→ LinkedIn semi-manual).
 
-Lee **`ARQUITECTURA_webforge_v2.md`** (la fuente de verdad) y **`CLAUDE.md`** (reglas para Fable).
+Lee **`ARQUITECTURA_webforge_v2.md`** (la fuente de verdad) y **`CLAUDE.md`** (reglas para Claude Code).
 
 ## Qué ya está hecho en este repo
 - Estructura de carpetas (app · supabase · orquestador).
 - `ARQUITECTURA_webforge_v2.md` — el spec completo.
-- `CLAUDE.md` — instrucciones para Fable/Claude Code.
+- `CLAUDE.md` — instrucciones para Claude Code.
 - `supabase/migrations/0001_init.sql` — schema + RLS **completos**.
 - `supabase/functions/_shared/prompts.ts` — prompts de Claude (brief · build · outreach).
 - Stubs con contrato de las 6 Edge Functions y del Orquestador (`orquestador/run.ts`).
@@ -19,11 +19,11 @@ Lee **`ARQUITECTURA_webforge_v2.md`** (la fuente de verdad) y **`CLAUDE.md`** (r
    Resend (dominio secundario), Stripe, Apify/Outscraper, y un VPS barato (~5€). LinkedIn (B2B) es
    semi-manual, sin claves.
 2. **Conectar el MCP de Lovable a Claude** en los ajustes de connectors (OAuth).
-3. **Abrir esta carpeta en VS Code** y lanzar **Claude Code con Fable** seleccionado.
+3. **Abrir esta carpeta en VS Code** y lanzar **Claude Code**.
    IMPORTANTE: NO tengas `ANTHROPIC_API_KEY` en el entorno donde corre Claude Code, o te facturará
    por token en vez de usar tu plan.
 4. **Pegar el prompt de arranque** (abajo) en el chat de Claude Code.
-5. Cuando Fable lo pida: copia `.env.example` a `.env`, rellena tus llaves, y aplica la migración
+5. Cuando Claude Code lo pida: copia `.env.example` a `.env`, rellena tus llaves, y aplica la migración
    `supabase/migrations/0001_init.sql` en tu Supabase (SQL Editor o `supabase db push`).
 
 ## Prompt de arranque (pega esto en Claude Code)

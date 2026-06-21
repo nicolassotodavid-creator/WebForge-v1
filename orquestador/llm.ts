@@ -100,7 +100,7 @@ async function callClaude(
 }
 
 // Claude → JSON estricto (brief, outreach). Parsea con try/catch implícito en extractJson.
-export async function fableJson<T = Record<string, unknown>>(
+export async function llmJson<T = Record<string, unknown>>(
   systemPrompt: string,
   input: unknown,
   maxTokens = 2000,
@@ -110,7 +110,7 @@ export async function fableJson<T = Record<string, unknown>>(
 }
 
 // Claude → texto plano (el build-prompt para Lovable). Salida = texto, no JSON.
-export async function fableText(
+export async function llmText(
   systemPrompt: string,
   input: unknown,
   maxTokens = 2000,

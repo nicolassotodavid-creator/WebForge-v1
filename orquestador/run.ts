@@ -2,9 +2,9 @@
 // Corre por CRON en un VPS. NO es serverless corto: un build de Lovable tarda minutos.
 //
 // Flujo en DOS PASOS (gate de validación humana entre pasos):
-//   PASO 1 — Brief: lee leads 'new' → Fable redacta brief → 'analyzed'
+//   PASO 1 — Brief: lee leads 'new' → el modelo redacta brief → 'analyzed'
 //             (El operador revisa el brief en el panel y pulsa "Construir web")
-//   PASO 2 — Build: lee leads 'build_queued' → Fable redacta build-prompt → Lovable → 'site_built'
+//   PASO 2 — Build: lee leads 'build_queued' → el modelo redacta build-prompt → Lovable → 'site_built'
 //             (Solo gasta créditos de Lovable cuando el operador lo ha aprobado)
 // Las aprobaciones y el outreach (email / LinkedIn) son pasos POSTERIORES (tras el QA humano).
 //
@@ -16,7 +16,7 @@
 import "./env.ts"; // debe ir el PRIMERO: carga ../.env antes de evaluar el resto
 import { createClient } from "@supabase/supabase-js";
 import { BRIEF_PROMPT, BUILD_PROMPT } from "../supabase/functions/_shared/prompts.ts";
-import { fableJson, fableText, extractReviews, ORQUESTADOR_MODEL } from "./fable.ts";
+import { llmJson, llmText, extractReviews, ORQUESTADOR_MODEL } from "./llm.ts";
 import { lovableBuild } from "./lovable.ts";
 import { analyzeSite } from "./analyze.ts";
 import { scoreExistingSites } from "./score-existing-sites.ts";
@@ -76,7 +76,7 @@ if (!DRY_RUN && !BOOKING_BASE) {
 // El Orquestador escribe con la SERVICE KEY (bypassa RLS). Nunca exponer esta clave en el frontend.
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
 
-// Payload compacto para Fable (solo datos reales, sin inventar nada).
+// Payload compacto para el modelo (solo datos reales, sin inventar nada).
 function leadPayload(lead: Lead) {
   return {
     name: lead.name,
@@ -90,13 +90,13 @@ function leadPayload(lead: Lead) {
   };
 }
 
-// ─── PASO 1: Generar brief (barato — Haiku/Fable) ──────────────────────────────
+// ─── PASO 1: Generar brief (barato — Sonnet/Haiku) ─────────────────────────────
 // Lee leads 'new', genera el brief y los pasa a 'analyzed'.
 // El operador revisa el brief en el panel y decide si encolar el build.
 async function processBrief(lead: Lead): Promise<Outcome> {
   console.log(`\n▶ [BRIEF] ${lead.id} — ${lead.name} (${lead.city ?? "?"})`);
 
-  const brief = await fableJson<Brief>(BRIEF_PROMPT, leadPayload(lead));
+  const brief = await llmJson<Brief>(BRIEF_PROMPT, leadPayload(lead));
   console.log(`  · brief listo (${brief.business_summary?.slice(0, 60) ?? "—"}…)`);
 
   if (DRY_RUN) {
@@ -147,7 +147,7 @@ async function processBuild(lead: Lead): Promise<Outcome> {
 
   const brief = briefData as Brief;
   const bookingUrl = `${BOOKING_BASE.replace(/\/$/, "")}/${lead.id}`;
-  const buildPrompt = await fableText(
+  const buildPrompt = await llmText(
     BUILD_PROMPT.replaceAll("{{BOOKING_URL}}", bookingUrl),
     { brief, business: leadPayload(lead) },
     3500, // margen para transcribir 12-15 reseñas reales (autor + estrellas + texto) en el carrusel

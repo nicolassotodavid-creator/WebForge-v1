@@ -1,4 +1,4 @@
-# WebForge — Arquitectura v2 (build spec para Fable / Claude Code)
+# WebForge — Arquitectura v2 (build spec para Claude Code)
 
 > Sistema de captación **outbound** que construye una **web a medida** (Lovable conducido por
 > Claude vía MCP) ANTES de contactar, te deja revisarla, y dispara el contacto para que
@@ -14,7 +14,7 @@
 
 ## 0. Cómo usar este documento
 
-Es la fuente de verdad para Fable (como Claude Code en VS Code). Léelo entero antes de tocar
+Es la fuente de verdad para Claude Code (en VS Code). Léelo entero antes de tocar
 nada. Construye **por fases** (sección 13), verificando cada una antes de seguir. Copia la
 sección 14 (`CLAUDE.md`) a la raíz del repo. El arranque y el super-prompt están en 15 y 16.
 
@@ -22,7 +22,7 @@ sección 14 (`CLAUDE.md`) a la raíz del repo. El arranque y el super-prompt est
 
 ## 1. Decisión arquitectónica clave
 
-**Las webs de cliente se construyen en Lovable, conducido por Claude (Fable) vía el MCP de Lovable.**
+**Las webs de cliente se construyen en Lovable, conducido por Claude vía el MCP de Lovable.**
 Lovable expone un servidor MCP que deja a un agente crear proyectos, iterar, lanzar deploy y
 recuperar una **URL en vivo**, todo programático (OAuth, sin API-key). Eso es el primitivo que
 convierte "web a medida" en algo automatizable a 5/día.
@@ -31,7 +31,7 @@ Hay **dos backends distintos**, no los confundas:
 
 - **La App** = tu panel + Supabase (DB, Auth, Edge Functions). Es lo que TÚ operas. Vive en
   Supabase, la construyes en VS Code. No usa Lovable.
-- **El Orquestador** = un agente que corre por cron (Fable + MCP de Lovable). Es el que cada
+- **El Orquestador** = un agente que corre por cron (Sonnet 4.6 + MCP de Lovable). Es el que cada
   mañana scrapea → analiza → **construye las webs en Lovable** → guarda las URLs en Supabase.
 
 Modelo de entrega: **web-first**. La web a medida se construye ANTES de contactar y es el gancho
@@ -41,16 +41,16 @@ mantienes). Implicación de coste en sección 17.
 
 ---
 
-## 2. Las dos caras de Fable (no las mezcles)
+## 2. Las dos caras de Claude (no las mezcles)
 
-Fable se usa en dos sitios totalmente distintos:
+Claude se usa en dos sitios totalmente distintos:
 
-1. **Fable como desarrollador** (en VS Code, vía Claude Code): escribe TODO el código del
+1. **Claude Code como desarrollador** (en VS Code): escribe TODO el código del
    sistema —la App y el Orquestador—. Es quien construye el proyecto siguiendo este doc.
-2. **Fable como cerebro del Orquestador** (en producción): el modelo que, dentro del agente
+2. **El modelo (Sonnet 4.6) como cerebro del Orquestador** (en producción): el modelo que, dentro del agente
    diario, redacta los briefs, compone los build-prompts y conduce Lovable por MCP.
 
-Mismo modelo, dos roles. La sección 16 (super-prompt) es para el rol 1.
+Dos roles distintos. La sección 16 (super-prompt) es para el rol 1.
 
 ---
 
@@ -58,21 +58,20 @@ Mismo modelo, dos roles. La sección 16 (super-prompt) es para el rol 1.
 
 | Capa | Tecnología |
 |---|---|
-| Construir el sistema | **Fable vía Claude Code** en VS Code (suscripción Max, plano; NO pongas `ANTHROPIC_API_KEY` en ese entorno o factura por token) |
+| Construir el sistema | **Claude Code** en VS Code (suscripción Max, plano; NO pongas `ANTHROPIC_API_KEY` en ese entorno o factura por token) |
 | App: frontend | React + Vite + Tailwind + shadcn/ui, desplegado en **Vercel** (free) |
 | App: backend/DB | **Supabase** (Postgres + Auth + Storage + **Edge Functions** Deno + **pg_cron**) |
 | Motor de webs de cliente | **Lovable** conducido por su **MCP** desde el Orquestador |
-| Orquestador (agente diario) | Node/TS con **Claude Agent SDK** (o Claude Code headless) + **MCP de Lovable**, modelo `claude-fable-5`, en un **VPS** por cron |
-| LLM en runtime | **Claude API**: `claude-fable-5` (briefs, build-prompts, orquestación), `claude-haiku-4-5-20251001` (extracción barata a volumen) |
+| Orquestador (agente diario) | Node/TS con **Claude Agent SDK** (o Claude Code headless) + **MCP de Lovable**, modelo `claude-sonnet-4-6`, en un **VPS** por cron |
+| LLM en runtime | **Claude API**: `claude-sonnet-4-6` (briefs, build-prompts, orquestación), `claude-haiku-4-5-20251001` (extracción barata a volumen) |
 | Email (locales) | **Resend** (transaccional, **dominio secundario**, texto plano) |
 | Pagos | **Stripe Checkout** |
 | Outreach LinkedIn (B2B) | **Semi-manual**: Claude redacta, tú copias/pegas. LinkedIn no permite envío automatizado sin baneo; NO hay API de envío ni secret. |
 | Scraping / fuentes de leads | Locales: Apify "Businesses Without Websites" / Outscraper. B2B: scraper/enriquecimiento de LinkedIn o directorios sectoriales. Ambas alimentan `ingest-leads` con su `segment`. |
 
-**Routing de modelos (coste):** Fable 5 es potente pero caro (~$10/$50 por millón de tokens),
-úsalo donde su calidad manda: el build-prompt (determina la calidad de la web) y conducir Lovable.
-Para extracción masiva de reseñas, Haiku 4.5. Sonnet 4.6 como alternativa más barata al build-prompt
-si Fable se dispara en coste. Activa **prompt caching** en los system prompts.
+**Routing de modelos (coste):** Sonnet 4.6 para briefs y build-prompt (determina la calidad de la web
+y conduce Lovable). Para extracción a volumen de reseñas, Haiku 4.5. Activa **prompt caching** en los
+system prompts.
 
 ---
 
@@ -80,9 +79,9 @@ si Fable se dispara en coste. Activa **prompt caching** en los system prompts.
 
 ```
                  ┌─────────────────────────────────────────────┐
-   (cron diario) │  ORQUESTADOR  (VPS · Agent SDK · Fable)      │
+   (cron diario) │  ORQUESTADOR  (VPS · Agent SDK · Sonnet 4.6) │
                  │  1. lee leads 'new' de Supabase             │
-   Scraper ─────►│  2. Fable: brief + build-prompt             │
+   Scraper ─────►│  2. Sonnet 4.6: brief + build-prompt        │
    (Apify)       │  3. MCP Lovable: construye web → live_url    │──► Lovable (webs de cliente)
                  │  4. escribe brief + site en Supabase        │
                  └───────────────┬─────────────────────────────┘
@@ -131,7 +130,7 @@ create index on leads (status);
 create index on leads (segment);
 create index on leads (city, category);
 
--- BRIEFS: salida del análisis (Fable/Haiku)
+-- BRIEFS: salida del análisis (Sonnet 4.6/Haiku)
 create table briefs (
   id uuid primary key default gen_random_uuid(),
   lead_id uuid references leads(id) on delete cascade,
@@ -284,7 +283,7 @@ Es lo que hace que todo sea automático. **No** es un cron de `curl`: es un agen
 sostiene la sesión OAuth del MCP de Lovable.
 
 **Cómo corre:** script Node/TS usando el **Claude Agent SDK** (o Claude Code en modo no-interactivo),
-con el **MCP de Lovable** configurado (OAuth), modelo `claude-fable-5` y la **service key de Supabase**.
+con el **MCP de Lovable** configurado (OAuth), modelo `claude-sonnet-4-6` y la **service key de Supabase**.
 Agendado por **cron en un VPS** (un build de Lovable tarda minutos, así que NADA de funciones
 serverless con timeout corto: VPS o job largo). Alternativa: GitHub Actions con workflow programado.
 
@@ -295,12 +294,12 @@ const leads = await db.from('leads').select('*').eq('status','new').limit(BATCH)
 
 for (const lead of leads) {
   // 1) Brief
-  const brief = await fable(BRIEF_PROMPT, leadConReviews);   // JSON estricto
-  await db.from('briefs').insert({ lead_id: lead.id, ...brief, model_used:'claude-fable-5' });
+  const brief = await llm(BRIEF_PROMPT, leadConReviews);   // JSON estricto
+  await db.from('briefs').insert({ lead_id: lead.id, ...brief, model_used:'claude-sonnet-4-6' });
   await db.from('leads').update({ status:'analyzed' }).eq('id', lead.id);
 
-  // 2) Build-prompt (Fable escribe el prompt para Lovable a partir del brief)
-  const buildPrompt = await fable(BUILD_PROMPT, { brief, lead,
+  // 2) Build-prompt (el modelo escribe el prompt para Lovable a partir del brief)
+  const buildPrompt = await llm(BUILD_PROMPT, { brief, lead,
       booking_url: `${BOOKING_BASE}?lead=${lead.id}` });
 
   // 3) Construir en Lovable VÍA MCP → URL en vivo
@@ -317,7 +316,7 @@ for (const lead of leads) {
 **Consistencia de marca:** fija una sola vez el *workspace/project knowledge* en Lovable (vía MCP)
 con tu sistema de diseño, tono y patrones, para que cada build salga consistente sin supervisión pesada.
 
-**El build-prompt** (lo genera Fable) debe instruir a Lovable: one-page a medida para `[negocio]`,
+**El build-prompt** (lo genera el modelo) debe instruir a Lovable: one-page a medida para `[negocio]`,
 secciones del brief, paleta, **reseñas reales**, horario/contacto, mobile-first y rápida, y un CTA
 prominente **"Reservar / Aceptar"** que enlace a `{booking_url}` (lleva el `lead_id`). Opcional:
 inyectar un snippet `fetch` a `track-event` en el `onLoad` para registrar `demo_viewed`.
@@ -397,14 +396,14 @@ BOOKING_BASE=https://app.webforge.io/book
 
 ---
 
-## 13. Orden de construcción (para Fable)
+## 13. Orden de construcción (para Claude Code)
 
 Fase a fase, verificando cada una.
 
 - **Fase 0 — Scaffold.** Repo + Vite/React/Tailwind/shadcn + Supabase. Aplicar migración (sección 5, schema+RLS). Auth (solo tú). Deploy en Vercel. Cargar secrets.
 - **Fase 1 — Ingest + datos.** `ingest-leads` (acepta `segment`: `local`|`b2b`) + `/import` + tabla de leads en `/`. Meter leads reales.
 - **Fase 2 — Brief.** Prompt en `_shared/prompts.ts` + `analyze-lead` (Edge Fn de prueba) + render del brief en `/leads/:id`.
-- **Fase 3 — Orquestador MVP (núcleo nuevo).** Script Node + Agent SDK + **MCP de Lovable** + Fable que, para UN lead, genere brief → build-prompt → **construya la web en Lovable** → guarde `live_url` en `sites`. Verificar que devuelve una URL viva.
+- **Fase 3 — Orquestador MVP (núcleo nuevo).** Script Node + Agent SDK + **MCP de Lovable** + Sonnet 4.6 que, para UN lead, genere brief → build-prompt → **construya la web en Lovable** → guarde `live_url` en `sites`. Verificar que devuelve una URL viva.
 - **Fase 4 — Dashboard QA.** Preview de la `live_url` en `/leads/:id` + Aprobar/Rechazar/Regenerar.
 - **Fase 5 — Outreach bicanal.** `generate-outreach` (canal según `segment`) + `send-email` (Resend, **solo email**) + acciones de panel: email → **Enviar**; LinkedIn → **Copiar mensaje** + **Abrir perfil** + **Marcar contactado**.
 - **Fase 6 — Booking + pagos.** `/book/:leadId` + `create-checkout` + `stripe-webhook` + `/gracias`.
@@ -416,10 +415,10 @@ Fase a fase, verificando cada una.
 ## 14. CLAUDE.md (copiar a la raíz del repo)
 
 ```md
-# WebForge — instrucciones para Fable / Claude Code
+# WebForge — instrucciones para Claude Code
 
 Dos backends: (1) APP = panel React (Vercel) + Supabase (Postgres+Auth+Edge Functions Deno+pg_cron).
-(2) ORQUESTADOR = agente Node (Claude Agent SDK + MCP de Lovable + modelo claude-fable-5) en VPS por cron,
+(2) ORQUESTADOR = agente Node (Claude Agent SDK + MCP de Lovable + modelo claude-sonnet-4-6) en VPS por cron,
 que construye las webs de cliente en Lovable y escribe en Supabase con la service key.
 
 Reglas duras:
@@ -428,7 +427,7 @@ Reglas duras:
 - Dos públicos / dos canales: negocios `local` → **email** (Resend, automático); `b2b` → **LinkedIn** (semi-manual: Claude redacta, el operador copia/pega). NADA de WhatsApp ni llamadas.
 - El front público no inserta en DB directo: pasa por create-checkout / track-event.
 - Salidas de Claude en JSON estricto (esquemas en ARQUITECTURA_webforge_v2.md sec. 10). Parsear con try/catch.
-- Modelos: Haiku 4.5 extracción a volumen; Fable 5 para build-prompt y conducir Lovable; Sonnet 4.6 alternativa barata. Prompt caching en system prompts.
+- Modelos: Sonnet 4.6 para briefs y build-prompt; Haiku 4.5 para extracción a volumen. Prompt caching en system prompts.
 - Gate de QA obligatorio: nada se contacta hasta status='approved' (visto bueno humano).
 - Mensaje en frío: texto plano, humano, corto, con reseñas reales. Email incluye la live_url; LinkedIn es nota de conexión (la web va en el seguimiento). Sin pinta de plantilla.
 - Construir por fases (sec. 13). Verificar cada fase antes de seguir.
@@ -451,18 +450,18 @@ Fuera de alcance (no construir): contacto por WhatsApp; llamadas (ElevenLabs). S
 8. **VPS** barato (Hetzner/DigitalOcean ~5€) para el cron del Orquestador.
 
 **B. Conectar el MCP de Lovable a Claude:** en los ajustes de connectors de Claude, añade Lovable
-(OAuth). Así Fable puede conducir Lovable. (El Orquestador en producción usa esa misma conexión vía SDK.)
+(OAuth). Así Claude puede conducir Lovable. (El Orquestador en producción usa esa misma conexión vía SDK.)
 
 **C. Arrancar el repo:**
 1. Crea el repo y mete este doc (`ARQUITECTURA_webforge_v2.md`) + el `CLAUDE.md` (sec. 14) en la raíz.
-2. Ábrelo en VS Code, lanza **Claude Code** con **Fable** seleccionado. (Asegúrate de NO tener
+2. Ábrelo en VS Code, lanza **Claude Code**. (Asegúrate de NO tener
    `ANTHROPIC_API_KEY` en ese entorno, o Code factura por token en vez de tu plan.)
-3. Pega el **super-prompt** (sección 16). Fable construye Fase 0 + 1 y para para que verifiques.
+3. Pega el **super-prompt** (sección 16). Claude Code construye Fase 0 + 1 y para para que verifiques.
 4. Avanza fase a fase dándole el OK.
 
 ---
 
-## 16. Super-prompt para Fable (copia y pega en Claude Code)
+## 16. Super-prompt para Claude Code (copia y pega en Claude Code)
 
 ```
 Eres el desarrollador principal de WebForge, un sistema que cada día scrapea negocios locales,
@@ -474,10 +473,10 @@ Son la fuente de verdad: síguelos al pie de la letra.
 Stack cerrado:
 - Dos backends: (1) APP = React+Vite+Tailwind+shadcn en Vercel + Supabase (Postgres + Auth +
   Edge Functions en Deno + pg_cron). (2) ORQUESTADOR = agente Node/TS con el Claude Agent SDK +
-  el MCP de Lovable + modelo claude-fable-5, que corre por cron en un VPS y construye las webs de
+  el MCP de Lovable + modelo claude-sonnet-4-6, que corre por cron en un VPS y construye las webs de
   cliente EN LOVABLE vía su MCP, escribiendo en Supabase con la service key.
-- Runtime LLM: Claude API. Haiku 4.5 para extracción a volumen; Fable 5 para build-prompt y conducir
-  Lovable. Contacto: email (Resend, dominio secundario, texto plano) para negocios locales + LinkedIn
+- Runtime LLM: Claude API. Sonnet 4.6 para briefs y build-prompt (conducir Lovable); Haiku 4.5 para
+  extracción a volumen. Contacto: email (Resend, dominio secundario, texto plano) para negocios locales + LinkedIn
   semi-manual (Claude redacta, el operador pega) para B2B. Pagos: Stripe. SIN WhatsApp ni llamadas.
 
 Reglas duras (innegociables):

@@ -5,7 +5,7 @@
 // Es ORIENTATIVO: no toca el gate humano (nada se contacta hasta status='approved').
 
 import { ANALYSIS_PROMPT } from "../supabase/functions/_shared/prompts.ts";
-import { extractJson } from "./fable.ts";
+import { extractJson } from "./llm.ts";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 // Haiku 4.5 para análisis a volumen (mismo modelo que la Edge Function analyze-site).

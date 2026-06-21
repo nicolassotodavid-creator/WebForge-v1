@@ -8,3 +8,4 @@ supabase/.branches
 supabase/.temp
 *.log
 orquestador/.tmp-email-preview.html
+com.webforge.orquestador.plist
