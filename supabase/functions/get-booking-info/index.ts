@@ -1,7 +1,9 @@
-// get-booking-info — datos PÚBLICOS para la landing /book/:leadId.
-// Sin auth. Devuelve: { business_name, category, city, live_url, preview_image_url }.
-// El panel usa la service key; aquí usamos la service key porque es un edge function
-// (los secrets nunca llegan al browser).
+// get-booking-info — datos PÚBLICOS por leadId. Lo consumen dos páginas de cliente:
+//  - /book/:leadId (panel Vercel): oferta + pago.
+//  - la landing warm nico-soto.es/:leadId (proyecto Lovable warm-web-offer): propuesta en frío.
+// Sin auth. Devuelve: { business_name, contact_name, category, city, rating, review_count,
+//   live_url, preview_image_url, highlights }.
+// Usa la service key (es un edge function; los secrets nunca llegan al browser).
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
@@ -35,7 +37,7 @@ Deno.serve(async (req: Request) => {
 
   const { data: lead } = await supabase
     .from("leads")
-    .select("name, category, city")
+    .select("name, contact_name, category, city, rating, review_count")
     .eq("id", lead_id)
     .maybeSingle();
 
@@ -49,11 +51,29 @@ Deno.serve(async (req: Request) => {
     .limit(1)
     .maybeSingle();
 
+  // Highlights reales de reseñas (temas concretos que repiten los clientes, sin nombres
+  // inventados). Salen del brief más reciente. La landing los usa como citas de "Reseñas".
+  const { data: brief } = await supabase
+    .from("briefs")
+    .select("highlights_from_reviews")
+    .eq("lead_id", lead_id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const rawHighlights = brief?.highlights_from_reviews;
+  const highlights = Array.isArray(rawHighlights)
+    ? rawHighlights.filter((h): h is string => typeof h === "string")
+    : [];
+
   return jsonResponse({
     business_name: lead.name,
+    contact_name: lead.contact_name ?? null,
     category: lead.category ?? null,
     city: lead.city ?? null,
+    rating: lead.rating ?? null,
+    review_count: lead.review_count ?? null,
     live_url: site?.live_url ?? null,
     preview_image_url: site?.preview_image_url ?? null,
+    highlights,
   });
 });

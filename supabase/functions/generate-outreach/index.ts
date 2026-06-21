@@ -27,11 +27,17 @@ function extractJson(text: string): Record<string, unknown> {
 }
 
 // Subjects fijos por segmento (no los decide Claude).
+// Asuntos por (tiene web, nº de email). Sin "Re:": cada asunto va solo — la pregunta
+// (Email 2) y la urgencia (Email 3) convierten más que simular un hilo de respuesta.
 function getSubject(hasWebsite: boolean, emailNumber: number): string {
-  const base = hasWebsite
-    ? "Tu web está lista. ¿Te gusta cómo ha quedado?"
-    : "Tu web está lista.";
-  return emailNumber === 1 ? base : `Re: ${base}`;
+  if (hasWebsite) {
+    if (emailNumber === 2) return "¿Os ha gustado el cambio?";
+    if (emailNumber === 3) return "La doy de baja el viernes";
+    return "Le di una vuelta a vuestra web";
+  }
+  if (emailNumber === 2) return "¿Has podido verla?";
+  if (emailNumber === 3) return "La borro el viernes";
+  return "Te monté una web";
 }
 
 // Templates literales para Email 2 y 3 (sin IA — son 3 líneas, no merece la pena).

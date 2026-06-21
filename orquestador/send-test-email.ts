@@ -31,12 +31,16 @@ const LEAD_REF = argValue("--lead") ?? "yuricar";
 const TO = argValue("--to") ?? "nicolassotodavid@gmail.com";
 const N = Number(argValue("--n") ?? 1) as 1 | 2 | 3;
 const DRY_RUN = process.argv.includes("--dry-run");
+// Slug del cliente en la landing warm (nico-soto.es/<slug>). Si se pasa, "Activar mi web"
+// apunta ahí en vez de a /book. Demo: --slug yuricar  → https://nico-soto.es/yuricar
+const SLUG = argValue("--slug");
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY ?? "";
 const FROM_EMAIL = process.env.FROM_EMAIL ?? "";
 const BOOKING_BASE = process.env.BOOKING_BASE ?? "";
+const WARM_BASE = process.env.WARM_BASE ?? "https://nico-soto.es"; // landing warm por-cliente (Lovable)
 
 if (!SUPABASE_URL || !SERVICE_KEY) {
   console.error("❌ Faltan SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY en .env");
@@ -47,11 +51,16 @@ const supabase = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSessio
 
 const isUuid = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 
+// Asuntos por (tiene web, nº de email). Sin "Re:": cada asunto va solo.
 function getSubject(hasWebsite: boolean, n: number): string {
-  const base = hasWebsite
-    ? "Tu web está lista. ¿Te gusta cómo ha quedado?"
-    : "Tu web está lista.";
-  return n === 1 ? base : `Re: ${base}`;
+  if (hasWebsite) {
+    if (n === 2) return "¿Os ha gustado el cambio?";
+    if (n === 3) return "La doy de baja el viernes";
+    return "Le di una vuelta a vuestra web";
+  }
+  if (n === 2) return "¿Has podido verla?";
+  if (n === 3) return "La borro el viernes";
+  return "Te monté una web";
 }
 
 // Cuerpo de respaldo si el lead aún no tiene borrador de ese email (mismas plantillas que producción).
@@ -101,27 +110,18 @@ async function main() {
   let bodyText = msg?.body ?? fallbackBody(N, hasWebsite, nombre, lead.rating, lead.review_count, liveUrl);
   const source = msg?.body ? `borrador real (${msg.generated_by_model ?? "?"}, ${msg.status})` : "cuerpo de respaldo (no había borrador)";
 
+  // "Activar mi web" → landing warm por-cliente (nico-soto.es/<slug>) si hay --slug;
+  // si no, cae al /book de Stripe (BOOKING_BASE/<leadId>).
+  const warmLink = SLUG ? `${WARM_BASE.replace(/\/$/, "")}/${SLUG}` : null;
   const bookLink = BOOKING_BASE ? `${BOOKING_BASE.replace(/\/$/, "")}/${lead.id}` : null;
+  const activarUrl = warmLink ?? bookLink;
 
-  let html: string;
-  let linkInfo: string;
-  if (N === 1) {
-    // Email 1 → diseño SHOWCASE: captura enmarcada + "Ver la web entera" (→ web) +
-    // "Activar mi web" (→ /book). El cuerpo se deja tal cual; renderEmail inserta el
-    // bloque donde el cuerpo menciona la web (la línea-URL).
-    const previewImageUrl = `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/site-previews/${lead.id}.png`;
-    html = renderEmail({ bodyText, trackingPixelUrl: null, subject, webUrl: liveUrl, previewImageUrl, bookingUrl: bookLink });
-    linkInfo = `captura=${previewImageUrl}\n            Ver la web → ${liveUrl}\n            Activar mi web → ${bookLink ?? "(sin BOOKING_BASE)"}`;
-  } else {
-    // Email 2/3 → diseño simple: una CTA → /book (sustituye la live_url del cuerpo).
-    if (bookLink) {
-      bodyText = bodyText.includes(liveUrl)
-        ? bodyText.split(liveUrl).join(bookLink)
-        : `${bodyText.trimEnd()}\n\n${bookLink}`;
-    }
-    html = renderEmail({ bodyText, trackingPixelUrl: null, subject });
-    linkInfo = bookLink ?? liveUrl;
-  }
+  // Los 3 emails (1, 2 y 3) usan el diseño SHOWCASE: captura enmarcada + "Ver la web
+  // entera" (→ web) + "Activar mi web" (→ landing warm / /book). renderEmail inserta el bloque
+  // donde el cuerpo menciona la web (la línea-URL); el resto del cuerpo (intro/cierre/firma) se respeta.
+  const previewImageUrl = `${SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/site-previews/${lead.id}.png`;
+  const html = renderEmail({ bodyText, trackingPixelUrl: null, subject, webUrl: liveUrl, previewImageUrl, bookingUrl: activarUrl });
+  const linkInfo = `captura=${previewImageUrl}\n            Ver la web → ${liveUrl}\n            Activar mi web → ${activarUrl ?? "(sin destino)"}`;
 
   console.log(`Lead:       ${lead.name} (${lead.id})  has_website=${hasWebsite}  status=${lead.status}`);
   console.log(`Email:      ${N}  ·  fuente del cuerpo: ${source}`);

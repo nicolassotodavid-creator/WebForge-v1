@@ -1,8 +1,9 @@
 // emailTemplate.ts — Plantilla de email compartida.
-//  - Email 1 (send-email): diseño "showcase" → captura de la web enmarcada en un
-//    mini-navegador + DOS CTAs ("Ver la web entera" → la web, "Activar mi web" → /book).
+//  - Los 3 emails (Email 1 en send-email, Email 2/3 en cron-followups) usan el diseño
+//    "showcase": captura de la web enmarcada en un mini-navegador + DOS CTAs
+//    ("Ver la web entera" → la web, "Activar mi web" → /book). Se activa pasando `webUrl`.
 //    Diseño canónico: docs/email-design/EMAIL1-DISENO-DEFINITIVO.html
-//  - Email 2/3 (cron-followups): versión simple, texto + 1 botón.
+//  - Modo simple (texto + 1 botón) = solo fallback si no hay web en vivo (sin `webUrl`).
 // Email-safe: tablas + estilos inline, una columna, fondo blanco.
 
 // Una línea que es SOLO una URL.
