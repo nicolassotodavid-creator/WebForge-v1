@@ -5,7 +5,7 @@
 // Secrets SOLO en servidor.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
-import { renderEmail } from "../_shared/emailTemplate.ts";
+import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -112,9 +112,29 @@ Deno.serve(async (req: Request) => {
   // Versión texto plano (fallback para clientes sin HTML). El cuerpo ya trae la firma.
   const textBody = msg.body;
 
-  // El cuerpo ya trae la CTA única → /book (la inyectan generate-outreach y cron-followups),
-  // así que aquí NO se añade ningún enlace de compra aparte: una sola CTA en los 3 emails.
-  const htmlBody = renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject });
+  // Email 1 → diseño SHOWCASE: captura enmarcada de la web + "Ver la web entera" (→ web)
+  // + "Activar mi web" (→ /book). El cuerpo trae la línea-URL donde se inserta el bloque.
+  // Email 2/3 → diseño simple (el cuerpo ya trae su botón). Si el Email 1 no tuviera web
+  // en vivo, cae al diseño simple para no romper el envío.
+  let htmlBody: string;
+  if (msg.email_number === 1) {
+    const { data: site } = await supabase
+      .from("sites")
+      .select("live_url")
+      .eq("lead_id", msg.lead_id)
+      .not("live_url", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const webUrl = site?.live_url ?? null;
+    const previewImageUrl = `${SUPABASE_URL}/storage/v1/object/public/site-previews/${msg.lead_id}.png`;
+    const bookingUrl = bookingLink(Deno.env.get("BOOKING_BASE"), msg.lead_id) ?? webUrl;
+    htmlBody = webUrl
+      ? renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject, webUrl, previewImageUrl, bookingUrl })
+      : renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject });
+  } else {
+    htmlBody = renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject });
+  }
 
   // --- Envío vía Resend (HTML + texto plano como fallback) ---
   let resendId: string | null = null;
