@@ -1,6 +1,6 @@
 # WebForge — Estado del proyecto (handoff)
 
-> Última actualización: 2026-06-11. Este archivo resume **qué está hecho y qué viene**, para
+> Última actualización: 2026-06-21. Este archivo resume **qué está hecho y qué viene**, para
 > retomar el proyecto en cualquier momento (incluido un chat nuevo). Léelo junto con
 > `ARQUITECTURA_webforge_v2.md` (la fuente de verdad) y `CLAUDE.md` (reglas duras).
 
@@ -31,6 +31,35 @@ Impacto (ya aplicado a docs y contratos):
 
 > El **núcleo no cambia**: scraper → brief → web en Lovable → QA → booking/pago siguen igual. Esto es
 > un recorte de canales (más simple) + un segundo público (B2B) en la capa de contacto.
+
+---
+
+## 🆕 Vista de pagos (2026-06-21) — módulo `/pagos`
+
+Módulo **separado** en el panel para ver cobros, abrir la factura **borrador** de Holded y
+**conciliar el pago con el banco**. **Mergeado a `master` (local), SIN desplegar todavía.**
+Spec y plan completos en `docs/superpowers/`.
+
+- **Página `/pagos`**: lista (negocio · importe · fecha de pago `paid_at` · estado Stripe · estado
+  banco), 4 KPIs (cobrado mes / pendiente→banco / confirmado banco / total), botones "Abrir en
+  Holded" y "Confirmar en banco". **No toca el Dashboard** ni su tabla.
+- **Conciliación híbrida**: Stripe pre-rellena vía webhook `payout.paid`; el operador confirma a
+  mano. Lógica de estado/KPIs en funciones puras testeadas (`app/src/lib/payments.ts`).
+- **Migración `0013_payments_reconciliation.sql`** (aditiva): `bookings` gana
+  `stripe_payment_intent`, `stripe_payout_id`, `payout_arrival_date`, `bank_confirmed_at`,
+  `holded_invoice_id`, `paid_at`. **PENDIENTE de aplicar.**
+- **Webhook `stripe-webhook`**: Fase 1 guarda `payment_intent`/`holded_invoice_id`/`paid_at` al
+  cobrar; Fase 2 (`payout.paid`) pre-rellena la llegada al banco. La factura de Holded sigue
+  **borrador** (`status:0`), nunca se emite.
+
+### ▶️ Para desplegar (ORDEN obligatorio — lo corre Nico):
+1. **Migración primero**: `supabase db push` (aplica `0013`).
+2. **Edge function**: `bash deploy.sh` (re-despliega `stripe-webhook`).
+3. **Front al final**: `git push origin master` (Vercel publica `/pagos`).
+
+> Si pusheas el front antes de migrar, `/pagos` referenciaría columnas inexistentes. La Fase 2
+> (pre-relleno de banco) se activa al dar de alta el evento `payout.paid` en Stripe + tener
+> `STRIPE_SECRET_KEY` en la función; sin eso, la confirmación de banco es manual y funciona igual.
 
 ---
 
