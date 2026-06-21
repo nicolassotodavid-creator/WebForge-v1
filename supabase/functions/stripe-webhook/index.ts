@@ -96,6 +96,16 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+/** Comparación de strings hex en tiempo constante (evita timing attacks en la firma). */
+function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
 Deno.serve(async (req: Request) => {
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -113,15 +123,19 @@ Deno.serve(async (req: Request) => {
 
   // --- Verificar firma Stripe (HMAC-SHA256) ---
   // Formato de Stripe-Signature: t=<unix_ts>,v1=<hex_hmac>[,v1=<hex_hmac2>]
-  const parts: Record<string, string> = {};
+  // Stripe puede enviar varios v1= durante una rotación del signing secret: acumúlalos todos.
+  let timestamp = "";
+  const signatures: string[] = [];
   for (const piece of sigHeader.split(",")) {
     const [k, v] = piece.split("=");
-    if (k && v) parts[k.trim()] = v.trim();
+    if (!k || !v) continue;
+    const key = k.trim();
+    const val = v.trim();
+    if (key === "t") timestamp = val;
+    else if (key === "v1") signatures.push(val);
   }
-  const timestamp = parts["t"];
-  const signature = parts["v1"];
 
-  if (!timestamp || !signature) {
+  if (!timestamp || signatures.length === 0) {
     return jsonResponse({ error: "Cabecera Stripe-Signature malformada." }, 400);
   }
 
@@ -144,7 +158,9 @@ Deno.serve(async (req: Request) => {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 
-  if (expected !== signature) {
+  // Comparación en tiempo constante contra cada v1 (evita timing attacks).
+  const valid = signatures.some((sig) => timingSafeEqualHex(sig, expected));
+  if (!valid) {
     return jsonResponse({ error: "Firma Stripe inválida." }, 401);
   }
 
