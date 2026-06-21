@@ -24,6 +24,11 @@ const PIXEL_GIF = new Uint8Array([
   0x3b,                               // trailer
 ]);
 
+// Tipos que el endpoint PÚBLICO (sin auth) acepta. Cualquier otro se rechaza para que un
+// tercero no pueda falsear demo_viewed (avanza el lead) ni email_opened, ni inflar `events`.
+// El resto de tipos (booking_*, email_sent, etc.) los insertan las funciones con service_role.
+const ALLOWED_PUBLIC_TYPES = new Set(["demo_viewed", "email_opened"]);
+
 function pixelResponse(): Response {
   return new Response(PIXEL_GIF, {
     headers: {
@@ -95,8 +100,8 @@ Deno.serve(async (req: Request) => {
     const type = url.searchParams.get("type");
     const messageId = url.searchParams.get("message_id");
 
-    // Siempre devolvemos el pixel, aunque los params sean incorrectos.
-    if (leadId && type) {
+    // Siempre devolvemos el pixel, aunque los params sean incorrectos o el tipo no esté permitido.
+    if (leadId && type && ALLOWED_PUBLIC_TYPES.has(type)) {
       await handleEvent(supabase, leadId, type, null, messageId).catch(() => {});
     }
     return pixelResponse();
@@ -115,6 +120,9 @@ Deno.serve(async (req: Request) => {
   const { lead_id, type, payload } = body ?? {};
   if (!lead_id) return jsonResponse({ error: "Falta lead_id." }, 400);
   if (!type) return jsonResponse({ error: "Falta type." }, 400);
+  if (!ALLOWED_PUBLIC_TYPES.has(type)) {
+    return jsonResponse({ error: "Tipo de evento no permitido." }, 400);
+  }
 
   await handleEvent(supabase, lead_id, type, payload, null);
 

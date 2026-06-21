@@ -116,7 +116,7 @@ Deno.serve(async (req: Request) => {
   }
 
   // --- Booking ---
-  const { data: booking } = await supabase
+  const { data: booking, error: bookingErr } = await supabase
     .from("bookings")
     .insert({
       lead_id,
@@ -133,6 +133,13 @@ Deno.serve(async (req: Request) => {
     .select("id")
     .single();
 
+  // Sin booking, un pago posterior quedaría HUÉRFANO: el webhook casa por stripe_session_id
+  // y no encontraría fila. Mejor fallar ANTES de entregar el checkout_url que cobrar sin registro.
+  if (bookingErr || !booking) {
+    console.error("create-checkout: fallo al insertar booking:", bookingErr?.message);
+    return jsonResponse({ error: "No se pudo registrar la reserva. Inténtalo de nuevo en un momento." }, 500);
+  }
+
   // --- Lead → booked (si no está en un estado más avanzado) ---
   const advancedStatuses = ["booked", "won", "nurture"];
   if (!advancedStatuses.includes(lead.status)) {
@@ -146,7 +153,7 @@ Deno.serve(async (req: Request) => {
   await supabase.from("events").insert({
     lead_id,
     type: "booking_started",
-    payload: { booking_id: booking?.id, stripe_session_id: (session as { id: string }).id },
+    payload: { booking_id: booking.id, stripe_session_id: (session as { id: string }).id },
   });
 
   return jsonResponse({ checkout_url: (session as { url: string }).url });

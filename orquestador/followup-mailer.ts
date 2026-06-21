@@ -186,7 +186,10 @@ export async function sendFollowupEmail(
   console.log(`  → [followup] Email ${emailNumber} enviado a ${lead.name} <${lead.email}>`);
 }
 
-// Obtiene la live_url más reciente de un lead.
+// Obtiene la live_url de un lead, prefiriendo una URL PUBLICADA y estable.
+// Si el build cayó en fallback de preview, la URL es preview--*.lovable.app y puede caerse:
+// no queremos enviar ese enlace en un seguimiento. Cogemos la primera URL publicada disponible
+// y solo como último recurso devolvemos la de preview (mejor un enlace inestable que ninguno).
 export async function getLiveUrl(leadId: string): Promise<string | null> {
   const { data } = await supabase
     .from("sites")
@@ -194,7 +197,9 @@ export async function getLiveUrl(leadId: string): Promise<string | null> {
     .eq("lead_id", leadId)
     .not("live_url", "is", null)
     .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  return data?.live_url ?? null;
+    .limit(10);
+  const urls = (data ?? [])
+    .map((r) => r.live_url as string | null)
+    .filter((u): u is string => !!u);
+  return urls.find((u) => !u.includes("preview--")) ?? urls[0] ?? null;
 }

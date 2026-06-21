@@ -8,41 +8,22 @@ import { Label } from "@/components/ui/label";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    setInfo(null);
     setLoading(true);
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        navigate("/", { replace: true });
-      } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (error) throw error;
-        if (data.session) {
-          navigate("/", { replace: true });
-        } else {
-          setInfo(
-            "Cuenta creada. Si tu Supabase pide confirmar el email, revisa tu correo y luego inicia sesión.",
-          );
-          setMode("signin");
-        }
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error de autenticación");
     } finally {
@@ -83,12 +64,10 @@ export default function Login() {
         <div className="rounded-2xl border border-border bg-card/85 p-6 shadow-elevated backdrop-blur-xl sm:p-7">
           <div className="mb-5">
             <h2 className="text-lg font-semibold tracking-tight">
-              {mode === "signin" ? "Inicia sesión" : "Crea tu cuenta"}
+              Inicia sesión
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {mode === "signin"
-                ? "Entra con tu cuenta de operador."
-                : "Solo la primera vez. Después usarás «entrar»."}
+              Entra con tu cuenta de operador.
             </p>
           </div>
 
@@ -122,9 +101,7 @@ export default function Login() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                autoComplete={
-                  mode === "signin" ? "current-password" : "new-password"
-                }
+                autoComplete="current-password"
                 required
                 minLength={6}
                 value={password}
@@ -135,11 +112,6 @@ export default function Login() {
             {error && (
               <p className="rounded-md border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {error}
-              </p>
-            )}
-            {info && (
-              <p className="rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
-                {info}
               </p>
             )}
 
@@ -153,26 +125,12 @@ export default function Login() {
                 "Un momento…"
               ) : (
                 <>
-                  {mode === "signin" ? "Entrar" : "Crear cuenta"}
+                  Entrar
                   <ArrowRight className="transition-transform duration-150 group-hover:translate-x-0.5" />
                 </>
               )}
             </Button>
           </form>
-
-          <button
-            type="button"
-            className="mt-5 w-full text-center text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-            onClick={() => {
-              setMode(mode === "signin" ? "signup" : "signin");
-              setError(null);
-              setInfo(null);
-            }}
-          >
-            {mode === "signin"
-              ? "¿Primera vez? Crear cuenta de operador"
-              : "Ya tengo cuenta · Entrar"}
-          </button>
         </div>
 
         <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
