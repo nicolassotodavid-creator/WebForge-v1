@@ -40,6 +40,7 @@ export default function Pagos() {
   const [confirming, setConfirming] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setError(null);
     setLoading(true);
     const { data, error } = await supabase
       .from("bookings")
@@ -56,16 +57,19 @@ export default function Pagos() {
 
   async function confirmBank(id: string) {
     setConfirming(id);
-    const { error } = await supabase
-      .from("bookings")
-      .update({ bank_confirmed_at: new Date().toISOString() })
-      .eq("id", id);
-    setConfirming(null);
-    if (error) {
-      alert("No se pudo confirmar: " + error.message);
-      return;
+    try {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ bank_confirmed_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) {
+        alert("No se pudo confirmar: " + error.message);
+        return;
+      }
+      await load();
+    } finally {
+      setConfirming(null);
     }
-    await load();
   }
 
   const kpis = computeKpis(bookings, new Date());
@@ -111,13 +115,13 @@ export default function Pagos() {
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-left text-xs text-muted-foreground">
               <tr>
-                <th className="px-3 py-2">Negocio</th>
-                <th className="px-3 py-2">Importe</th>
-                <th className="px-3 py-2">Fecha pago</th>
-                <th className="px-3 py-2">Stripe</th>
-                <th className="px-3 py-2">Banco</th>
-                <th className="px-3 py-2">Holded</th>
-                <th className="px-3 py-2"></th>
+                <th scope="col" className="px-3 py-2">Negocio</th>
+                <th scope="col" className="px-3 py-2">Importe</th>
+                <th scope="col" className="px-3 py-2">Fecha pago</th>
+                <th scope="col" className="px-3 py-2">Stripe</th>
+                <th scope="col" className="px-3 py-2">Banco</th>
+                <th scope="col" className="px-3 py-2">Holded</th>
+                <th scope="col" className="px-3 py-2"><span className="sr-only">Acciones</span></th>
               </tr>
             </thead>
             <tbody>
