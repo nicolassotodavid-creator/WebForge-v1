@@ -18,11 +18,17 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-function getSubject(hasWebsite: boolean): string {
-  const base = hasWebsite
-    ? "Tu web está lista. ¿Te gusta cómo ha quedado?"
-    : "Tu web está lista.";
-  return `Re: ${base}`;
+// Asuntos por (tiene web, nº de email). Sin "Re:": la pregunta (Email 2) y la urgencia
+// (Email 3) convierten más que simular un hilo.
+function getSubject(hasWebsite: boolean, emailNumber: number): string {
+  if (hasWebsite) {
+    if (emailNumber === 2) return "¿Os ha gustado el cambio?";
+    if (emailNumber === 3) return "La doy de baja el viernes";
+    return "Le di una vuelta a vuestra web";
+  }
+  if (emailNumber === 2) return "¿Has podido verla?";
+  if (emailNumber === 3) return "La borro el viernes";
+  return "Te monté una web";
 }
 
 // `link` va SOLO en su propia línea para que la plantilla lo renderice como botón "Ver la web →".
@@ -46,10 +52,14 @@ async function sendFollowup(
 ): Promise<void> {
   const hasWebsite = lead.has_website === true;
   const nombre = lead.contact_name ?? lead.name;
-  const subject = getSubject(hasWebsite);
-  // Una sola CTA → la página de venta /book (cae a la web cruda si no hay BOOKING_BASE).
+  const subject = getSubject(hasWebsite, emailNumber);
+  // CTA → la página de venta /book (cae a la web cruda si no hay BOOKING_BASE).
   const link = bookingLink(BOOKING_BASE, lead.id) ?? liveUrl;
   const bodyText = buildBody(emailNumber, hasWebsite, nombre, link);
+  // Diseño SHOWCASE también en los seguimientos (igual que el Email 1): captura enmarcada
+  // de la web + "Ver la web entera" (→ web) + "Activar mi web" (→ /book). Sin esto el
+  // email se ve pelado y parece spam.
+  const previewImageUrl = `${SUPABASE_URL}/storage/v1/object/public/site-previews/${lead.id}.png`;
 
   const { data: msg, error: insErr } = await supabase
     .from("outreach_messages")
@@ -81,7 +91,7 @@ async function sendFollowup(
       from: `Nico <${FROM_EMAIL}>`,
       to: [lead.email],
       subject,
-      html: renderEmail({ bodyText, trackingPixelUrl, subject }),
+      html: renderEmail({ bodyText, trackingPixelUrl, subject, webUrl: liveUrl, previewImageUrl, bookingUrl: link }),
       text: bodyText,
     }),
   });
