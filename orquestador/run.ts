@@ -15,8 +15,9 @@
 
 import "./env.ts"; // debe ir el PRIMERO: carga ../.env antes de evaluar el resto
 import { createClient } from "@supabase/supabase-js";
-import { BRIEF_PROMPT, BUILD_PROMPT } from "../supabase/functions/_shared/prompts.ts";
+import { BRIEF_PROMPT, BUILD_PROMPT, REVIEW_HIGHLIGHTS_PROMPT } from "../supabase/functions/_shared/prompts.ts";
 import { llmJson, llmText, extractReviews, ORQUESTADOR_MODEL } from "./llm.ts";
+import { fetchReviewsForPlace, placeIdFromLead } from "./reviews.ts";
 import { lovableBuild } from "./lovable.ts";
 import { analyzeSite } from "./analyze.ts";
 import { scoreExistingSites } from "./score-existing-sites.ts";
@@ -47,6 +48,7 @@ interface Lead {
   phone?: string | null;
   rating?: number | null;
   review_count?: number | null;
+  google_place_id?: string | null;
   raw_json?: unknown;
   status: string;
 }
@@ -146,6 +148,56 @@ async function processBuild(lead: Lead): Promise<Outcome> {
   }
 
   const brief = briefData as Brief;
+
+  // ── Pasada 2 de reseñas ───────────────────────────────────────────────────────────────────────
+  // El scrape de prospección ya NO trae reseñas (cuestan por reseña en el actor y solo se usan al
+  // construir la web). Las traemos AQUÍ, una sola vez y solo para este negocio aprobado.
+  // Idempotente: si el lead ya tiene reseñas (scrape antiguo o build reintentado) NO se re-paga.
+  if (!DRY_RUN && extractReviews(lead.raw_json).length === 0) {
+    const placeId = placeIdFromLead(lead);
+    if (!placeId) {
+      console.log("  · sin placeId (ChIJ…): no se pueden traer reseñas; la web se construye sin carrusel.");
+    } else {
+      try {
+        const fetched = await fetchReviewsForPlace(placeId, { maxReviews: 15, language: "es" });
+        if (fetched.length > 0) {
+          const raw = { ...((lead.raw_json ?? {}) as Record<string, unknown>), reviews: fetched };
+          lead.raw_json = raw;
+          await supabase.from("leads")
+            .update({ raw_json: raw, updated_at: new Date().toISOString() })
+            .eq("id", lead.id);
+          console.log(`  · reseñas traídas para el carrusel: ${fetched.length}`);
+
+          // Refrescar highlights_from_reviews del brief: el Email 1 en frío CITA una reseña real
+          // desde ahí (generate-outreach), y el brief de prospección se generó sin reseñas.
+          const hasHighlights = Array.isArray(brief.highlights_from_reviews) &&
+            brief.highlights_from_reviews.length > 0;
+          if (!hasHighlights) {
+            try {
+              const hl = await llmJson<{ highlights_from_reviews?: string[] }>(
+                REVIEW_HIGHLIGHTS_PROMPT,
+                { reviews: extractReviews(raw) },
+              );
+              if (hl.highlights_from_reviews?.length) {
+                brief.highlights_from_reviews = hl.highlights_from_reviews;
+                await supabase.from("briefs")
+                  .update({ highlights_from_reviews: hl.highlights_from_reviews })
+                  .eq("id", (briefData as { id: string }).id);
+                console.log(`  · highlights_from_reviews refrescados (${hl.highlights_from_reviews.length}) para el outreach.`);
+              }
+            } catch (e) {
+              console.error(`  · no se pudieron refrescar highlights (no crítico): ${e instanceof Error ? e.message : e}`);
+            }
+          }
+        } else {
+          console.log("  · el actor no devolvió reseñas (el negocio puede no tener).");
+        }
+      } catch (e) {
+        console.error(`  · no se pudieron traer reseñas (no crítico, sigue el build): ${e instanceof Error ? e.message : e}`);
+      }
+    }
+  }
+
   const bookingUrl = `${BOOKING_BASE.replace(/\/$/, "")}/${lead.id}`;
   const buildPrompt = await llmText(
     BUILD_PROMPT.replaceAll("{{BOOKING_URL}}", bookingUrl),

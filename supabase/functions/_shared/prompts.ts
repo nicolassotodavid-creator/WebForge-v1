@@ -21,6 +21,18 @@ Reglas: todo en español. Básate SOLO en los datos reales recibidos; no invente
 de contacto. Si falta información, omite ese elemento en vez de inventarlo.
 `;
 
+// Extrae SOLO los highlights de reseñas. Lo usa el Orquestador en el BUILD para refrescar el brief
+// cuando las reseñas se trajeron en la "pasada 2" (el brief de prospección se generó sin ellas,
+// porque el scrape ya no scrapea reseñas: cuestan por reseña en el actor de Maps). Sin esto, el
+// Email 1 en frío —que CITA una reseña real desde highlights_from_reviews— se quedaría sin material.
+export const REVIEW_HIGHLIGHTS_PROMPT = `
+Eres analista de negocio. Recibes un objeto JSON con un array "reviews" de reseñas reales de Google.
+Devuelve ÚNICAMENTE un objeto JSON válido (sin markdown, sin texto antes ni después):
+{ "highlights_from_reviews": ["string", ...] }
+con 3 a 6 temas o elogios CONCRETOS que repiten los clientes. Todo en español. Básate SOLO en las
+reseñas recibidas; no inventes nada. Si no hay reseñas, devuelve { "highlights_from_reviews": [] }.
+`;
+
 export const BUILD_PROMPT = `
 Eres director creativo web. Recibes un brief de negocio (JSON) y una URL de reserva ({{BOOKING_URL}}).
 Tu salida es UN PROMPT DE CONSTRUCCIÓN para Lovable: texto plano en español, listo para enviar al MCP

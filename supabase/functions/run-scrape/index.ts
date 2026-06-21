@@ -51,7 +51,10 @@ Deno.serve(async (req: Request) => {
   let query: string, city: string;
   let max = 20;
   let language = "es";
-  let maxReviews = 15; // material suficiente para el carrusel de reseñas de la web (mín. 12 reales)
+  // 0 en prospección: el actor COBRA por reseña (`maxReviews` lleva "($)" en su esquema) y las
+  // reseñas solo hacen falta al CONSTRUIR la web. El Orquestador las trae en el build, una sola vez
+  // y solo para el negocio aprobado (orquestador/reviews.ts). `reviewsCount` (el total) llega igual.
+  let maxReviews = 0;
   let onlyWithoutWebsite = true;
   let countryCode = "es"; // España por defecto: el producto es para negocios locales españoles.
   // Filtros de calidad post-scrape
@@ -67,7 +70,11 @@ Deno.serve(async (req: Request) => {
     if (!query || !city) return jsonResponse({ error: "Faltan query y city." }, 400);
     if (body?.max !== undefined) max = Math.min(Number(body.max) || 20, 60); // tope duro 60
     if (body?.language) language = String(body.language);
-    if (body?.maxReviews !== undefined) maxReviews = Number(body.maxReviews) || 15;
+    if (body?.maxReviews !== undefined) {
+      // OJO: `Number(0) || 15` daría 15 — usamos isFinite para respetar un 0 explícito.
+      const mr = Number(body.maxReviews);
+      maxReviews = Number.isFinite(mr) && mr >= 0 ? mr : 0;
+    }
     if (body?.onlyWithoutWebsite !== undefined) onlyWithoutWebsite = Boolean(body.onlyWithoutWebsite);
     if (body?.minRating !== undefined) minRating = Number(body.minRating) || 0;
     if (body?.categoryKeyword) categoryKeyword = String(body.categoryKeyword).trim().toLowerCase();
@@ -81,13 +88,12 @@ Deno.serve(async (req: Request) => {
   // scrapeContacts hace que el actor visite la web/redes de CADA ficha para sacar el email.
   // Es lo que ralentiza el run (3-5x) y provoca los TIMED-OUT que recortan la profundidad.
   //
-  // La clave: si buscas "Solo sin web", el email NO es la prioridad. Esos negocios (los
-  // prospectos reales del producto) son pequeños y caen ABAJO en Maps, que ordena por
-  // prominencia; lo que necesitas es PROFUNDIDAD (max alto) para llegar a ellos antes de que
-  // el run se corte. Y para saber si un negocio TIENE web NO hace falta scrapeContacts: el
-  // campo `website` viene en la ficha de Maps igual. Así que en este modo lo apagamos: el run
-  // es rápido, cabe un tope mayor sin timeout, y el email de esos leads lo rellena después el
-  // Orquestador (backfill-emails.ts) descubriendo su web/redes reales. No se pierde nada.
+  // En modo "Solo sin web" el email NO es la prioridad y lo apagamos: para saber si un negocio
+  // tiene web NO hace falta scrapeContacts (el campo `website` viene en el scrape básico), y el
+  // email de esos leads lo rellena después el Orquestador (backfill-emails.ts) descubriendo su
+  // web/redes reales. Antes, además, tocaba scrapear en PROFUNDIDAD (max alto) porque los negocios
+  // sin web caen abajo en Maps; ahora el filtro `website:"withoutWebsite"` del actor (ver runInput)
+  // hace que devuelva directamente solo los sin-web, así que no hay que sobre-scrapear para llegar.
   //
   // Si NO filtras por "sin web" (quieres cualquier negocio), ahí sí lo encendemos: el email es
   // la pieza accionable del canal local (CLAUDE.md) y compensa ir más lento, con tope 12.
@@ -136,6 +142,17 @@ Deno.serve(async (req: Request) => {
     // negocio. scrapeContacts lo activa para CADA resultado, tenga o no web propia
     // (Apify también rastrea las redes enlazadas). Siempre encendido: ver nota arriba.
     scrapeContacts,
+    // ── Modo barato (máximo resultado, mínimo coste) ──────────────────────────────────────────
+    // (1) scrapePlaceDetailPage:false → la prospección NO necesita la página de detalle (horarios,
+    //     fotos, Q&A, popularTimes…). website, teléfono, rating, categoría y reviewsCount vienen
+    //     del scrape BÁSICO. Con esto + maxReviews:0 ya no se cobra el add-on `place-details-scraped`
+    //     (≈½ del coste por ficha; antes se disparaba solo por pedir reseñas).
+    scrapePlaceDetailPage: false,
+    // (2) website filter del ACTOR → en "sin web" que devuelva directamente solo negocios sin web
+    //     propia, en vez de scrapear 40 mixtos y descartar 32. Así cada ficha pagada es un lead útil
+    //     (más resultado por € sin subir el max). Seguimos pasando deriveHasWebsite abajo como red
+    //     de precisión. "allPlaces" cuando no filtramos por sin-web (ahí queremos cualquier negocio).
+    website: onlyWithoutWebsite ? "withoutWebsite" : "allPlaces",
   };
 
   let items: Record<string, unknown>[] = [];
@@ -198,7 +215,12 @@ Deno.serve(async (req: Request) => {
   const partial = runStatus !== "SUCCEEDED";
   const found = items.length;
 
-  // --- Filtro "sin web" ---
+  // --- Filtro "sin web" (red de precisión sobre el filtro del actor) ---
+  // El actor ya devuelve solo sin-web (website:"withoutWebsite"), pero su criterio es más burdo:
+  // puede contar un Instagram/Facebook como "web propia" (o al revés). deriveHasWebsite afina —
+  // descarta los que enlazan google/maps/facebook/instagram como si fuera su web. Doble malla =
+  // precisión sin coste extra. Si en la calibración el actor dejara fuera negocios solo-Instagram
+  // que sí queremos, basta con quitar el `website` filter del runInput y volver al barrido + este.
   let filtered = onlyWithoutWebsite ? items.filter((i) => !deriveHasWebsite(i)) : items;
   const withoutWebsite = filtered.length;
 
