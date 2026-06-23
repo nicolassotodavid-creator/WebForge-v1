@@ -26,6 +26,9 @@ import { sendFollowupEmail, getLiveUrl, supabase as supabaseFollowup } from "./f
 
 const BATCH = Number(process.env.BATCH_SIZE ?? 5);
 const BOOKING_BASE = process.env.BOOKING_BASE ?? "";
+// Solo el admin construye webs. Si está definido, el cron procesa SOLO sus leads (o sin dueño):
+// los leads de otros usuarios (Luvia) no se analizan ni se les genera brief.
+const ADMIN_USER_ID = process.env.ADMIN_USER_ID;
 // Un build se considera abandonado pasado este tiempo: permite re-reclamar el lead si el
 // proceso anterior murió a mitad. > BUILD_DEADLINE_MS de lovable.ts (15 min).
 const BUILD_LOCK_STALE_MS = Number(process.env.BUILD_LOCK_STALE_MS ?? 20 * 60 * 1000);
@@ -406,7 +409,9 @@ async function processFollowups(): Promise<void> {
 }
 
 async function selectLeadsByStatus(status: string): Promise<Lead[]> {
-  const { data, error } = await supabase.from("leads").select("*").eq("status", status).limit(BATCH);
+  let q = supabase.from("leads").select("*").eq("status", status).limit(BATCH);
+  if (ADMIN_USER_ID) q = q.or(`owner.eq.${ADMIN_USER_ID},owner.is.null`);
+  const { data, error } = await q;
   if (error) throw new Error(error.message);
   return (data ?? []) as Lead[];
 }
@@ -456,7 +461,7 @@ async function run() {
       console.log("\n── PASO 0: DRY-RUN — no se puntúan webs actuales (gasta tokens y escribe en leads).");
     } else {
       try {
-        const { scored, skipped, failed } = await scoreExistingSites(supabase);
+        const { scored, skipped, failed } = await scoreExistingSites(supabase, ADMIN_USER_ID);
         console.log(`\n── PASO 0: webs actuales puntuadas: ${scored} · sin URL: ${skipped} · fallidas: ${failed}`);
       } catch (e) {
         console.error(`── PASO 0: barrido de scoring falló: ${e instanceof Error ? e.message : e}`);
