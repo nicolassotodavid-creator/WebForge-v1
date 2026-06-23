@@ -8,7 +8,7 @@ import {
   type LeadStatus,
 } from "@/lib/types";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { visibleStages } from "@/lib/pipeline";
+import { visibleStages, WEB_ONLY_STAGES } from "@/lib/pipeline";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -441,7 +441,7 @@ export default function Dashboard() {
       ?.scrollIntoView({ block: "nearest" });
   }, [focusIdx]);
 
-  const chips: { key: ViewFilter; label: string; star?: boolean }[] = flagsSupported
+  const allChips: { key: ViewFilter; label: string; star?: boolean }[] = flagsSupported
     ? [
         { key: "all", label: "Todos" },
         { key: "unseen", label: "No vistos" },
@@ -456,8 +456,14 @@ export default function Dashboard() {
         { key: "chat", label: "Con chat web" },
         { key: "whatsapp", label: "Con WhatsApp" },
       ];
+  // No-admin (Luvia) no tiene webs: fuera los chips de web. "Con WhatsApp" se queda.
+  const chips = allChips.filter(
+    (c) => isAdmin || (c.key !== "noweb" && c.key !== "chat"),
+  );
 
-  const colCount = (flagsSupported ? 13 : 12) + (outreachSupported ? 1 : 0);
+  // No-admin oculta 2 columnas (Web, Score), así que el colspan del estado vacío baja en 2.
+  const colCount =
+    (flagsSupported ? 13 : 12) + (outreachSupported ? 1 : 0) - (isAdmin ? 0 : 2);
   const filtersActive =
     statusFilter !== "all" || city || category || view !== "all" || search;
   const selectedCount = selected.size;
@@ -577,11 +583,14 @@ export default function Dashboard() {
           className="h-10 rounded-md border border-input bg-background px-3 text-sm shadow-sm transition-[color,box-shadow,border-color] duration-150 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30"
         >
           <option value="all">Todos los estados</option>
-          {Object.entries(STATUS_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
+          {Object.entries(STATUS_LABELS)
+            // No-admin (Luvia) no construye webs: ocultar las etapas de web del filtro.
+            .filter(([value]) => isAdmin || !WEB_ONLY_STAGES.includes(value as LeadStatus))
+            .map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
         </select>
         <Input
           placeholder="Ciudad…"
@@ -712,14 +721,18 @@ export default function Dashboard() {
                   >
                     Reseñas<SortIcon col="rating" />
                   </TableHead>
-                  <TableHead>Web</TableHead>
-                  <TableHead
-                    className="cursor-pointer select-none"
-                    onClick={() => handleSort("score")}
-                    title="Score IA de la web actual del negocio (1-10). Ordena ascendente para ver las webs más flojas (mejores candidatos)."
-                  >
-                    Score<SortIcon col="score" />
-                  </TableHead>
+                  {isAdmin && (
+                    <>
+                      <TableHead>Web</TableHead>
+                      <TableHead
+                        className="cursor-pointer select-none"
+                        onClick={() => handleSort("score")}
+                        title="Score IA de la web actual del negocio (1-10). Ordena ascendente para ver las webs más flojas (mejores candidatos)."
+                      >
+                        Score<SortIcon col="score" />
+                      </TableHead>
+                    </>
+                  )}
                   <TableHead
                     className="cursor-pointer select-none"
                     onClick={() => handleSort("status")}
@@ -869,6 +882,8 @@ export default function Dashboard() {
                         "—"
                       )}
                     </TableCell>
+                    {isAdmin && (
+                    <>
                     <TableCell className="max-w-[180px]">
                       {(() => {
                         const url = getWebsiteUrl(l);
@@ -927,6 +942,8 @@ export default function Dashboard() {
                         <span className="text-xs text-muted-foreground" title="Web propia aún sin analizar">—</span>
                       )}
                     </TableCell>
+                    </>
+                    )}
                     <TableCell>
                       <StatusBadge status={l.status} />
                     </TableCell>
