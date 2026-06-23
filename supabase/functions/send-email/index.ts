@@ -7,6 +7,11 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { renderEmail } from "../_shared/emailTemplate.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
+import {
+  DEFAULT_REPLY_TO_LUVIA,
+  DEFAULT_REPLY_TO_WEBFORGE,
+  replyToFor,
+} from "../_shared/replyTo.ts";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -127,6 +132,12 @@ Deno.serve(async (req: Request) => {
   // así que aquí NO se añade ningún enlace de compra aparte: una sola CTA en los 3 emails.
   const htmlBody = renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject });
 
+  // Reply-To por dueño: respuestas de leads Luvia → Miguel; WebForge → Nico.
+  const replyTo = replyToFor(lead.owner, Deno.env.get("ADMIN_USER_ID"), {
+    webforge: Deno.env.get("REPLY_TO_WEBFORGE") ?? DEFAULT_REPLY_TO_WEBFORGE,
+    luvia: Deno.env.get("REPLY_TO_LUVIA") ?? DEFAULT_REPLY_TO_LUVIA,
+  });
+
   // --- Envío vía Resend (HTML + texto plano como fallback) ---
   let resendId: string | null = null;
   try {
@@ -142,6 +153,7 @@ Deno.serve(async (req: Request) => {
         subject: msg.subject,
         html: htmlBody,
         text: textBody,
+        ...(replyTo ? { reply_to: replyTo } : {}),
       }),
     });
     const data = (await res.json().catch(() => ({}))) as {

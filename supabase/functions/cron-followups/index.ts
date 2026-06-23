@@ -4,6 +4,11 @@
 // Lógica idéntica al PASO 3 del orquestador Node — ahora vive en la nube.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
+import {
+  DEFAULT_REPLY_TO_LUVIA,
+  DEFAULT_REPLY_TO_WEBFORGE,
+  replyToFor,
+} from "../_shared/replyTo.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -39,7 +44,7 @@ function buildBody(emailNumber: 2 | 3, hasWebsite: boolean, nombre: string, link
 
 async function sendFollowup(
   supabase: ReturnType<typeof createClient>,
-  lead: { id: string; name: string; email: string; contact_name?: string | null; has_website?: boolean | null },
+  lead: { id: string; name: string; email: string; contact_name?: string | null; has_website?: boolean | null; owner?: string | null },
   emailNumber: 2 | 3,
   liveUrl: string,
 ): Promise<void> {
@@ -49,6 +54,12 @@ async function sendFollowup(
   // Una sola CTA → la página de venta /book (cae a la web cruda si no hay BOOKING_BASE).
   const link = bookingLink(BOOKING_BASE, lead.id) ?? liveUrl;
   const bodyText = buildBody(emailNumber, hasWebsite, nombre, link);
+
+  // Reply-To por dueño: respuestas de leads Luvia → Miguel; WebForge → Nico.
+  const replyTo = replyToFor(lead.owner, Deno.env.get("ADMIN_USER_ID"), {
+    webforge: Deno.env.get("REPLY_TO_WEBFORGE") ?? DEFAULT_REPLY_TO_WEBFORGE,
+    luvia: Deno.env.get("REPLY_TO_LUVIA") ?? DEFAULT_REPLY_TO_LUVIA,
+  });
 
   const { data: msg, error: insErr } = await supabase
     .from("outreach_messages")
@@ -82,6 +93,7 @@ async function sendFollowup(
       subject,
       html: renderEmail({ bodyText, trackingPixelUrl, subject }),
       text: bodyText,
+      ...(replyTo ? { reply_to: replyTo } : {}),
     }),
   });
 
@@ -121,7 +133,7 @@ Deno.serve(async (req: Request) => {
   // ── EMAIL 2: leads 'contacted' desde hace 4+ días ───────────────────────
   const { data: staleLeads } = await supabase
     .from("leads")
-    .select("id, name, email, contact_name, has_website")
+    .select("id, name, email, contact_name, has_website, owner")
     .eq("status", "contacted")
     .lt("updated_at", day4Ago);
 
@@ -156,7 +168,7 @@ Deno.serve(async (req: Request) => {
     if (existing) continue;
 
     const { data: lead } = await supabase
-      .from("leads").select("id, name, email, contact_name, has_website")
+      .from("leads").select("id, name, email, contact_name, has_website, owner")
       .eq("id", msg.lead_id).maybeSingle();
     if (!lead?.email) continue;
 
