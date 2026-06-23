@@ -45,7 +45,7 @@ language sql stable as $$
 $$;
 ```
 
-## Reglas RLS (migración 0015)
+## Reglas RLS (migración 0016)
 
 Se reescriben las políticas (hoy todas `auth.role()='authenticated'`, que dejan ver todo):
 
