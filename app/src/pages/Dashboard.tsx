@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 import { RefreshCw, Star, Globe, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Search, Upload, Inbox, Eye, EyeOff, MessageCircle, Facebook, Check } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
-  PIPELINE_ORDER,
   STATUS_LABELS,
   type Lead,
   type LeadStatus,
 } from "@/lib/types";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { visibleStages } from "@/lib/pipeline";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,6 +110,8 @@ type LeadEmailState = {
 };
 
 export default function Dashboard() {
+  const isAdmin = useIsAdmin();
+
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -493,7 +496,7 @@ export default function Dashboard() {
 
       {/* Contadores del pipeline */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
-        {PIPELINE_ORDER.map((s) => {
+        {visibleStages(isAdmin).map((s) => {
           const active = statusFilter === s;
           return (
             <button
