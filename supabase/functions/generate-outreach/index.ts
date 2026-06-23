@@ -1,5 +1,5 @@
 // generate-outreach — Contrato: ARQUITECTURA_webforge_v2.md sec. 8 y 10 (Fase 5).
-// Input: { lead_id, email_number? }. Solo para leads status='approved'|'contacted'.
+// Input: { lead_id, email_number? }. Solo para leads status='approved'|'contacted' (Luvia exento de gates de web).
 // email_number: 1 (gancho, IA personalizada), 2 (recordatorio día 4, template), 3 (cierre día 7, template).
 // Canal sale de lead.segment: 'local' -> 'email', 'b2b' -> 'linkedin'.
 // Guarda el draft en outreach_messages con email_number. Secrets SOLO en servidor.
@@ -368,7 +368,7 @@ Deno.serve(async (req: Request) => {
       lead_id: leadId,
       channel,
       subject: channel === "email" ? finalSubject : null,
-      body: withWhatsappFooter(finalBody, channel),
+      body: luvia ? finalBody : withWhatsappFooter(finalBody, channel),
       status: "draft",
       generated_by_model: ANTHROPIC_MODEL,
       email_number: 1,
