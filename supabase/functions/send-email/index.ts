@@ -6,6 +6,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { renderEmail } from "../_shared/emailTemplate.ts";
+import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -47,11 +48,15 @@ Deno.serve(async (req: Request) => {
     .replace(/^Bearer\s+/i, "")
     .trim();
   let authorized = false;
+  let operator: Operator | null = null; // != null solo si entra un operador real
   if (token === SERVICE_KEY) {
-    authorized = true; // llamada interna desde el orquestador (no exponer al navegador)
+    authorized = true; // llamada interna desde el orquestador (de confianza, no exponer al navegador)
   } else if (token) {
     const { data, error } = await supabase.auth.getUser(token);
-    if (!error && data?.user) authorized = true;
+    if (!error && data?.user) {
+      authorized = true;
+      operator = { id: data.user.id, email: data.user.email ?? "" };
+    }
   }
   if (!authorized) return jsonResponse({ error: "No autorizado" }, 401);
 
@@ -92,10 +97,16 @@ Deno.serve(async (req: Request) => {
   // --- Destinatario: el email del lead ---
   const { data: lead, error: leadErr } = await supabase
     .from("leads")
-    .select("id,email,status")
+    .select("id,email,status,owner")
     .eq("id", msg.lead_id)
     .maybeSingle();
   if (leadErr) return jsonResponse({ error: leadErr.message }, 500);
+
+  // Aislamiento por cuenta: un operador solo envía a SUS leads (admin, cualquiera). El
+  // service_role del orquestador trae operator=null y se salta esta comprobación.
+  if (lead && operator && !canAccessLead(lead.owner, operator)) {
+    return jsonResponse({ error: "Este lead no es de tu cuenta." }, 403);
+  }
   if (!lead?.email) {
     return jsonResponse({ error: "El lead no tiene email; no se puede enviar." }, 422);
   }

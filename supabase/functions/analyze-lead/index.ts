@@ -5,6 +5,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { BRIEF_PROMPT } from "../_shared/prompts.ts";
+import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 
 // Haiku 4.5 para extracción a volumen (ver routing de modelos en la arquitectura).
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
@@ -126,7 +127,9 @@ Deno.serve(async (req: Request) => {
   });
 
   // --- Autorización: sesión de operador (o secret del webhook) ---
+  // operator != null solo si entra un usuario real; el secret (orquestador) es de confianza.
   let authorized = false;
+  let operator: Operator | null = null;
   const secret = Deno.env.get("INGEST_WEBHOOK_SECRET");
   const providedSecret = req.headers.get("x-ingest-secret");
   if (secret && providedSecret && providedSecret === secret) authorized = true;
@@ -136,7 +139,10 @@ Deno.serve(async (req: Request) => {
       .trim();
     if (token) {
       const { data, error } = await supabase.auth.getUser(token);
-      if (!error && data?.user) authorized = true;
+      if (!error && data?.user) {
+        authorized = true;
+        operator = { id: data.user.id, email: data.user.email ?? "" };
+      }
     }
   }
   if (!authorized) return jsonResponse({ error: "No autorizado" }, 401);
@@ -159,6 +165,12 @@ Deno.serve(async (req: Request) => {
     .maybeSingle();
   if (leadErr) return jsonResponse({ error: leadErr.message }, 500);
   if (!lead) return jsonResponse({ error: "Lead no encontrado." }, 404);
+
+  // Aislamiento por cuenta: un operador solo analiza SUS leads (admin, cualquiera). El secret
+  // server-to-server trae operator=null y se salta esta comprobación.
+  if (operator && !canAccessLead(lead.owner, operator)) {
+    return jsonResponse({ error: "Este lead no es de tu cuenta." }, 403);
+  }
 
   // --- Buscar email en la web del negocio (best-effort, no bloquea si falla) ---
   if (!lead.email && lead.has_website) {

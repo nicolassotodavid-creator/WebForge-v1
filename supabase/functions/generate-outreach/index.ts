@@ -7,6 +7,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { OUTREACH_PROMPT } from "../_shared/prompts.ts";
 import { bookingLink } from "../_shared/emailTemplate.ts";
+import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
@@ -83,11 +84,15 @@ Deno.serve(async (req: Request) => {
   // --- Autorización: sesión de operador (Bearer) o service_role (orquestador) ---
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
   let authorized = false;
+  let operator: Operator | null = null; // != null solo si entra un operador real
   if (token === SERVICE_KEY) {
-    authorized = true; // llamada interna desde el orquestador
+    authorized = true; // llamada interna desde el orquestador (de confianza)
   } else if (token) {
     const { data, error } = await supabase.auth.getUser(token);
-    if (!error && data?.user) authorized = true;
+    if (!error && data?.user) {
+      authorized = true;
+      operator = { id: data.user.id, email: data.user.email ?? "" };
+    }
   }
   if (!authorized) return jsonResponse({ error: "No autorizado" }, 401);
 
@@ -121,6 +126,12 @@ Deno.serve(async (req: Request) => {
     .maybeSingle();
   if (leadErr) return jsonResponse({ error: leadErr.message }, 500);
   if (!lead) return jsonResponse({ error: "Lead no encontrado." }, 404);
+
+  // Aislamiento por cuenta: un operador solo redacta para SUS leads (admin, cualquiera). El
+  // service_role del orquestador trae operator=null y se salta esta comprobación.
+  if (operator && !canAccessLead(lead.owner, operator)) {
+    return jsonResponse({ error: "Este lead no es de tu cuenta." }, 403);
+  }
 
   if (lead.status !== "approved" && lead.status !== "contacted") {
     return jsonResponse(
