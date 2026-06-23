@@ -332,6 +332,8 @@ export default function Dashboard() {
       unseen: base.filter((l) => matchesView(l, "unseen")).length,
       favorites: base.filter((l) => matchesView(l, "favorites")).length,
       noweb: base.filter((l) => matchesView(l, "noweb")).length,
+      chat: base.filter((l) => matchesView(l, "chat")).length,
+      whatsapp: base.filter((l) => matchesView(l, "whatsapp")).length,
     };
   }, [leads, filterState]);
 
@@ -442,10 +444,14 @@ export default function Dashboard() {
         { key: "unseen", label: "No vistos" },
         { key: "favorites", label: "Favoritos", star: true },
         { key: "noweb", label: "Sin web" },
+        { key: "chat", label: "Con chat web" },
+        { key: "whatsapp", label: "Con WhatsApp" },
       ]
     : [
         { key: "all", label: "Todos" },
         { key: "noweb", label: "Sin web" },
+        { key: "chat", label: "Con chat web" },
+        { key: "whatsapp", label: "Con WhatsApp" },
       ];
 
   const colCount = (flagsSupported ? 13 : 12) + (outreachSupported ? 1 : 0);

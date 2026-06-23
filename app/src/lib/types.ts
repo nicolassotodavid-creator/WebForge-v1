@@ -50,6 +50,10 @@ export interface Lead {
   site_score: number | null;
   site_analysis: SiteAnalysis | null;
   site_analyzed_at: string | null;
+  // ¿La web actual del negocio tiene chat web / WhatsApp? (detección determinista sobre el HTML,
+  // ver 0017_lead_site_widgets.sql). null = no comprobado (web caída o sin analizar).
+  site_has_chat: boolean | null;
+  site_has_whatsapp: boolean | null;
   // Bandeja del operador (ver 0008_lead_flags.sql). Independientes del status `viewed`
   // del pipeline (ese es del cliente). seen_at null = no visto.
   is_favorite: boolean;
@@ -127,6 +131,11 @@ export interface SiteAnalysis {
   summary: string;
   strengths: string[];
   improvements: { area: string; issue: string; fix: string }[];
+  // Detección determinista de widgets de la web actual (la añaden analyze-site / score-sites
+  // al JSON). Los flags booleanos viven en columnas (site_has_chat/whatsapp); aquí guardamos
+  // los nombres de los chats detectados para mostrarlos en la ficha. Opcional (análisis viejos
+  // no lo tienen).
+  _widgets?: { hasChat: boolean; hasWhatsapp: boolean; vendors: string[] };
 }
 
 export interface Site {

@@ -7,6 +7,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { ANALYSIS_PROMPT } from "../_shared/prompts.ts";
 import { resolveWebsite } from "../_shared/website.ts";
+import { fetchPageForAnalysis } from "../_shared/html.ts";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -55,32 +56,14 @@ Deno.serve(async (req: Request) => {
   const url = resolveWebsite(lead);
   if (!url) return jsonResponse({ error: "Este negocio no tiene una web propia para analizar." }, 409);
 
-  // Intentar traer el HTML de la página
-  let htmlSnippet = "";
-  try {
-    const pageRes = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; WebForge-Analyzer/1.0)" },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (pageRes.ok) {
-      const html = await pageRes.text();
-      // Extraer solo texto relevante (quitar scripts/styles, limitar a 4000 chars)
-      htmlSnippet = html
-        .replace(/<script[\s\S]*?<\/script>/gi, "")
-        .replace(/<style[\s\S]*?<\/style>/gi, "")
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 4000);
-    }
-  } catch (_e) {
-    // Si no se puede traer la página, seguimos solo con los metadatos del negocio
-  }
+  // Un solo fetch: el snippet limpio para Claude + los flags de chat/WhatsApp del HTML crudo.
+  // Si la página bloquea el scraping, seguimos solo con los metadatos del negocio (signals=null).
+  const page = await fetchPageForAnalysis(url);
 
   const payload = {
     negocio: { nombre: lead.name, categoria: lead.category, ciudad: lead.city, valoracion: lead.rating, reseñas: lead.review_count },
     url,
-    contenido_pagina: htmlSnippet || "(no disponible — la página bloquea el scraping)",
+    contenido_pagina: page.snippet || "(no disponible — la página bloquea el scraping)",
   };
 
   // Llamar a Claude
@@ -119,10 +102,18 @@ Deno.serve(async (req: Request) => {
 
   // Persistir en `leads` para que el score sea visible en el panel sin re-analizar
   // (best-effort: si falla la escritura, seguimos devolviendo el análisis al usuario).
+  if (page.signals) analysis._widgets = page.signals; // vendors de chat visibles en la ficha
   const score = typeof analysis.score === "number" ? analysis.score : null;
   const { error: persistErr } = await supabase
     .from("leads")
-    .update({ site_score: score, site_analysis: analysis, site_analyzed_at: new Date().toISOString() })
+    .update({
+      site_score: score,
+      site_analysis: analysis,
+      site_analyzed_at: new Date().toISOString(),
+      // null = no se pudo bajar la web (sin comprobar); true/false = comprobado.
+      site_has_chat: page.signals ? page.signals.hasChat : null,
+      site_has_whatsapp: page.signals ? page.signals.hasWhatsapp : null,
+    })
     .eq("id", leadId);
   if (persistErr) console.error(`No se pudo guardar el análisis: ${persistErr.message}`);
 
