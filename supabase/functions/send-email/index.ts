@@ -188,12 +188,13 @@ Deno.serve(async (req: Request) => {
     payload: { message_id: messageId, to: lead.email, resend_id: resendId },
   });
 
-  // --- Mover el lead approved -> contacted (sin regresar leads más avanzados) ---
+  // Mover a 'contacted' al enviar. Web: desde 'approved'. Luvia: desde 'new' (sus leads no
+  // pasan por el gate de web). El `.in` evita regresar leads ya más avanzados (contacted/booked/won).
   await supabase
     .from("leads")
     .update({ status: "contacted", updated_at: nowIso })
     .eq("id", msg.lead_id)
-    .eq("status", "approved");
+    .in("status", ["approved", "new"]);
 
   return jsonResponse({ ok: true, resend_id: resendId, message_id: messageId });
 });
