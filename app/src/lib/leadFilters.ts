@@ -1,7 +1,7 @@
 import type { Lead, LeadStatus } from "./types";
 
 /** Pestañas de vista rápida de la bandeja. Mutuamente excluyentes. */
-export type ViewFilter = "all" | "unseen" | "favorites" | "noweb";
+export type ViewFilter = "all" | "unseen" | "favorites" | "noweb" | "chat" | "whatsapp";
 
 /** Filtros que NO dependen de la pestaña de vista. */
 export interface LeadFilterState {
@@ -51,6 +51,10 @@ export function matchesView(l: Lead, view: ViewFilter): boolean {
       return !!l.is_favorite;
     case "noweb":
       return !l.has_website;
+    case "chat":
+      return l.site_has_chat === true;
+    case "whatsapp":
+      return l.site_has_whatsapp === true;
     case "all":
     default:
       return true;

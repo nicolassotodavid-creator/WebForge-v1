@@ -11,6 +11,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { ANALYSIS_PROMPT } from "../_shared/prompts.ts";
 import { resolveWebsite } from "../_shared/website.ts";
+import { fetchPageForAnalysis } from "../_shared/html.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -28,30 +29,14 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-// Trae el texto visible de la página (sin scripts/estilos), recortado. Best-effort.
-async function fetchHtmlSnippet(url: string): Promise<string> {
-  try {
-    const pageRes = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; WebForge-Analyzer/1.0)" },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!pageRes.ok) return "";
-    const html = await pageRes.text();
-    return html
-      .replace(/<script[\s\S]*?<\/script>/gi, "")
-      .replace(/<style[\s\S]*?<\/style>/gi, "")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 4000);
-  } catch (_e) {
-    return "";
-  }
-}
-
-// Puntúa UNA web con Claude. Devuelve el objeto análisis (con .score) o lanza si Claude falla.
-async function analyzeOne(lead: Record<string, unknown>, url: string): Promise<Record<string, unknown>> {
-  const htmlSnippet = await fetchHtmlSnippet(url);
+// Puntúa UNA web con Claude a partir del snippet ya descargado. Devuelve el objeto análisis
+// (con .score) o lanza si Claude falla. El fetch del HTML lo hace el caller (fetchPageForAnalysis),
+// que además saca los flags de chat/WhatsApp del HTML crudo.
+async function analyzeOne(
+  lead: Record<string, unknown>,
+  url: string,
+  htmlSnippet: string,
+): Promise<Record<string, unknown>> {
   const payload = {
     negocio: {
       nombre: lead.name,
@@ -139,11 +124,21 @@ Deno.serve(async (req: Request) => {
     }
 
     try {
-      const analysis = await analyzeOne(lead, url);
+      // Un solo fetch: el snippet para Claude + los flags de chat/WhatsApp del HTML crudo.
+      const page = await fetchPageForAnalysis(url);
+      const analysis = await analyzeOne(lead, url, page.snippet);
+      if (page.signals) analysis._widgets = page.signals; // vendors visibles en la ficha
       const score = typeof analysis.score === "number" ? analysis.score : null;
       await supabase
         .from("leads")
-        .update({ site_score: score, site_analysis: analysis, site_analyzed_at: new Date().toISOString() })
+        .update({
+          site_score: score,
+          site_analysis: analysis,
+          site_analyzed_at: new Date().toISOString(),
+          // null = no se pudo bajar la web (sin comprobar); true/false = comprobado.
+          site_has_chat: page.signals ? page.signals.hasChat : null,
+          site_has_whatsapp: page.signals ? page.signals.hasWhatsapp : null,
+        })
         .eq("id", lead.id as string);
       result.scored++;
     } catch (e) {

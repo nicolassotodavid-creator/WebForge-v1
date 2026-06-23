@@ -42,3 +42,52 @@ export function resolveWebsite(
 export function getWebsiteUrl(raw: unknown): string | null {
   return realWebsiteFromRaw(raw);
 }
+
+// ── Detección de widgets en la web ACTUAL del negocio ───────────────────────────────────────
+// Señal de prospección DETERMINISTA (sin Claude): ¿la web ya tiene un chat web (Tawk, Crisp…)
+// o un canal de WhatsApp (wa.me, botón flotante)? Se escanea el HTML CRUDO — los widgets viven
+// en <script> y en <a href>, justo lo que la limpieza para Claude descarta. Función pura: la
+// usan las Edge Functions (Deno) y el Orquestador (Node).
+//
+// Semántica honesta: solo ve lo que está en el HTML inicial. Un widget cargado por JS/GTM tras
+// el render puede escaparse (falso negativo). hasChat/hasWhatsapp=true => lo tiene seguro.
+export interface WidgetSignals {
+  hasChat: boolean;
+  hasWhatsapp: boolean;
+  vendors: string[]; // nombres legibles de los chats detectados (para mostrar en la ficha)
+}
+
+// Firma (subcadena que el proveedor inyecta, normalmente el src de su script) → nombre legible.
+// Se busca sobre el HTML en minúsculas, así que las firmas van en minúsculas.
+const CHAT_VENDORS: { name: string; re: RegExp }[] = [
+  { name: "Tawk.to", re: /tawk\.to/ },
+  { name: "Crisp", re: /crisp\.chat/ },
+  { name: "Intercom", re: /widget\.intercom\.io|intercomcdn|intercom\.(io|com)/ },
+  { name: "Tidio", re: /tidio\.(co|com)/ },
+  { name: "Zendesk", re: /zdassets\.com|static\.zopim\.com|zopim|zendesk\.com\/embeddable/ },
+  { name: "Drift", re: /js\.driftt\.com|drift\.com\/include|driftt\.com/ },
+  { name: "HubSpot", re: /js\.hs-scripts\.com|js\.usemessages\.com|js\.hsforms\.net/ },
+  { name: "Smartsupp", re: /smartsuppchat\.com|smartsupp/ },
+  { name: "LiveChat", re: /cdn\.livechatinc\.com|livechatinc\.com|livechat\.com/ },
+  { name: "Olark", re: /static\.olark\.com|olark/ },
+  { name: "Freshchat", re: /wchat\.freshchat\.com|freshchat/ },
+  { name: "JivoChat", re: /code\.jivosite\.com|jivosite|jivo_api|jivochat/ },
+  { name: "Chatra", re: /call\.chatra\.io|chatra\.io|window\.chatra/ },
+  { name: "Userlike", re: /userlike\.com|userlikecdn/ },
+  { name: "Landbot", re: /landbot\.io|static\.landbot/ },
+  { name: "ManyChat", re: /manychat\.com|mch_widget/ },
+];
+
+// Canal de WhatsApp: enlace o botón a un chat de WhatsApp (no un "compartir en WhatsApp", que es
+// raro en webs de negocio local). wa.link es el acortador oficial de WhatsApp Business.
+const WHATSAPP_RE = /wa\.me\/|api\.whatsapp\.com\/send|web\.whatsapp\.com|whatsapp:\/\/send|wa\.link\//;
+
+export function detectWidgets(html: unknown): WidgetSignals {
+  const hay = (typeof html === "string" ? html : "").toLowerCase();
+  const vendors = CHAT_VENDORS.filter((v) => v.re.test(hay)).map((v) => v.name);
+  return {
+    hasChat: vendors.length > 0,
+    hasWhatsapp: WHATSAPP_RE.test(hay),
+    vendors,
+  };
+}

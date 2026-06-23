@@ -58,11 +58,19 @@ export async function scoreExistingSites(supabase: SupabaseClient): Promise<Swee
     }
 
     try {
-      const analysis = await analyzeExistingSite({ lead, url });
+      const { analysis, signals } = await analyzeExistingSite({ lead, url });
+      if (signals) analysis._widgets = signals; // vendors visibles en la ficha
       const score = typeof analysis.score === "number" ? analysis.score : null;
       await supabase
         .from("leads")
-        .update({ site_score: score, site_analysis: analysis, site_analyzed_at: new Date().toISOString() })
+        .update({
+          site_score: score,
+          site_analysis: analysis,
+          site_analyzed_at: new Date().toISOString(),
+          // null = no se pudo bajar la web (sin comprobar); true/false = comprobado.
+          site_has_chat: signals ? signals.hasChat : null,
+          site_has_whatsapp: signals ? signals.hasWhatsapp : null,
+        })
         .eq("id", lead.id);
       console.log(`  · web actual puntuada: ${lead.name} → ${score ?? "?"}/10`);
       result.scored++;

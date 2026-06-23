@@ -609,6 +609,38 @@ export default function LeadDetail() {
                     </p>
                   )}
 
+                  {/* Flags deterministas de la web actual: ¿chat web / WhatsApp? (ver 0017) */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {(() => {
+                      const chip = (
+                        label: string,
+                        state: boolean | null,
+                        detail?: string,
+                      ) =>
+                        state === true ? (
+                          <Badge className="border-transparent bg-green-100 text-green-800 hover:bg-green-100">
+                            <Check className="mr-1 h-3 w-3" />
+                            {label}
+                            {detail ? ` · ${detail}` : ""}
+                          </Badge>
+                        ) : state === false ? (
+                          <Badge variant="outline" className="text-muted-foreground">
+                            Sin {label.toLowerCase()}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-muted-foreground/60">
+                            {label}: sin comprobar
+                          </Badge>
+                        );
+                      return (
+                        <>
+                          {chip("Chat web", lead.site_has_chat, lead.site_analysis?._widgets?.vendors?.join(", "))}
+                          {chip("WhatsApp", lead.site_has_whatsapp)}
+                        </>
+                      );
+                    })()}
+                  </div>
+
                   {analysis.strengths?.length > 0 && (
                     <div className="space-y-1">
                       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Puntos fuertes</p>

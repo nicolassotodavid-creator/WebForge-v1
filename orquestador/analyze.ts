@@ -5,6 +5,7 @@
 // Es ORIENTATIVO: no toca el gate humano (nada se contacta hasta status='approved').
 
 import { ANALYSIS_PROMPT } from "../supabase/functions/_shared/prompts.ts";
+import { detectWidgets, type WidgetSignals } from "../supabase/functions/_shared/website.ts";
 import { extractJson } from "./llm.ts";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
@@ -21,6 +22,9 @@ export interface SiteAnalysis {
   summary: string;
   strengths: string[];
   improvements: { area: string; issue: string; fix: string }[];
+  // Detección determinista de widgets de la web actual (chat/WhatsApp). La adjunta el barrido al
+  // JSON para mostrar los vendors en la ficha; los flags booleanos van a columnas. Opcional.
+  _widgets?: WidgetSignals;
 }
 
 interface AnalyzeLead {
@@ -50,25 +54,28 @@ interface AnalyzeExistingInput {
   url: string;
 }
 
-// Baja el HTML de la página y lo deja en texto plano recortado a 4000 chars.
-// Misma limpieza que analyze-site. Si la página bloquea el scraping, devolvemos "".
-async function fetchPageSnippet(url: string): Promise<string> {
+// Baja el HTML de la página UNA vez y deriva: el snippet limpio (texto plano, 4000 chars) para
+// Claude y `signals`, la detección de chat/WhatsApp sobre el HTML CRUDO (misma lógica que la Edge
+// _shared/html.ts). Si la página bloquea el scraping, devolvemos snippet:"" y signals:null.
+async function fetchPage(url: string): Promise<{ snippet: string; signals: WidgetSignals | null }> {
   try {
     const res = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; WebForge-Analyzer/1.0)" },
       signal: AbortSignal.timeout(10000),
     });
-    if (!res.ok) return "";
+    if (!res.ok) return { snippet: "", signals: null };
     const html = await res.text();
-    return html
+    const signals = detectWidgets(html);
+    const snippet = html
       .replace(/<script[\s\S]*?<\/script>/gi, "")
       .replace(/<style[\s\S]*?<\/style>/gi, "")
       .replace(/<[^>]+>/g, " ")
       .replace(/\s+/g, " ")
       .trim()
       .slice(0, 4000);
+    return { snippet, signals };
   } catch (_e) {
-    return "";
+    return { snippet: "", signals: null };
   }
 }
 
@@ -76,11 +83,15 @@ async function fetchPageSnippet(url: string): Promise<string> {
 // el JSON estricto del scoring. Lo usan tanto el análisis de la web construida (analyzeSite)
 // como el de la web ACTUAL del negocio (analyzeExistingSite). `brief` es opcional (null para
 // la web del negocio, que no tiene brief nuestro).
-async function analyzeUrl(lead: AnalyzeLead, brief: AnalyzeBrief | null, url: string): Promise<SiteAnalysis> {
+async function analyzeUrl(
+  lead: AnalyzeLead,
+  brief: AnalyzeBrief | null,
+  url: string,
+): Promise<{ analysis: SiteAnalysis; signals: WidgetSignals | null }> {
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
   if (!ANTHROPIC_API_KEY) throw new Error("Falta ANTHROPIC_API_KEY en el entorno del Orquestador.");
 
-  const htmlSnippet = await fetchPageSnippet(url);
+  const { snippet: htmlSnippet, signals } = await fetchPage(url);
 
   const payload = {
     negocio: {
@@ -123,18 +134,24 @@ async function analyzeUrl(lead: AnalyzeLead, brief: AnalyzeBrief | null, url: st
 
   const text = data.content?.find((c) => c.type === "text")?.text ?? data.content?.[0]?.text ?? "";
   if (!text) throw new Error("Claude devolvió una respuesta vacía");
-  return extractJson<SiteAnalysis>(text);
+  return { analysis: extractJson<SiteAnalysis>(text), signals };
 }
 
 // Analiza la web CONSTRUIDA por nosotros (live_url). La llama processBuild justo tras publicar
 // en Lovable; el resultado se guarda en `sites`. No crítico: la web ya está publicada.
+// (Los flags de chat/WhatsApp son señal de PROSPECCIÓN de la web del negocio, no de la nuestra,
+// así que aquí se descartan.)
 export async function analyzeSite({ lead, brief, liveUrl }: AnalyzeInput): Promise<SiteAnalysis> {
-  return analyzeUrl(lead, brief, liveUrl);
+  const { analysis } = await analyzeUrl(lead, brief, liveUrl);
+  return analysis;
 }
 
 // Analiza la web ACTUAL del negocio (la de raw_json, el globo del panel). La usa el barrido
 // diario del Orquestador y el botón manual; el resultado se guarda en `leads.site_*`.
-// Sin brief: es la web del negocio, no nuestra propuesta.
-export async function analyzeExistingSite({ lead, url }: AnalyzeExistingInput): Promise<SiteAnalysis> {
+// Sin brief: es la web del negocio, no nuestra propuesta. Devuelve también `signals` (chat/
+// WhatsApp) para que el barrido escriba los flags, igual que la Edge score-sites.
+export async function analyzeExistingSite(
+  { lead, url }: AnalyzeExistingInput,
+): Promise<{ analysis: SiteAnalysis; signals: WidgetSignals | null }> {
   return analyzeUrl(lead, null, url);
 }
