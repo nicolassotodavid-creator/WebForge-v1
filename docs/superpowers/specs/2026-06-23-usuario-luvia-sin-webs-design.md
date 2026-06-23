@@ -10,7 +10,7 @@
 - **Un solo sistema, no un segundo producto.** Misma Supabase, mismo panel desplegado, misma RLS.
 - **Identificación por usuario/dueño.** Admin = `nicolassotodavid@gmail.com` → ve y opera las webs.
   Cualquier **otro** usuario (el de Luvia) → no ve webs y va por el camino de contacto Luvia.
-  Se apoya en el aislamiento por `owner` + RLS ya existente (migración `0015_lead_ownership.sql`).
+  Se apoya en el aislamiento por `owner` + RLS ya existente (migración `0016_lead_ownership.sql`).
 - **Sin cambios de base de datos.** Todo es código + variables de entorno. El "es de Luvia" se deriva
   de `owner ≠ admin`, no de una columna nueva.
 - **No es solo ocultar botones.** Hoy el contacto está acoplado a la web: el panel "Mensaje de

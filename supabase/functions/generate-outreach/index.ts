@@ -8,7 +8,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { OUTREACH_PROMPT, LUVIA_OUTREACH_PROMPT } from "../_shared/prompts.ts";
 import { isLuviaLead } from "../_shared/luvia.ts";
 import { bookingLink } from "../_shared/emailTemplate.ts";
-import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
+import { canAccessLead, isAdminEmail, type Operator } from "../_shared/leadAccess.ts";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
@@ -140,7 +140,11 @@ Deno.serve(async (req: Request) => {
   }
 
   const ADMIN_USER_ID = Deno.env.get("ADMIN_USER_ID");
-  const luvia = isLuviaLead(lead.owner, ADMIN_USER_ID);
+  // La rama Luvia solo se activa cuando el LLAMADOR es un operador real no-admin
+  // (email = misma fuente de verdad que RLS / leadAccess.ts), de modo que el admin
+  // nunca puede disparar un email Luvia aunque ADMIN_USER_ID esté mal configurado.
+  const luvia =
+    isLuviaLead(lead.owner, ADMIN_USER_ID) && !!operator && !isAdminEmail(operator.email);
 
   if (!luvia && lead.status !== "approved" && lead.status !== "contacted") {
     return jsonResponse(
