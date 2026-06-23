@@ -5,7 +5,8 @@
 // Guarda el draft en outreach_messages con email_number. Secrets SOLO en servidor.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
-import { OUTREACH_PROMPT } from "../_shared/prompts.ts";
+import { OUTREACH_PROMPT, LUVIA_OUTREACH_PROMPT } from "../_shared/prompts.ts";
+import { isLuviaLead } from "../_shared/luvia.ts";
 import { bookingLink } from "../_shared/emailTemplate.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 
@@ -25,6 +26,11 @@ function extractJson(text: string): Record<string, unknown> {
   const end = t.lastIndexOf("}");
   if (start === -1 || end === -1) throw new Error("respuesta sin JSON");
   return JSON.parse(t.slice(start, end + 1));
+}
+
+// Asunto de respaldo de Luvia si la IA no devuelve uno (en Luvia el subject lo propone el modelo).
+function getLuviaSubject(): string {
+  return "Una recepción que no duerme para tu clínica";
 }
 
 // Subjects fijos por segmento (no los decide Claude).
@@ -133,15 +139,25 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Este lead no es de tu cuenta." }, 403);
   }
 
-  if (lead.status !== "approved" && lead.status !== "contacted") {
+  const ADMIN_USER_ID = Deno.env.get("ADMIN_USER_ID");
+  const luvia = isLuviaLead(lead.owner, ADMIN_USER_ID);
+
+  if (!luvia && lead.status !== "approved" && lead.status !== "contacted") {
     return jsonResponse(
       { error: `El lead debe estar 'approved' o 'contacted' (está '${lead.status}').` },
       409,
     );
   }
+  // Luvia este sprint solo Email 1 (sin secuencia de seguimientos propia).
+  if (luvia && emailNumber !== 1) {
+    return jsonResponse(
+      { error: "Los seguimientos de Luvia aún no están disponibles (solo Email 1)." },
+      409,
+    );
+  }
 
   const segment = lead.segment === "b2b" ? "b2b" : "local";
-  const channel = segment === "b2b" ? "linkedin" : "email";
+  const channel = luvia ? "email" : (segment === "b2b" ? "linkedin" : "email");
   const hasWebsite = lead.has_website === true;
 
   // --- Idempotency: no generar el mismo email_number dos veces para el mismo lead ---
@@ -202,7 +218,7 @@ Deno.serve(async (req: Request) => {
     .limit(1)
     .maybeSingle();
   if (briefErr) return jsonResponse({ error: briefErr.message }, 500);
-  if (!brief && emailNumber === 1) {
+  if (!luvia && !brief && emailNumber === 1) {
     return jsonResponse(
       { error: "Este lead no tiene brief todavía. Genera el brief antes del mensaje." },
       409,
@@ -219,7 +235,7 @@ Deno.serve(async (req: Request) => {
     .limit(1)
     .maybeSingle();
   const liveUrl: string | null = site?.live_url ?? null;
-  if (channel === "email" && !liveUrl) {
+  if (!luvia && channel === "email" && !liveUrl) {
     return jsonResponse(
       { error: "La web aún no tiene URL en vivo (live_url); no se puede redactar el email." },
       409,
@@ -260,26 +276,39 @@ Deno.serve(async (req: Request) => {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // EMAIL 1: IA personalizada (Claude Haiku con OUTREACH_PROMPT)
+  // EMAIL 1: IA personalizada (Claude Haiku)
+  //  - Web (OUTREACH_PROMPT): vende la web de muestra; el sistema añade CTA → /book.
+  //  - Luvia (LUVIA_OUTREACH_PROMPT): ofrece el agente de chat; SIN link (CTA = responder).
   // ─────────────────────────────────────────────────────────────────────────────
-  const payload = {
-    segment,
-    channel,
-    has_website: hasWebsite,
-    live_url: liveUrl,
-    business: { name: lead.name, category: lead.category, city: lead.city },
-    contact: { name: lead.contact_name ?? null, role: lead.contact_role ?? null },
-    brief: brief
-      ? {
-          business_summary: brief.business_summary,
-          tone: brief.tone,
-          value_props: brief.value_props,
-          highlights_from_reviews: brief.highlights_from_reviews,
-          services: brief.services,
-          hero_copy: brief.hero_copy,
-        }
-      : null,
-  };
+  const systemPrompt = luvia ? LUVIA_OUTREACH_PROMPT : OUTREACH_PROMPT;
+  const payload = luvia
+    ? {
+        business: {
+          name: lead.name,
+          category: lead.category,
+          city: lead.city,
+          rating: lead.rating,
+          review_count: lead.review_count,
+        },
+      }
+    : {
+        segment,
+        channel,
+        has_website: hasWebsite,
+        live_url: liveUrl,
+        business: { name: lead.name, category: lead.category, city: lead.city },
+        contact: { name: lead.contact_name ?? null, role: lead.contact_role ?? null },
+        brief: brief
+          ? {
+              business_summary: brief.business_summary,
+              tone: brief.tone,
+              value_props: brief.value_props,
+              highlights_from_reviews: brief.highlights_from_reviews,
+              services: brief.services,
+              hero_copy: brief.hero_copy,
+            }
+          : null,
+      };
 
   let anthropicData: { content?: { text?: string }[]; error?: { message?: string } };
   try {
@@ -293,7 +322,7 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify({
         model: ANTHROPIC_MODEL,
         max_tokens: 1200,
-        system: [{ type: "text", text: OUTREACH_PROMPT, cache_control: { type: "ephemeral" } }],
+        system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: JSON.stringify(payload) }],
       }),
     });
@@ -324,19 +353,21 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "El mensaje redactado vino vacío.", raw: text.slice(0, 500) }, 422);
   }
 
-  // El subject lo pone el template (no Claude), así siempre coincide con la secuencia.
-  // La IA ya no coloca el enlace (ver OUTREACH_PROMPT). En email lo añade el sistema aquí,
-  // solo en su propia línea, para que el template lo renderice como botón "Ver la web →".
-  // Destino = /book (emailLink): la página de venta donde el prospecto ve la web y COMPRA.
-  // En LinkedIn no va link (lo penaliza; la web va en el mensaje de seguimiento).
-  const finalBody = channel === "email" ? `${bodyText}\n\n${emailLink}` : bodyText;
+  // Web: asunto fijo del sistema + CTA → /book añadida por el sistema.
+  // Luvia: asunto lo propone la IA (con respaldo fijo) y NO se añade ningún link.
+  const finalSubject = luvia
+    ? (typeof draft.subject === "string" && draft.subject.trim() ? draft.subject.trim() : getLuviaSubject())
+    : subject;
+  const finalBody = luvia
+    ? bodyText
+    : (channel === "email" ? `${bodyText}\n\n${emailLink}` : bodyText);
 
   const { data: inserted, error: insErr } = await supabase
     .from("outreach_messages")
     .insert({
       lead_id: leadId,
       channel,
-      subject: channel === "email" ? subject : null,
+      subject: channel === "email" ? finalSubject : null,
       body: withWhatsappFooter(finalBody, channel),
       status: "draft",
       generated_by_model: ANTHROPIC_MODEL,
