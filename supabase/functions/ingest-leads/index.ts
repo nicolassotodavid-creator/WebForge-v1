@@ -276,11 +276,17 @@ Deno.serve(async (req: Request) => {
   });
 
   // --- Autorización: secret del webhook O sesión de operador ---
+  // operatorId = dueño de los leads que entren. Si llega por sesión de operador (panel),
+  // es ese usuario. Si llega por secret server-to-server (run-scrape), el dueño viaja en
+  // body.owner (más abajo). NULL = sin dueño = solo admin.
   let authorized = false;
+  let viaSecret = false;
+  let operatorId: string | null = null;
   const secret = Deno.env.get("INGEST_WEBHOOK_SECRET");
   const providedSecret = req.headers.get("x-ingest-secret");
   if (secret && providedSecret && providedSecret === secret) {
     authorized = true;
+    viaSecret = true;
   }
   if (!authorized) {
     const token = (req.headers.get("Authorization") ?? "")
@@ -288,7 +294,10 @@ Deno.serve(async (req: Request) => {
       .trim();
     if (token) {
       const { data, error } = await supabase.auth.getUser(token);
-      if (!error && data?.user) authorized = true;
+      if (!error && data?.user) {
+        authorized = true;
+        operatorId = data.user.id;
+      }
     }
   }
   if (!authorized) {
@@ -298,6 +307,7 @@ Deno.serve(async (req: Request) => {
   // --- Parsear cuerpo ---
   let rawLeads: RawLead[] = [];
   let defaultSource = "manual";
+  let bodyOwner: string | null = null; // dueño propuesto por server-to-server (run-scrape)
   const contentType = req.headers.get("content-type") ?? "";
   try {
     if (contentType.includes("text/csv")) {
@@ -310,6 +320,7 @@ Deno.serve(async (req: Request) => {
       } else if (body && Array.isArray(body.leads)) {
         rawLeads = body.leads;
         if (typeof body.source === "string") defaultSource = body.source;
+        if (typeof body.owner === "string") bodyOwner = body.owner;
       } else if (body && typeof body.csv === "string") {
         rawLeads = parseCsv(body.csv);
         defaultSource = "import-csv";
@@ -333,8 +344,17 @@ Deno.serve(async (req: Request) => {
     .map((o) => normalizeLead(o, defaultSource))
     .filter((l) => l.name);
 
-  const withPid = normalized.filter((l) => l.google_place_id);
-  const withoutPid = normalized.filter((l) => !l.google_place_id);
+  // Dueño de los leads que entran: la sesión de operador manda; si no, el dueño que pasa
+  // run-scrape por server-to-server (solo se confía si entró por el secret). NULL = sin
+  // dueño = solo lo ve el admin (p.ej. scrapes por cron). El trigger trg_lock_lead_owner
+  // impide que un upsert sobre un lead que ya existía le cambie el dueño.
+  const ownerId = operatorId ?? (viaSecret ? bodyOwner : null);
+  const owned = ownerId
+    ? normalized.map((l) => ({ ...l, owner: ownerId }))
+    : normalized;
+
+  const withPid = owned.filter((l) => l.google_place_id);
+  const withoutPid = owned.filter((l) => !l.google_place_id);
 
   const errors: string[] = [];
   let upserted = 0;

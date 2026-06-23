@@ -39,11 +39,16 @@ Deno.serve(async (req: Request) => {
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
 
   // --- Autorización: sesión de operador ---
+  // Guardamos el id del operador: los leads que entren serán SUYOS (aislamiento por cuenta).
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
   let authorized = false;
+  let operatorId: string | null = null;
   if (token) {
     const { data, error } = await supabase.auth.getUser(token);
-    if (!error && data?.user) authorized = true;
+    if (!error && data?.user) {
+      authorized = true;
+      operatorId = data.user.id;
+    }
   }
   if (!authorized) return jsonResponse({ error: "No autorizado" }, 401);
 
@@ -295,7 +300,7 @@ Deno.serve(async (req: Request) => {
         // Fallback: si no hay INGEST_WEBHOOK_SECRET, usamos la service key como Bearer
         ...(INGEST_SECRET ? {} : { Authorization: `Bearer ${SERVICE_KEY}` }),
       },
-      body: JSON.stringify({ leads: filtered, source: "apify" }),
+      body: JSON.stringify({ leads: filtered, source: "apify", owner: operatorId }),
     });
     ingestResult = await ingestRes.json().catch(() => ({}));
   } catch (e) {
