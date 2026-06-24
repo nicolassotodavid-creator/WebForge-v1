@@ -21,6 +21,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { waLink } from "@/lib/contact";
 import type { Brief, Lead, Site, OutreachMessage } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
@@ -74,6 +75,7 @@ function Field({ label, value }: { label: string; value: ReactNode }) {
 
 export default function LeadDetail() {
   const { id } = useParams();
+  const isAdmin = useIsAdmin();
   const [lead, setLead] = useState<Lead | null>(null);
   const [brief, setBrief] = useState<Brief | null>(null);
   const [loading, setLoading] = useState(true);
@@ -563,6 +565,7 @@ export default function LeadDetail() {
       </Card>
 
       {/* Web actual del negocio — análisis IA de prospección (la de raw_json, no la que construimos) */}
+      {isAdmin && (
       <Card>
         <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
           <div>
@@ -675,8 +678,10 @@ export default function LeadDetail() {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Brief */}
+      {isAdmin && (
       <Card>
         <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
           <div>
@@ -798,9 +803,10 @@ export default function LeadDetail() {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Gate de validación: aparece cuando hay brief y aún no se ha encolado el build */}
-      {brief && lead.status === "analyzed" && (
+      {isAdmin && brief && lead.status === "analyzed" && (
         <Card className="border-amber-200 bg-amber-50">
           <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -847,6 +853,7 @@ export default function LeadDetail() {
         </Card>
       )}
 
+      {isAdmin && (
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Web · QA</CardTitle>
@@ -1034,9 +1041,10 @@ export default function LeadDetail() {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Panel de Outreach — solo visible cuando el lead está approved o contactado */}
-      {(lead.status === "approved" || lead.status === "contacted") && (
+      {(lead.status === "approved" || lead.status === "contacted" || !isAdmin) && (
         <Card>
           <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
             <div>
@@ -1044,7 +1052,9 @@ export default function LeadDetail() {
               <CardDescription>
                 {lead.status === "contacted"
                   ? "Email enviado. El lead está en estado «Contactado»."
-                  : "La web está aprobada. Genera el mensaje y envíalo."}
+                  : isAdmin
+                    ? "La web está aprobada. Genera el mensaje y envíalo."
+                    : "Genera el mensaje de contacto y envíalo."}
               </CardDescription>
             </div>
             <Button
