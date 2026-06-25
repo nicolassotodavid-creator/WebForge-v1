@@ -33,25 +33,79 @@ export function bookingLink(base: string | null | undefined, leadId: string): st
   return base ? `${base.replace(/\/$/, "")}/${leadId}` : null;
 }
 
+// Bloque "escaparate" (diseño definitivo, docs/email-design/EMAIL1-DISENO-DEFINITIVO.html):
+// captura de la web enmarcada en un mini-navegador (clicable → la web) + DOS botones:
+// "Ver la web entera" → live_url, y "Activar mi web" → /book. Se renderiza SOLO si hay
+// captura (previewImageUrl). Si falta la web (webUrl) o el /book (bookUrl) se omiten esas
+// piezas en vez de romper el email.
+function showcaseBlock(previewImageUrl: string, webUrl?: string | null, bookUrl?: string | null): string {
+  const frameInner =
+    `<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #E7E5E4;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(17,24,39,0.10);">` +
+    `<tr><td style="background:#F5F5F4;padding:10px 14px;border-bottom:1px solid #E7E5E4;font-size:13px;color:#C4C0BB;letter-spacing:3px;line-height:1;">&#9679;&nbsp;&#9679;&nbsp;&#9679;</td></tr>` +
+    `<tr><td style="font-size:0;line-height:0;"><img src="${previewImageUrl}" width="540" alt="Vista previa de tu web" style="display:block;width:100%;height:auto;border:0;" /></td></tr>` +
+    `</table>`;
+  const frame = webUrl
+    ? `<a href="${webUrl}" style="text-decoration:none;color:inherit;display:block;margin:0 0 24px;">${frameInner}</a>`
+    : `<div style="margin:0 0 24px;">${frameInner}</div>`;
+
+  const ctaWeb = webUrl
+    ? `<p style="margin:0 0 30px;text-align:center;"><a href="${webUrl}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:14px 30px;border-radius:9px;font-size:15px;font-weight:600;">Ver la web entera &rarr;</a></p>`
+    : "";
+
+  const softSell = bookUrl
+    ? `<p style="margin:0 0 16px;color:#57534E;font-size:15px;line-height:1.6;">Si te convence, te la dejo publicada y lista &mdash; con tu dominio, las reseñas de Google y todo en marcha. Pago único, sin permanencia.</p>` +
+      `<p style="margin:0 0 30px;text-align:center;"><a href="${bookUrl}" style="display:inline-block;background:#ffffff;color:#111827;text-decoration:none;padding:13px 28px;border-radius:9px;font-size:15px;font-weight:600;border:1.5px solid #111827;">Activar mi web &rarr;</a></p>`
+    : "";
+
+  return frame + ctaWeb + softSell;
+}
+
 export interface RenderEmailOptions {
   bodyText: string;
   trackingPixelUrl?: string | null;
   subject?: string;
-  // Enlace suave de compra → página de contratación. Solo en seguimientos (Email 2/3);
-  // el Email 1 en frío va sin él (doctrina: "que abran el link, no que compren todavía").
+  // Enlace de compra → página de contratación /book. En modo texto plano es el enlace
+  // suave de seguimiento; en modo escaparate es el botón "Activar mi web".
   bookingUrl?: string | null;
+  // Modo escaparate: captura re-hospedada de la web (sites.preview_image_url). Si viene,
+  // el email sale con la captura enmarcada + 2 CTAs. Si es null/undefined → texto plano.
+  previewImageUrl?: string | null;
+  // URL en vivo de la web (sites.live_url) → captura clicable + botón "Ver la web entera".
+  webUrl?: string | null;
 }
 
 // Devuelve el HTML completo del email. NO añade firma (el cuerpo ya la trae) ni
-// botón de WhatsApp. Solo: cuerpo + (enlace de compra opcional) + opt-out + píxel.
-export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl }: RenderEmailOptions): string {
+// botón de WhatsApp. Con captura → escaparate (captura enmarcada + 2 CTAs); sin
+// captura → texto plano + (enlace de compra opcional). Siempre: opt-out + píxel.
+export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl }: RenderEmailOptions): string {
   const pixel = trackingPixelUrl
     ? `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`
     : "";
 
-  const buyLink = bookingUrl
-    ? `<p style="margin:0 0 18px;"><a href="${bookingUrl}" style="color:#111827;font-size:14px;font-weight:600;text-decoration:none;border-bottom:1px solid #111827;padding-bottom:1px;">Si ya la quieres, te la dejo lista aquí →</a></p>`
-    : "";
+  // ── Cuerpo ──────────────────────────────────────────────────────────────
+  // Modo escaparate: insertamos el bloque (captura + CTAs) DONDE el cuerpo tenía
+  // la línea-URL suelta (los redactores la ponen tras un "…te dejo el enlace abajo"),
+  // y la quitamos para no duplicar botón. Si no hay línea-URL, va al final del cuerpo.
+  let bodyHtml: string;
+  let buyLink = "";
+  if (previewImageUrl) {
+    const block = showcaseBlock(previewImageUrl, webUrl, bookingUrl);
+    const paras = bodyText.split(/\n{2,}/);
+    const urlIdx = paras.findIndex((p) => /^https?:\/\/[^\s]+$/.test(p.trim()));
+    if (urlIdx >= 0) {
+      const before = paras.slice(0, urlIdx).join("\n\n");
+      const after = paras.slice(urlIdx + 1).join("\n\n");
+      bodyHtml = (before ? bodyToHtml(before) : "") + block + (after ? bodyToHtml(after) : "");
+    } else {
+      bodyHtml = bodyToHtml(bodyText) + block;
+    }
+  } else {
+    bodyHtml = bodyToHtml(bodyText);
+    // Enlace suave de compra (solo en seguimientos sin captura).
+    buyLink = bookingUrl
+      ? `<p style="margin:0 0 18px;"><a href="${bookingUrl}" style="color:#111827;font-size:14px;font-weight:600;text-decoration:none;border-bottom:1px solid #111827;padding-bottom:1px;">Si ya la quieres, te la dejo lista aquí →</a></p>`
+      : "";
+  }
 
   return `<!DOCTYPE html>
 <html lang="es">
@@ -68,7 +122,7 @@ export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingU
         <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;">
           <tr>
             <td style="color:#1a1a1a;font-size:16px;line-height:1.6;">
-              ${bodyToHtml(bodyText)}
+              ${bodyHtml}
               ${buyLink}
               <hr style="border:none;border-top:1px solid #eeeeee;margin:28px 0 16px;">
               <p style="margin:0;color:#9ca3af;font-size:13px;line-height:1.5;">Si no te encaja, respóndeme y no vuelvo a escribir.</p>

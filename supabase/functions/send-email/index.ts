@@ -5,7 +5,7 @@
 // Secrets SOLO en servidor.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
-import { renderEmail } from "../_shared/emailTemplate.ts";
+import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 import {
   DEFAULT_REPLY_TO_LUVIA,
@@ -116,6 +116,16 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "El lead no tiene email; no se puede enviar." }, 422);
   }
 
+  // --- Web del lead: captura (escaparate) + live_url (botón "Ver la web entera") ---
+  const { data: site } = await supabase
+    .from("sites")
+    .select("live_url, preview_image_url")
+    .eq("lead_id", msg.lead_id)
+    .not("live_url", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   // --- Construir HTML del email (plantilla compartida _shared/emailTemplate.ts) ---
   // Pixel de seguimiento de apertura (1×1, llamada pública a track-event GET).
   // Permite saber si el lead abrió el email antes de enviar el Email 3.
@@ -128,9 +138,17 @@ Deno.serve(async (req: Request) => {
   // Versión texto plano (fallback para clientes sin HTML). El cuerpo ya trae la firma.
   const textBody = msg.body;
 
-  // El cuerpo ya trae la CTA única → /book (la inyectan generate-outreach y cron-followups),
-  // así que aquí NO se añade ningún enlace de compra aparte: una sola CTA en los 3 emails.
-  const htmlBody = renderEmail({ bodyText: textBody, trackingPixelUrl, subject: msg.subject });
+  // Showcase en los 3 emails: si el lead tiene captura → captura enmarcada + "Ver la web
+  // entera" (→ live_url) + "Activar mi web" (→ /book). Sin captura → texto plano (la línea-URL
+  // del cuerpo se vuelve botón "Ver la web →").
+  const htmlBody = renderEmail({
+    bodyText: textBody,
+    trackingPixelUrl,
+    subject: msg.subject,
+    previewImageUrl: site?.preview_image_url ?? null,
+    webUrl: site?.live_url ?? null,
+    bookingUrl: bookingLink(Deno.env.get("BOOKING_BASE"), msg.lead_id),
+  });
 
   // Reply-To por dueño: respuestas de leads Luvia → Miguel; WebForge → Nico.
   const replyTo = replyToFor(lead.owner, Deno.env.get("ADMIN_USER_ID"), {

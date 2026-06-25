@@ -47,12 +47,14 @@ async function sendFollowup(
   lead: { id: string; name: string; email: string; contact_name?: string | null; has_website?: boolean | null; owner?: string | null },
   emailNumber: 2 | 3,
   liveUrl: string,
+  previewImageUrl: string | null,
 ): Promise<void> {
   const hasWebsite = lead.has_website === true;
   const nombre = lead.contact_name ?? lead.name;
   const subject = getSubject(hasWebsite);
-  // Una sola CTA → la página de venta /book (cae a la web cruda si no hay BOOKING_BASE).
-  const link = bookingLink(BOOKING_BASE, lead.id) ?? liveUrl;
+  // /book como destino de compra (cae a la web cruda si no hay BOOKING_BASE).
+  const bookUrl = bookingLink(BOOKING_BASE, lead.id);
+  const link = bookUrl ?? liveUrl;
   const bodyText = buildBody(emailNumber, hasWebsite, nombre, link);
 
   // Reply-To por dueño: respuestas de leads Luvia → Miguel; WebForge → Nico.
@@ -91,7 +93,15 @@ async function sendFollowup(
       from: `Nico <${FROM_EMAIL}>`,
       to: [lead.email],
       subject,
-      html: renderEmail({ bodyText, trackingPixelUrl, subject }),
+      // Showcase también en 2/3: captura + "Ver la web entera" (→ live_url) + "Activar mi web" (→ /book).
+      html: renderEmail({
+        bodyText,
+        trackingPixelUrl,
+        subject,
+        previewImageUrl,
+        webUrl: liveUrl,
+        bookingUrl: bookUrl,
+      }),
       text: bodyText,
       ...(replyTo ? { reply_to: replyTo } : {}),
     }),
@@ -145,12 +155,12 @@ Deno.serve(async (req: Request) => {
     if (existing) continue;
 
     const { data: site } = await supabase
-      .from("sites").select("live_url")
+      .from("sites").select("live_url, preview_image_url")
       .eq("lead_id", lead.id).not("live_url", "is", null)
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (!site?.live_url) continue;
 
-    await sendFollowup(supabase, lead, 2, site.live_url);
+    await sendFollowup(supabase, lead, 2, site.live_url, site.preview_image_url ?? null);
     sent2++;
   }
 
@@ -173,12 +183,12 @@ Deno.serve(async (req: Request) => {
     if (!lead?.email) continue;
 
     const { data: site } = await supabase
-      .from("sites").select("live_url")
+      .from("sites").select("live_url, preview_image_url")
       .eq("lead_id", lead.id).not("live_url", "is", null)
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (!site?.live_url) continue;
 
-    await sendFollowup(supabase, lead, 3, site.live_url);
+    await sendFollowup(supabase, lead, 3, site.live_url, site.preview_image_url ?? null);
     sent3++;
   }
 

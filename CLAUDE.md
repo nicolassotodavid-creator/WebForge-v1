@@ -13,6 +13,7 @@ Reglas duras:
 - Modelos: Sonnet 4.6 (claude-sonnet-4-6) para build-prompt y briefs; Haiku 4.5 (haiku-4-5-20251001) para extracción a volumen. Configurable con ORQUESTADOR_MODEL en .env. Prompt caching en system prompts.
 - Gate de QA obligatorio: nada se contacta hasta status='approved' (visto bueno humano).
 - Mensaje en frío: texto plano, humano, corto, con reseñas reales. Email incluye la live_url; LinkedIn es nota de conexión (la web va en el seguimiento). Sin pinta de plantilla.
+- Emails (los 3, OBLIGATORIO): cuando el lead tiene captura (`sites.preview_image_url`), TODOS los emails (1, 2 y 3) llevan el bloque "showcase" = captura de la web enmarcada (mini-navegador, clicable → la web) + DOS CTAs: "Ver la web entera" → `live_url` y "Activar mi web" → `/book/:leadId`. Sin captura → texto plano. Layout canónico: `docs/email-design/EMAIL1-DISENO-DEFINITIVO.html`. El copy/asuntos del 2 y 3 son los cortos de `generate-outreach/templates.md` (NO se cambian); solo se les añade el bloque visual. NUNCA quitar la preview ni el 2º enlace de los recordatorios. Preview = captura estática del bucket `site-previews`, NUNCA iframe.
 - Construir por fases (sec. 13). Verificar cada fase antes de seguir.
 
 Estado del repo: el scaffold de carpetas, el doc, esta guía, la migración SQL completa

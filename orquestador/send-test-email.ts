@@ -81,12 +81,13 @@ async function main() {
   const hasWebsite = lead.has_website === true;
   const nombre = lead.contact_name ?? lead.name;
 
-  // --- live_url ---
+  // --- live_url + captura (escaparate) ---
   const { data: site } = await supabase
-    .from("sites").select("live_url")
+    .from("sites").select("live_url, preview_image_url")
     .eq("lead_id", lead.id).not("live_url", "is", null)
     .order("created_at", { ascending: false }).limit(1).maybeSingle();
   const liveUrl: string = site?.live_url ?? "https://ejemplo.lovable.app";
+  const previewImageUrl: string | null = site?.preview_image_url ?? null;
 
   // --- Borrador REAL de ese email (si existe) ---
   const { data: msg } = await supabase
@@ -113,11 +114,22 @@ async function main() {
     linkDestino = bookLink;
   }
 
-  const html = renderEmail({ bodyText, trackingPixelUrl: null, subject });
+  // Showcase en los 3 emails: captura enmarcada + "Ver la web entera" (→ live_url) +
+  // "Activar mi web" (→ /book). webUrl es la live_url ORIGINAL (no la sustituida por /book
+  // en el cuerpo). Sin captura → texto plano.
+  const html = renderEmail({
+    bodyText,
+    trackingPixelUrl: null,
+    subject,
+    previewImageUrl,
+    webUrl: liveUrl,
+    bookingUrl: bookLink,
+  });
 
   console.log(`Lead:       ${lead.name} (${lead.id})  has_website=${hasWebsite}  status=${lead.status}`);
   console.log(`Email:      ${N}  ·  fuente del cuerpo: ${source}`);
   console.log(`Asunto:     ${subject}${subjectNote}`);
+  console.log(`Captura:    ${previewImageUrl ? previewImageUrl : "— (sin preview_image_url → email en texto plano)"}`);
   console.log(`Enlace CTA: ${linkDestino}`);
   console.log(`---- cuerpo (texto) ----\n${bodyText}\n------------------------`);
 
