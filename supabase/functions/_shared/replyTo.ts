@@ -7,7 +7,8 @@ import { isLuviaLead } from "./luvia.ts";
 
 // Defaults si no hay env. No son secretos (van solo en el servidor). Override con
 // REPLY_TO_WEBFORGE / REPLY_TO_LUVIA sin tocar código (p. ej. apuntar WebForge a un Gmail).
-export const DEFAULT_REPLY_TO_WEBFORGE = "hello@nico-soto.es";
+// WebForge = mismo buzón que el remitente (FROM_EMAIL = hola@nico-soto.es): todo coherente.
+export const DEFAULT_REPLY_TO_WEBFORGE = "hola@nico-soto.es";
 export const DEFAULT_REPLY_TO_LUVIA = "marketing@luvia-ia.es";
 
 export function replyToFor(
