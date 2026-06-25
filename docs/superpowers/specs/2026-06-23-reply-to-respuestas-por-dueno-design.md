@@ -23,7 +23,7 @@ Añadir `reply_to` **por dueño del lead**, reutilizando el helper `isLuviaLead`
 | Producto | Reply-To (default) | ¿Recibe hoy? |
 |----------|--------------------|--------------|
 | Luvia (`owner != admin`) | `marketing@luvia-ia.es` | **Sí** — luvia-ia.es tiene MX de Google |
-| WebForge (admin / sin dueño) | `hello@nico-soto.es` | **No todavía** — nico-soto.es no tiene MX (pendiente reenvío) |
+| WebForge (admin / sin dueño) | `hola@nico-soto.es` (= FROM_EMAIL) | **Sí** (desde 2026-06-24) — reenvío ImprovMX en GoDaddy a Gmail |
 
 Las direcciones son **configurables por env** (`REPLY_TO_LUVIA`, `REPLY_TO_WEBFORGE`) con esos
 valores como default. Si la env está vacía, no se añade `reply_to` (degradación segura, no rompe el
@@ -58,9 +58,9 @@ aplicar el mismo helper para poner `reply_to`.
 ## Fuera de alcance / heads-up
 
 - **Opción C** (parsear respuestas a Supabase, marcar lead "respondió", parar seguimientos) → otro sprint.
-- **DNS de nico-soto.es**: para que `hello@nico-soto.es` reciba de verdad hay que añadir reenvío
-  (p. ej. ImprovMX: MX `mx1/mx2.improvmx.com` + TXT SPF en GoDaddy, mapear `hello@ → Gmail`). No
-  toca el registro A de la web. Lo hace el usuario; el código ya queda listo para ese buzón.
+- **DNS de nico-soto.es** (HECHO 2026-06-24): reenvío con ImprovMX → MX `mx1/mx2.improvmx.com` +
+  TXT `v=spf1 include:spf.improvmx.com ~all` en GoDaddy, catch-all `*` → Gmail. No toca el registro
+  A de la web ni el envío de Resend (`send` SES). `hola@nico-soto.es` (y cualquier @nico-soto.es) recibe.
 - **cron-followups firma "Nico" y habla de "tu web"** — copy que no encaja con leads Luvia (clínicas
   sin web). Es un problema distinto del reply-to; queda anotado para revisar aparte.
 
