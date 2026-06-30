@@ -36,6 +36,42 @@ interface ScrapeResult {
   notes?: string[];
 }
 
+interface DiagnoseResult {
+  diagnose?: boolean;
+  sampled?: number;
+  with_web?: number;
+  without_web?: number;
+  pct_with_web?: number;
+  rescued?: number;
+  run_status?: string;
+  error?: string;
+}
+
+/**
+ * Veredicto del barrido profundo `allPlaces` que lanzamos cuando «Solo sin web» da 0. NO depende
+ * del filtro de Google: cava hondo, se queda con los sin-web según nuestro criterio y los mete al
+ * pipeline. Si rescató algo → verde. Si no había ninguno → informa de si el nicho está saturado.
+ */
+function diagnoseSummary(d: DiagnoseResult, query: string, city: string): { tone: "ok" | "info"; text: string } {
+  const rescued = d.rescued ?? 0;
+  if (rescued > 0) {
+    const p = rescued === 1 ? "" : "s";
+    return {
+      tone: "ok",
+      text: `Rescatamos ${rescued} negocio${p} sin web que estaba${rescued === 1 ? "" : "n"} más abajo en Google Maps (el filtro de Google no los sacó). Ya está${rescued === 1 ? "" : "n"} en el pipeline.`,
+    };
+  }
+  const sampled = d.sampled ?? 0;
+  if (sampled === 0) {
+    return { tone: "info", text: `Google Maps casi no tiene negocios de «${query}» en ${city}. Prueba una zona más amplia o un término más común.` };
+  }
+  const pct = d.pct_with_web ?? 0;
+  return {
+    tone: "info",
+    text: `Barrimos a fondo los ${sampled} negocios de «${query}» en ${city} y el ${pct}% ya tiene web — no había ninguno sin web que rescatar. Cambia de gremio (peluquerías de barrio, fontaneros, cerrajeros, talleres pequeños, fruterías…) o prueba un barrio/pueblo más pequeño.`,
+  };
+}
+
 /**
  * Resumen en una frase de QUÉ hizo el scrape, que sale SIEMPRE (no solo cuando falla).
  * Traduce el embudo encontrados → sin web → tras filtros → nuevos a lenguaje claro, para
@@ -91,6 +127,9 @@ export default function Import() {
   const [scraping, setScraping] = useState(false);
   const [scrapeResult, setScrapeResult] = useState<ScrapeResult | null>(null);
   const [scrapeError, setScrapeError] = useState<string | null>(null);
+  // Auto-diagnóstico: cuando «Solo sin web» da 0, muestreamos la zona para explicar el porqué.
+  const [diagnose, setDiagnose] = useState<DiagnoseResult | null>(null);
+  const [diagnosing, setDiagnosing] = useState(false);
 
   async function handleScrape() {
     if (!scrapeQuery.trim() || !scrapeCity.trim()) {
@@ -100,6 +139,8 @@ export default function Import() {
     setScraping(true);
     setScrapeError(null);
     setScrapeResult(null);
+    setDiagnose(null);
+    let sr: ScrapeResult | null = null;
     try {
       const { data, error } = await supabase.functions.invoke("run-scrape", {
         body: {
@@ -116,11 +157,30 @@ export default function Import() {
         },
       });
       if (error) throw error;
-      setScrapeResult(data as ScrapeResult);
+      sr = data as ScrapeResult;
+      setScrapeResult(sr);
     } catch (e) {
       setScrapeError(await edgeFunctionErrorMessage(e, "Error al buscar en Google."));
     } finally {
       setScraping(false);
+    }
+
+    // Si pediste «Solo sin web» y salieron 0 sin-web, el filtro de Google falló (o el gremio tiene
+    // web). Lanzamos un barrido profundo `allPlaces` que NO depende de ese filtro: cava hondo, se
+    // queda con los sin-web reales y los mete al pipeline. Si no hay ninguno, informa de si el nicho
+    // está saturado. La búsqueda ya terminó (botón liberado); esto corre aparte con su indicador.
+    if (sr && scrapeOnlyNoWeb && (sr.without_website ?? 0) === 0) {
+      setDiagnosing(true);
+      try {
+        const { data: dgData, error: dgError } = await supabase.functions.invoke("run-scrape", {
+          body: { query: scrapeQuery.trim(), city: scrapeCity.trim(), diagnose: true },
+        });
+        if (!dgError && dgData) setDiagnose(dgData as DiagnoseResult);
+      } catch {
+        // El diagnóstico es opcional: si falla, el resumen normal ya explica el 0.
+      } finally {
+        setDiagnosing(false);
+      }
     }
   }
 
@@ -228,11 +288,11 @@ export default function Import() {
             <Input
               type="number"
               min={1}
-              max={12}
+              max={scrapeOnlyNoWeb ? 40 : 12}
               value={scrapeMax}
               onChange={(e) => setScrapeMax(Number(e.target.value))}
               className="max-w-[90px]"
-              title="Máx. negocios (tope 60)"
+              title={scrapeOnlyNoWeb ? "Máx. negocios (hasta 40 en «Solo sin web»)" : "Máx. negocios (hasta 12 con extracción de email)"}
             />
           </div>
 
@@ -342,6 +402,33 @@ export default function Import() {
                   <p className={`rounded-md border p-2.5 text-sm font-medium ${cls}`}>
                     {sm.tone === "ok" ? "✅ " : "⚠️ "}
                     {sm.text}
+                  </p>
+                );
+              })()}
+              {diagnosing && (
+                <div className="rounded-md border border-sky-200 bg-sky-50 p-2.5 text-sm dark:border-sky-900 dark:bg-sky-950/30">
+                  <span className="flex items-center gap-2 text-sky-700 dark:text-sky-400">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Barriendo Google Maps a fondo para rescatar sin-web… (puede tardar 1–2 min)
+                  </span>
+                </div>
+              )}
+              {!diagnosing && diagnose && (() => {
+                if (diagnose.error) {
+                  return (
+                    <div className="rounded-md border p-2.5 text-sm text-muted-foreground">
+                      No se pudo barrer la zona ({diagnose.error}).
+                    </div>
+                  );
+                }
+                const dg = diagnoseSummary(diagnose, scrapeQuery.trim(), scrapeCity.trim());
+                const cls =
+                  dg.tone === "ok"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300"
+                    : "border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-900 dark:bg-sky-950/30 dark:text-sky-300";
+                return (
+                  <p className={`rounded-md border p-2.5 text-sm ${cls}`}>
+                    {dg.tone === "ok" ? "🎉 " : "🔎 "}
+                    {dg.text}
                   </p>
                 );
               })()}

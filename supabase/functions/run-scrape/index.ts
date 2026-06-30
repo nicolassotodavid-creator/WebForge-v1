@@ -18,6 +18,62 @@ function deriveHasWebsite(o: Record<string, unknown>): boolean {
   return true;
 }
 
+const ACTOR = "compass~crawler-google-places";
+
+// Lanza un run de Apify, espera a estado terminal (o a que se aborte por timeout) y SIEMPRE
+// lee el dataset (un run TIMED-OUT igual deja sus parciales). Lo usan el scrape principal y el
+// modo diagnóstico. Lanza Error con mensaje legible; el handler lo mapea a 502.
+async function runApify(
+  apifyToken: string,
+  runInput: Record<string, unknown>,
+  opts: { runTimeout: number; wallBudgetMs: number },
+): Promise<{ items: Record<string, unknown>[]; runStatus: string }> {
+  const TERMINAL = new Set(["SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"]);
+
+  // 1. Lanzar el run (asíncrono). `timeout` aborta el actor; no esperamos a que acabe aquí.
+  const startRes = await fetch(
+    `https://api.apify.com/v2/acts/${ACTOR}/runs?token=${apifyToken}&timeout=${opts.runTimeout}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(runInput),
+    },
+  );
+  if (!startRes.ok) {
+    const txt = await startRes.text().catch(() => "");
+    throw new Error(`Apify no aceptó el run (${startRes.status}): ${txt.slice(0, 300)}`);
+  }
+  const startJson = await startRes.json();
+  const runId = String(startJson?.data?.id ?? "");
+  const datasetId = String(startJson?.data?.defaultDatasetId ?? "");
+  let runStatus = String(startJson?.data?.status ?? "RUNNING");
+  if (!runId || !datasetId) throw new Error("Apify no devolvió runId/datasetId.");
+
+  // 2. Esperar a estado terminal. `waitForFinish` bloquea hasta 20s por llamada; el actor
+  //    se aborta solo a los runTimeout s, así que el bucle converge sin colgarse.
+  const startedAt = Date.now();
+  while (!TERMINAL.has(runStatus) && (Date.now() - startedAt) < opts.wallBudgetMs) {
+    const pollRes = await fetch(
+      `https://api.apify.com/v2/actor-runs/${runId}?token=${apifyToken}&waitForFinish=20`,
+    );
+    if (!pollRes.ok) break; // si falla el poll, salimos y rescatamos lo que haya en el dataset.
+    const pollJson = await pollRes.json().catch(() => null);
+    runStatus = String(pollJson?.data?.status ?? runStatus);
+  }
+
+  // 3. Leer el dataset SIEMPRE: incluye los parciales aunque el run acabara TIMED-OUT.
+  const itemsRes = await fetch(
+    `https://api.apify.com/v2/datasets/${datasetId}/items?token=${apifyToken}&format=json`,
+  );
+  if (!itemsRes.ok) {
+    const txt = await itemsRes.text().catch(() => "");
+    throw new Error(`Apify devolvió ${itemsRes.status} al leer el dataset: ${txt.slice(0, 300)}`);
+  }
+  const items = await itemsRes.json();
+  if (!Array.isArray(items)) throw new Error("Apify no devolvió un array.");
+  return { items, runStatus };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Método no permitido" }, 405);
@@ -61,6 +117,7 @@ Deno.serve(async (req: Request) => {
   // y solo para el negocio aprobado (orquestador/reviews.ts). `reviewsCount` (el total) llega igual.
   let maxReviews = 0;
   let onlyWithoutWebsite = true;
+  let diagnose = false; // modo diagnóstico: muestreo `allPlaces` para explicar un 0 sin-web.
   let countryCode = "es"; // España por defecto: el producto es para negocios locales españoles.
   // Filtros de calidad post-scrape
   let minRating = 0;          // ej: 4.5 — excluye negocios con peor nota
@@ -86,8 +143,83 @@ Deno.serve(async (req: Request) => {
     if (body?.requirePhone !== undefined) requirePhone = Boolean(body.requirePhone);
     if (body?.requireEmail !== undefined) requireEmail = Boolean(body.requireEmail);
     if (body?.countryCode) countryCode = String(body.countryCode).trim().toLowerCase();
+    if (body?.diagnose !== undefined) diagnose = Boolean(body.diagnose);
   } catch (_e) {
     return jsonResponse({ error: "Cuerpo no válido." }, 400);
+  }
+
+  // --- Modo diagnóstico + rescate ------------------------------------------------------------
+  // Cuando «Solo sin web» devuelve 0, el front nos vuelve a llamar con diagnose:true. Aquí NO nos
+  // fiamos del filtro `withoutWebsite` de Google (en nichos reales devuelve fichas CON web): barremos
+  // `allPlaces` EN PROFUNDIDAD (40), nos quedamos con los sin-web según deriveHasWebsite (nuestra
+  // verdad, no la de Google) y los METEMOS al pipeline. Si no hay ninguno, devolvemos el % con web
+  // para decir si el nicho está saturado. Solo se paga este barrido cuando el modo barato falló, así
+  // que el coste extra es acotado, y es scrape básico (sin contactos/detalle/reseñas).
+  if (diagnose) {
+    const DEEP_MAX = 40;
+    const deepInput = {
+      searchStringsArray: [query],
+      countryCode,
+      city,
+      maxCrawledPlacesPerSearch: DEEP_MAX,
+      language,
+      maxReviews: 0,
+      reviewsSort: "newest",
+      scrapeReviewsPersonalData: false,
+      skipClosedPlaces: true,
+      includeWebResults: false,
+      scrapeContacts: false,
+      scrapePlaceDetailPage: false,
+      website: "allPlaces",
+    };
+    try {
+      const { items, runStatus } = await runApify(APIFY_TOKEN, deepInput, {
+        runTimeout: 90,
+        wallBudgetMs: 100_000,
+      });
+      const sampled = items.length;
+      const sinWeb = items.filter((i) => !deriveHasWebsite(i));
+      const withoutWeb = sinWeb.length;
+      const withWeb = sampled - withoutWeb;
+      const pctWithWeb = sampled ? Math.round((withWeb / sampled) * 100) : 0;
+
+      // Rescate: si el barrido profundo encontró sin-web, los metemos al pipeline. ingest-leads
+      // deduplica por google_place_id, así que no duplica los que ya hubieran entrado antes.
+      let rescued = 0;
+      if (withoutWeb > 0) {
+        const INGEST_SECRET = Deno.env.get("INGEST_WEBHOOK_SECRET") ?? "";
+        try {
+          const ingestRes = await fetch(`${SUPABASE_URL}/functions/v1/ingest-leads`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-ingest-secret": INGEST_SECRET,
+              ...(INGEST_SECRET ? {} : { Authorization: `Bearer ${SERVICE_KEY}` }),
+            },
+            body: JSON.stringify({ leads: sinWeb, source: "apify", owner: operatorId }),
+          });
+          const ingestResult = await ingestRes.json().catch(() => ({}));
+          rescued = Number(ingestResult?.inserted ?? 0);
+        } catch (_e) {
+          // El rescate es best-effort: si el ingest falla, devolvemos igual el diagnóstico.
+        }
+      }
+
+      return jsonResponse({
+        diagnose: true,
+        sampled,
+        with_web: withWeb,
+        without_web: withoutWeb,
+        pct_with_web: pctWithWeb,
+        rescued,
+        run_status: runStatus,
+      });
+    } catch (e) {
+      return jsonResponse(
+        { diagnose: true, error: e instanceof Error ? e.message : "Falló el diagnóstico." },
+        502,
+      );
+    }
   }
 
   // scrapeContacts hace que el actor visite la web/redes de CADA ficha para sacar el email.
@@ -124,10 +256,8 @@ Deno.serve(async (req: Request) => {
   // cada negocio (3-5x más lento), así que con max=20 el run rebasaba 120s a menudo.
   // Ahora: lanzamos el run, esperamos a estado terminal (o a que Apify lo aborte por
   // timeout) y SIEMPRE leemos el dataset — un run TIMED-OUT igual deja sus parciales.
-  const ACTOR = "compass~crawler-google-places";
   const RUN_TIMEOUT = 100;        // s — Apify aborta el actor aquí; deja headroom para leer el dataset bajo el límite ~150s de la Edge Function.
   const WALL_BUDGET_MS = 110_000; // tope de espera total antes de rescatar parciales.
-  const TERMINAL = new Set(["SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"]);
 
   const runInput = {
     // El término va separado de la ubicación: así Google Maps geolocaliza bien.
@@ -163,51 +293,12 @@ Deno.serve(async (req: Request) => {
   let items: Record<string, unknown>[] = [];
   let runStatus = "RUNNING";
   try {
-    // 1. Lanzar el run (asíncrono). `timeout` aborta el actor; no esperamos a que acabe aquí.
-    const startRes = await fetch(
-      `https://api.apify.com/v2/acts/${ACTOR}/runs?token=${APIFY_TOKEN}&timeout=${RUN_TIMEOUT}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(runInput),
-      },
-    );
-    if (!startRes.ok) {
-      const txt = await startRes.text().catch(() => "");
-      return jsonResponse({ error: `Apify no aceptó el run (${startRes.status}): ${txt.slice(0, 300)}` }, 502);
-    }
-    const startJson = await startRes.json();
-    const runId = String(startJson?.data?.id ?? "");
-    const datasetId = String(startJson?.data?.defaultDatasetId ?? "");
-    runStatus = String(startJson?.data?.status ?? "RUNNING");
-    if (!runId || !datasetId) {
-      return jsonResponse({ error: "Apify no devolvió runId/datasetId." }, 502);
-    }
-
-    // 2. Esperar a estado terminal. `waitForFinish` bloquea hasta 20s por llamada; el actor
-    //    se aborta solo a los RUN_TIMEOUT s, así que el bucle converge sin colgarse.
-    const startedAt = Date.now();
-    while (!TERMINAL.has(runStatus) && (Date.now() - startedAt) < WALL_BUDGET_MS) {
-      const pollRes = await fetch(
-        `https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_TOKEN}&waitForFinish=20`,
-      );
-      if (!pollRes.ok) break; // si falla el poll, salimos y rescatamos lo que haya en el dataset.
-      const pollJson = await pollRes.json().catch(() => null);
-      runStatus = String(pollJson?.data?.status ?? runStatus);
-    }
-
-    // 3. Leer el dataset SIEMPRE: incluye los parciales aunque el run acabara TIMED-OUT.
-    const itemsRes = await fetch(
-      `https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_TOKEN}&format=json`,
-    );
-    if (!itemsRes.ok) {
-      const txt = await itemsRes.text().catch(() => "");
-      return jsonResponse({ error: `Apify devolvió ${itemsRes.status} al leer el dataset: ${txt.slice(0, 300)}` }, 502);
-    }
-    items = await itemsRes.json();
-    if (!Array.isArray(items)) {
-      return jsonResponse({ error: "Apify no devolvió un array.", raw: String(items).slice(0, 200) }, 502);
-    }
+    const res = await runApify(APIFY_TOKEN, runInput, {
+      runTimeout: RUN_TIMEOUT,
+      wallBudgetMs: WALL_BUDGET_MS,
+    });
+    items = res.items;
+    runStatus = res.runStatus;
   } catch (e) {
     return jsonResponse(
       { error: `No se pudo contactar con Apify: ${e instanceof Error ? e.message : "error"}` },
