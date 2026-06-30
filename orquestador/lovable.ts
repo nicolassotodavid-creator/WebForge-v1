@@ -393,12 +393,14 @@ export async function lovableBuild(
   } else {
     const created = (await mcpCall(token, "create_project", {
       workspace_id:    workspaceId,
-      prompt:          buildPrompt,
+      // Lovable renombró este parámetro: antes `prompt`, ahora `initial_message` (requerido).
+      initial_message: buildPrompt,
       wait:            true,
       timeout_seconds: 600,
     }, CREATE_TIMEOUT_MS)) as Record<string, unknown>;
 
-    projectId = String(created?.project_id ?? created?.id ?? "");
+    // La respuesta puede traer el id como project_id / projectId / id según versión del MCP.
+    projectId = String(created?.project_id ?? created?.projectId ?? created?.id ?? "");
     if (!projectId) {
       throw new Error("create_project no devolvió project_id/id: " + JSON.stringify(created).slice(0, 300));
     }
