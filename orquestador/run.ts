@@ -39,6 +39,10 @@ type Outcome = "ok" | "dry" | "failed" | "skip";
 // --- args ---
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
+// --builds-only: SOLO ejecuta PASO 2 (construir leads 'build_queued'). Lo usa el cron
+// frecuente (cada minuto) para que un build aprobado arranque en <1 min. Scoring, briefs y
+// seguimientos NO se tocan aquí: siguen en el run diario completo de las 08:00.
+const BUILDS_ONLY = args.includes("--builds-only");
 const leadFlagIdx = args.indexOf("--lead");
 const ONLY_LEAD = leadFlagIdx !== -1 ? args[leadFlagIdx + 1] : process.env.LEAD_ID;
 
@@ -457,7 +461,9 @@ async function run() {
     // Modo normal: dos pasadas independientes.
 
     // PASO 0 — Scoring de la web ACTUAL de cada negocio (señal de prospección, se ve en el panel).
-    if (DRY_RUN) {
+    if (BUILDS_ONLY) {
+      // Tick build-only (cron frecuente): sin scoring; solo construimos lo que ya está en cola.
+    } else if (DRY_RUN) {
       console.log("\n── PASO 0: DRY-RUN — no se puntúan webs actuales (gasta tokens y escribe en leads).");
     } else {
       try {
@@ -468,8 +474,8 @@ async function run() {
       }
     }
 
-    // PASADA 1 — Briefs (leads 'new' → 'analyzed')
-    const newLeads = await selectLeadsByStatus("new");
+    // PASADA 1 — Briefs (leads 'new' → 'analyzed'). En modo build-only se omite.
+    const newLeads = BUILDS_ONLY ? [] : await selectLeadsByStatus("new");
     if (newLeads.length > 0) {
       console.log(`\n── PASO 1: Generando briefs para ${newLeads.length} lead(s) nuevos ──`);
       for (const lead of newLeads) {
@@ -503,7 +509,7 @@ async function run() {
 
   // PASADA 3 — Seguimientos automáticos (Email 2 día 4, Email 3 día 7 si no abrió Email 2)
   // No aplica en dry-run ni en modo --lead (son pruebas puntuales, no el ciclo completo).
-  if (!DRY_RUN && !ONLY_LEAD) {
+  if (!DRY_RUN && !ONLY_LEAD && !BUILDS_ONLY) {
     await processFollowups();
   }
 

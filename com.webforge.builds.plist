@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.webforge.builds</string>
+
+  <!-- Tick cada 60 s: construye al instante los leads que el operador aprueba en el panel.
+       launchd NO solapa instancias: si un build sigue en curso, el tick se omite. -->
+  <key>StartInterval</key>
+  <integer>60</integer>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/davidnicolassoto/webforge/orquestador/run-builds.sh</string>
+  </array>
+
+  <!-- Logs de arranque del propio launchd (el detalle de cada build va a builds.log). -->
+  <key>StandardOutPath</key>
+  <string>/Users/davidnicolassoto/Library/Logs/WebForge/builds-launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/davidnicolassoto/Library/Logs/WebForge/builds-launchd.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>/Users/davidnicolassoto</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+</plist>
