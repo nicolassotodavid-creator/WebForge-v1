@@ -32,6 +32,7 @@ jobs:
             generate-outreach \
             send-email \
             cron-followups \
+            cron-briefs \
             track-event \
             ingest-leads \
             run-scrape \

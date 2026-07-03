@@ -1,0 +1,56 @@
+name: Brief automático (leads new → analyzed)
+
+# Dispara la Edge Function cron-briefs para generar los briefs de los leads 'new' SIN depender
+# del Mac. Es el PASO 1 del Orquestador movido a la nube (ver docs/superpowers/specs/
+# 2026-07-03-brief-cron-servidor-design.md). El build en Lovable sigue en local (fase 2 aparte).
+#
+# Requiere el secreto SUPABASE_SERVICE_ROLE_KEY en el repo:
+#   GitHub → Settings → Secrets and variables → Actions → New repository secret.
+
+on:
+  schedule:
+    # Cada 2 horas (UTC, best-effort). Los briefs no son tiempo real; ajusta a gusto.
+    - cron: '0 */2 * * *'
+  workflow_dispatch: {}
+
+# No solapar ejecuciones: si un tick sigue en marcha, el siguiente espera (no se cancela).
+concurrency:
+  group: cron-briefs
+  cancel-in-progress: false
+
+jobs:
+  briefs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generar briefs (drena la cola de leads 'new')
+        env:
+          FUNCTION_URL: https://khscikqchvjxyvoaruas.supabase.co/functions/v1/cron-briefs
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SERVICE_KEY:-}" ]; then
+            echo "::error::Falta el secreto SUPABASE_SERVICE_ROLE_KEY. Añádelo en Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+          total=0
+          # Bucle de drenado: llama hasta que un tick no procese nada (cola vacía), con tope de
+          # seguridad de 40 iteraciones para no colgarse si algo va mal.
+          for i in $(seq 1 40); do
+            resp=$(curl -sS -X POST "$FUNCTION_URL" \
+              -H "Authorization: Bearer $SERVICE_KEY" \
+              -H "Content-Type: application/json" \
+              --max-time 150)
+            echo "tick $i → $resp"
+
+            processed=$(echo "$resp" | jq -r '.processed // empty')
+            if ! [[ "$processed" =~ ^[0-9]+$ ]]; then
+              echo "::error::Respuesta inesperada de cron-briefs: $resp"
+              exit 1
+            fi
+
+            total=$((total + processed))
+            [ "$processed" -eq 0 ] && break
+          done
+
+          echo "Briefs generados en esta ejecución: $total"

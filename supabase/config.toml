@@ -24,6 +24,12 @@ verify_jwt = false
 [functions.score-sites]
 verify_jwt = false
 
+# cron-briefs la invoca GitHub Actions (.github/workflows/daily-brief.yml) con Authorization:
+# Bearer <service_role_key>. Igual que cron-followups/score-sites: la función exige que el token
+# sea la service key, así que desactivamos el JWT de la pasarela.
+[functions.cron-briefs]
+verify_jwt = false
+
 # Funciones públicas: llamadas desde la landing /book sin sesión de usuario
 [functions.get-booking-info]
 verify_jwt = false
