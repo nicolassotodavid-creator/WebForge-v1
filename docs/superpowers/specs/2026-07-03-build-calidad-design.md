@@ -85,10 +85,17 @@ Tras recuperar el brief y refrescar highlights (igual que hoy):
 4. Ensamblar: `variable + photoManifest(photos) + DESIGN_SYSTEM`.
 5. `lovableBuild(...)` igual que hoy (un solo tiro), `analyze` igual que hoy.
 
-### 2.6 `run-scrape` (Edge Function) — subir `maxImages`
-Añadir `"maxImages": 12` al body del actor `compass/crawler-google-places` para que los leads futuros
-traigan galería que curar. Afecta **solo a scrapes nuevos**; los leads ya ingeridos seguirán con las
-1-2 fotos que tengan (la curación funciona igual, solo con menos candidatas).
+### 2.6 Fotos en "pasada 2" en el build (NO en la prospección)
+La prospección corre con `scrapePlaceDetailPage: false` a propósito (ahorra ~½ del coste por ficha,
+ver `run-scrape/index.ts`), y la galería de fotos vive en esa página de detalle. Subir `maxImages` en
+la prospección no traería galería o encarecería **todos** los leads (la mayoría nunca se construyen).
+
+Por eso las fotos se traen igual que las reseñas: en una **"pasada 2" en el build**, solo para el
+lead aprobado. Nuevo `fetchPhotosForPlace(placeId, { maxImages })` (molde de `fetchReviewsForPlace`
+en `orquestador/reviews.ts`) que hace una llamada dirigida al actor con `maxImages: 10`, y sus URLs se
+**mergean en `lead.raw_json.imageUrls`** (idempotente: si ya hay fotos, no se re-paga). Después,
+`extractPhotoCandidates` lee de ese `raw_json` ya enriquecido. Los leads con scrape básico que ya
+tengan `imageUrl` (portada) se curan igual, solo con menos candidatas.
 
 ---
 
@@ -172,8 +179,9 @@ con foto rota o sin sentido que una web tipográfica limpia sin fotos.
 | `supabase/functions/_shared/prompts.ts` | + `DESIGN_SYSTEM`; adelgazar `BUILD_PROMPT` |
 | `orquestador/photos.ts` | **nuevo** — curación por visión + re-host |
 | `orquestador/run.ts` | PASO 2: curar fotos, ensamblar `variable + fotos + DESIGN_SYSTEM` |
-| `orquestador/llm.ts` | posible helper de visión (o reutilizar `callClaude` con imágenes) |
-| `run-scrape` (Edge Function) | `maxImages: 12` en el body del actor |
+| `orquestador/llm.ts` | + helper de visión (`llmVisionJson`) |
+| `orquestador/reviews.ts` | + `fetchPhotosForPlace(placeId, { maxImages })` (molde de `fetchReviewsForPlace`) |
+| `orquestador/preview.ts` | refactor: extraer `rehostToBucket(...)` genérico (lo usan captura y fotos) |
 
 ---
 
