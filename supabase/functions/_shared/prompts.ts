@@ -42,11 +42,12 @@ El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este n
 - Diseño mobile-first, rápido y profesional, acorde al tono y a la paleta sugerida del brief.
 - Las secciones de recommended_sections, con copy en español basado en value_props y hero_copy.
 - Una sección "Reseñas" SIEMPRE, montada como un CARRUSEL de reseñas reales de Google. Reglas:
-  · Usa SOLO las reseñas reales del input (business.reviews). Transcribe cada una TAL CUAL dentro del
-    prompt de Lovable —el texto, el nombre del autor (si viene) y las estrellas (si vienen)— para que
-    Lovable tenga el contenido literal que renderizar. NUNCA inventes reseñas, nombres ni valoraciones.
-  · Apunta a un mínimo de 12 reseñas en el carrusel. Si hay 12 o más reales, incluye al menos 12. Si hay
-    menos de 12 reales, incluye TODAS las que haya y NO rellenes con falsas (mejor 7 reales que 12 falsas).
+  · Usa SOLO las reseñas reales del input (business.reviews). Transcribe TAL CUAL —el texto, el nombre del
+    autor (si viene) y las estrellas (si vienen)— para que Lovable tenga el contenido literal que renderizar.
+    NUNCA inventes reseñas, nombres ni valoraciones.
+  · Incluye entre 6 y 8 reseñas en el carrusel: elige las más representativas (variedad de autores, que
+    mencionen cosas concretas). Si hay menos de 6 reales, incluye TODAS las que haya y NO rellenes con
+    falsas. No pongas más de 8 aunque haya más disponibles —el carrusel debe ir ligero.
   · Carrusel bien hecho: tarjetas con estrellas (1-5), nombre del autor y la cita; deslizable en móvil
     (swipe), con flechas y puntos de navegación en escritorio y autoplay suave y pausable. Encabeza la
     sección con la nota media y el nº de reseñas reales (business.rating y business.review_count) bajo la
