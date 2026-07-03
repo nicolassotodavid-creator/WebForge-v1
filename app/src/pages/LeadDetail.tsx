@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { waLink } from "@/lib/contact";
+import { waLink, waNumber, whatsappOutreachText } from "@/lib/contact";
 import type { Brief, Lead, Site, OutreachMessage } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -100,6 +100,10 @@ export default function LeadDetail() {
   const [sendEmailError, setSendEmailError] = useState<string | null>(null);
   const [sendEmailDone, setSendEmailDone] = useState(false);
   const [copied, setCopied] = useState(false);
+  // WhatsApp saliente manual: `waText` = borrador editable (null = composer cerrado).
+  const [waText, setWaText] = useState<string | null>(null);
+  const [waSaving, setWaSaving] = useState(false);
+  const [waError, setWaError] = useState<string | null>(null);
   const [editingBody, setEditingBody] = useState(false);
   const [editedBody, setEditedBody] = useState("");
   const [editingEmail, setEditingEmail] = useState(false);
@@ -307,6 +311,44 @@ export default function LeadDetail() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
+  }
+
+  /** Abre el composer de WhatsApp con el texto de plantilla prerellenado. */
+  function openWhatsappComposer() {
+    if (!lead || !site?.live_url) return;
+    const bookUrl = `${window.location.origin}/book/${lead.id}`;
+    setWaText(whatsappOutreachText(lead.name, site.live_url, bookUrl));
+    setWaError(null);
+  }
+
+  /** Abre WhatsApp con el texto (editado) y registra el envío en outreach_messages. */
+  async function sendWhatsapp() {
+    if (!lead || waText == null) return;
+    // Abrir WhatsApp SIEMPRE primero: el contacto no debe depender del registro.
+    const link = waLink(lead, waText);
+    if (link) window.open(link, "_blank");
+    setWaSaving(true);
+    setWaError(null);
+    const { error } = await supabase.from("outreach_messages").upsert(
+      {
+        lead_id: lead.id,
+        channel: "whatsapp",
+        email_number: 0, // centinela: fuera de la secuencia de emails 1/2/3
+        subject: null,
+        body: waText,
+        status: "sent",
+        generated_by_model: "manual",
+        sent_at: new Date().toISOString(),
+      },
+      { onConflict: "lead_id,email_number" },
+    );
+    setWaSaving(false);
+    if (error) {
+      setWaError("No se pudo registrar el envío (WhatsApp se abrió igual).");
+    } else {
+      setWaText(null);
+      await reloadOutreach();
+    }
   }
 
   /** Aprueba el brief y encola el build en Lovable (lead → 'build_queued'). */
@@ -1022,6 +1064,47 @@ export default function LeadDetail() {
                   Rechazar
                 </Button>
               </div>
+
+              {waNumber(lead) && (
+                <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium">Enviar por WhatsApp</span>
+                    {waText == null && (
+                      <Button size="sm" variant="outline" onClick={openWhatsappComposer}>
+                        <MessageCircle className="h-4 w-4" /> Preparar mensaje
+                      </Button>
+                    )}
+                  </div>
+                  {waText != null && (
+                    <>
+                      <textarea
+                        value={waText}
+                        onChange={(e) => setWaText(e.target.value)}
+                        rows={7}
+                        className="w-full rounded-md border bg-background p-2 text-sm"
+                      />
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" onClick={sendWhatsapp} disabled={waSaving}>
+                          {waSaving ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <MessageCircle className="h-4 w-4" />
+                          )}
+                          Abrir WhatsApp
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setWaText(null)}>
+                          Cancelar
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Se abrirá WhatsApp con el mensaje ya escrito. Revísalo y dale a enviar tú.
+                      </p>
+                    </>
+                  )}
+                  {waError && <p className="text-xs text-amber-700">{waError}</p>}
+                </div>
+              )}
+
               <p className="text-xs text-muted-foreground">
                 ¿No te convence? Edítala en Lovable (botón «Editar en Lovable» arriba) y
                 vuelve a revisar; cuando esté lista, apruébala.
@@ -1086,7 +1169,13 @@ export default function LeadDetail() {
                     .sort((a, b) => (a.sent_at ?? "").localeCompare(b.sent_at ?? ""))
                     .map((m) => (
                       <li key={m.id} className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
-                        <span className="font-medium">Email {m.email_number ?? 1}</span>
+                        <span className="font-medium">
+                          {m.channel === "whatsapp"
+                            ? "WhatsApp"
+                            : m.channel === "linkedin"
+                              ? "LinkedIn"
+                              : `Email ${m.email_number ?? 1}`}
+                        </span>
                         <span className="inline-flex items-center gap-1 text-xs text-green-600">
                           <Check className="h-3.5 w-3.5" />
                           Enviado{m.sent_at ? ` ${fmtWhen(m.sent_at)}` : ""}
