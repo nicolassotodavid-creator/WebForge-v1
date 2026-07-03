@@ -19,8 +19,32 @@ export function waNumber(lead: ContactLead): string | null {
   return null;
 }
 
-/** Enlace wa.me listo para usar, o null si el lead no tiene WhatsApp. */
-export function waLink(lead: ContactLead): string | null {
+/** Enlace wa.me listo para usar; si se pasa `mensaje`, lo prerellena (?text=). Null si el lead no tiene WhatsApp. */
+export function waLink(lead: ContactLead, mensaje?: string): string | null {
   const n = waNumber(lead);
-  return n ? `https://wa.me/${n}` : null;
+  if (!n) return null;
+  return mensaje
+    ? `https://wa.me/${n}?text=${encodeURIComponent(mensaje)}`
+    : `https://wa.me/${n}`;
+}
+
+/**
+ * Texto de la plantilla de WhatsApp saliente (acción manual desde la ficha del lead):
+ * saludo + enlace a la web (liveUrl) + enlace de activación (/book). `negocio` vacío/null
+ * omite el nombre con gracia. Editable por el operador antes de enviar.
+ */
+export function whatsappOutreachText(
+  negocio: string | null | undefined,
+  liveUrl: string,
+  bookUrl: string,
+): string {
+  const n = (negocio ?? "").trim();
+  const saludo = n
+    ? `Hola 👋 soy Nico. He preparado una web para ${n}, échale un vistazo:`
+    : `Hola 👋 soy Nico. He preparado una web, échale un vistazo:`;
+  return (
+    `${saludo}\n${liveUrl}\n\n` +
+    `Si te gusta, aquí la dejas activada en un momento:\n${bookUrl}\n\n` +
+    `Un saludo.`
+  );
 }
