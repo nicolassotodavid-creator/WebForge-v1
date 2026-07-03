@@ -2,6 +2,10 @@
 // Helpers PUROS (extractPhotoCandidates, parseCurationResponse, photoManifest) + la cola de red
 // (curatePhotos, Task 5). Mismo patrón que llm.ts: lógica pura y llamada de red en un módulo.
 
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { llmVisionJson } from "./llm.ts";
+import { rehostToBucket, PREVIEW_BUCKET } from "./preview.ts";
+
 export interface CuratedPhotos {
   hero: string | null;
   gallery: string[];
@@ -85,4 +89,45 @@ export function photoManifest(photos: CuratedPhotos): string {
   if (photos.gallery.length) lines.push(`Galería: ${photos.gallery.join(", ")}`);
   lines.push("Son fotos reales; respétalas, no las deformes ni recortes las caras.");
   return lines.join(" ");
+}
+
+const CURATION_SYSTEM = `Eres director de arte seleccionando fotos para la web profesional de un negocio.
+Recibes varias imágenes numeradas desde 0 y los datos del negocio. Devuelve ÚNICAMENTE un objeto JSON
+válido (sin markdown): { "order": [índices] }, con los índices de las 4-6 MEJORES fotos, la primera = la
+mejor para el hero. Incluye SOLO fotos que sean: (a) de buena calidad y CLARAMENTE relevantes a este
+negocio, y (b) seguras para publicar: NADA de caras identificables en primer plano, capturas de pantalla,
+tiques, menús como texto, memes, ni fotos borrosas u oscuras. Si ninguna cumple con confianza, devuelve
+{ "order": [] }. Ante la duda, EXCLUYE (mejor sin foto que una foto mala).`;
+
+// Curación por visión + re-host de solo las ganadoras. Degradación total ante cualquier fallo.
+export async function curatePhotos(
+  supabase: SupabaseClient,
+  leadId: string,
+  candidates: string[],
+  ctx: { name: string; category?: string | null; city?: string | null },
+): Promise<CuratedPhotos> {
+  const empty: CuratedPhotos = { hero: null, gallery: [] };
+  if (candidates.length === 0) return empty;
+  try {
+    const userText = `Negocio: ${ctx.name}${ctx.category ? ` (${ctx.category})` : ""}${ctx.city ? ` en ${ctx.city}` : ""}. Hay ${candidates.length} imágenes numeradas 0..${candidates.length - 1} en el orden en que se te envían.`;
+    const parsed = await llmVisionJson<{ order?: unknown }>(CURATION_SYSTEM, candidates, userText);
+    const order = parseCurationResponse(JSON.stringify(parsed), candidates.length);
+    if (order.length === 0) {
+      console.log("  · curación de fotos: ninguna pasó el filtro → web sin fotos.");
+      return empty;
+    }
+    // Re-hospedar en orden; hero = primera superviviente, galería = resto.
+    const survivors: string[] = [];
+    for (let i = 0; i < order.length; i++) {
+      const slot = i === 0 ? "hero" : `g${i}`;
+      const rehosted = await rehostToBucket(supabase, PREVIEW_BUCKET, `photos/${leadId}/${slot}`, candidates[order[i]]);
+      if (rehosted) survivors.push(rehosted);
+    }
+    if (survivors.length === 0) return empty;
+    console.log(`  · curación de fotos: ${survivors.length} foto(s) seleccionada(s) y re-hospedada(s).`);
+    return { hero: survivors[0], gallery: survivors.slice(1) };
+  } catch (e) {
+    console.error(`  · curación de fotos falló (no crítico, web sin fotos): ${e instanceof Error ? e.message : e}`);
+    return empty;
+  }
 }
