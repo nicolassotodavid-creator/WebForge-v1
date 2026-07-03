@@ -17,6 +17,8 @@ assertEq(normalizeUrlInput("   "), null, "espacios → null");
 assertEq(normalizeUrlInput("no es una url"), null, "texto sin dominio → null");
 assertEq(normalizeUrlInput("ftp://cosa.com"), null, "esquema no http(s) → null");
 assertEq(normalizeUrlInput(null), null, "null → null");
+assertEq(normalizeUrlInput("contacto@talleres.com"), null, "email pegado por error → null");
+assertEq(normalizeUrlInput("https://user:pass@talleres.com"), null, "URL con credenciales → null");
 
 // siteHost — clave de duplicados
 assertEq(siteHost("https://www.Talleres-Garcia.COM/contacto"), "talleres-garcia.com", "minúsculas y sin www");

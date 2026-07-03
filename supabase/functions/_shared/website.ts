@@ -104,6 +104,10 @@ export function normalizeUrlInput(input: unknown): string | null {
     const parsed = new URL(u);
     if (!/^https?:$/.test(parsed.protocol)) return null;
     if (!parsed.hostname.includes(".")) return null;
+    // Rechaza URLs con userinfo (usuario:contraseña@host). Un email pegado por error
+    // ("contacto@talleres.com") parsea como https://contacto@talleres.com/, con
+    // "contacto" como username — no es una URL válida para guardar como lead.
+    if (parsed.username || parsed.password) return null;
     return parsed.toString();
   } catch (_e) {
     return null;
