@@ -1065,7 +1065,7 @@ export default function LeadDetail() {
                 </Button>
               </div>
 
-              {waNumber(lead) && (
+              {waNumber(lead) && site.status === "approved" && (
                 <div className="space-y-2 rounded-md border bg-muted/30 p-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">Enviar por WhatsApp</span>
