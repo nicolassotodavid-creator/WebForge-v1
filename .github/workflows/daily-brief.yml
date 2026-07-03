@@ -4,8 +4,9 @@ name: Brief automático (leads new → analyzed)
 # del Mac. Es el PASO 1 del Orquestador movido a la nube (ver docs/superpowers/specs/
 # 2026-07-03-brief-cron-servidor-design.md). El build en Lovable sigue en local (fase 2 aparte).
 #
-# Requiere el secreto SUPABASE_SERVICE_ROLE_KEY en el repo:
-#   GitHub → Settings → Secrets and variables → Actions → New repository secret.
+# NO necesita ningún secreto nuevo: deriva la service_role key en tiempo de ejecución desde
+# SUPABASE_ACCESS_TOKEN (que ya existe en el repo, lo usa el deploy) vía la Management API de
+# Supabase. Así la service key nunca se guarda como secreto ni pasa por sitios de más.
 
 on:
   schedule:
@@ -22,20 +23,32 @@ jobs:
   briefs:
     runs-on: ubuntu-latest
     steps:
-      - name: Generar briefs (drena la cola de leads 'new')
+      - name: Generar briefs (deriva la service key y drena la cola de leads 'new')
         env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PROJECT_REF: khscikqchvjxyvoaruas
           FUNCTION_URL: https://khscikqchvjxyvoaruas.supabase.co/functions/v1/cron-briefs
-          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           set -euo pipefail
-          if [ -z "${SERVICE_KEY:-}" ]; then
-            echo "::error::Falta el secreto SUPABASE_SERVICE_ROLE_KEY. Añádelo en Settings → Secrets and variables → Actions."
+          if [ -z "${SUPABASE_ACCESS_TOKEN:-}" ]; then
+            echo "::error::Falta el secreto SUPABASE_ACCESS_TOKEN en el repo."
             exit 1
           fi
 
+          # ── Derivar la service_role key desde el access token (Management API) ────────────
+          keyresp=$(curl -sS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true")
+          SERVICE_KEY=$(echo "$keyresp" | jq -r '.[]? | select(.name=="service_role") | (.api_key // .secret // .value // empty)')
+          if [ -z "${SERVICE_KEY:-}" ] || [ "$SERVICE_KEY" = "null" ]; then
+            # No imprimimos la respuesta cruda (contiene claves); solo los nombres, para depurar.
+            echo "::error::No pude derivar la service_role key. Nombres recibidos: $(echo "$keyresp" | jq -rc '[.[]?.name]' 2>/dev/null || echo '??')"
+            exit 1
+          fi
+          echo "::add-mask::$SERVICE_KEY"
+          echo "✓ service key derivada"
+
+          # ── Drenar la cola: llamar hasta que un tick no procese nada, con tope de seguridad ─
           total=0
-          # Bucle de drenado: llama hasta que un tick no procese nada (cola vacía), con tope de
-          # seguridad de 40 iteraciones para no colgarse si algo va mal.
           for i in $(seq 1 40); do
             resp=$(curl -sS -X POST "$FUNCTION_URL" \
               -H "Authorization: Bearer $SERVICE_KEY" \
