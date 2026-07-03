@@ -32,6 +32,12 @@ const ADMIN_USER_ID = process.env.ADMIN_USER_ID;
 // Un build se considera abandonado pasado este tiempo: permite re-reclamar el lead si el
 // proceso anterior murió a mitad. > BUILD_DEADLINE_MS de lovable.ts (15 min).
 const BUILD_LOCK_STALE_MS = Number(process.env.BUILD_LOCK_STALE_MS ?? 20 * 60 * 1000);
+// Cuántos builds/briefs se procesan EN PARALELO dentro de un mismo run. Antes era 1 (serie):
+// la cola se molía de una en una y N builds de ~4 min tardaban N×4 min. Como cada lead crea su
+// propio proyecto Lovable (con lock atómico anti-doble-build en processBuild), un pool baja el
+// wall-clock a ≈(N/concurrencia)×build. Conservador por los rate limits de Lovable: si se queja,
+// bájalo a 2 con BUILD_CONCURRENCY en .env.
+const BUILD_CONCURRENCY = Math.max(1, Number(process.env.BUILD_CONCURRENCY ?? 3));
 
 // Resultado de procesar un lead. 'skip' = no se hizo nada (ya reclamado por otro proceso).
 type Outcome = "ok" | "dry" | "failed" | "skip";
@@ -427,6 +433,26 @@ async function selectSingleLead(id: string): Promise<Lead[]> {
   return (data ?? []) as Lead[];
 }
 
+// Procesa `items` con como mucho `concurrency` en vuelo a la vez. N workers van tomando del
+// índice compartido (`i++` es atómico en el bucle de eventos: no hay await entre leer y escribir,
+// así que dos workers nunca cogen el mismo lead). Un item que lanza NO tumba el pool: el worker
+// de cada item ya captura su propio error y actualiza el tally.
+async function runPool<T>(
+  items: T[],
+  concurrency: number,
+  worker: (item: T) => Promise<void>,
+): Promise<void> {
+  let i = 0;
+  const n = Math.max(1, Math.min(concurrency, items.length));
+  await Promise.all(
+    Array.from({ length: n }, async () => {
+      while (i < items.length) {
+        await worker(items[i++]);
+      }
+    }),
+  );
+}
+
 async function run() {
   console.log(`WebForge Orquestador — modelo ${ORQUESTADOR_MODEL}${DRY_RUN ? " (DRY-RUN)" : ""}`);
 
@@ -477,15 +503,15 @@ async function run() {
     // PASADA 1 — Briefs (leads 'new' → 'analyzed'). En modo build-only se omite.
     const newLeads = BUILDS_ONLY ? [] : await selectLeadsByStatus("new");
     if (newLeads.length > 0) {
-      console.log(`\n── PASO 1: Generando briefs para ${newLeads.length} lead(s) nuevos ──`);
-      for (const lead of newLeads) {
+      console.log(`\n── PASO 1: Generando briefs para ${newLeads.length} lead(s) nuevos · concurrencia ${BUILD_CONCURRENCY} ──`);
+      await runPool(newLeads, BUILD_CONCURRENCY, async (lead) => {
         try {
           tally[await processBrief(lead)]++;
         } catch (e) {
           tally.failed++;
           console.error(`  ✗ error brief ${lead.id}: ${e instanceof Error ? e.message : e}`);
         }
-      }
+      });
     } else {
       console.log("── PASO 1: No hay leads nuevos para procesar.");
     }
@@ -493,15 +519,15 @@ async function run() {
     // PASADA 2 — Builds (leads 'build_queued' → 'site_built')
     const buildLeads = await selectLeadsByStatus("build_queued");
     if (buildLeads.length > 0) {
-      console.log(`\n── PASO 2: Construyendo webs en Lovable para ${buildLeads.length} lead(s) ──`);
-      for (const lead of buildLeads) {
+      console.log(`\n── PASO 2: Construyendo webs en Lovable para ${buildLeads.length} lead(s) · concurrencia ${BUILD_CONCURRENCY} ──`);
+      await runPool(buildLeads, BUILD_CONCURRENCY, async (lead) => {
         try {
           tally[await processBuild(lead)]++;
         } catch (e) {
           tally.failed++;
           console.error(`  ✗ error build ${lead.id}: ${e instanceof Error ? e.message : e}`);
         }
-      }
+      });
     } else {
       console.log("── PASO 2: No hay leads encolados para construir.");
     }
