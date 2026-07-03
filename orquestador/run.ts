@@ -209,7 +209,7 @@ async function processBuild(lead: Lead): Promise<Outcome> {
   const buildPrompt = await llmText(
     BUILD_PROMPT.replaceAll("{{BOOKING_URL}}", bookingUrl),
     { brief, business: leadPayload(lead) },
-    3500, // margen para transcribir 12-15 reseñas reales (autor + estrellas + texto) en el carrusel
+    2800, // tope holgado: transcribir 6-8 reseñas reales (autor + estrellas + texto) + resto de secciones sin truncar el CTA/badge del final
   );
   console.log(`  · build-prompt listo (${buildPrompt.length} chars), reserva → ${bookingUrl}`);
 
