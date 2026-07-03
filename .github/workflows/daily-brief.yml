@@ -4,9 +4,9 @@ name: Brief automático (leads new → analyzed)
 # del Mac. Es el PASO 1 del Orquestador movido a la nube (ver docs/superpowers/specs/
 # 2026-07-03-brief-cron-servidor-design.md). El build en Lovable sigue en local (fase 2 aparte).
 #
-# NO necesita ningún secreto nuevo: deriva la service_role key en tiempo de ejecución desde
-# SUPABASE_ACCESS_TOKEN (que ya existe en el repo, lo usa el deploy) vía la Management API de
-# Supabase. Así la service key nunca se guarda como secreto ni pasa por sitios de más.
+# NO necesita ningún secreto nuevo: obtiene la service_role key (la JWT legacy que la función
+# tiene inyectada) desde SUPABASE_ACCESS_TOKEN (ya existente) vía la Management API de Supabase.
+# La key se enmascara (::add-mask::) y nunca se imprime.
 
 on:
   schedule:
@@ -14,7 +14,6 @@ on:
     - cron: '0 */2 * * *'
   workflow_dispatch: {}
 
-# No solapar ejecuciones: si un tick sigue en marcha, el siguiente espera (no se cancela).
 concurrency:
   group: cron-briefs
   cancel-in-progress: false
@@ -23,7 +22,7 @@ jobs:
   briefs:
     runs-on: ubuntu-latest
     steps:
-      - name: Generar briefs (deriva la service key y drena la cola de leads 'new')
+      - name: Generar briefs (obtiene la service key y drena la cola de leads 'new')
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           PROJECT_REF: khscikqchvjxyvoaruas
@@ -35,19 +34,18 @@ jobs:
             exit 1
           fi
 
-          # ── Derivar la service_role key desde el access token (Management API) ────────────
+          # ── service_role key (JWT legacy) desde el access token. Se enmascara; no se imprime. ──
           keyresp=$(curl -sS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-            "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true")
-          SERVICE_KEY=$(echo "$keyresp" | jq -r '.[]? | select(.name=="service_role") | (.api_key // .secret // .value // empty)')
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys")
+          SERVICE_KEY=$(echo "$keyresp" | jq -r 'if type=="array" then (.[]? | select(.name=="service_role") | .api_key) else empty end' | head -n1)
           if [ -z "${SERVICE_KEY:-}" ] || [ "$SERVICE_KEY" = "null" ]; then
-            # No imprimimos la respuesta cruda (contiene claves); solo los nombres, para depurar.
-            echo "::error::No pude derivar la service_role key. Nombres recibidos: $(echo "$keyresp" | jq -rc '[.[]?.name]' 2>/dev/null || echo '??')"
+            echo "::error::No pude obtener la service_role key (respuesta no esperada de la Management API)."
             exit 1
           fi
           echo "::add-mask::$SERVICE_KEY"
-          echo "✓ service key derivada"
+          echo "✓ service key obtenida"
 
-          # ── Drenar la cola: llamar hasta que un tick no procese nada, con tope de seguridad ─
+          # ── Drenar la cola: llamar hasta que un tick no procese nada, con tope de seguridad ──
           total=0
           for i in $(seq 1 40); do
             resp=$(curl -sS -X POST "$FUNCTION_URL" \
@@ -58,7 +56,7 @@ jobs:
 
             processed=$(echo "$resp" | jq -r '.processed // empty')
             if ! [[ "$processed" =~ ^[0-9]+$ ]]; then
-              echo "::error::Respuesta inesperada de cron-briefs: $resp"
+              echo "::error::La función no autorizó o devolvió algo inesperado: $resp"
               exit 1
             fi
 
