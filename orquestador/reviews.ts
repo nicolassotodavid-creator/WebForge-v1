@@ -62,3 +62,48 @@ export async function fetchReviewsForPlace(
   const reviews = (items[0] as Record<string, unknown> | undefined)?.["reviews"];
   return Array.isArray(reviews) ? (reviews as Record<string, unknown>[]) : [];
 }
+
+// Pasada 2 de FOTOS: la prospección corre con scrapePlaceDetailPage:false (barato) y ahí no hay
+// galería. Aquí, solo para el lead APROBADO, pagamos el detalle de UNA ficha para traer sus fotos.
+// maxReviews:0 → no re-pagamos reseñas (ya vienen por su propia pasada 2).
+export async function fetchPhotosForPlace(
+  placeId: string,
+  opts: { maxImages?: number } = {},
+): Promise<string[]> {
+  const maxImages = opts.maxImages ?? 10;
+  const input = {
+    placeIds: [placeId],
+    maxReviews: 0,
+    maxImages,
+    scrapePlaceDetailPage: true,
+    maxCrawledPlacesPerSearch: 1,
+    language: "es",
+  };
+  const res = await fetch(`${APIFY_SYNC}?token=${apifyToken()}&timeout=120`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) {
+    const txt = await res.text().catch(() => "");
+    throw new Error(`Apify devolvió ${res.status} al traer fotos: ${txt.slice(0, 200)}`);
+  }
+  const items = (await res.json()) as unknown;
+  if (!Array.isArray(items) || items.length === 0) return [];
+  const item = items[0] as Record<string, unknown>;
+  const urls: string[] = [];
+  const seen = new Set<string>();
+  const add = (v: unknown) => {
+    let u: string | null = null;
+    if (typeof v === "string" && /^https?:\/\//i.test(v)) u = v;
+    else if (v && typeof v === "object") {
+      const o = v as Record<string, unknown>;
+      const c = o.imageUrl ?? o.url;
+      if (typeof c === "string" && /^https?:\/\//i.test(c)) u = c;
+    }
+    if (u && !seen.has(u)) { seen.add(u); urls.push(u); }
+  };
+  add(item.imageUrl);
+  if (Array.isArray(item.imageUrls)) for (const x of item.imageUrls) add(x);
+  return urls;
+}
