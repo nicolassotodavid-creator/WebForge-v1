@@ -9,6 +9,8 @@
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const ORQUESTADOR_MODEL = process.env.ORQUESTADOR_MODEL ?? "claude-sonnet-4-6";
+// Visión para curar fotos: Haiku 4.5 (barato, ~céntimos por web). Independiente de ORQUESTADOR_MODEL.
+const VISION_MODEL = "claude-haiku-4-5-20251001";
 
 interface AnthropicResponse {
   content?: { type?: string; text?: string }[];
@@ -59,11 +61,14 @@ export function extractJson<T = Record<string, unknown>>(text: string): T {
   return JSON.parse(t.slice(start, end + 1)) as T;
 }
 
-// Llamada base al orquestador. Devuelve el texto del primer bloque de la respuesta.
-async function callClaude(
+type AnthropicMessage = { role: "user" | "assistant"; content: unknown };
+
+// Core: manda `messages` con el `system` cacheado. Devuelve el texto del primer bloque.
+async function callAnthropic(
   systemPrompt: string,
-  input: unknown,
-  maxTokens = 2000,
+  messages: AnthropicMessage[],
+  maxTokens: number,
+  model: string,
 ): Promise<string> {
   const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
   if (!ANTHROPIC_API_KEY) {
@@ -72,7 +77,6 @@ async function callClaude(
         "Es la API key de runtime, NO el plan Max.",
     );
   }
-
   const res = await fetch(ANTHROPIC_API, {
     method: "POST",
     headers: {
@@ -81,15 +85,12 @@ async function callClaude(
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      model: ORQUESTADOR_MODEL,
+      model,
       max_tokens: maxTokens,
       system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
-      messages: [
-        { role: "user", content: typeof input === "string" ? input : JSON.stringify(input) },
-      ],
+      messages,
     }),
   });
-
   const data = (await res.json()) as AnthropicResponse;
   if (!res.ok) {
     throw new Error(`Claude API devolvió ${res.status}: ${data?.error?.message ?? "error"}`);
@@ -97,6 +98,12 @@ async function callClaude(
   const text = data.content?.find((c) => c.type === "text")?.text ?? data.content?.[0]?.text ?? "";
   if (!text) throw new Error("Claude devolvió una respuesta vacía");
   return text;
+}
+
+// Texto → texto (build/brief). Mantiene la firma que ya usan llmJson/llmText.
+async function callClaude(systemPrompt: string, input: unknown, maxTokens = 2000): Promise<string> {
+  const content = typeof input === "string" ? input : JSON.stringify(input);
+  return callAnthropic(systemPrompt, [{ role: "user", content }], maxTokens, ORQUESTADOR_MODEL);
 }
 
 // Claude → JSON estricto (brief, outreach). Parsea con try/catch implícito en extractJson.
@@ -117,6 +124,22 @@ export async function llmText(
 ): Promise<string> {
   const text = await callClaude(systemPrompt, input, maxTokens);
   return text.trim();
+}
+
+// Imágenes (por URL) + instrucción → JSON. Usado por la curación de fotos (photos.ts) con Haiku visión.
+// Si Claude no puede descargar una URL, la ignora; nosotros degradamos a "sin fotos" aguas arriba.
+export async function llmVisionJson<T = Record<string, unknown>>(
+  systemPrompt: string,
+  imageUrls: string[],
+  userText: string,
+  maxTokens = 500,
+): Promise<T> {
+  const content = [
+    ...imageUrls.map((url) => ({ type: "image", source: { type: "url", url } })),
+    { type: "text", text: userText },
+  ];
+  const text = await callAnthropic(systemPrompt, [{ role: "user", content }], maxTokens, VISION_MODEL);
+  return extractJson<T>(text);
 }
 
 export { ORQUESTADOR_MODEL };
