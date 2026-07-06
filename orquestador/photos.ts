@@ -119,7 +119,7 @@ export async function curatePhotos(
     // Re-hospedar en orden; hero = primera superviviente, galería = resto.
     const survivors: string[] = [];
     for (let i = 0; i < order.length; i++) {
-      const slot = i === 0 ? "hero" : `g${i}`;
+      const slot = survivors.length === 0 ? "hero" : `g${survivors.length}`;
       const rehosted = await rehostToBucket(supabase, PREVIEW_BUCKET, `photos/${leadId}/${slot}`, candidates[order[i]]);
       if (rehosted) survivors.push(rehosted);
     }

@@ -10,7 +10,7 @@
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const ORQUESTADOR_MODEL = process.env.ORQUESTADOR_MODEL ?? "claude-sonnet-4-6";
 // Visión para curar fotos: Haiku 4.5 (barato, ~céntimos por web). Independiente de ORQUESTADOR_MODEL.
-const VISION_MODEL = "haiku-4-5-20251001";
+const VISION_MODEL = "claude-haiku-4-5-20251001";
 
 interface AnthropicResponse {
   content?: { type?: string; text?: string }[];

@@ -224,6 +224,8 @@ async function processBuild(lead: Lead): Promise<Outcome> {
       } catch (e) {
         console.error(`  · no se pudieron traer fotos (no crítico, sigue el build): ${e instanceof Error ? e.message : e}`);
       }
+    } else {
+      console.log("  · sin placeId: no se pueden traer fotos; la web se construye sin galería.");
     }
   }
 
