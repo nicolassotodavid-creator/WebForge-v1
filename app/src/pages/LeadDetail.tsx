@@ -179,7 +179,8 @@ export default function LeadDetail() {
     const msgs = (outreachData as OutreachMessage[] | null) ?? [];
     setOutreachHistory(msgs);
     // El más reciente (orden desc) alimenta el panel de composición/envío.
-    setOutreachMsg(msgs[0] ?? null);
+    // El composer es de email/LinkedIn; la fila de WhatsApp (envío manual) no debe secuestrarlo.
+    setOutreachMsg(msgs.find((m) => m.channel !== "whatsapp") ?? null);
     setLoading(false);
   }, [id]);
 
@@ -323,7 +324,8 @@ export default function LeadDetail() {
 
   /** Abre WhatsApp con el texto (editado) y registra el envío en outreach_messages. */
   async function sendWhatsapp() {
-    if (!lead || waText == null) return;
+    // Texto vacío/solo espacios: ni abrir ni registrar (evita un "enviado" fantasma sin mensaje).
+    if (!lead || !waText?.trim()) return;
     // Abrir WhatsApp SIEMPRE primero: el contacto no debe depender del registro.
     const link = waLink(lead, waText);
     if (link) window.open(link, "_blank");
@@ -1084,7 +1086,7 @@ export default function LeadDetail() {
                         className="w-full rounded-md border bg-background p-2 text-sm"
                       />
                       <div className="flex items-center gap-2">
-                        <Button size="sm" onClick={sendWhatsapp} disabled={waSaving}>
+                        <Button size="sm" onClick={sendWhatsapp} disabled={waSaving || !waText.trim()}>
                           {waSaving ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (

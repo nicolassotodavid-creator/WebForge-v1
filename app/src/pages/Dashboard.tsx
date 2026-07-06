@@ -257,7 +257,10 @@ export default function Dashboard() {
       supabase.from("leads").select("*").order("created_at", { ascending: false }),
       supabase
         .from("outreach_messages")
-        .select("lead_id,status,sent_at,opened_at"),
+        .select("lead_id,status,sent_at,opened_at")
+        // Solo email: la columna se rotula "Email" y el WhatsApp manual (channel='whatsapp')
+        // no debe contar como email enviado. Mismo criterio que Emails.tsx.
+        .eq("channel", "email"),
     ]);
     if (leadsRes.error) {
       setError(leadsRes.error.message);
