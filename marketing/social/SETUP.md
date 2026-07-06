@@ -29,8 +29,17 @@ Estado del setup una-sola-vez del canal. `/lote-contenido` lee la sección
 
 ### Candidatos de avatar
 
-*(pendiente de generar — ver Task 5 del plan; si no hay URLs abajo, generarlos en la
-primera sesión)*
+Generados el 2026-07-06 (modelo `soul_2`, 9:16, ~1 crédito c/u). **Elegir 1 en la
+primera sesión** (o pedir nuevos si ninguno convence). El `job_id` es lo que se pasa
+como referencia de identidad (`medias[].value`) al generar los vídeos.
+
+| # | Perfil | job_id | Imagen |
+|---|--------|--------|--------|
+| 1 | Mujer ~35, cercana, fondo peluquería | `4575c606-f265-43b0-9db3-af50b3f6d156` | [ver](https://d8j0ntlcm91z4.cloudfront.net/user_3Aa57yxxelh2aMt3JIB518b7VGi/hf_20260706_181729_4575c606-f265-43b0-9db3-af50b3f6d156.png) |
+| 2 | Hombre ~40, cercano, fondo cafetería | `b0e4ada8-f694-4c7a-a55e-8a45daba1d41` | [ver](https://d8j0ntlcm91z4.cloudfront.net/user_3Aa57yxxelh2aMt3JIB518b7VGi/hf_20260706_181732_b0e4ada8-f694-4c7a-a55e-8a45daba1d41.png) |
+| 3 | Mujer ~48, dueña de negocio, fondo restaurante | `5d6847b9-a73a-4589-8b31-4701b077ce03` | [ver](https://d8j0ntlcm91z4.cloudfront.net/user_3Aa57yxxelh2aMt3JIB518b7VGi/hf_20260706_181737_5d6847b9-a73a-4589-8b31-4701b077ce03.png) |
+
+Nota de saldo (2026-07-06): 526 créditos, plan Pro.
 
 ### Identidad elegida
 
