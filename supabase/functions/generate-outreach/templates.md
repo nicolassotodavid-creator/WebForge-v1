@@ -18,9 +18,16 @@ Me puse.
 Están vuestros servicios, algunas fotos y frases de 
 clientes reales de Google. Carga bien en el móvil.
 Si os gusta y queréis quedarosla, me decís.
+Si hay algo que cambiaríais —colores, textos, una foto— os lo ajusto 
+sin coste. Me escribís y ya.
 Si no, sin problema — fue un rato mío.
 Nico
 ```
+
+> El **cuerpo del Email 1 lo redacta Claude** (`OUTREACH_PROMPT` en `_shared/prompts.ts`); esto es la
+> referencia del tono, no un literal fijo. La frase de "cambios sin coste" va en el prompt para bajar la
+> objeción. **Pie de WhatsApp:** si el secreto `WHATSAPP_NUMBER` está configurado, el sistema añade
+> `WhatsApp: https://wa.me/…` bajo la firma en los **tres** emails (clicable en el HTML). Vacío → sin pie.
 
 ---
 
@@ -61,6 +68,7 @@ Vi que tenéis un {{nota_google}} en Google con {{num_reseñas}} reseñas.
 Me pregunté si os llega gente desde el móvil.
 Le di una vuelta a cómo podría verse: {{live_url}}
 Si os resulta útil, me decís.
+Si hay algo que cambiaríais del diseño, os lo ajusto sin coste — me escribís.
 Nico
 ```
 

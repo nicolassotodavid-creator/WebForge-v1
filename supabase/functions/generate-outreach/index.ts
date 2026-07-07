@@ -7,7 +7,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { OUTREACH_PROMPT, LUVIA_OUTREACH_PROMPT } from "../_shared/prompts.ts";
 import { isLuviaLead } from "../_shared/luvia.ts";
-import { bookingLink } from "../_shared/emailTemplate.ts";
+import { bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import { canAccessLead, isAdminEmail, type Operator } from "../_shared/leadAccess.ts";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
@@ -59,17 +59,6 @@ function buildTemplateBody(
     `Esta semana ${verb} — tengo otros negocios esperando y no puedo tenerlo activo indefinidamente.\n` +
     `Por si acaso, aquí la tienes:\n\n${link}\n\nNico`
   );
-}
-
-// Footer de contacto OPCIONAL para email. Si el secreto WHATSAPP_NUMBER está
-// configurado (solo dígitos, formato internacional, p.ej. 34600000000) añade una
-// línea bajo la firma para que el prospecto pueda responder por WhatsApp además de
-// por email. Vacío o canal != 'email' => no añade nada (apagado por defecto, y nunca
-// en LinkedIn, que va por nota de conexión).
-function withWhatsappFooter(body: string, channel: string): string {
-  const raw = (Deno.env.get("WHATSAPP_NUMBER") ?? "").replace(/\D/g, "");
-  if (channel !== "email" || raw.length < 8) return body;
-  return `${body}\nWhatsApp: https://wa.me/${raw}`;
 }
 
 Deno.serve(async (req: Request) => {
@@ -267,7 +256,7 @@ Deno.serve(async (req: Request) => {
         lead_id: leadId,
         channel,
         subject: channel === "email" ? subject : null,
-        body: withWhatsappFooter(bodyText, channel),
+        body: withWhatsappFooter(bodyText, Deno.env.get("WHATSAPP_NUMBER"), channel),
         status: "draft",
         generated_by_model: "template",
         email_number: emailNumber,
@@ -372,7 +361,7 @@ Deno.serve(async (req: Request) => {
       lead_id: leadId,
       channel,
       subject: channel === "email" ? finalSubject : null,
-      body: luvia ? finalBody : withWhatsappFooter(finalBody, channel),
+      body: luvia ? finalBody : withWhatsappFooter(finalBody, Deno.env.get("WHATSAPP_NUMBER"), channel),
       status: "draft",
       generated_by_model: ANTHROPIC_MODEL,
       email_number: 1,

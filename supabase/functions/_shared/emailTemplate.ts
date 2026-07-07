@@ -18,7 +18,12 @@ export function bodyToHtml(text: string): string {
         if (urlMatch) {
           return `<a href="${urlMatch[1]}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:11px 22px;border-radius:8px;font-size:15px;font-weight:600;">Ver la web →</a>`;
         }
-        return line;
+        // URL embebida dentro de una línea de texto (p.ej. el pie "WhatsApp: https://wa.me/…")
+        // → clicable. Las URLs que van SOLAS en su línea ya son botón arriba; esto es solo inline.
+        return line.replace(
+          /(https?:\/\/[^\s<]+)/g,
+          '<a href="$1" style="color:#111827;text-decoration:underline;">$1</a>',
+        );
       });
       const isButton = rendered.some((l) => l.startsWith("<a "));
       if (isButton) return `<p style="margin:20px 0;">${rendered.join("<br>")}</p>`;
@@ -31,6 +36,18 @@ export function bodyToHtml(text: string): string {
 // Devuelve null si no hay base configurada → los llamadores caen entonces a la live_url cruda.
 export function bookingLink(base: string | null | undefined, leadId: string): string | null {
   return base ? `${base.replace(/\/$/, "")}/${leadId}` : null;
+}
+
+// Añade una línea de contacto por WhatsApp bajo la firma del cuerpo, para que el prospecto
+// pueda responder por WhatsApp además de por email. `number` = WHATSAPP_NUMBER (dígitos; el
+// llamador lo lee de Deno.env — así el helper es puro y testeable). Se omite si el canal no
+// es email o si no hay número válido (>= 8 dígitos): apagado por defecto y NUNCA en LinkedIn
+// (que va por nota de conexión). La URL sale clicable en el HTML (ver bodyToHtml) y visible
+// en la versión de texto plano. Usado por generate-outreach (email 1) y cron-followups (2/3).
+export function withWhatsappFooter(body: string, number: string | null | undefined, channel = "email"): string {
+  const raw = (number ?? "").replace(/\D/g, "");
+  if (channel !== "email" || raw.length < 8) return body;
+  return `${body}\nWhatsApp: https://wa.me/${raw}`;
 }
 
 // Bloque "escaparate" (diseño definitivo, docs/email-design/EMAIL1-DISENO-DEFINITIVO.html):
