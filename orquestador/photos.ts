@@ -104,7 +104,10 @@ export function photoManifest(photos: CuratedPhotos): string {
 const CURATION_SYSTEM = `Eres director de arte seleccionando fotos para la web profesional de un negocio.
 Recibes varias imágenes numeradas desde 0 y los datos del negocio. Devuelve ÚNICAMENTE un objeto JSON
 válido (sin markdown): { "order": [índices] }, con los índices de las 4-6 MEJORES fotos, la primera = la
-mejor para el hero. Incluye SOLO fotos que sean: (a) de buena calidad y CLARAMENTE relevantes a este
+mejor para el hero. La foto HERO (primera) va a pantalla completa con TEXTO ENCIMA, así que elige la
+más LIMPIA y profesional: plano amplio, bien iluminada, poco recargada y con zonas despejadas donde el
+texto pueda leerse; DESCARTA para hero las estacionales o con atrezo (árboles de Navidad, adornos), las
+muy saturadas de objetos y las de escaparate/mostrador desordenado. Incluye SOLO fotos que sean: (a) de buena calidad y CLARAMENTE relevantes a este
 negocio —para clínicas de salud/estética son muy relevantes las INSTALACIONES, la APARATOLOGÍA/tecnología
 y el EQUIPO en contexto—, y (b) seguras para publicar: NADA de caras identificables en primer plano
 (fuera fotos de pacientes y antes/después), capturas de pantalla, tiques, menús como texto, memes, ni
