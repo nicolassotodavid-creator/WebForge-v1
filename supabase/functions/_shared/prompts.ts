@@ -11,7 +11,7 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin markdown, sin texto antes ni de
   "tone": "string — tono de marca recomendado (p.ej. 'cercano y familiar')",
   "value_props": ["string — 3 a 5 propuestas de valor reales"],
   "highlights_from_reviews": ["string — 3 a 6 temas/elogios concretos que repiten los clientes"],
-  "recommended_sections": ["hero","servicios","resenas","galeria","reserva","contacto"],
+  "recommended_sections": ["string — secciones EN EL ORDEN adecuado a la vertical inferida; ver la guía de abajo, NO una lista fija por defecto"],
   "services": [{"name":"string","desc":"string"}],
   "suggested_palette": {"primary":"#hex","accent":"#hex","bg":"#hex"},
   "hero_copy": "string — titular potente para la portada"
@@ -75,8 +75,9 @@ El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este n
   · "tratamientos": rejilla de tarjetas limpias (icono + categoría + descripción breve) a partir de
     services. Son CATEGORÍAS; no listes procedimientos concretos que no consten.
   · "confianza": bloque con la nota media y nº de reseñas reales + las value_props. Si business.reviews
-    NOMBRA a un/a profesional, destácalo con su nombre y UNA cita real; si no lo nombran, OMITE el
-    elemento de equipo. No inventes titulaciones, colegiación ni certificaciones.
+    NOMBRA a un/a profesional, destácalo con su nombre y UNA cita real TRANSCRITA TAL CUAL de la reseña
+    (sin parafrasear ni inventar); si no lo nombran, OMITE el elemento de equipo. No inventes
+    titulaciones, colegiación ni certificaciones.
   · "instalaciones": galería de las fotos reales curadas respetando el bloque FOTOS (no fuerces una
     cuadrícula con huecos; si no hay fotos, no incluyas la sección).
 - GUARDARRAÍLES (obligatorio): nunca incluyas antes/después, precios, financiación, credenciales,
