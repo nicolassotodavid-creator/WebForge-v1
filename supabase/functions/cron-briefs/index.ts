@@ -168,6 +168,7 @@ Deno.serve(async (req: Request) => {
 
   let processed = 0;
   let failed = 0;
+  const errors: string[] = [];
   for (const lead of (leads ?? []) as Lead[]) {
     try {
       await briefLead(supabase, lead);
@@ -176,10 +177,12 @@ Deno.serve(async (req: Request) => {
     } catch (e) {
       // Un fallo de un lead no tumba el lote. El lead sigue en 'new' y se reintenta el próximo tick.
       failed++;
-      console.error(`[cron-briefs] fallo en ${lead.id}: ${e instanceof Error ? e.message : e}`);
+      const msg = e instanceof Error ? e.message : String(e);
+      if (errors.length < 3) errors.push(msg.slice(0, 200)); // muestra para diagnóstico/monitorización
+      console.error(`[cron-briefs] fallo en ${lead.id}: ${msg}`);
     }
   }
 
   console.log(`cron-briefs: processed=${processed} failed=${failed}`);
-  return jsonResponse({ ok: true, processed, failed });
+  return jsonResponse({ ok: true, processed, failed, ...(errors.length ? { errors } : {}) });
 });
