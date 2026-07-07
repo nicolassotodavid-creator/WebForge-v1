@@ -17,6 +17,17 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin markdown, sin texto antes ni de
   "hero_copy": "string — titular potente para la portada"
 }
 
+Antes de rellenar el JSON, INFIERE la vertical del negocio desde \`category\` y ajusta la estructura al
+recorrido de compra de esa vertical (no uses una lista de secciones genérica por defecto):
+- \`recommended_sections\` va EN EL ORDEN adecuado a la vertical e incluye SOLO las secciones con material
+  real (omite las que no puedas sostener con datos).
+- SALUD/ESTÉTICA (clínica de medicina/cirugía estética, dermatología, dental, fisioterapia, etc.): usa
+  el orden ["hero","tratamientos","confianza","resenas","instalaciones","reserva","contacto"], incluyendo
+  solo las que apliquen. Para esta vertical, \`services\` son CATEGORÍAS de tratamiento (p.ej. "Medicina
+  estética facial", "Estética corporal", "Cirugía estética", "Láser y aparatología"), fundadas en
+  \`category\` y en lo que citen las reseñas. NUNCA inventes procedimientos concretos, precios,
+  antes/después, credenciales ni certificaciones: si no consta, se omite.
+
 Reglas: todo en español. Básate SOLO en los datos reales recibidos; no inventes servicios ni datos
 de contacto. Si falta información, omite ese elemento en vez de inventarlo.
 `;
