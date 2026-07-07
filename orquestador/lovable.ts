@@ -23,6 +23,7 @@ const SHORT_TIMEOUT_MS   = 60_000;       // get_project / deploy_project
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
+import { singleFlight } from "./single-flight.ts";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ENV_PATH  = path.resolve(__dirname, "../.env");
 
@@ -42,8 +43,9 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: numbe
   }
 }
 
-/** Refresca el access token usando el refresh token y lo guarda en .env */
-async function refreshAccessToken(): Promise<string> {
+/** Refresca el access token usando el refresh token y lo guarda en .env. NO llamar directo:
+ *  usar `refreshAccessToken` (envuelto en single-flight). */
+async function doRefreshAccessToken(): Promise<string> {
   const refreshToken = process.env.LOVABLE_REFRESH_TOKEN;
   if (!refreshToken) throw new Error("Falta LOVABLE_REFRESH_TOKEN en .env. Ejecuta: npm run auth");
 
@@ -80,6 +82,13 @@ async function refreshAccessToken(): Promise<string> {
   console.log("  · Lovable token refrescado y guardado en .env");
   return newAccess;
 }
+
+// Refresh envuelto en single-flight: con el pool de builds en paralelo, dos workers pueden
+// pedir refrescar el token a la vez. Lovable ROTA el refresh_token en cada uso, así que dos
+// refrescos simultáneos se invalidarían mutuamente (y competirían por escribir el .env). El
+// single-flight garantiza UN solo refresh compartido por ráfaga; cuando termina, el candado se
+// libera para el siguiente refresh que haga falta más tarde.
+const refreshAccessToken = singleFlight(doRefreshAccessToken);
 
 /** Reemplaza KEY=... en el contenido del .env, o lo añade al final si no existe. */
 function upsertEnvVar(env: string, key: string, value: string): string {

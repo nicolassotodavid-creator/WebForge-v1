@@ -24,6 +24,7 @@ import { analyzeSite } from "./analyze.ts";
 import { scoreExistingSites } from "./score-existing-sites.ts";
 import { rehostScreenshot } from "./preview.ts";
 import { sendFollowupEmail, getLiveUrl, supabase as supabaseFollowup } from "./followup-mailer.ts";
+import { runPool } from "./pool.ts";
 
 const BATCH = Number(process.env.BATCH_SIZE ?? 5);
 const BOOKING_BASE = process.env.BOOKING_BASE ?? "";
@@ -466,26 +467,6 @@ async function selectSingleLead(id: string): Promise<Lead[]> {
   const { data, error } = await supabase.from("leads").select("*").eq("id", id).limit(1);
   if (error) throw new Error(error.message);
   return (data ?? []) as Lead[];
-}
-
-// Procesa `items` con como mucho `concurrency` en vuelo a la vez. N workers van tomando del
-// índice compartido (`i++` es atómico en el bucle de eventos: no hay await entre leer y escribir,
-// así que dos workers nunca cogen el mismo lead). Un item que lanza NO tumba el pool: el worker
-// de cada item ya captura su propio error y actualiza el tally.
-async function runPool<T>(
-  items: T[],
-  concurrency: number,
-  worker: (item: T) => Promise<void>,
-): Promise<void> {
-  let i = 0;
-  const n = Math.max(1, Math.min(concurrency, items.length));
-  await Promise.all(
-    Array.from({ length: n }, async () => {
-      while (i < items.length) {
-        await worker(items[i++]);
-      }
-    }),
-  );
 }
 
 async function run() {
