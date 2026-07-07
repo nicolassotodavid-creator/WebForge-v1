@@ -13,7 +13,12 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { BRIEF_PROMPT } from "../_shared/prompts.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+// SERVICE_KEY: solo para el cliente de DB (bypass RLS). Supabase la inyecta y sirve para escribir.
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+// CRON_SECRET: secreto DEDICADO de auth del cron (lo controlamos en los dos extremos: este entorno
+// y quien invoca). NO usamos SUPABASE_SERVICE_ROLE_KEY para autenticar porque está DEPRECATED y su
+// valor en runtime no es reproducible tras la migración de keys del proyecto (daba 401 siempre).
+const CRON_SECRET = Deno.env.get("CRON_SECRET");
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 // Solo el admin construye webs. Si está definido, el cron procesa SOLO sus leads (o sin dueño):
 // los leads de usuarios Luvia no se analizan ni se les genera brief. Igual que run.ts.
@@ -140,9 +145,9 @@ async function briefLead(
 }
 
 Deno.serve(async (req: Request) => {
-  // Auth: solo service_role (el workflow de GitHub Actions manda el Bearer con la service key).
+  // Auth: Bearer <CRON_SECRET>. Lo manda el workflow de GitHub Actions (daily-brief.yml).
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
-  if (token !== SERVICE_KEY) return jsonResponse({ error: "No autorizado" }, 401);
+  if (!CRON_SECRET || token !== CRON_SECRET) return jsonResponse({ error: "No autorizado" }, 401);
 
   if (!ANTHROPIC_API_KEY) {
     return jsonResponse({ error: "Falta ANTHROPIC_API_KEY en los secrets de la función." }, 500);

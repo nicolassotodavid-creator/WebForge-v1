@@ -4,9 +4,9 @@ name: Brief automático (leads new → analyzed)
 # del Mac. Es el PASO 1 del Orquestador movido a la nube (ver docs/superpowers/specs/
 # 2026-07-03-brief-cron-servidor-design.md). El build en Lovable sigue en local (fase 2 aparte).
 #
-# Requiere el secreto SUPABASE_SERVICE_ROLE_KEY en el repo (la service_role key LEGACY, la JWT
-# que empieza por "eyJ", NO una key "sb_secret_..."):
-#   GitHub → Settings → Secrets and variables → Actions → New repository secret.
+# Auth con el secreto CRON_SECRET (secreto dedicado del cron, NO la service key). Está en:
+#   - GitHub → Secrets and variables → Actions → CRON_SECRET
+#   - Supabase (lo fija el workflow deploy.yml con `supabase secrets set`)
 
 on:
   schedule:
@@ -25,11 +25,11 @@ jobs:
       - name: Generar briefs (drena la cola de leads 'new')
         env:
           FUNCTION_URL: https://khscikqchvjxyvoaruas.supabase.co/functions/v1/cron-briefs
-          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           set -euo pipefail
-          if [ -z "${SERVICE_KEY:-}" ]; then
-            echo "::error::Falta el secreto SUPABASE_SERVICE_ROLE_KEY. Añádelo en Settings → Secrets and variables → Actions."
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::Falta el secreto CRON_SECRET en el repo (Settings → Secrets → Actions)."
             exit 1
           fi
 
@@ -37,7 +37,7 @@ jobs:
           total=0
           for i in $(seq 1 40); do
             resp=$(curl -sS -X POST "$FUNCTION_URL" \
-              -H "Authorization: Bearer $SERVICE_KEY" \
+              -H "Authorization: Bearer $CRON_SECRET" \
               -H "Content-Type: application/json" \
               --max-time 150)
             echo "tick $i → $resp"

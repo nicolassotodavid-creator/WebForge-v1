@@ -18,6 +18,16 @@ jobs:
         with:
           version: latest
 
+      # Auth dedicada de los crons (cron-briefs / cron-followups / score-sites). Desacopla la
+      # autenticación de SUPABASE_SERVICE_ROLE_KEY (DEPRECATED e irreproducible tras la migración
+      # de keys). GitHub enmascara el valor en los logs.
+      - name: Fijar secreto CRON_SECRET
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          supabase secrets set CRON_SECRET="$CRON_SECRET" --project-ref khscikqchvjxyvoaruas
+
       - name: Deploy Edge Functions
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

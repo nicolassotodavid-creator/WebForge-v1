@@ -14,7 +14,11 @@ import { resolveWebsite } from "../_shared/website.ts";
 import { fetchPageForAnalysis } from "../_shared/html.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+// SERVICE_KEY: solo para el cliente de DB (bypass RLS). CRON_SECRET: auth dedicada del cron
+// (la manda pg_cron leyéndola del Vault 'cron_secret'). No autenticamos con la service key
+// porque está DEPRECATED y su valor en runtime no es reproducible tras la migración de keys.
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const CRON_SECRET = Deno.env.get("CRON_SECRET");
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 
 // Tope de webs por corrida. Cada web = fetch HTML (≤10s) + Claude (~1-4s); con 6 el run cabe
@@ -81,9 +85,9 @@ Deno.serve(async (req: Request) => {
   if (!SUPABASE_URL || !SERVICE_KEY) return jsonResponse({ error: "Faltan vars de Supabase." }, 500);
   if (!ANTHROPIC_API_KEY) return jsonResponse({ error: "Falta ANTHROPIC_API_KEY." }, 500);
 
-  // Auth: el Bearer debe ser la service key (lo manda pg_cron con el secreto del Vault).
+  // Auth: Bearer <CRON_SECRET> (lo manda pg_cron leyéndolo del Vault 'cron_secret'). Ver env vars.
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
-  if (token !== SERVICE_KEY) return jsonResponse({ error: "No autorizado" }, 401);
+  if (!CRON_SECRET || token !== CRON_SECRET) return jsonResponse({ error: "No autorizado" }, 401);
 
   let limit = DEFAULT_BATCH;
   try {
