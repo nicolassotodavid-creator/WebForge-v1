@@ -1,0 +1,358 @@
+<!doctype html>
+<!--
+  MAQUETA "GOLDEN" — Clínica Visalia (Medicina y Cirugía Estética)
+  ================================================================
+  Referencia de ESTRUCTURA para el brief/build conscientes de vertical (salud/estética).
+  · El copy y los nombres son ILUSTRATIVOS (no son datos reales de Visalia).
+  · Cada sección lleva una etiqueta ▸ que indica DE DÓNDE se puebla en el pipeline real.
+  · Todo lo marcado como real sale del scrape (reseñas, fotos, NAP) o de la categoría.
+  · Lo que NO tenemos (antes/después, credenciales, financiación) NO aparece: se omite.
+  Aplica el DESIGN_SYSTEM del repo (2 Google Fonts, fondo neutro, 1 acento, sin gradientes IA).
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clínica Visalia — Medicina y Cirugía Estética</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-alt:#f6f4f0;         /* gris/beige muy claro para alternar secciones */
+    --ink:#1b1a18;            /* casi-negro */
+    --muted:#6f6b64;          /* texto secundario */
+    --line:#e7e3dc;
+    --accent:#5c6b5b;         /* sage — eyebrows, iconos, detalles */
+    --cta:#3f4d3e;            /* verde profundo — botón primario */
+    --cta-hover:#33402f;
+    --max:1180px;
+    --pad:120px;              /* padding vertical de sección (desktop) */
+    --radius:14px;
+    --shadow:0 1px 2px rgba(27,26,24,.04), 0 8px 24px rgba(27,26,24,.05);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Source Sans 3",system-ui,sans-serif;
+    font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:"Playfair Display",Georgia,serif;font-weight:600;line-height:1.15;letter-spacing:-.01em}
+  h1{font-size:clamp(2.4rem,5vw,3.9rem);margin:0}
+  h2{font-size:clamp(1.9rem,3.4vw,2.7rem);margin:0 0 .4em}
+  h3{font-size:1.28rem;margin:0 0 .35em}
+  p{margin:0 0 1em}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+  section{padding:var(--pad) 0}
+  .alt{background:var(--bg-alt)}
+  .eyebrow{
+    font-size:.78rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 .9em;display:inline-flex;gap:.5em;align-items:center;
+  }
+  .lead{font-size:1.15rem;color:var(--muted);max-width:52ch}
+  .center{text-align:center}
+  .center .lead{margin-left:auto;margin-right:auto}
+
+  /* botones */
+  .btn{
+    display:inline-flex;align-items:center;gap:.55em;font-weight:600;font-size:1rem;
+    padding:15px 28px;border-radius:999px;cursor:pointer;transition:.2s ease;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--cta);color:#fff}
+  .btn-primary:hover{background:var(--cta-hover);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* etiqueta de fuente de datos (solo en la maqueta, no en la web real) */
+  .src{
+    font-family:"Source Sans 3",sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.04em;
+    color:#9a8f60;background:#f3efe2;border:1px dashed #d8caa0;border-radius:999px;
+    padding:3px 10px;display:inline-flex;gap:.4em;align-items:center;text-transform:none;letter-spacing:.02em;
+  }
+
+  /* header */
+  header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{font-family:"Playfair Display",serif;font-weight:600;font-size:1.4rem;letter-spacing:-.01em}
+  .brand small{display:block;font-family:"Source Sans 3";font-weight:600;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-top:-2px}
+  nav ul{display:flex;gap:30px;list-style:none;margin:0;padding:0;font-size:.98rem;font-weight:500}
+  nav a:hover{color:var(--accent)}
+  .nav-cta{display:flex;align-items:center;gap:18px}
+  @media(max-width:860px){nav ul{display:none}}
+
+  /* hero */
+  .hero{padding:96px 0 84px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  .hero h1{margin-bottom:.35em}
+  .hero .lead{margin-bottom:1.8em}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .trust{display:flex;align-items:center;gap:14px;margin-top:26px;color:var(--muted);font-size:.95rem}
+  .stars{color:#c9a24a;letter-spacing:2px;font-size:1.05rem}
+  .hero-photo{
+    aspect-ratio:4/5;border-radius:var(--radius);background:
+      linear-gradient(0deg,rgba(63,77,62,.06),rgba(63,77,62,.06)),
+      repeating-linear-gradient(135deg,#efeae1,#efeae1 22px,#eae4d9 22px,#eae4d9 44px);
+    border:1px solid var(--line);display:flex;align-items:flex-end;padding:22px;box-shadow:var(--shadow)
+  }
+  @media(max-width:860px){.hero-grid{grid-template-columns:1fr;gap:34px}.hero-photo{aspect-ratio:16/11}}
+
+  /* grid de tratamientos */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:52px}
+  @media(max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:30px 26px;transition:.2s}
+  .alt .card{background:#fff}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#ddd6cc}
+  .ico{width:44px;height:44px;border-radius:11px;background:#eef1ec;color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .ico svg{width:22px;height:22px}
+  .card p{color:var(--muted);font-size:.98rem;margin:0}
+
+  /* confianza */
+  .trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+  @media(max-width:860px){.trust-grid{grid-template-columns:1fr;gap:34px}}
+  .metrics{display:flex;gap:40px;margin:28px 0 8px}
+  .metric b{font-family:"Playfair Display",serif;font-size:2.4rem;font-weight:600;display:block;line-height:1}
+  .metric span{color:var(--muted);font-size:.9rem}
+  .values{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:14px}
+  .values li{display:flex;gap:13px;align-items:flex-start}
+  .values svg{width:20px;height:20px;color:var(--accent);flex:none;margin-top:3px}
+  .doctor{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow)}
+  .doctor .avatar{width:56px;height:56px;border-radius:50%;background:#eef1ec;color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:"Playfair Display",serif;font-size:1.5rem;margin-bottom:16px}
+
+  /* reseñas */
+  .reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:46px}
+  @media(max-width:860px){.reviews{grid-template-columns:1fr}}
+  .review{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+  .review .stars{font-size:.95rem;margin-bottom:12px;display:block}
+  .review p{font-size:1rem;margin-bottom:18px}
+  .review .who{display:flex;align-items:center;gap:11px;font-size:.92rem}
+  .review .who .dot{width:34px;height:34px;border-radius:50%;background:#eef1ec;color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600}
+  .gmark{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:.9rem;margin-top:8px}
+
+  /* instalaciones */
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px}
+  @media(max-width:720px){.gallery{grid-template-columns:1fr 1fr}}
+  .shot{aspect-ratio:1/1;border-radius:12px;border:1px solid var(--line);background:
+    repeating-linear-gradient(135deg,#efeae1,#efeae1 20px,#eae4d9 20px,#eae4d9 40px);
+    display:flex;align-items:flex-end;padding:14px}
+
+  /* reserva band */
+  .cta-band{background:var(--cta);color:#fff;border-radius:20px;padding:64px 40px;text-align:center}
+  .cta-band h2{color:#fff}
+  .cta-band .lead{color:rgba(255,255,255,.82)}
+  .cta-band .btn-primary{background:#fff;color:var(--cta)}
+  .cta-band .btn-primary:hover{background:#f2efe9}
+
+  /* contacto */
+  .contact{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+  @media(max-width:860px){.contact{grid-template-columns:1fr;gap:30px}}
+  .nap{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:18px}
+  .nap li{display:flex;gap:14px;align-items:flex-start}
+  .nap svg{width:21px;height:21px;color:var(--accent);flex:none;margin-top:3px}
+  .nap b{display:block}
+  .map{aspect-ratio:16/12;border-radius:var(--radius);border:1px solid var(--line);background:
+    repeating-linear-gradient(135deg,#efeae1,#efeae1 20px,#eae4d9 20px,#eae4d9 40px);display:flex;align-items:flex-end;padding:16px}
+
+  footer{border-top:1px solid var(--line);padding:44px 0;color:var(--muted);font-size:.9rem}
+  .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+
+  /* badge flotante 397€ (contrato) */
+  .badge{
+    position:fixed;right:22px;bottom:22px;z-index:60;background:var(--ink);color:#fff;
+    border-radius:14px;padding:14px 18px;box-shadow:0 10px 30px rgba(0,0,0,.22);
+    display:flex;align-items:center;gap:12px;max-width:340px;font-size:.92rem;font-weight:500
+  }
+  .badge .x{cursor:pointer;opacity:.6;font-size:1.1rem;line-height:1}
+  .badge a{color:#fff;text-decoration:underline;font-weight:600}
+  @media(max-width:520px){.badge{left:12px;right:12px;bottom:12px;max-width:none}}
+</style>
+</head>
+<body>
+
+<!-- ░░ HEADER — wordmark en la fuente display (DESIGN_SYSTEM) ░░ -->
+<header>
+  <div class="wrap nav">
+    <div class="brand">Clínica Visalia<small>Medicina & Cirugía Estética</small></div>
+    <nav><ul>
+      <li><a href="#tratamientos">Tratamientos</a></li>
+      <li><a href="#confianza">Por qué nosotros</a></li>
+      <li><a href="#resenas">Reseñas</a></li>
+      <li><a href="#instalaciones">Instalaciones</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul></nav>
+    <div class="nav-cta">
+      <a href="#reserva" class="btn btn-primary">Reservar valoración</a>
+    </div>
+  </div>
+</header>
+
+<!-- ░░ 1 · HERO ░░  ▸ hero_copy + señal de confianza real -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Medicina y Cirugía Estética</span>
+      <h1>Realza tu belleza natural, con seguridad médica.</h1>
+      <p class="lead">Cada tratamiento empieza por una valoración personalizada. Resultados naturales y acompañamiento cercano, de principio a fin.</p>
+      <div class="hero-actions">
+        <a href="#reserva" class="btn btn-primary">Reservar valoración</a>
+        <a href="#tratamientos" class="btn btn-ghost">Ver tratamientos</a>
+      </div>
+      <div class="trust">
+        <span class="stars">★★★★★</span>
+        <span><b>4,9</b> · 187 reseñas en Google</span>
+        <span class="src">▸ nota real del scrape</span>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <span class="src">▸ foto real del local, curada por visión</span>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 2 · TRATAMIENTOS ░░  ▸ categorías (de la categoría del negocio + reseñas). NUNCA procedimientos inventados -->
+<section id="tratamientos" class="alt">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Qué hacemos <span class="src">▸ categorías reales, no procedimientos inventados</span></span>
+      <h2>Áreas de tratamiento</h2>
+      <p class="lead">Áreas que trabajamos en la clínica. En tu valoración definimos el plan concreto para ti.</p>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M9 10h.01M15 10h.01M9 15c1 1 5 1 6 0"/></svg></div>
+        <h3>Medicina estética facial</h3>
+        <p>Rejuvenecimiento, hidratación y armonización del rostro con enfoque natural.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2v20M6 7c0 3 12 3 12 0M6 17c0-3 12-3 12 0"/></svg></div>
+        <h3>Estética corporal</h3>
+        <p>Tratamientos para el cuidado, la firmeza y el contorno corporal.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 4l6 6-9 9-6 0 0-6z"/><path d="M13 5l6 6"/></svg></div>
+        <h3>Cirugía estética</h3>
+        <p>Procedimientos quirúrgicos realizados con criterio médico y seguimiento.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <h3>Láser y aparatología</h3>
+        <p>Tecnología para piel, depilación y tratamientos no invasivos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 3 · CONFIANZA / EQUIPO ░░  ▸ nota Google + profesional citado en reseñas (si aparece) + value_props. Credenciales SOLO si constan -->
+<section id="confianza">
+  <div class="wrap trust-grid">
+    <div>
+      <span class="eyebrow">Por qué Visalia</span>
+      <h2>Criterio médico y trato cercano</h2>
+      <p class="lead">Lo que más repiten nuestros pacientes en sus reseñas.</p>
+      <div class="metrics">
+        <div class="metric"><b>4,9</b><span>Google · 187 reseñas</span></div>
+        <div class="metric"><b>+10</b><span>años de experiencia <span class="src" style="display:block;margin-top:4px">▸ solo si consta</span></span></div>
+      </div>
+      <ul class="values">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6 9 17l-5-5"/></svg><span><b>Resultados naturales</b> — el elogio que más se repite en las reseñas.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6 9 17l-5-5"/></svg><span><b>Trato cercano y honesto</b> — te explican cada paso sin prisas.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6 9 17l-5-5"/></svg><span><b>Seguimiento</b> — acompañamiento antes y después del tratamiento.</span></li>
+      </ul>
+    </div>
+    <div class="doctor">
+      <div class="avatar">V</div>
+      <span class="src">▸ nombre y elogio salen de las reseñas reales; se omite si no lo citan</span>
+      <h3 style="margin-top:14px">Dra. [citada en reseñas]</h3>
+      <p style="color:var(--muted);margin:0">“Profesional excelente, te asesora con honestidad y los resultados son muy naturales.” — reseña real destacada.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 4 · RESEÑAS ░░  ▸ carrusel de reseñas REALES de Google (contrato, ya existe). Aquí en rejilla por simplicidad -->
+<section id="resenas" class="alt">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Reseñas de Google <span class="src">▸ transcritas literales, 6-8 reales</span></span>
+      <h2>Lo que dicen nuestros pacientes</h2>
+      <span class="gmark"><svg width="16" height="16" viewBox="0 0 24 24" fill="#c9a24a"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.8 20.9l1.6-6.8L2.2 8.9l6.9-.6z"/></svg> 4,9 sobre 5 · basado en 187 reseñas reales</span>
+    </div>
+    <div class="reviews">
+      <div class="review">
+        <span class="stars">★★★★★</span>
+        <p>“Me hice una valoración y desde el minuto uno me sentí en buenas manos. Resultados naturales, justo lo que buscaba.”</p>
+        <div class="who"><span class="dot">M</span><span><b>María G.</b><br><span style="color:var(--muted)">hace 3 semanas</span></span></div>
+      </div>
+      <div class="review">
+        <span class="stars">★★★★★</span>
+        <p>“Trato inmejorable y muy profesionales. Te explican todo con calma y sin venderte cosas que no necesitas.”</p>
+        <div class="who"><span class="dot">J</span><span><b>Javier R.</b><br><span style="color:var(--muted)">hace 1 mes</span></span></div>
+      </div>
+      <div class="review">
+        <span class="stars">★★★★★</span>
+        <p>“La clínica está impecable y el seguimiento después del tratamiento es de 10. Repetiré sin duda.”</p>
+        <div class="who"><span class="dot">L</span><span><b>Laura P.</b><br><span style="color:var(--muted)">hace 2 meses</span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 5 · INSTALACIONES ░░  ▸ fotos reales curadas del local. Se OMITE toda la sección si no hay fotos -->
+<section id="instalaciones">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">La clínica <span class="src">▸ fotos reales curadas · sección se omite si no hay</span></span>
+      <h2>Un espacio pensado para ti</h2>
+    </div>
+    <div class="gallery">
+      <div class="shot"><span class="src">▸ foto real</span></div>
+      <div class="shot"><span class="src">▸ foto real</span></div>
+      <div class="shot"><span class="src">▸ foto real</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 6 · RESERVA ░░  ▸ CTA a {{BOOKING_URL}} (contrato) -->
+<section id="reserva">
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Da el primer paso hoy</h2>
+      <p class="lead">Reserva tu valoración personalizada. Sin compromiso.</p>
+      <a href="#" class="btn btn-primary" style="margin-top:8px">Reservar valoración →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ 7 · CONTACTO ░░  ▸ NAP + horario, SOLO lo que consta -->
+<section id="contacto" class="alt">
+  <div class="wrap contact">
+    <div>
+      <span class="eyebrow">Contacto <span class="src">▸ dirección/teléfono/horario reales; se omite lo que falte</span></span>
+      <h2>Estamos cerca de ti</h2>
+      <ul class="nap">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg><span><b>Dirección</b>Calle Ejemplo 00, Ciudad</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg><span><b>Teléfono</b>000 00 00 00</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span><b>Horario</b>L–V 9:00–20:00 · S 10:00–14:00</span></li>
+      </ul>
+    </div>
+    <div class="map"><span class="src">▸ mapa / dirección real</span></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div class="brand" style="font-size:1.15rem">Clínica Visalia</div>
+    <div>© Clínica Visalia · Medicina y Cirugía Estética</div>
+  </div>
+</footer>
+
+<!-- badge flotante 397€ (contrato — NO se quita) -->
+<div class="badge" id="badge">
+  <span>✦ ¿Te gusta esta web? Te la dejo lista por <b>397€</b> — <a href="#">Contrátala</a></span>
+  <span class="x" onclick="document.getElementById('badge').style.display='none'">✕</span>
+</div>
+
+</body>
+</html>
