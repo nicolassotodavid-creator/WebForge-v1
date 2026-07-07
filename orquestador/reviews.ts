@@ -70,7 +70,7 @@ export async function fetchPhotosForPlace(
   placeId: string,
   opts: { maxImages?: number } = {},
 ): Promise<string[]> {
-  const maxImages = opts.maxImages ?? 10;
+  const maxImages = opts.maxImages ?? 15;
   const input = {
     placeIds: [placeId],
     maxReviews: 0,

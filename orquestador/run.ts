@@ -218,7 +218,7 @@ async function processBuild(lead: Lead): Promise<Outcome> {
     const photoPlaceId = placeIdFromLead(lead);
     if (photoPlaceId) {
       try {
-        const fetchedPhotos = await fetchPhotosForPlace(photoPlaceId, { maxImages: 10 });
+        const fetchedPhotos = await fetchPhotosForPlace(photoPlaceId, { maxImages: 15 });
         if (fetchedPhotos.length > 0) {
           const raw = { ...((lead.raw_json ?? {}) as Record<string, unknown>), imageUrls: fetchedPhotos };
           lead.raw_json = raw;
