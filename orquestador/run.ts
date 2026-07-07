@@ -15,9 +15,10 @@
 
 import "./env.ts"; // debe ir el PRIMERO: carga ../.env antes de evaluar el resto
 import { createClient } from "@supabase/supabase-js";
-import { BRIEF_PROMPT, BUILD_PROMPT, REVIEW_HIGHLIGHTS_PROMPT } from "../supabase/functions/_shared/prompts.ts";
+import { BRIEF_PROMPT, BUILD_PROMPT, REVIEW_HIGHLIGHTS_PROMPT, DESIGN_SYSTEM } from "../supabase/functions/_shared/prompts.ts";
 import { llmJson, llmText, extractReviews, ORQUESTADOR_MODEL } from "./llm.ts";
-import { fetchReviewsForPlace, placeIdFromLead } from "./reviews.ts";
+import { fetchReviewsForPlace, placeIdFromLead, fetchPhotosForPlace } from "./reviews.ts";
+import { extractPhotoCandidates, curatePhotos, photoManifest } from "./photos.ts";
 import { lovableBuild } from "./lovable.ts";
 import { analyzeSite } from "./analyze.ts";
 import { scoreExistingSites } from "./score-existing-sites.ts";
@@ -212,13 +213,47 @@ async function processBuild(lead: Lead): Promise<Outcome> {
     }
   }
 
+  // ── Pasada 2 de FOTOS (idempotente, molde de las reseñas) ───────────────────────────────────────
+  // Solo el lead aprobado paga el detalle de su ficha. Si ya tiene galería suficiente, no se re-paga.
+  if (!DRY_RUN && extractPhotoCandidates(lead.raw_json).length < 3) {
+    const photoPlaceId = placeIdFromLead(lead);
+    if (photoPlaceId) {
+      try {
+        const fetchedPhotos = await fetchPhotosForPlace(photoPlaceId, { maxImages: 10 });
+        if (fetchedPhotos.length > 0) {
+          const raw = { ...((lead.raw_json ?? {}) as Record<string, unknown>), imageUrls: fetchedPhotos };
+          lead.raw_json = raw;
+          await supabase.from("leads")
+            .update({ raw_json: raw, updated_at: new Date().toISOString() })
+            .eq("id", lead.id);
+          console.log(`  · fotos traídas para la galería: ${fetchedPhotos.length}`);
+        }
+      } catch (e) {
+        console.error(`  · no se pudieron traer fotos (no crítico, sigue el build): ${e instanceof Error ? e.message : e}`);
+      }
+    } else {
+      console.log("  · sin placeId: no se pueden traer fotos; la web se construye sin galería.");
+    }
+  }
+
+  // ── Curación por visión (Haiku): solo ganadoras, re-hospedadas. Fallback: sin fotos ────────────
+  const curated = DRY_RUN
+    ? { hero: null, gallery: [] as string[] }
+    : await curatePhotos(supabase, lead.id, extractPhotoCandidates(lead.raw_json), {
+        name: lead.name,
+        category: lead.category ?? null,
+        city: lead.city ?? null,
+      });
+
   const bookingUrl = `${BOOKING_BASE.replace(/\/$/, "")}/${lead.id}`;
-  const buildPrompt = await llmText(
+  const variablePrompt = await llmText(
     BUILD_PROMPT.replaceAll("{{BOOKING_URL}}", bookingUrl),
-    { brief, business: leadPayload(lead) },
+    { brief, business: leadPayload(lead), photos: { hero: curated.hero != null, gallery: curated.gallery.length } },
     2800, // tope holgado: transcribir 6-8 reseñas reales (autor + estrellas + texto) + resto de secciones sin truncar el CTA/badge del final
   );
-  console.log(`  · build-prompt listo (${buildPrompt.length} chars), reserva → ${bookingUrl}`);
+  // Prompt final a Lovable = parte variable (Sonnet) + manifiesto de fotos + design-system invariante.
+  const buildPrompt = `${variablePrompt}\n\n${photoManifest(curated)}\n\n${DESIGN_SYSTEM}`;
+  console.log(`  · build-prompt listo (${buildPrompt.length} chars; fotos: hero=${curated.hero != null}, galería=${curated.gallery.length}), reserva → ${bookingUrl}`);
 
   if (DRY_RUN) {
     console.log("  · DRY-RUN: no se construye en Lovable ni se escribe en `sites`.");

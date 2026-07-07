@@ -34,13 +34,16 @@ reseñas recibidas; no inventes nada. Si no hay reseñas, devuelve { "highlights
 `;
 
 export const BUILD_PROMPT = `
-Eres director creativo web. Recibes un brief de negocio (JSON) y una URL de reserva ({{BOOKING_URL}}).
-Tu salida es UN PROMPT DE CONSTRUCCIÓN para Lovable: texto plano en español, listo para enviar al MCP
-de Lovable. NO devuelvas JSON ni explicaciones: solo el prompt.
+Eres director creativo web. Recibes un brief de negocio (JSON), una URL de reserva ({{BOOKING_URL}}) y
+un objeto "photos" ({ "hero": boolean, "gallery": number }) que indica si hay fotos reales curadas.
+Tu salida es UN PROMPT DE CONSTRUCCIÓN para Lovable: texto plano en español. NO devuelvas JSON ni
+explicaciones: solo el prompt. IMPORTANTE: el SISTEMA DE DISEÑO y el detalle de las FOTOS se añaden
+automáticamente DESPUÉS de tu texto — NO redactes reglas de tipografía, color, espaciado ni listas de
+fotos; céntrate en el CONTENIDO y la ESTRUCTURA del negocio.
 
 El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este negocio con:
-- Diseño mobile-first, rápido y profesional, acorde al tono y a la paleta sugerida del brief.
 - Las secciones de recommended_sections, con copy en español basado en value_props y hero_copy.
+  Si photos.hero es false, NO incluyas una sección de galería de fotos; apóyate en el carrusel de reseñas.
 - Una sección "Reseñas" SIEMPRE, montada como un CARRUSEL de reseñas reales de Google. Reglas:
   · Usa SOLO las reseñas reales del input (business.reviews). Transcribe TAL CUAL —el texto, el nombre del
     autor (si viene) y las estrellas (si vienen)— para que Lovable tenga el contenido literal que renderizar.
@@ -60,6 +63,51 @@ El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este n
 - Sin texto de relleno tipo lorem ipsum ni datos inventados.
 
 Devuelve solo el prompt para Lovable.
+`;
+
+// Gramática de diseño INVARIANTE. run.ts la añade tal cual al final del prompt de Lovable en cada
+// build (no la parafrasea el modelo → no deriva). La variación entre webs la ponen paleta, fotos y copy.
+export const DESIGN_SYSTEM = `
+SISTEMA DE DISEÑO (aplícalo estrictamente; estas reglas mandan sobre cualquier estilo por defecto):
+
+TIPOGRAFÍA
+- Usa DOS fuentes de Google Fonts de un par curado (display para titulares + texto para el cuerpo). Elige
+  UNO acorde al tono del brief: Fraunces + Inter · Playfair Display + Source Sans 3 · Sora + Inter ·
+  Libre Franklin + Lora. Nada de la fuente por defecto.
+- Escala tipográfica modular (ratio ~1.25), titulares grandes y con peso, cuerpo 16-18px, line-height
+  1.5-1.7. Jerarquía clara: nunca dos textos del mismo tamaño compitiendo.
+
+COLOR
+- Fondo neutro (blanco / gris muy claro), texto casi-negro (#1a1a1a). UN color de acento (el primary del
+  brief) SOLO en CTAs, enlaces y detalles. Contraste AA como mínimo.
+- PROHIBIDO: gradientes morado→rosa o azul→violeta "de IA", fondos saturados a pantalla completa, texto
+  gris claro sobre blanco.
+
+RITMO Y LAYOUT
+- Ancho máximo de contenido 1100-1200px, centrado. Whitespace generoso.
+- Padding vertical de sección amplio y CONSISTENTE (≈96-120px en escritorio, 56-64px en móvil).
+- Separa secciones alternando fondo blanco / gris muy claro, sin líneas divisorias duras.
+
+COMPONENTES E ICONOS
+- Iconos SVG de un set consistente (estilo lucide). NUNCA emojis como iconos.
+- Botones con estado hover, radios de borde y sombras sutiles y uniformes. Tarjetas homogéneas.
+
+HERO
+- Sobre el pliegue: titular (hero_copy), subtítulo corto, UN CTA primario a la reserva, y una señal de
+  confianza (⭐ nota media + nº de reseñas reales). Con foto de hero, úsala con buen contraste del texto.
+
+MICRO-INTERACCIONES
+- Transiciones sutiles (fade/slide suave al entrar en viewport). Nada de rebotes ni animaciones llamativas.
+
+MARCA Y SEO
+- Header con wordmark: el nombre del negocio en la fuente display (no un genérico). Favicon con la inicial.
+- <title> y meta description reales; Open Graph (title, description e imagen).
+- Horario en tabla legible y NAP (nombre/dirección/teléfono) consistentes en el footer, SOLO si vienen.
+
+PROHIBIDO EXPLÍCITO (evita estos "AI tells")
+- Nada de lorem ipsum. Nada de estadísticas inventadas ("+500 clientes", "Nº1"). Nada de sellos/badges
+  falsos. Nada de todo centrado por defecto. Nada de secciones vacías de relleno. Nada de stock genérico
+  (solo las fotos que se te indiquen). Nada de emojis como iconos.
 `;
 
 export const OUTREACH_PROMPT = `
