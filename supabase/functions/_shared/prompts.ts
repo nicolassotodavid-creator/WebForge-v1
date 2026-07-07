@@ -71,6 +71,16 @@ El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este n
 - Un badge/botón flotante fijo en la esquina inferior derecha, discreto y cerrable (con una "x"),
   con el texto "✦ ¿Te gusta esta web? Te la dejo lista por 397€ — Contrátala", que enlace a
   {{BOOKING_URL}}. Visible durante todo el scroll, sin tapar el contenido ni el CTA principal.
+- Si recommended_sections incluye secciones de clínica (salud/estética), constrúyelas con datos REALES:
+  · "tratamientos": rejilla de tarjetas limpias (icono + categoría + descripción breve) a partir de
+    services. Son CATEGORÍAS; no listes procedimientos concretos que no consten.
+  · "confianza": bloque con la nota media y nº de reseñas reales + las value_props. Si business.reviews
+    NOMBRA a un/a profesional, destácalo con su nombre y UNA cita real; si no lo nombran, OMITE el
+    elemento de equipo. No inventes titulaciones, colegiación ni certificaciones.
+  · "instalaciones": galería de las fotos reales curadas respetando el bloque FOTOS (no fuerces una
+    cuadrícula con huecos; si no hay fotos, no incluyas la sección).
+- GUARDARRAÍLES (obligatorio): nunca incluyas antes/después, precios, financiación, credenciales,
+  titulaciones ni certificaciones que no vengan en los datos. Si no consta, se omite.
 - Sin texto de relleno tipo lorem ipsum ni datos inventados.
 
 Devuelve solo el prompt para Lovable.
