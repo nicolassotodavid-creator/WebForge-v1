@@ -57,5 +57,23 @@ assertEq(
   assertEq(m.includes("hero"), true, "con fotos → marca el hero");
 }
 
+// --- Task 1: manifiesto adaptativo por nº de fotos ---
+{
+  const m = photoManifest({ hero: "http://x/h.jpg", gallery: [] });
+  assertEq(m.includes("imagen destacada"), true, "1 foto → imagen destacada");
+}
+{
+  const m = photoManifest({ hero: "http://x/h.jpg", gallery: ["http://x/g.jpg"] });
+  assertEq(m.includes("dúo"), true, "2 fotos → dúo");
+}
+{
+  const m = photoManifest({ hero: "http://x/h.jpg", gallery: ["http://x/g1.jpg", "http://x/g2.jpg"] });
+  assertEq(m.includes("rejilla de instalaciones"), true, "3 fotos → rejilla");
+}
+{
+  const m = photoManifest({ hero: null, gallery: [] });
+  assertEq(m.includes("NO incluyas"), true, "0 fotos → omite la sección");
+}
+
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures > 0) process.exit(1);
