@@ -3,7 +3,7 @@
 // Email 3: Email 2 enviado hace 3+ días sin apertura y sin Email 3.
 // Lógica idéntica al PASO 3 del orquestador Node — ahora vive en la nube.
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
+import { renderEmail, bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import {
   DEFAULT_REPLY_TO_LUVIA,
   DEFAULT_REPLY_TO_WEBFORGE,
@@ -55,7 +55,10 @@ async function sendFollowup(
   // /book como destino de compra (cae a la web cruda si no hay BOOKING_BASE).
   const bookUrl = bookingLink(BOOKING_BASE, lead.id);
   const link = bookUrl ?? liveUrl;
-  const bodyText = buildBody(emailNumber, hasWebsite, nombre, link);
+  // Pie de WhatsApp opcional (WHATSAPP_NUMBER): mismo mecanismo que el Email 1 en
+  // generate-outreach, para que 1, 2 y 3 ofrezcan la misma vía de respuesta por WhatsApp.
+  // Va en el cuerpo → aparece tanto en el HTML (renderEmail) como en la versión de texto.
+  const bodyText = withWhatsappFooter(buildBody(emailNumber, hasWebsite, nombre, link), Deno.env.get("WHATSAPP_NUMBER"));
 
   // Reply-To por dueño: respuestas de leads Luvia → Miguel; WebForge → Nico.
   const replyTo = replyToFor(lead.owner, Deno.env.get("ADMIN_USER_ID"), {

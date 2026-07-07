@@ -163,10 +163,15 @@ Según el canal:
   · "subject": directo, sin clickbait, que anticipe el contenido. Máx 8 palabras. Puede ser informal.
     Ejemplos del estilo correcto: "Te hice una web, échale un vistazo" / "Hice algo para [Nombre negocio]"
     Nunca: "¡Oportunidad única para tu negocio!" ni signos de exclamación vacíos.
-  · "body": 5-8 frases en dos párrafos cortos. Estructura:
+  · "body": 6-9 frases en dos párrafos cortos. Estructura:
       Párrafo 1 — Por qué me fijé en ellos (detalle real del brief o la reseña citada).
       Párrafo 2 — Qué hice (les construí una web de muestra) y la invitación suave a verla.
     Cierra con algo como "Si te gusta hablamos, si no, sin problema." — quita presión.
+    Añade además, con naturalidad, una frase de tranquilidad: si les gusta pero cambiarían
+    algo del diseño (colores, textos, una foto), se lo ajustas SIN COSTE — que te escriban y ya.
+    Es tranquilidad, NO una segunda llamada a la acción dura: intégrala en el cierre, sin sonar
+    a oferta ni a venta. El sistema añade debajo la vía de contacto (email/WhatsApp); no escribas
+    tú ningún enlace ni número de teléfono.
 
 - channel 'linkedin' (segment 'b2b', profesionales y empresas):
   · "subject": null.

@@ -42,7 +42,19 @@ function buildBody(emailNumber: 2 | 3, hasWebsite: boolean, nombre: string, live
   );
 }
 
-// HTML mínimo para emails de seguimiento (sin CTA de WhatsApp, sin HTML complejo — solo texto).
+// Pie de WhatsApp opcional — espejo Node de withWhatsappFooter (_shared/emailTemplate.ts).
+// Si WHATSAPP_NUMBER está en el .env (>=8 dígitos), añade una línea de contacto por WhatsApp
+// como PÁRRAFO PROPIO (\n\n) bajo la firma. Esta ruta launchd es un gemelo del pg_cron
+// cron-followups; sin esto, los Email 2/3 que salen por aquí irían SIN WhatsApp aunque el
+// secreto esté puesto (y por husos horarios esta ruta suele ganar la carrera de idempotencia).
+function withWhatsappFooter(body: string): string {
+  const raw = (process.env.WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
+  if (raw.length < 8) return body;
+  return `${body}\n\nWhatsApp: https://wa.me/${raw}`;
+}
+
+// HTML mínimo para emails de seguimiento (sin HTML complejo — solo texto + pie de WhatsApp
+// opcional, que se renderiza clicable si el cuerpo trae la línea "WhatsApp: https://wa.me/…").
 function buildHtml(body: string, subject: string, trackingPixel: string): string {
   const paragraphs = body
     .split(/\n{2,}/)
@@ -53,7 +65,11 @@ function buildHtml(body: string, subject: string, trackingPixel: string): string
         if (urlMatch) {
           return `<a href="${urlMatch[1]}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:15px;font-weight:600;margin:8px 0;">Ver la web →</a>`;
         }
-        return line;
+        // URL embebida en una línea de texto (p.ej. el pie "WhatsApp: https://wa.me/…") → clicable.
+        return line.replace(
+          /(https?:\/\/[^\s<]+)/g,
+          '<a href="$1" style="color:#111827;text-decoration:underline;">$1</a>',
+        );
       });
       const isButton = rendered.some((l) => l.startsWith("<a "));
       if (isButton) return `<p style="margin:16px 0;">${rendered.join("<br>")}</p>`;
@@ -110,7 +126,7 @@ export async function sendFollowupEmail(
   const hasWebsite = lead.has_website === true;
   const nombre = lead.contact_name ?? lead.name;
   const subject = getSubject(hasWebsite);
-  const bodyText = buildBody(emailNumber, hasWebsite, nombre, liveUrl);
+  const bodyText = withWhatsappFooter(buildBody(emailNumber, hasWebsite, nombre, liveUrl));
 
   // Insertar draft en outreach_messages
   const { data: msg, error: insErr } = await supabase
