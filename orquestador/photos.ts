@@ -77,16 +77,26 @@ export function parseCurationResponse(text: string, n: number): number[] {
 
 // Bloque determinista que run.ts añade al prompt de Lovable según el resultado de la curación.
 export function photoManifest(photos: CuratedPhotos): string {
-  if (!photos.hero && photos.gallery.length === 0) {
+  const total = (photos.hero ? 1 : 0) + photos.gallery.length;
+  if (total === 0) {
     return [
       "FOTOS: No hay fotos disponibles de este negocio.",
       "NO uses fotos de stock ni imágenes de relleno. Construye un diseño tipográfico limpio:",
       "hero de texto, iconos para los servicios, y apóyate en el carrusel de reseñas como prueba social.",
+      "NO incluyas una sección de galería/instalaciones vacía.",
     ].join(" ");
   }
   const lines = ["FOTOS: usa EXCLUSIVAMENTE estas fotos reales del negocio (no añadas stock)."];
   if (photos.hero) lines.push(`Hero (foto principal): ${photos.hero}`);
   if (photos.gallery.length) lines.push(`Galería: ${photos.gallery.join(", ")}`);
+  // Layout adaptativo: el nº de celdas = nº de fotos reales. NUNCA una cuadrícula con huecos.
+  if (total === 1) {
+    lines.push("Solo hay UNA foto: úsala como imagen destacada (hero grande o banda ancha). No montes galería en cuadrícula ni dejes huecos.");
+  } else if (total === 2) {
+    lines.push("Hay DOS fotos: preséntalas en dúo (dos columnas equilibradas). No dejes celdas vacías.");
+  } else {
+    lines.push(`Hay ${total} fotos: rejilla de instalaciones usando EXACTAMENTE esas fotos, sin celdas vacías.`);
+  }
   lines.push("Son fotos reales; respétalas, no las deformes ni recortes las caras.");
   return lines.join(" ");
 }
@@ -95,9 +105,11 @@ const CURATION_SYSTEM = `Eres director de arte seleccionando fotos para la web p
 Recibes varias imágenes numeradas desde 0 y los datos del negocio. Devuelve ÚNICAMENTE un objeto JSON
 válido (sin markdown): { "order": [índices] }, con los índices de las 4-6 MEJORES fotos, la primera = la
 mejor para el hero. Incluye SOLO fotos que sean: (a) de buena calidad y CLARAMENTE relevantes a este
-negocio, y (b) seguras para publicar: NADA de caras identificables en primer plano, capturas de pantalla,
-tiques, menús como texto, memes, ni fotos borrosas u oscuras. Si ninguna cumple con confianza, devuelve
-{ "order": [] }. Ante la duda, EXCLUYE (mejor sin foto que una foto mala).`;
+negocio —para clínicas de salud/estética son muy relevantes las INSTALACIONES, la APARATOLOGÍA/tecnología
+y el EQUIPO en contexto—, y (b) seguras para publicar: NADA de caras identificables en primer plano
+(fuera fotos de pacientes y antes/después), capturas de pantalla, tiques, menús como texto, memes, ni
+fotos borrosas u oscuras. Si ninguna cumple con confianza, devuelve { "order": [] }. Ante la duda,
+EXCLUYE (mejor sin foto que una foto mala).`;
 
 // Curación por visión + re-host de solo las ganadoras. Degradación total ante cualquier fallo.
 export async function curatePhotos(

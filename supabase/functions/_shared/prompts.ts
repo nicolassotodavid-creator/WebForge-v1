@@ -11,11 +11,22 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin markdown, sin texto antes ni de
   "tone": "string — tono de marca recomendado (p.ej. 'cercano y familiar')",
   "value_props": ["string — 3 a 5 propuestas de valor reales"],
   "highlights_from_reviews": ["string — 3 a 6 temas/elogios concretos que repiten los clientes"],
-  "recommended_sections": ["hero","servicios","resenas","galeria","reserva","contacto"],
+  "recommended_sections": ["string — secciones EN EL ORDEN adecuado a la vertical inferida; ver la guía de abajo, NO una lista fija por defecto"],
   "services": [{"name":"string","desc":"string"}],
   "suggested_palette": {"primary":"#hex","accent":"#hex","bg":"#hex"},
   "hero_copy": "string — titular potente para la portada"
 }
+
+Antes de rellenar el JSON, INFIERE la vertical del negocio desde \`category\` y ajusta la estructura al
+recorrido de compra de esa vertical (no uses una lista de secciones genérica por defecto):
+- \`recommended_sections\` va EN EL ORDEN adecuado a la vertical e incluye SOLO las secciones con material
+  real (omite las que no puedas sostener con datos).
+- SALUD/ESTÉTICA (clínica de medicina/cirugía estética, dermatología, dental, fisioterapia, etc.): usa
+  el orden ["hero","tratamientos","confianza","resenas","instalaciones","reserva","contacto"], incluyendo
+  solo las que apliquen. Para esta vertical, \`services\` son CATEGORÍAS de tratamiento (p.ej. "Medicina
+  estética facial", "Estética corporal", "Cirugía estética", "Láser y aparatología"), fundadas en
+  \`category\` y en lo que citen las reseñas. NUNCA inventes procedimientos concretos, precios,
+  antes/después, credenciales ni certificaciones: si no consta, se omite.
 
 Reglas: todo en español. Básate SOLO en los datos reales recibidos; no inventes servicios ni datos
 de contacto. Si falta información, omite ese elemento en vez de inventarlo.
@@ -60,6 +71,17 @@ El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este n
 - Un badge/botón flotante fijo en la esquina inferior derecha, discreto y cerrable (con una "x"),
   con el texto "✦ ¿Te gusta esta web? Te la dejo lista por 397€ — Contrátala", que enlace a
   {{BOOKING_URL}}. Visible durante todo el scroll, sin tapar el contenido ni el CTA principal.
+- Si recommended_sections incluye secciones de clínica (salud/estética), constrúyelas con datos REALES:
+  · "tratamientos": rejilla de tarjetas limpias (icono + categoría + descripción breve) a partir de
+    services. Son CATEGORÍAS; no listes procedimientos concretos que no consten.
+  · "confianza": bloque con la nota media y nº de reseñas reales + las value_props. Si business.reviews
+    NOMBRA a un/a profesional, destácalo con su nombre y UNA cita real TRANSCRITA TAL CUAL de la reseña
+    (sin parafrasear ni inventar); si no lo nombran, OMITE el elemento de equipo. No inventes
+    titulaciones, colegiación ni certificaciones.
+  · "instalaciones": galería de las fotos reales curadas respetando el bloque FOTOS (no fuerces una
+    cuadrícula con huecos; si no hay fotos, no incluyas la sección).
+- GUARDARRAÍLES (obligatorio): nunca incluyas antes/después, precios, financiación, credenciales,
+  titulaciones ni certificaciones que no vengan en los datos. Si no consta, se omite.
 - Sin texto de relleno tipo lorem ipsum ni datos inventados.
 
 Devuelve solo el prompt para Lovable.
