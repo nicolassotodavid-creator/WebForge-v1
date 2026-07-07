@@ -103,15 +103,28 @@ async function getValidToken(): Promise<string> {
   const token = process.env.LOVABLE_ACCESS_TOKEN;
   if (!token) throw new Error("Falta LOVABLE_ACCESS_TOKEN en .env. Ejecuta: npm run auth");
 
-  // Decodificar exp del JWT (sin verificar firma)
+  // Decodificar exp del JWT (sin verificar firma). Solo el decode va en el try: antes el catch
+  // se tragaba TAMBIÉN los errores del refresh y se enviaba el token caducado (→ 401 confuso).
+  let expiresIn: number | null = null;
   try {
     const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
-    const expiresIn = (payload.exp as number) - Math.floor(Date.now() / 1000);
-    if (expiresIn < 300) { // refresca si queda menos de 5 min (o ya caducó)
-      console.log(`  · Lovable token ${expiresIn < 0 ? "caducado" : `expira en ${expiresIn}s`} — refrescando...`);
+    expiresIn = (payload.exp as number) - Math.floor(Date.now() / 1000);
+  } catch { /* token no decodificable: se usa tal cual */ }
+
+  if (expiresIn !== null && expiresIn < 300) { // refresca si queda menos de 5 min (o ya caducó)
+    console.log(`  · Lovable token ${expiresIn < 0 ? "caducado" : `expira en ${expiresIn}s`} — refrescando...`);
+    try {
       return await refreshAccessToken();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (expiresIn > 0) {
+        // Aún no caducó del todo: mejor intentar la llamada con el token actual que abortar.
+        console.warn(`  ⚠ refresh falló (${msg}) — usando el token actual (${expiresIn}s restantes)`);
+        return token;
+      }
+      throw new Error(`Token de Lovable caducado y el refresh falló: ${msg}`);
     }
-  } catch { /* si no se puede decodificar, usamos el token tal cual */ }
+  }
 
   return token;
 }
@@ -326,6 +339,24 @@ function slugify(text: string): string {
     .slice(0, 48) || "webforge";
 }
 
+// Lovable rechaza deploys con name > 45 caracteres (400 bad_request "project name can be at
+// most 45 characters"). Era la causa de las webs atascadas en URL id-preview-- ("re-deploy
+// pendiente"): todos los slugs largos fallaban el deploy. Recorta la BASE (en un guion si se
+// puede) y conserva SIEMPRE el sufijo anti-colisión del lead.
+const MAX_DEPLOY_SLUG = 45;
+function composeDeploySlug(base: string, suffix?: string): string {
+  const suf = suffix ? `-${slugify(suffix)}` : "";
+  const maxBase = Math.max(1, MAX_DEPLOY_SLUG - suf.length);
+  let b = slugify(base);
+  if (b.length > maxBase) {
+    b = b.slice(0, maxBase);
+    const lastDash = b.lastIndexOf("-");
+    if (lastDash > 20) b = b.slice(0, lastDash); // corta en palabra completa si no acorta de más
+  }
+  b = b.replace(/-+$/g, "");
+  return `${b}${suf}`;
+}
+
 /**
  * Obtiene la URL pública publicada (*.lovable.app sin preview--).
  * Prioriza el campo `url` (publicado) de deploy_project / get_project.
@@ -423,8 +454,8 @@ export async function lovableBuild(
   const built = await waitForBuild(token, projectId);
   process.stdout.write(`\n  · build listo en ${elapsed()}\n`);
 
-  // 3. Publicar (deploy) con slug estable y único (descripción + sufijo) y reintentos.
-  const deploySlug = slugify(description) + (opts.slugSuffix ? `-${slugify(opts.slugSuffix)}` : "");
+  // 3. Publicar (deploy) con slug estable y único (descripción + sufijo, ≤45 chars) y reintentos.
+  const deploySlug = composeDeploySlug(description, opts.slugSuffix);
   const deployed = (await mcpCall(token, "deploy_project", {
     project_id: projectId,
     name:       deploySlug,
@@ -436,6 +467,77 @@ export async function lovableBuild(
 
   // 5. Captura del build (la re-hospeda el orquestador para la preview de /book)
   const screenshotUrl = pickScreenshot(built) ?? pickScreenshot(deployed);
+
+  return { projectId, liveUrl, isPreview, screenshotUrl };
+}
+
+/**
+ * ACTUALIZA una web YA construida: envía un mensaje de edición al agente del proyecto
+ * existente (send_message) y re-publica. Para conservar la URL pública, pasa en
+ * `deploySlug` el slug ACTUAL (subdominio de la live_url sin `.lovable.app`).
+ * A diferencia de lovableBuild, aquí no se crea proyecto: no hay riesgo de duplicar créditos
+ * por reintento de create_project, pero cada send_message SÍ consume créditos del agente.
+ */
+export async function lovableUpdate(
+  projectId: string,
+  message: string,
+  deploySlug: string,
+): Promise<LovableResult> {
+  const token = await getValidToken();
+  const t0 = Date.now();
+  const elapsed = () => `${Math.round((Date.now() - t0) / 1000)}s`;
+
+  // 1. Mensaje de edición al agente (bloquea hasta terminar o hasta el timeout del servidor).
+  //    NO se reintenta: reenviar duplicaría el gasto de créditos del agente.
+  const sent = (await mcpCall(token, "send_message", {
+    project_id:      projectId,
+    message,
+    wait:            true,
+    timeout_seconds: 600,
+  }, CREATE_TIMEOUT_MS)) as Record<string, unknown>;
+
+  // 2. Si el servidor agotó sus 600 s con el agente aún trabajando, seguimos con get_message
+  //    (idempotente, sí se reintenta) hasta el deadline global del build.
+  const sentStatus = String(sent?.status ?? "").toLowerCase();
+  const messageId = String(sent?.message_id ?? sent?.messageId ?? "");
+  if (FAIL_STATUSES.includes(sentStatus)) {
+    throw new Error(`Edición de Lovable falló (status=${sentStatus}): ${JSON.stringify(sent).slice(0, 300)}`);
+  }
+  if (IN_PROGRESS_STATUSES.includes(sentStatus) && messageId) {
+    const deadline = Date.now() + BUILD_DEADLINE_MS;
+    process.stdout.write("  · agente aún trabajando; esperando con get_message");
+    for (;;) {
+      if (Date.now() >= deadline) {
+        throw new Error(`Timeout (${Math.round(BUILD_DEADLINE_MS / 60_000)} min) esperando la edición de Lovable (${projectId})`);
+      }
+      await sleep(POLL_MS);
+      process.stdout.write(".");
+      const msg = (await mcpCall(token, "get_message", {
+        project_id: projectId,
+        message_id: messageId,
+      }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
+      const st = String(msg?.status ?? "").toLowerCase();
+      if (DONE_STATUSES.includes(st)) break;
+      if (FAIL_STATUSES.includes(st)) {
+        throw new Error(`Edición de Lovable falló (status=${st}): ${JSON.stringify(msg).slice(0, 300)}`);
+      }
+    }
+    process.stdout.write("\n");
+  }
+  console.log(`  · edición aplicada en ${elapsed()}`);
+
+  // 3. Re-publicar con el slug indicado (el actual → misma URL pública).
+  const deployed = (await mcpCall(token, "deploy_project", {
+    project_id: projectId,
+    name:       deploySlug,
+  }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
+
+  const { url: liveUrl, isPreview } = await extractPublicUrl(token, projectId, deployed);
+  console.log(`  · re-publicado en ${elapsed()}: ${liveUrl}${isPreview ? " (preview, no publicada)" : ""}`);
+
+  // 4. Captura tras la edición (puede tardar en regenerarse; el caller decide si esperar una nueva).
+  const proj = (await mcpCall(token, "get_project", { project_id: projectId }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
+  const screenshotUrl = pickScreenshot(deployed) ?? pickScreenshot(proj);
 
   return { projectId, liveUrl, isPreview, screenshotUrl };
 }
