@@ -105,9 +105,11 @@ const CURATION_SYSTEM = `Eres director de arte seleccionando fotos para la web p
 Recibes varias imágenes numeradas desde 0 y los datos del negocio. Devuelve ÚNICAMENTE un objeto JSON
 válido (sin markdown): { "order": [índices] }, con los índices de las 4-6 MEJORES fotos, la primera = la
 mejor para el hero. Incluye SOLO fotos que sean: (a) de buena calidad y CLARAMENTE relevantes a este
-negocio, y (b) seguras para publicar: NADA de caras identificables en primer plano, capturas de pantalla,
-tiques, menús como texto, memes, ni fotos borrosas u oscuras. Si ninguna cumple con confianza, devuelve
-{ "order": [] }. Ante la duda, EXCLUYE (mejor sin foto que una foto mala).`;
+negocio —para clínicas de salud/estética son muy relevantes las INSTALACIONES, la APARATOLOGÍA/tecnología
+y el EQUIPO en contexto—, y (b) seguras para publicar: NADA de caras identificables en primer plano
+(fuera fotos de pacientes y antes/después), capturas de pantalla, tiques, menús como texto, memes, ni
+fotos borrosas u oscuras. Si ninguna cumple con confianza, devuelve { "order": [] }. Ante la duda,
+EXCLUYE (mejor sin foto que una foto mala).`;
 
 // Curación por visión + re-host de solo las ganadoras. Degradación total ante cualquier fallo.
 export async function curatePhotos(
