@@ -8,6 +8,12 @@
   · Todo lo marcado como real sale del scrape (reseñas, fotos, NAP) o de la categoría.
   · Lo que NO tenemos (antes/después, credenciales, financiación) NO aparece: se omite.
   Aplica el DESIGN_SYSTEM del repo (2 Google Fonts, fondo neutro, 1 acento, sin gradientes IA).
+  · La sección "Instalaciones" es ADAPTATIVA por nº de fotos reales curadas:
+      0 → se omite (web foto-ligera: tipografía + iconos + reseñas)
+      1 → una imagen destacada (sin cuadrícula)
+      2 → dúo (dos columnas)
+      3+ → rejilla (este es el estado que muestra la maqueta)
+    El nº de celdas = nº de fotos reales. NUNCA una rejilla con huecos.
 -->
 <html lang="es">
 <head>
