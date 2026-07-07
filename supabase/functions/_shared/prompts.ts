@@ -116,13 +116,20 @@ COMPONENTES E ICONOS
 
 HERO
 - Sobre el pliegue: titular (hero_copy), subtítulo corto, UN CTA primario a la reserva, y una señal de
-  confianza (⭐ nota media + nº de reseñas reales). Con foto de hero, úsala con buen contraste del texto.
+  confianza (⭐ nota media + nº de reseñas reales).
+- Con foto de hero: a pantalla completa con una CAPA OSCURA ENCIMA OBLIGATORIA (degradado negro de
+  ~55% arriba a ~30% abajo, o velo sólido ~45%) para que el titular en BLANCO se lea con contraste AA
+  SEA CUAL SEA la foto. NUNCA texto oscuro sobre foto clara. El titular no debe quedar tapado por el
+  objeto principal de la foto.
 
 MICRO-INTERACCIONES
 - Transiciones sutiles (fade/slide suave al entrar en viewport). Nada de rebotes ni animaciones llamativas.
 
 MARCA Y SEO
-- Header con wordmark: el nombre del negocio en la fuente display (no un genérico). Favicon con la inicial.
+- Header FIJO (sticky) SIEMPRE, en TODAS las webs: wordmark del negocio a la izquierda (nombre en la
+  fuente display, no un genérico) y a la derecha un menú de navegación con enlaces-ancla a las secciones
+  presentes (p.ej. Servicios · Trabajos · Reseñas · Contacto) + el botón CTA de presupuesto. En móvil,
+  menú hamburguesa. Favicon con la inicial.
 - <title> y meta description reales; Open Graph (title, description e imagen).
 - Horario en tabla legible y NAP (nombre/dirección/teléfono) consistentes en el footer, SOLO si vienen.
 
