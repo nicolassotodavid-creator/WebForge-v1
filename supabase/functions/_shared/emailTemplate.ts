@@ -44,10 +44,16 @@ export function bookingLink(base: string | null | undefined, leadId: string): st
 // es email o si no hay número válido (>= 8 dígitos): apagado por defecto y NUNCA en LinkedIn
 // (que va por nota de conexión). La URL sale clicable en el HTML (ver bodyToHtml) y visible
 // en la versión de texto plano. Usado por generate-outreach (email 1) y cron-followups (2/3).
+//
+// IMPORTANTE: el pie va como PÁRRAFO PROPIO (separado por \n\n). Si se pegara con un solo \n,
+// en el Email 1 quedaría fundido con la línea-URL final (…\n\nURL\nWhatsApp:…) y renderEmail
+// dejaría de reconocer esa URL como línea suelta → el escaparate no la sustituiría y saldría un
+// botón "Ver la web →" duplicado con la captura descolocada al final. Con \n\n la URL sigue
+// sola en su párrafo y el escaparate funciona.
 export function withWhatsappFooter(body: string, number: string | null | undefined, channel = "email"): string {
   const raw = (number ?? "").replace(/\D/g, "");
   if (channel !== "email" || raw.length < 8) return body;
-  return `${body}\nWhatsApp: https://wa.me/${raw}`;
+  return `${body}\n\nWhatsApp: https://wa.me/${raw}`;
 }
 
 // Bloque "escaparate" (diseño definitivo, docs/email-design/EMAIL1-DISENO-DEFINITIVO.html):
