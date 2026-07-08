@@ -19,6 +19,7 @@ import {
   RefreshCw,
   Eye,
   EyeOff,
+  Ban,
 } from "lucide-react";
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -223,6 +224,25 @@ export default function LeadDetail() {
     if (error) {
       setLead({ ...lead, is_favorite: !next });
       alert("No se pudo actualizar el favorito: " + error.message);
+    }
+  }
+
+  // BAJA / no contactar: toggle optimista. Cuando el lead responde "BAJA" al email,
+  // el operador lo marca aquí → generate-outreach, send-email y cron-followups dejan de
+  // escribirle (honra la promesa del pie legal). Ver 0020_lead_do_not_contact.sql.
+  async function toggleDoNotContact() {
+    if (!lead) return;
+    const next = !lead.do_not_contact;
+    if (next && !confirm(`¿Marcar BAJA a "${lead.name}"? No se le enviará ningún email más.`)) return;
+    const nowIso = new Date().toISOString();
+    setLead({ ...lead, do_not_contact: next, unsubscribed_at: next ? nowIso : null });
+    const { error } = await supabase
+      .from("leads")
+      .update({ do_not_contact: next, unsubscribed_at: next ? nowIso : null })
+      .eq("id", lead.id);
+    if (error) {
+      setLead({ ...lead, do_not_contact: !next });
+      alert("No se pudo actualizar la baja: " + error.message);
     }
   }
 
@@ -479,6 +499,16 @@ export default function LeadDetail() {
                 className={`h-5 w-5 ${lead.is_favorite ? "fill-amber-400 text-amber-400" : ""}`}
               />
             </button>
+          )}
+          <button
+            onClick={toggleDoNotContact}
+            title={lead.do_not_contact ? "Reactivar contacto" : "Marcar BAJA / no contactar"}
+            className={`rounded-md p-1.5 transition-colors hover:text-destructive ${lead.do_not_contact ? "text-destructive" : "text-muted-foreground"}`}
+          >
+            <Ban className="h-5 w-5" />
+          </button>
+          {lead.do_not_contact && (
+            <span className="rounded-md bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">BAJA</span>
           )}
           <StatusBadge status={lead.status} />
         </div>
