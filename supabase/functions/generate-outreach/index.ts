@@ -9,6 +9,7 @@ import { OUTREACH_PROMPT, LUVIA_OUTREACH_PROMPT } from "../_shared/prompts.ts";
 import { isLuviaLead } from "../_shared/luvia.ts";
 import { bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import { canAccessLead, isAdminEmail, type Operator } from "../_shared/leadAccess.ts";
+import { isOptedOut } from "../_shared/contactability.ts";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
@@ -126,6 +127,11 @@ Deno.serve(async (req: Request) => {
   // service_role del orquestador trae operator=null y se salta esta comprobación.
   if (operator && !canAccessLead(lead.owner, operator)) {
     return jsonResponse({ error: "Este lead no es de tu cuenta." }, 403);
+  }
+
+  // BAJA (opt-out): si el lead pidió no ser contactado, no se redacta ni se envía nada.
+  if (isOptedOut(lead)) {
+    return jsonResponse({ error: "Este lead pidió BAJA (do_not_contact); no se le contacta." }, 409);
   }
 
   const ADMIN_USER_ID = Deno.env.get("ADMIN_USER_ID");

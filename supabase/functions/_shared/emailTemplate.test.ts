@@ -66,5 +66,33 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertIncludes(showcaseHtml, `href="https://wa.me/34600782211"`, "escaparate: WhatsApp clicable tras la captura");
 }
 
+// ── Pie legal (LSSI Art. 21/10 + RGPD): opt-out BAJA + origen del dato + identidad ──
+// Debe aparecer en TODO email (los 3), con captura o sin ella. Sin él, un envío en frío
+// es infracción casi automática si el destinatario denuncia.
+{
+  const legal = renderEmail({ bodyText: "Hola Ana,\n\nNico", subject: "x" });
+  assertIncludes(legal, "BAJA", "pie legal: incluye el opt-out BAJA");
+  assertIncludes(legal, "ficha p", "pie legal: declara el origen del dato (ficha pública)");
+  assertIncludes(legal, "David Nicol", "pie legal: identifica al remitente (default)");
+  const custom = renderEmail({ bodyText: "Hola\n\nNico", subject: "x", senderIdentity: "Fulano SL &middot; B12345678" });
+  assertIncludes(custom, "Fulano SL", "pie legal: senderIdentity override se respeta");
+  assertExcludes(custom, "David Nicol", "pie legal: el override reemplaza el default");
+}
+
+// ── Copy neutro del escaparate: "Ver la propuesta", NO venta directa en el email ──
+{
+  const showcase = renderEmail({
+    bodyText: "Hola Ana, te hice una web.\n\nhttps://webforge.app/book/lead-1\n\nNico",
+    subject: "x",
+    previewImageUrl: "https://cdn/site-previews/lead-1.png",
+    webUrl: "https://clinica-ana.web.app",
+    bookingUrl: "https://webforge.app/book/lead-1",
+  });
+  assertIncludes(showcase, "Ver la propuesta", "escaparate: botón neutro 'Ver la propuesta'");
+  assertExcludes(showcase, "Activar mi web", "escaparate: sin CTA de venta directa 'Activar mi web'");
+  assertExcludes(showcase, "sin permanencia", "escaparate: la venta dura (precio/permanencia) no va en el email");
+  assertIncludes(showcase, "book/lead-1", "escaparate: el 2º enlace a /book se mantiene");
+}
+
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures) process.exit(1);

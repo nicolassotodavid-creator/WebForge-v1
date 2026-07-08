@@ -4,6 +4,7 @@
 // Lógica idéntica al PASO 3 del orquestador Node — ahora vive en la nube.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { renderEmail, bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
+import { isOptedOut } from "../_shared/contactability.ts";
 import {
   DEFAULT_REPLY_TO_LUVIA,
   DEFAULT_REPLY_TO_WEBFORGE,
@@ -100,7 +101,7 @@ async function sendFollowup(
       from: `Nico <${FROM_EMAIL}>`,
       to: [lead.email],
       subject,
-      // Showcase también en 2/3: captura + "Ver la web entera" (→ live_url) + "Activar mi web" (→ /book).
+      // Showcase también en 2/3: captura + "Ver la web entera" (→ live_url) + "Ver la propuesta" (→ /book).
       html: renderEmail({
         bodyText,
         trackingPixelUrl,
@@ -108,6 +109,7 @@ async function sendFollowup(
         previewImageUrl,
         webUrl: liveUrl,
         bookingUrl: bookUrl,
+        senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
       }),
       text: bodyText,
       ...(replyTo ? { reply_to: replyTo } : {}),
@@ -148,10 +150,12 @@ Deno.serve(async (req: Request) => {
   let sent2 = 0, sent3 = 0;
 
   // ── EMAIL 2: leads 'contacted' desde hace 4+ días ───────────────────────
+  // do_not_contact=false: no seguir a quien pidió BAJA (LSSI/RGPD — ver 0020).
   const { data: staleLeads } = await supabase
     .from("leads")
-    .select("id, name, email, contact_name, has_website, owner")
+    .select("id, name, email, contact_name, has_website, owner, do_not_contact")
     .eq("status", "contacted")
+    .eq("do_not_contact", false)
     .lt("updated_at", day4Ago);
 
   for (const lead of staleLeads ?? []) {
@@ -185,9 +189,10 @@ Deno.serve(async (req: Request) => {
     if (existing) continue;
 
     const { data: lead } = await supabase
-      .from("leads").select("id, name, email, contact_name, has_website, owner")
+      .from("leads").select("id, name, email, contact_name, has_website, owner, do_not_contact")
       .eq("id", msg.lead_id).maybeSingle();
     if (!lead?.email) continue;
+    if (isOptedOut(lead)) continue; // BAJA: no mandar el Email 3 aunque exista el Email 2.
 
     const { data: site } = await supabase
       .from("sites").select("live_url, preview_image_url")

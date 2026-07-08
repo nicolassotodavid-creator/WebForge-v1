@@ -58,6 +58,10 @@ export interface Lead {
   // del pipeline (ese es del cliente). seen_at null = no visto.
   is_favorite: boolean;
   seen_at: string | null;
+  // Opt-out / BAJA (ver 0020_lead_do_not_contact.sql). true = pidió no ser contactado →
+  // no recibe ningún email (lo respetan generate-outreach, send-email y cron-followups).
+  do_not_contact?: boolean;
+  unsubscribed_at?: string | null;
 }
 
 export interface BriefService {

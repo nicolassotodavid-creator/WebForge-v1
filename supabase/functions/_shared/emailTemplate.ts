@@ -4,6 +4,12 @@
 // y píxel de apertura opcional. Email-safe: tablas + estilos inline, una columna.
 // Diseño: docs/superpowers/specs/2026-06-20-email-template-personal-design.md
 
+// Identidad del remitente para el pie legal (LSSI Art. 10 + principio de transparencia
+// del RGPD: toda comunicación comercial debe identificar a quien la envía). Sobrescribible
+// por los callers vía la opción `senderIdentity` (p.ej. Deno.env.get("SENDER_LEGAL_IDENTITY"))
+// si se quiere añadir NIF/domicilio y cubrir el Art. 10 al 100 %.
+const DEFAULT_SENDER_IDENTITY = "David Nicolás Soto · diseño web (autónomo)";
+
 // Convierte el cuerpo en texto plano a HTML:
 //  - párrafos separados por línea en blanco
 //  - una línea que es SOLO una URL → botón slim "Ver la web →"
@@ -82,9 +88,12 @@ function showcaseBlock(previewImageUrl: string, webUrl?: string | null, bookUrl?
     ? `<p style="margin:0 0 30px;text-align:center;"><a href="${webUrl}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:14px 30px;border-radius:9px;font-size:15px;font-weight:600;">Ver la web entera &rarr;</a></p>`
     : "";
 
+  // CTA secundaria neutra ("muestra de trabajo", no producto en venta): el enlace sigue
+  // yendo a /book (2º enlace obligatorio, no se quita), pero el copy no es venta directa.
+  // El precio y el "activar" viven en la propia /book, cuando el prospecto ya ha entrado.
   const softSell = bookUrl
-    ? `<p style="margin:0 0 16px;color:#57534E;font-size:15px;line-height:1.6;">Si te convence, te la dejo publicada y lista &mdash; con tu dominio, las reseñas de Google y todo en marcha. Pago único, sin permanencia.</p>` +
-      `<p style="margin:0 0 30px;text-align:center;"><a href="${bookUrl}" style="display:inline-block;background:#ffffff;color:#111827;text-decoration:none;padding:13px 28px;border-radius:9px;font-size:15px;font-weight:600;border:1.5px solid #111827;">Activar mi web &rarr;</a></p>`
+    ? `<p style="margin:0 0 16px;color:#57534E;font-size:15px;line-height:1.6;">Es una muestra de mi trabajo &mdash; te la dejo aqu&iacute; por si quieres verla en detalle o comentarla.</p>` +
+      `<p style="margin:0 0 30px;text-align:center;"><a href="${bookUrl}" style="display:inline-block;background:#ffffff;color:#111827;text-decoration:none;padding:13px 28px;border-radius:9px;font-size:15px;font-weight:600;border:1.5px solid #111827;">Ver la propuesta &rarr;</a></p>`
     : "";
 
   return frame + ctaWeb + softSell;
@@ -95,8 +104,10 @@ export interface RenderEmailOptions {
   trackingPixelUrl?: string | null;
   subject?: string;
   // Enlace de compra → página de contratación /book. En modo texto plano es el enlace
-  // suave de seguimiento; en modo escaparate es el botón "Activar mi web".
+  // suave de seguimiento; en modo escaparate es el botón "Ver la propuesta".
   bookingUrl?: string | null;
+  // Pie legal: identidad del remitente (LSSI Art. 10 / RGPD). Si se omite → DEFAULT_SENDER_IDENTITY.
+  senderIdentity?: string;
   // Modo escaparate: captura re-hospedada de la web (sites.preview_image_url). Si viene,
   // el email sale con la captura enmarcada + 2 CTAs. Si es null/undefined → texto plano.
   previewImageUrl?: string | null;
@@ -107,7 +118,7 @@ export interface RenderEmailOptions {
 // Devuelve el HTML completo del email. NO añade firma (el cuerpo ya la trae) ni
 // botón de WhatsApp. Con captura → escaparate (captura enmarcada + 2 CTAs); sin
 // captura → texto plano + (enlace de compra opcional). Siempre: opt-out + píxel.
-export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl }: RenderEmailOptions): string {
+export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY }: RenderEmailOptions): string {
   const pixel = trackingPixelUrl
     ? `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`
     : "";
@@ -155,7 +166,8 @@ export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingU
               ${bodyHtml}
               ${buyLink}
               <hr style="border:none;border-top:1px solid #eeeeee;margin:28px 0 16px;">
-              <p style="margin:0;color:#9ca3af;font-size:13px;line-height:1.5;">Si no te encaja, respóndeme y no vuelvo a escribir.</p>
+              <p style="margin:0 0 6px;color:#9ca3af;font-size:13px;line-height:1.5;">Te escribo a t&iacute;tulo profesional; encontr&eacute; tu contacto en tu ficha p&uacute;blica de actividad. Si no quieres recibir m&aacute;s propuestas o prefieres que borre tus datos, responde <strong>BAJA</strong> a este correo y lo hago de inmediato.</p>
+              <p style="margin:0;color:#9ca3af;font-size:13px;line-height:1.5;">${senderIdentity}</p>
               ${pixel}
             </td>
           </tr>
