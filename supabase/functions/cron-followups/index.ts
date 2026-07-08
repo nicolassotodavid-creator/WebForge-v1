@@ -100,7 +100,7 @@ async function sendFollowup(
       from: `Nico <${FROM_EMAIL}>`,
       to: [lead.email],
       subject,
-      // Showcase también en 2/3: captura + "Ver la web entera" (→ live_url) + "Activar mi web" (→ /book).
+      // Showcase también en 2/3: captura + "Ver la web entera" (→ live_url) + "Ver la propuesta" (→ /book).
       html: renderEmail({
         bodyText,
         trackingPixelUrl,
@@ -108,6 +108,7 @@ async function sendFollowup(
         previewImageUrl,
         webUrl: liveUrl,
         bookingUrl: bookUrl,
+        senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
       }),
       text: bodyText,
       ...(replyTo ? { reply_to: replyTo } : {}),
