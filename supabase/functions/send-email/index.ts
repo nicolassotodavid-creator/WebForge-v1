@@ -139,7 +139,7 @@ Deno.serve(async (req: Request) => {
   const textBody = msg.body;
 
   // Showcase en los 3 emails: si el lead tiene captura → captura enmarcada + "Ver la web
-  // entera" (→ live_url) + "Activar mi web" (→ /book). Sin captura → texto plano (la línea-URL
+  // entera" (→ live_url) + "Ver la propuesta" (→ /book). Sin captura → texto plano (la línea-URL
   // del cuerpo se vuelve botón "Ver la web →").
   const htmlBody = renderEmail({
     bodyText: textBody,
@@ -148,6 +148,7 @@ Deno.serve(async (req: Request) => {
     previewImageUrl: site?.preview_image_url ?? null,
     webUrl: site?.live_url ?? null,
     bookingUrl: bookingLink(Deno.env.get("BOOKING_BASE"), msg.lead_id),
+    senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
   });
 
   // Reply-To por dueño: respuestas de leads Luvia → Miguel; WebForge → Nico.

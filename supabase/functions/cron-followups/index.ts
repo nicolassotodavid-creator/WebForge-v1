@@ -11,7 +11,11 @@ import {
 } from "../_shared/replyTo.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+// SERVICE_KEY: solo para el cliente de DB (bypass RLS). CRON_SECRET: auth dedicada del cron
+// (la manda pg_cron leyéndola del Vault 'cron_secret'). No autenticamos con la service key
+// porque está DEPRECATED y su valor en runtime no es reproducible tras la migración de keys.
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const CRON_SECRET = Deno.env.get("CRON_SECRET");
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL");
 const BOOKING_BASE = Deno.env.get("BOOKING_BASE"); // base de la página de contratación (/book)
@@ -96,7 +100,7 @@ async function sendFollowup(
       from: `Nico <${FROM_EMAIL}>`,
       to: [lead.email],
       subject,
-      // Showcase también en 2/3: captura + "Ver la web entera" (→ live_url) + "Activar mi web" (→ /book).
+      // Showcase también en 2/3: captura + "Ver la web entera" (→ live_url) + "Ver la propuesta" (→ /book).
       html: renderEmail({
         bodyText,
         trackingPixelUrl,
@@ -104,6 +108,7 @@ async function sendFollowup(
         previewImageUrl,
         webUrl: liveUrl,
         bookingUrl: bookUrl,
+        senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
       }),
       text: bodyText,
       ...(replyTo ? { reply_to: replyTo } : {}),
@@ -128,9 +133,9 @@ async function sendFollowup(
 }
 
 Deno.serve(async (req: Request) => {
-  // Auth: solo service_role (pg_cron) o llamada manual del operador
+  // Auth: Bearer <CRON_SECRET> (lo manda pg_cron o el operador). Ver nota en las env vars.
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
-  if (token !== SERVICE_KEY) return jsonResponse({ error: "No autorizado" }, 401);
+  if (!CRON_SECRET || token !== CRON_SECRET) return jsonResponse({ error: "No autorizado" }, 401);
 
   if (!RESEND_API_KEY || !FROM_EMAIL) {
     return jsonResponse({ error: "Faltan RESEND_API_KEY o FROM_EMAIL en los secrets." }, 500);
