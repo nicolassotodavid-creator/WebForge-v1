@@ -353,7 +353,7 @@ export default function Book() {
             <Reveal className="text-center lg:text-left lg:sticky lg:top-24 lg:self-start">
               <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Inversión única</p>
               <div className="font-serif text-[5.5rem] leading-none mb-3 lv-text-gradient sm:text-7xl sm:mb-4 lg:text-[9rem]">397€</div>
-              <p className="text-xs opacity-60 italic mb-10 sm:mb-12 lg:text-sm lg:mb-16">Pago único · sin contratos · sin cuotas</p>
+              <p className="text-xs opacity-60 italic mb-10 sm:mb-12 lg:text-sm lg:mb-16">Sin cuotas ni contratos. La web es tuya.</p>
               <div className="hidden lg:block">
                 <div className="flex gap-5 items-center">
                   <div className="shrink-0 size-20 rounded-full ring-2 ring-brick grid place-items-center">
