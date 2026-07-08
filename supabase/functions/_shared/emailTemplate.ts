@@ -14,11 +14,18 @@ export function bodyToHtml(text: string): string {
     .map((para) => {
       const lines = para.split("\n").filter((l) => l.trim());
       const rendered = lines.map((line) => {
+        // Pie de WhatsApp ("WhatsApp: https://wa.me/…") → botón verde de marca en vez de un
+        // enlace pelado. Es CTA secundaria (responder por WhatsApp), va tras la firma. La URL
+        // sigue siendo exactamente https://wa.me/… → clicable y detectable por los tests.
+        const waMatch = line.trim().match(/^WhatsApp:\s*(https:\/\/wa\.me\/\d+)$/i);
+        if (waMatch) {
+          return `<a href="${waMatch[1]}" style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;padding:13px 28px;border-radius:999px;font-size:15px;font-weight:700;line-height:1;box-shadow:0 4px 12px rgba(37,211,102,0.30);">Escríbeme por WhatsApp &nbsp;→</a>`;
+        }
         const urlMatch = line.trim().match(/^(https?:\/\/[^\s]+)$/);
         if (urlMatch) {
           return `<a href="${urlMatch[1]}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:11px 22px;border-radius:8px;font-size:15px;font-weight:600;">Ver la web →</a>`;
         }
-        // URL embebida dentro de una línea de texto (p.ej. el pie "WhatsApp: https://wa.me/…")
+        // URL embebida dentro de una línea de texto (p.ej. otras URLs sueltas en una frase)
         // → clicable. Las URLs que van SOLAS en su línea ya son botón arriba; esto es solo inline.
         return line.replace(
           /(https?:\/\/[^\s<]+)/g,
