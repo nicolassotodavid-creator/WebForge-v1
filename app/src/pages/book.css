@@ -1,0 +1,122 @@
+/* book.css — estilos y animaciones de la landing /book (diseño de Nico, portado de Lovable
+   "warm-web-offer"). Scoped a .lv-scope para no afectar al panel. Fuentes: Instrument Serif
+   (display) + DM Sans (cuerpo). Colores paper/ink/brick viven en tailwind.config.js. */
+
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap");
+
+/* Variables de color para las animaciones lv-* (que usan var(--color-*)). Scoped a la landing. */
+.lv-scope {
+  --color-paper: oklch(0.992 0.005 80);
+  --color-ink: oklch(0.18 0.012 60);
+  --color-brick: oklch(0.46 0.15 30);
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ============ Motion ============ */
+@keyframes lv-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes lv-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes lv-shine {
+  0%   { transform: translateX(-120%) skewX(-12deg); }
+  100% { transform: translateX(220%) skewX(-12deg); }
+}
+@keyframes lv-pulse-ring {
+  0%   { box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-brick) 45%, transparent); }
+  70%  { box-shadow: 0 0 0 18px color-mix(in oklab, var(--color-brick) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-brick) 0%, transparent); }
+}
+@keyframes lv-gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes lv-blob {
+  0%, 100% { border-radius: 42% 58% 63% 37% / 45% 38% 62% 55%; transform: translate3d(0,0,0) rotate(0deg); }
+  50%      { border-radius: 58% 42% 38% 62% / 55% 62% 38% 45%; transform: translate3d(10px,-12px,0) rotate(18deg); }
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  filter: blur(6px);
+  transition:
+    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+[data-reveal="in"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+
+.lv-marquee-track { animation: lv-marquee 38s linear infinite; }
+.lv-float        { animation: lv-float 6s ease-in-out infinite; }
+.lv-pulse-ring   { animation: lv-pulse-ring 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite; }
+.lv-blob         { animation: lv-blob 14s ease-in-out infinite; }
+
+.lv-shine-wrap { position: relative; overflow: hidden; isolation: isolate; }
+.lv-shine-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    color-mix(in oklab, white 35%, transparent) 50%,
+    transparent 80%
+  );
+  transform: translateX(-120%) skewX(-12deg);
+}
+.lv-shine-wrap:hover::after { animation: lv-shine 900ms ease-out; }
+
+.lv-text-gradient {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-ink) 0%,
+    var(--color-brick) 50%,
+    var(--color-ink) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: lv-gradient-pan 6s ease-in-out infinite;
+}
+
+.lv-lift {
+  transition:
+    transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 500ms ease;
+  will-change: transform;
+}
+.lv-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -22px color-mix(in oklab, var(--color-ink) 35%, transparent);
+}
+
+.lv-underline-grow {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  transition: background-size 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lv-underline-grow:hover { background-size: 100% 1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal], [data-reveal="in"] {
+    opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important;
+  }
+  .lv-marquee-track, .lv-float, .lv-pulse-ring, .lv-text-gradient, .lv-blob {
+    animation: none !important;
+  }
+}

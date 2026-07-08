@@ -24,6 +24,9 @@ export default {
           "Arial",
           "sans-serif",
         ],
+        // Fuentes de la landing /book (diseño de Nico): display serif + cuerpo DM Sans.
+        serif: ["Instrument Serif", "ui-serif", "Georgia", "serif"],
+        book: ["DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
         border: oklch("--border"),
@@ -61,6 +64,11 @@ export default {
         },
         success: oklch("--success"),
         warning: oklch("--warning"),
+        // Paleta de la landing /book (diseño de Nico) — valores fijos con soporte de alpha
+        // (bg-ink/5, text-brick, border-ink/10, …). Solo la usa /book; el panel no.
+        paper: "oklch(0.992 0.005 80 / <alpha-value>)",
+        ink: "oklch(0.18 0.012 60 / <alpha-value>)",
+        brick: "oklch(0.46 0.15 30 / <alpha-value>)",
       },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",

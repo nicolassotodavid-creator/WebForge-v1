@@ -1,483 +1,502 @@
-// /book/:leadId — Página PÚBLICA (sin auth).
-import { useState, useEffect, FormEvent } from "react";
+// /book/:leadId — Página PÚBLICA (sin auth). Diseño de Nico (portado de su proyecto
+// Lovable "warm-web-offer" / "Your New Web"): propuesta editorial paper/ink/brick,
+// Instrument Serif + DM Sans, marquee, comparativa 1.500€ vs 397€, garantía 7 días, FAQ.
+// Datos reales del lead vía get-booking-info. CTA = captación (WhatsApp/email a Nico),
+// NO Stripe: el prospecto deja sus datos y Nico cierra por WhatsApp.
+import { useState, useEffect, type FormEvent } from "react";
 import { useParams } from "react-router-dom";
-import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
-import { Loader2, ExternalLink, CheckCircle2, ArrowRight, ShieldCheck, Monitor } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { supabase } from "@/lib/supabase";
+import { Palette, Search, ClipboardList, Star, Zap, Smartphone, ChevronDown, Loader2 } from "lucide-react";
 import { CONTACT_EMAIL, whatsappLink } from "@/lib/business";
+import { Reveal } from "@/components/Reveal";
+import "./book.css";
+
+const NICO_NAME = "Nico";
 
 interface BookingInfo {
   business_name: string;
   category: string | null;
   city: string | null;
   live_url: string | null;
-  // Captura re-hospedada de la web (Supabase Storage). Se muestra como preview estático
-  // en vez de embeber la web viva: nunca se bloquea y escala a clicks ilimitados.
   preview_image_url: string | null;
+  rating: number | null;
+  review_count: number | null;
+  contact_name: string | null;
 }
 
-const PRECIO = "397 €";
-const LORA = "Lora, Georgia, serif";
-const INTER = "Inter, system-ui, sans-serif";
+// Contenido estático (idéntico al diseño de Nico) — igual para todos los negocios.
+const OUTCOMES = [
+  { title: "Captar clientes nuevos", body: "La gente que busca calidad está dispuesta a venir si tu imagen transmite confianza desde el primer clic." },
+  { title: "Mostrar servicios y precios", body: "Que vean qué hacéis y tarifas antes de decidirse." },
+  { title: "Aparecer en Google", body: "Web optimizada para que te encuentren cuando alguien busca tu servicio en tu zona." },
+];
+const INCLUDED = [
+  { title: "Diseño exclusivo", body: "Hecho a medida para tu negocio, sin plantillas genéricas." },
+  { title: "Optimización SEO local", body: "Apareces cuando buscan tu servicio en tu zona." },
+  { title: "Servicios y tarifas visibles", body: "Tus clientes ven qué ofreces y cuánto cuesta antes de contactar." },
+  { title: "Reseñas de Google integradas", body: "Tus valoraciones reales, visibles desde el primer momento." },
+  { title: "Carga ultra-rápida", body: "Web ligera que abre al instante en cualquier dispositivo." },
+  { title: "Adaptado a móviles", body: "Se ve y funciona perfecto en cualquier pantalla." },
+];
+const FAQ = [
+  { q: "¿Y si no me gusta la web?", a: "Tienes 7 días de garantía total. Si no te convence, te devuelvo el dinero sin preguntas." },
+  { q: "¿Necesito saber de tecnología?", a: "Nada. Yo me encargo del dominio, hosting, correos y todo lo técnico. Tú solo me das el visto bueno." },
+  { q: "¿Es caro comparado con hacerla yo?", a: "Una agencia te cobra 1.500€ o más. Conmigo pagas 397€ una sola vez y la web es tuya para siempre." },
+  { q: "¿Y si ya tengo web?", a: "La reemplazamos. Esta está optimizada para móvil, velocidad y Google — lo que probablemente la tuya no hace." },
+  { q: "¿Hay cuotas mensuales?", a: "Ninguna. Es un pago único y la web es tuya. El hosting del primer año va incluido." },
+  { q: "¿Cuánto tarda en estar lista?", a: "La estructura ya está construida. En cuanto me confirmes, la adapto a tu negocio y está online en 48-72 horas." },
+];
 
-// ── componente ───────────────────────────────────────────────────────────────
+function domainHintFrom(name: string): string {
+  const slug = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "").slice(0, 20);
+  return `${slug || "tunegocio"}.es`;
+}
+
+const Stars = ({ size = "text-lg" }: { size?: string }) => (
+  <div className={`flex gap-0.5 text-brick leading-none ${size}`}>
+    {"★★★★★".split("").map((s, i) => (
+      <span key={i}>{s}</span>
+    ))}
+  </div>
+);
 
 export default function Book() {
   const { leadId } = useParams<{ leadId: string }>();
-
-  const [info, setInfo]         = useState<BookingInfo | null>(null);
-  const [loading, setLoading]   = useState(true);
+  const [info, setInfo] = useState<BookingInfo | null>(null);
+  const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [name,      setName]      = useState("");
-  const [email,     setEmail]     = useState("");
-  const [phone,     setPhone]     = useState("");
-  const [empresa,   setEmpresa]   = useState("");
-  const [nif,       setNif]       = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [cp, setCp] = useState("");
-  const [ciudad, setCiudad] = useState("");
-  const [provincia, setProvincia] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [formError,  setFormError]  = useState<string | null>(null);
+  const [form, setForm] = useState({ name: "", contact: "", phone: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // ── cargar datos del lead ──
   useEffect(() => {
     if (!leadId) { setLoadError("Enlace no válido."); setLoading(false); return; }
-
     if (leadId === "preview") {
       setInfo({
-        business_name: "Talleres YuriCar",
-        category: "Taller mecánico",
-        city: "Valencia",
-        live_url: "https://yuricars-landing-joy.lovable.app",
-        preview_image_url: null,
+        business_name: "Talleres YuriCar", category: "taller", city: "Valencia",
+        live_url: "https://yuricars-landing-joy.lovable.app", preview_image_url: null,
+        rating: 4.9, review_count: 87, contact_name: "Yuri",
       });
       setLoading(false);
       return;
     }
-
     supabase.functions.invoke("get-booking-info", { body: { lead_id: leadId } })
       .then(({ data, error }) => {
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
         setInfo(data as BookingInfo);
-        supabase.functions.invoke("track-event", {
-          body: { lead_id: leadId, type: "demo_viewed" },
-        }).catch(() => {});
+        supabase.functions.invoke("track-event", { body: { lead_id: leadId, type: "demo_viewed" } }).catch(() => {});
       })
       .catch((e: Error) => setLoadError(e.message))
       .finally(() => setLoading(false));
   }, [leadId]);
 
-  // ── pago ──
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!name.trim() || !email.trim()) { setFormError("Nombre y email son obligatorios."); return; }
-    setSubmitting(true); setFormError(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { lead_id: leadId, contact: { name, email, phone }, fiscal: { empresa, nif, direccion, cp, ciudad, provincia } },
-      });
-      if (error) throw error;
-      const url = (data as { checkout_url?: string })?.checkout_url;
-      if (url) { window.location.href = url; }
-      else throw new Error("No se recibió la URL de pago.");
-    } catch (e: unknown) {
-      setFormError(await edgeFunctionErrorMessage(e, "Error al procesar el pago."));
-    } finally { setSubmitting(false); }
-  }
-
-  // ── renders de estado ──
+  // ── estados ──
   if (loading) return (
-    <div className="grid min-h-screen place-items-center" style={{ backgroundColor: "#FAF8F4" }}>
-      <Loader2 className="h-6 w-6 animate-spin" style={{ color: "#78716C" }} />
+    <div className="lv-scope grid min-h-screen place-items-center bg-paper">
+      <Loader2 className="h-6 w-6 animate-spin text-brick" />
     </div>
   );
-
-  if (loadError) return (
-    <div className="grid min-h-screen place-items-center px-4" style={{ backgroundColor: "#FAF8F4" }}>
-      <div className="text-center space-y-2">
-        <p style={{ fontFamily: LORA, fontSize: "1.25rem", color: "#1C1917" }}>Página no encontrada</p>
-        <p style={{ color: "#78716C", fontSize: "0.875rem" }}>{loadError}</p>
+  if (loadError || !info) return (
+    <div className="lv-scope grid min-h-screen place-items-center bg-paper px-4 text-center">
+      <div>
+        <p className="font-serif text-2xl text-ink">Página no encontrada</p>
+        <p className="mt-2 text-sm text-ink/50">{loadError ?? "No se pudo cargar la propuesta."}</p>
       </div>
     </div>
   );
 
-  // ── render principal ──
-  // Mensaje de WhatsApp pre-rellenado, contextual al negocio. waHref es null
-  // mientras no haya número configurado en business.ts → el botón no se pinta.
-  const waMessage = info?.business_name
-    ? `Hola Nico, soy de ${info.business_name}. Vi la web que me preparaste y quería preguntarte una cosa.`
-    : "Hola Nico, vi la web que me preparaste y quería preguntarte una cosa.";
-  const waHref = whatsappLink(waMessage);
+  // ── datos derivados ──
+  const businessName = info.business_name;
+  const city = info.city ?? "tu ciudad";
+  const category = (info.category ?? "negocio").toLowerCase();
+  const previewUrl = info.live_url ?? "#";
+  const screenshotUrl = info.preview_image_url;
+  const rating = info.rating != null ? String(info.rating) : "4.9";
+  const domainHint = domainHintFrom(businessName);
+  const greeting = info.contact_name ? `Hola ${info.contact_name}, ` : "Hola, ";
+  const waDefault = whatsappLink(`Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quería preguntarte una cosa.`) ?? "#";
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (form.name.trim().length < 2) e.name = "Pon tu nombre";
+    if (form.contact.trim().length < 5) e.contact = "Email o teléfono";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const submit = (ev: FormEvent) => {
+    ev.preventDefault();
+    if (!validate()) return;
+    const subject = `Quiero mi web · ${businessName}`;
+    const body =
+      `Hola ${NICO_NAME},\n\nSoy ${form.name} de ${businessName}. Vi la web que preparaste y me interesa.\n` +
+      `Contacto: ${form.contact}${form.phone ? `\nTeléfono: ${form.phone}` : ""}\n`;
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const submitWhatsapp = () => {
+    const named = form.name.trim().length >= 2;
+    const msg = named
+      ? `Hola ${NICO_NAME}, soy ${form.name} de ${businessName}. Vi la web y quiero reservarla.${form.phone ? ` Mi teléfono: ${form.phone}.` : ""}`
+      : `Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quiero reservarla.`;
+    window.open(whatsappLink(msg) ?? "#", "_blank");
+  };
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#FAF8F4", fontFamily: INTER }}>
-
-      {/* ── HERO ── */}
-      <div style={{ backgroundColor: "#1C1917", padding: "4rem 2rem 3.5rem" }}>
-        <div style={{ maxWidth: "72rem", margin: "0 auto" }}>
-          {info?.city && (
-            <p style={{ color: "#78716C", fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: "1.25rem" }}>
-              {info.city}
-            </p>
-          )}
-          <h1 style={{ fontFamily: LORA, color: "#FAFAF9", fontSize: "clamp(2rem, 4vw, 3.25rem)", lineHeight: 1.2, maxWidth: "36rem", margin: 0 }}>
-            {info?.business_name
-              ? `Hola, ${info.business_name}. Te construí una web.`
-              : "Hola. Te construí una web."}
-          </h1>
-          <p style={{ color: "#A8A29E", fontSize: "1rem", marginTop: "1rem", maxWidth: "30rem", lineHeight: 1.7 }}>
-            Sin pedirte permiso. Sin cobrar por adelantado. Échale un vistazo — si te convence, me dices.
-          </p>
+    <div className="lv-scope bg-paper text-ink min-h-screen overflow-x-hidden selection:bg-brick/10 selection:text-brick">
+      {/* NAV */}
+      <nav className="sticky top-0 z-40 border-b border-ink/5 bg-paper/80 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6 lg:h-16 lg:px-10">
+          <span className="font-serif text-xl italic lg:text-2xl">{NICO_NAME}.</span>
+          <div className="flex items-center gap-6">
+            <a href="#incluye" className="hidden text-sm opacity-70 hover:opacity-100 lg:block">Qué incluye</a>
+            <a href="#nico" className="hidden text-sm opacity-70 hover:opacity-100 lg:block">Sobre mí</a>
+            <a href="#contact" className="text-sm font-medium tracking-tight text-brick">Reservar propuesta →</a>
+          </div>
         </div>
-      </div>
+      </nav>
 
-      {/* ── BODY: dos columnas en desktop ── */}
-      <div
-        className="book-grid"
-        style={{
-          maxWidth: "72rem", margin: "0 auto", padding: "2.5rem 1.5rem",
-          display: "grid", gridTemplateColumns: "minmax(0,1.4fr) minmax(0,1fr)",
-          gap: "2rem", alignItems: "start",
-        }}
-      >
-        {/* ── COLUMNA IZQUIERDA — preview + qué incluye ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+      <main>
+        {/* HERO */}
+        <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-14 sm:px-6 sm:pt-12 sm:pb-16 lg:grid lg:grid-cols-[1fr_1.2fr] lg:gap-14 lg:px-10 lg:pt-24 lg:pb-28">
+          <div aria-hidden className="pointer-events-none absolute -top-20 -left-24 -z-10 size-[420px] rounded-full bg-brick/15 blur-3xl lv-blob" />
+          <div aria-hidden className="pointer-events-none absolute top-40 right-0 -z-10 size-[360px] rounded-full bg-ink/10 blur-3xl lv-blob" style={{ animationDelay: "-7s" }} />
 
-          {/* Preview: captura estática de la web (o fallback si aún no hay) */}
-          <div style={{ background: "white", borderRadius: "1rem", border: "1px solid #E7E5E4", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
-
-            {/* Barra browser falsa */}
-            <div style={{ background: "#F5F5F4", borderBottom: "1px solid #E7E5E4", padding: "0.6rem 1rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-              <div style={{ display: "flex", gap: "0.35rem" }}>
-                <div style={{ width: "0.65rem", height: "0.65rem", borderRadius: "50%", background: "#F87171" }} />
-                <div style={{ width: "0.65rem", height: "0.65rem", borderRadius: "50%", background: "#FBBF24" }} />
-                <div style={{ width: "0.65rem", height: "0.65rem", borderRadius: "50%", background: "#34D399" }} />
-              </div>
-              <span style={{ fontSize: "0.7rem", color: "#A8A29E", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {info?.live_url?.replace(/^https?:\/\//, "") ?? "tu-web.com"}
+          <Reveal>
+            <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-ink/10 bg-paper/70 backdrop-blur px-3 py-1">
+              <span className="relative grid place-items-center">
+                <span className="size-1.5 rounded-full bg-brick lv-pulse-ring" />
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">
+                Propuesta para {businessName} · {city}
               </span>
             </div>
 
-            {/* Contenido del preview: captura estática scrolleable, o fallback si aún no hay */}
-            {info?.preview_image_url ? (
-              <div style={{ height: "520px", overflowY: "auto", background: "white" }}>
-                <img
-                  src={info.preview_image_url}
-                  alt={`Vista previa de la web de ${info.business_name}`}
-                  loading="lazy"
-                  style={{ width: "100%", display: "block" }}
-                />
-              </div>
-            ) : (
-              <WebPreviewFallback liveUrl={info?.live_url ?? null} businessName={info?.business_name ?? null} />
-            )}
+            <h1 className="font-serif text-[2.5rem] leading-[1.05] text-balance mb-5 sm:text-5xl sm:mb-6 lg:text-7xl">
+              He diseñado una nueva web para tu <span className="lv-text-gradient italic">{category}</span>.
+            </h1>
 
-            {/* Botón ver web */}
-            {info?.live_url && (
-              <div style={{ padding: "1rem 1.25rem", borderTop: "1px solid #E7E5E4", display: "flex", justifyContent: "flex-end" }}>
-                <a
-                  href={info.live_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: "0.4rem",
-                    fontSize: "0.8rem", color: "#44403C", fontWeight: 500, textDecoration: "none",
-                    padding: "0.4rem 0.875rem", border: "1px solid #D6D3D1", borderRadius: "0.5rem",
-                    background: "white",
-                  }}
-                >
-                  Abrir en pantalla completa <ExternalLink style={{ width: "0.875rem", height: "0.875rem" }} />
-                </a>
-              </div>
-            )}
-          </div>
+            <p className="max-w-[44ch] text-[15px] leading-relaxed text-pretty opacity-80 mb-7 sm:text-base sm:mb-8 lg:text-lg">
+              {greeting}estuve mirando negocios locales con buena reputación en Google pero con una web que no les hace justicia. El tuyo me llamó la atención, así que me tomé la libertad de montarla. Si te gusta, es tuya.
+            </p>
 
-          {/* Qué incluye */}
-          <div style={{ background: "white", borderRadius: "1rem", border: "1px solid #E7E5E4", padding: "1.75rem" }}>
-            <h2 style={{ fontFamily: LORA, fontSize: "1.25rem", color: "#1C1917", marginBottom: "1.25rem" }}>¿Qué incluye?</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
-              {([
-                ["Web a medida para tu negocio", "Con tus servicios, fotos y reseñas reales. Mobile-first. Sin plantillas ni diseños genéricos."],
-                ["Publicada bajo tu dominio en 24 h", "Te ayudo a conseguir el dominio si no tienes (~10 €/año) y lo dejamos todo listo y funcionando."],
-                ["Un mes de soporte incluido", "Si quieres cambiar textos, fotos u horarios, me escribes y lo hago ese mismo día. Sin coste adicional."],
-              ] as [string, string][]).map(([title, desc]) => (
-                <div key={title} style={{ display: "flex", gap: "0.875rem", alignItems: "flex-start" }}>
-                  <CheckCircle2 style={{ width: "1.1rem", height: "1.1rem", color: "#92400E", flexShrink: 0, marginTop: "0.15rem" }} />
-                  <div>
-                    <p style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1C1917" }}>{title}</p>
-                    <p style={{ fontSize: "0.8rem", color: "#78716C", marginTop: "0.25rem", lineHeight: 1.6 }}>{desc}</p>
+            <div className="flex flex-col gap-2.5 mb-10 sm:flex-row sm:gap-3 sm:mb-12 lg:mb-0">
+              <a href={previewUrl} target="_blank" rel="noopener noreferrer"
+                className="lv-shine-wrap group flex items-center justify-center gap-2 rounded-sm bg-ink px-5 py-3.5 text-sm font-medium text-paper ring-1 ring-ink transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-6">
+                <span>Ver la web completa</span>
+                <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+              </a>
+              <a href={waDefault} target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-sm border border-ink/15 px-5 py-3.5 text-sm font-medium transition-all duration-500 hover:bg-ink/5 hover:border-ink/30 sm:px-6">
+                Preguntar por WhatsApp
+              </a>
+            </div>
+          </Reveal>
+
+          {/* Browser mockup */}
+          <Reveal delay={150} className="relative flex flex-col lv-float lg:justify-center">
+            <div className="flex items-center gap-1.5 rounded-t-lg border border-ink/10 border-b-0 bg-ink/5 px-4 py-2.5">
+              <div className="size-2 rounded-full bg-ink/20" />
+              <div className="size-2 rounded-full bg-ink/20" />
+              <div className="size-2 rounded-full bg-ink/20" />
+              <div className="flex-1 ml-2 truncate text-[10px] font-mono text-ink/40">{domainHint}</div>
+            </div>
+            <div className={`relative w-full border border-ink/10 border-t-0 rounded-b-lg overflow-hidden bg-ink/5 shadow-2xl shadow-ink/20 ${screenshotUrl ? "" : "aspect-[4/5] lg:aspect-auto lg:flex-1 lg:min-h-0"}`}>
+              {screenshotUrl && (
+                <img src={screenshotUrl} alt="Vista previa de la web" className="block w-full h-auto" />
+              )}
+              <a href={previewUrl} target="_blank" rel="noopener noreferrer"
+                className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper via-paper/90 to-transparent flex items-end justify-center pb-4">
+                <span className="font-serif italic text-brick text-base lv-underline-grow pb-0.5">Abrir web completa →</span>
+              </a>
+            </div>
+          </Reveal>
+        </section>
+
+        {/* TRUST — marquee */}
+        <section className="border-y border-ink/10 bg-ink text-paper py-5 overflow-hidden">
+          <div className="flex w-max lv-marquee-track gap-12 whitespace-nowrap">
+            {Array.from({ length: 2 }).map((_, dup) => (
+              <div key={dup} className="flex items-center gap-12 pr-12">
+                {Array.from({ length: 6 }).map((__, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <Stars />
+                    <p className="text-sm font-medium italic opacity-90 lg:text-base">Los clientes ya hablan bien de ti en Google</p>
+                    <span className="text-xs uppercase tracking-widest opacity-50">{rating}/5 · Google</span>
+                    <span className="text-brick">✦</span>
                   </div>
-                </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* OUTCOMES */}
+        <section className="bg-ink text-paper px-5 pt-16 pb-10 sm:px-6 sm:pt-20 sm:pb-12 lg:pt-32 lg:pb-16">
+          <div className="mx-auto max-w-6xl lg:px-4">
+            <Reveal>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Para qué sirve</p>
+              <h2 className="font-serif text-[2rem] leading-tight mb-10 sm:text-4xl sm:mb-12 lg:text-5xl lg:mb-16 lg:max-w-2xl">Lo que consigues con tu propia web.</h2>
+            </Reveal>
+            <div className="space-y-10 lg:grid lg:grid-cols-3 lg:gap-10 lg:space-y-0">
+              {OUTCOMES.map((o, i) => (
+                <Reveal key={o.title} delay={i * 120} className="flex gap-5 lg:flex-col lg:gap-4">
+                  <div className="shrink-0 font-serif text-brick text-2xl leading-none lg:text-4xl">{String(i + 1).padStart(2, "0")}</div>
+                  <div>
+                    <h3 className="text-base font-medium mb-2 lg:text-lg">{o.title}</h3>
+                    <p className="text-sm leading-relaxed opacity-60 max-w-[40ch]">{o.body}</p>
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* ── COLUMNA DERECHA — sticky ── */}
-        <div className="book-sticky" style={{ display: "flex", flexDirection: "column", gap: "1.25rem", position: "sticky", top: "1.5rem" }}>
-
-          {/* Quién soy */}
-          <div style={{ background: "white", borderRadius: "1rem", border: "1px solid #E7E5E4", padding: "1.5rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.875rem", marginBottom: "0.875rem" }}>
-              <img
-                src="https://unavatar.io/nicolassotodavid@gmail.com"
-                alt="Nico"
-                style={{ width: "3.25rem", height: "3.25rem", borderRadius: "50%", objectFit: "cover", border: "1px solid #E7E5E4", flexShrink: 0 }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "https://ui-avatars.com/api/?name=Nico+Soto&background=1C1917&color=FAFAF9&size=52";
-                }}
-              />
-              <div>
-                <p style={{ fontFamily: LORA, fontSize: "1rem", fontWeight: 600, color: "#1C1917" }}>Nico Soto</p>
-                <p style={{ fontSize: "0.75rem", color: "#78716C" }}>Diseñador web · Valencia</p>
-                <a href="https://linkedin.com/in/nicolassotodavid" target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: "0.7rem", color: "#2563EB", textDecoration: "none" }}>
-                  Ver en LinkedIn →
-                </a>
+        {/* CONVINCE BAND */}
+        <section className="relative bg-ink text-paper overflow-hidden">
+          <div className="mx-auto max-w-6xl px-5 pt-2 pb-10 sm:px-6 sm:pb-12 lg:px-10 lg:pb-16">
+            <Reveal>
+              <div className="relative rounded-sm border border-paper/10 bg-gradient-to-br from-paper/[0.04] to-transparent px-5 py-6 sm:px-8 sm:py-7 lg:px-12 lg:py-8">
+                <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-4 sm:mb-5">Haz la cuenta</p>
+                <div className="grid gap-5 lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
+                  <div className="text-center lg:text-right">
+                    <p className="text-[11px] uppercase tracking-widest opacity-50 mb-1">Una agencia</p>
+                    <p className="font-serif text-3xl leading-none line-through decoration-brick decoration-2 opacity-60 sm:text-4xl">1.500€</p>
+                    <p className="text-xs opacity-50 mt-1.5">o más · con cuotas</p>
+                  </div>
+                  <div className="hidden lg:flex flex-col items-center gap-1.5 text-paper/30">
+                    <div className="h-8 w-px bg-paper/15" />
+                    <span className="font-serif italic text-sm">vs</span>
+                    <div className="h-8 w-px bg-paper/15" />
+                  </div>
+                  <div className="lg:hidden flex items-center justify-center gap-3 text-paper/30">
+                    <div className="h-px w-10 bg-paper/15" />
+                    <span className="font-serif italic text-sm">vs</span>
+                    <div className="h-px w-10 bg-paper/15" />
+                  </div>
+                  <div className="text-center lg:text-left">
+                    <p className="text-[11px] uppercase tracking-widest text-brick mb-1">Conmigo</p>
+                    <p className="font-serif text-4xl leading-none text-paper sm:text-5xl">397<span className="text-brick">€</span></p>
+                    <p className="text-xs opacity-70 mt-1.5">una sola vez · tuya para siempre</p>
+                  </div>
+                </div>
+                <div className="mt-5 pt-4 border-t border-paper/10 text-center sm:mt-6 sm:pt-5">
+                  <p className="font-serif italic text-sm leading-snug text-paper/80 sm:text-base">Sin cuotas. Sin contratos. Sin sorpresas.</p>
+                </div>
               </div>
-            </div>
-            <p style={{ fontSize: "0.8rem", color: "#57534E", lineHeight: 1.7 }}>
-              Soy una persona, no una agencia. Busco negocios con buena reputación en Google y les construyo la web antes de presentarme. Sin contratos ni permanencias.
+            </Reveal>
+          </div>
+          <div className="h-8 bg-gradient-to-b from-ink to-paper" aria-hidden />
+        </section>
+
+        {/* INCLUDED */}
+        <section id="incluye" className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-32">
+          <Reveal>
+            <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Qué incluye</p>
+            <h2 className="font-serif text-[2rem] leading-tight mb-2 sm:text-4xl lg:text-5xl">Todo en un pago.</h2>
+            <p className="text-[15px] opacity-60 mb-8 sm:text-base sm:mb-10 lg:mb-14 lg:text-lg">Sin cuotas mensuales, sin sorpresas.</p>
+          </Reveal>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+            {INCLUDED.map((item, idx) => {
+              const Icon = item.title === "Diseño exclusivo" ? Palette
+                : item.title === "Optimización SEO local" ? Search
+                : item.title === "Servicios y tarifas visibles" ? ClipboardList
+                : item.title === "Reseñas de Google integradas" ? Star
+                : item.title === "Carga ultra-rápida" ? Zap
+                : Smartphone;
+              return (
+                <Reveal key={item.title} delay={idx * 80}
+                  className="group lv-lift rounded-sm border border-ink/5 bg-ink/[0.02] p-6 hover:bg-ink/[0.04] hover:border-brick/20 lg:p-8">
+                  <div className="mb-4 inline-flex size-11 items-center justify-center rounded-sm bg-brick/10 text-brick transition-all duration-500 group-hover:bg-brick group-hover:text-paper group-hover:rotate-6">
+                    <Icon className="size-5 lg:size-6" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-sm font-medium leading-snug lg:text-base mb-1">{item.title}</h3>
+                  <p className="text-sm leading-relaxed opacity-60">{item.body}</p>
+                </Reveal>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ABOUT NICO */}
+        <section id="nico" className="bg-ink/[0.03] border-y border-ink/5 px-5 py-16 sm:px-6 sm:py-20 lg:py-28">
+          <Reveal className="mx-auto flex max-w-3xl flex-col items-center text-center">
+            <div className="size-20 rounded-full bg-ink/5 ring-1 ring-ink/10 mb-5 grid place-items-center font-serif italic text-2xl text-ink/60 lv-float sm:size-24 sm:mb-6 sm:text-3xl lg:size-28 lg:text-4xl">N</div>
+            <p className="text-[10px] font-medium uppercase tracking-widest opacity-50 mb-3">Quién está detrás</p>
+            <h2 className="font-serif text-3xl mb-4 lg:text-5xl">Soy {NICO_NAME}.</h2>
+            <p className="text-[15px] leading-relaxed opacity-80 max-w-[52ch] text-pretty sm:text-sm lg:text-lg">
+              No trabajo en una agencia. Soy un autónomo que diseña webs para negocios locales. Construyo la web antes de presentarme — si te convence, hablamos. Si no, sin drama.
             </p>
-          </div>
+          </Reveal>
+        </section>
 
-          {/* Garantía */}
-          <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: "1rem", padding: "1.25rem", display: "flex", gap: "0.875rem", alignItems: "flex-start" }}>
-            <ShieldCheck style={{ width: "1.25rem", height: "1.25rem", color: "#92400E", flexShrink: 0, marginTop: "0.1rem" }} />
-            <div>
-              <p style={{ fontFamily: LORA, fontSize: "0.95rem", fontWeight: 600, color: "#78350F" }}>Garantía de 7 días</p>
-              <p style={{ fontSize: "0.78rem", color: "#92400E", marginTop: "0.3rem", lineHeight: 1.6 }}>
-                Si no estás contento, te devuelvo el dinero completo. Sin preguntas. <strong>El riesgo es mío, no tuyo.</strong>
-              </p>
-            </div>
-          </div>
-
-          {/* Precio */}
-          <div style={{ background: "#1C1917", borderRadius: "1rem", padding: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <p style={{ fontSize: "0.65rem", color: "#78716C", textTransform: "uppercase", letterSpacing: "0.12em" }}>Precio</p>
-              <p style={{ fontFamily: LORA, fontSize: "2.5rem", fontWeight: 600, color: "#FAFAF9", lineHeight: 1.1, marginTop: "0.25rem" }}>{PRECIO}</p>
-              <p style={{ fontSize: "0.75rem", color: "#78716C", marginTop: "0.3rem" }}>pago único · IVA incluido · sin permanencia</p>
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "#A8A29E", textAlign: "right", lineHeight: 2 }}>
-              <div>✓ Web a medida</div>
-              <div>✓ Dominio incluido</div>
-              <div>✓ 1 mes soporte</div>
-              <div>✓ Garantía 7 días</div>
-            </div>
-          </div>
-
-          {/* Formulario */}
-          <div style={{ background: "white", borderRadius: "1rem", border: "1px solid #E7E5E4", padding: "1.5rem" }}>
-            <h2 style={{ fontFamily: LORA, fontSize: "1.1rem", color: "#1C1917", marginBottom: "0.25rem" }}>Reservar la web</h2>
-            <p style={{ fontSize: "0.78rem", color: "#A8A29E", marginBottom: "1.25rem" }}>Pago seguro con Stripe · menos de 2 minutos</p>
-
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
-              <div>
-                <Label htmlFor="b-name" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>Tu nombre</Label>
-                <Input id="b-name" value={name} onChange={e => setName(e.target.value)} placeholder="Ana García" required autoComplete="name" style={{ marginTop: "0.3rem" }} />
-              </div>
-              <div>
-                <Label htmlFor="b-email" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>Email de contacto</Label>
-                <Input id="b-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="ana@tuempresa.com" required autoComplete="email" style={{ marginTop: "0.3rem" }} />
-              </div>
-              <div>
-                <Label htmlFor="b-phone" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>
-                  Teléfono <span style={{ color: "#A8A29E", fontWeight: 400 }}>(opcional)</span>
-                </Label>
-                <Input id="b-phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+34 600 000 000" autoComplete="tel" style={{ marginTop: "0.3rem" }} />
-              </div>
-
-              <div style={{ borderTop: "1px solid #F5F5F4", paddingTop: "0.875rem" }}>
-                <p style={{ fontSize: "0.7rem", color: "#A8A29E", marginBottom: "0.75rem" }}>Datos para la factura</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                  <div>
-                    <Label htmlFor="b-empresa" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>Nombre o razón social</Label>
-                    <Input id="b-empresa" value={empresa} onChange={e => setEmpresa(e.target.value)} placeholder="Talleres Ejemplo S.L." required autoComplete="organization" style={{ marginTop: "0.3rem" }} />
-                  </div>
-                  <div>
-                    <Label htmlFor="b-nif" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>NIF / CIF</Label>
-                    <Input id="b-nif" value={nif} onChange={e => setNif(e.target.value)} placeholder="B12345678" required style={{ marginTop: "0.3rem" }} />
-                  </div>
-                  <div>
-                    <Label htmlFor="b-dir" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>Dirección fiscal</Label>
-                    <Input id="b-dir" value={direccion} onChange={e => setDireccion(e.target.value)} placeholder="Calle Mayor 1, 1º" required autoComplete="street-address" style={{ marginTop: "0.3rem" }} />
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.45fr) minmax(0, 1fr)", gap: "0.75rem" }}>
-                    <div>
-                      <Label htmlFor="b-cp" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>CP</Label>
-                      <Input id="b-cp" value={cp} onChange={e => setCp(e.target.value)} placeholder="46001" required inputMode="numeric" autoComplete="postal-code" style={{ marginTop: "0.3rem" }} />
-                    </div>
-                    <div>
-                      <Label htmlFor="b-ciudad" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>Ciudad</Label>
-                      <Input id="b-ciudad" value={ciudad} onChange={e => setCiudad(e.target.value)} placeholder="Valencia" required autoComplete="address-level2" style={{ marginTop: "0.3rem" }} />
+        {/* PRICING + FORM */}
+        <section id="contact" className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-32">
+          <div className="lg:grid lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+            <Reveal className="text-center lg:text-left lg:sticky lg:top-24 lg:self-start">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Inversión única</p>
+              <div className="font-serif text-[5.5rem] leading-none mb-3 lv-text-gradient sm:text-7xl sm:mb-4 lg:text-[9rem]">397€</div>
+              <p className="text-xs opacity-60 italic mb-10 sm:mb-12 lg:text-sm lg:mb-16">Pago único · sin contratos · sin cuotas</p>
+              <div className="hidden lg:block">
+                <div className="flex gap-5 items-center">
+                  <div className="shrink-0 size-20 rounded-full ring-2 ring-brick grid place-items-center">
+                    <div className="text-center leading-none">
+                      <div className="font-serif text-3xl text-brick">7</div>
+                      <div className="text-[8px] font-bold tracking-widest text-brick uppercase">días</div>
                     </div>
                   </div>
-                  <div>
-                    <Label htmlFor="b-provincia" style={{ fontSize: "0.8rem", color: "#44403C", fontWeight: 500 }}>
-                      Provincia <span style={{ color: "#A8A29E", fontWeight: 400 }}>(opcional)</span>
-                    </Label>
-                    <Input id="b-provincia" value={provincia} onChange={e => setProvincia(e.target.value)} placeholder="Valencia" autoComplete="address-level1" style={{ marginTop: "0.3rem" }} />
+                  <div className="text-left">
+                    <p className="font-serif text-xl mb-1">Garantía de devolución</p>
+                    <p className="text-sm opacity-70 leading-relaxed">Si no estás contento en 7 días, te devuelvo el dinero entero.</p>
                   </div>
                 </div>
               </div>
+            </Reveal>
 
-              {formError && (
-                <p style={{ fontSize: "0.8rem", color: "#DC2626", background: "#FEF2F2", borderRadius: "0.5rem", padding: "0.75rem 1rem" }}>
-                  {formError}
-                </p>
-              )}
+            <Reveal delay={120} className="mt-2 bg-paper ring-1 ring-ink/10 rounded-sm p-5 shadow-2xl shadow-ink/5 sm:mt-4 sm:p-7 lg:p-10">
+              <div className="grid grid-cols-3 gap-2 mb-7 pb-6 border-b border-ink/5">
+                {[["Contacto", "directo"], ["Garantía", "7 días"], ["Respuesta", "<1h"]].map(([k, v]) => (
+                  <div key={k} className="text-center">
+                    <p className="text-[9px] font-medium uppercase tracking-widest opacity-40">{k}</p>
+                    <p className="text-xs font-medium mt-1">{v}</p>
+                  </div>
+                ))}
+              </div>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
-                  padding: "0.875rem", borderRadius: "0.75rem", border: "none", cursor: submitting ? "not-allowed" : "pointer",
-                  background: "#1C1917", color: "white", fontSize: "0.875rem", fontWeight: 600,
-                  opacity: submitting ? 0.6 : 1, fontFamily: INTER,
-                }}
-              >
-                {submitting
-                  ? <><Loader2 style={{ width: "1rem", height: "1rem", animation: "spin 1s linear infinite" }} /> Procesando…</>
-                  : <>Quiero esta web · Pagar {PRECIO} <ArrowRight style={{ width: "1rem", height: "1rem" }} /></>}
-              </button>
+              <form onSubmit={submit} className="space-y-4" noValidate>
+                <Field label="Tu nombre" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} placeholder={info.contact_name || "Tu nombre"} error={errors.name} />
+                <Field label="Email o teléfono" value={form.contact} onChange={(v) => setForm((f) => ({ ...f, contact: v }))} placeholder={`hola@${domainHint}`} error={errors.contact} />
+                <Field label="Teléfono (opcional)" value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))} placeholder="+34 600 000 000" type="tel" error={errors.phone} />
+                <button type="submit"
+                  className="lv-shine-wrap w-full rounded-sm bg-brick py-4 text-[15px] font-medium text-paper ring-1 ring-brick shadow-lg shadow-brick/20 active:translate-y-px transition-all duration-300 hover:shadow-xl hover:shadow-brick/30 hover:-translate-y-0.5 mt-2 sm:text-sm lg:text-base lg:py-5">
+                  Reservar mi web por 397€
+                </button>
+              </form>
 
-              <p style={{ fontSize: "0.7rem", color: "#A8A29E", textAlign: "center" }}>
-                Pago 100 % seguro con Stripe · Garantía de devolución 7 días
-              </p>
-            </form>
-          </div>
+              <div className="mt-8 space-y-2 pt-6 border-t border-ink/5">
+                <MiniFaq q="¿Cuotas?" a="No. Pago único, la web es tuya." />
+                <MiniFaq q="¿Tecnología?" a="No necesitas saber nada. Yo lo gestiono todo." />
+                <MiniFaq q="¿Contratos?" a="Ninguno. Solo el pago con garantía de 7 días." />
+              </div>
+            </Reveal>
 
-          {/* Dudas */}
-          <div style={{ textAlign: "center", paddingBottom: "2rem" }}>
-            <p style={{ fontSize: "0.75rem", color: "#A8A29E", marginBottom: "0.75rem" }}>
-              ¿Tienes dudas antes de pagar? Escríbeme directamente.
-            </p>
-
-            {waHref && (
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "0.5rem",
-                  padding: "0.6rem 1.1rem", borderRadius: "0.75rem",
-                  background: "#25D366", color: "white", fontSize: "0.8rem", fontWeight: 600,
-                  textDecoration: "none", marginBottom: "0.875rem",
-                }}
-              >
-                <WhatsAppIcon /> Escríbeme por WhatsApp
-              </a>
-            )}
-
-            <div>
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                style={{ fontSize: "0.75rem", color: "#57534E", textDecoration: "underline", textUnderlineOffset: "3px" }}
-              >
-                {CONTACT_EMAIL}
-              </a>
+            <div className="mt-10 flex gap-5 items-center lg:hidden">
+              <div className="shrink-0 size-20 rounded-full ring-2 ring-brick grid place-items-center">
+                <div className="text-center leading-none">
+                  <div className="font-serif text-3xl text-brick">7</div>
+                  <div className="text-[8px] font-bold tracking-widest text-brick uppercase">días</div>
+                </div>
+              </div>
+              <div>
+                <p className="font-serif text-xl mb-1">Garantía total</p>
+                <p className="text-sm opacity-70 leading-relaxed">Si en 7 días no estás contento, te devuelvo el dinero entero. Sin preguntas.</p>
+              </div>
             </div>
           </div>
+        </section>
 
-        </div>
-      </div>
+        {/* WHATSAPP BLOCK */}
+        <section className="mx-auto max-w-3xl px-5 pb-14 sm:px-6 sm:pb-16 lg:px-10 lg:pb-24">
+          <Reveal>
+            <button onClick={submitWhatsapp}
+              className="group lv-shine-wrap w-full flex items-center gap-4 rounded-sm border border-ink/10 bg-ink/[0.03] px-5 py-4 text-left transition-all duration-300 hover:border-brick/40 hover:bg-brick/5 sm:gap-5 sm:px-6 sm:py-5">
+              <span className="shrink-0 grid place-items-center size-11 rounded-full bg-brick text-paper transition-transform duration-300 group-hover:scale-105 sm:size-12">
+                <WhatsAppIcon />
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-[11px] uppercase tracking-widest text-brick font-medium mb-0.5">¿Prefieres hablarlo?</span>
+                <span className="block font-serif text-lg text-ink leading-tight sm:text-xl">Escríbeme un WhatsApp y te contesto yo mismo</span>
+              </span>
+              <span className="shrink-0 font-serif text-brick text-2xl transition-transform duration-300 group-hover:translate-x-1 sm:text-3xl">→</span>
+            </button>
+          </Reveal>
+        </section>
 
-      {/* Responsive */}
-      <style>{`
-        @media (max-width: 768px) {
-          .book-grid { grid-template-columns: 1fr !important; }
-          .book-sticky { position: static !important; }
-        }
-      `}</style>
+        {/* FAQ */}
+        <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-32">
+          <div className="lg:grid lg:grid-cols-[1fr_2fr] lg:gap-16">
+            <Reveal className="mb-8 lg:mb-0">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Dudas frecuentes</p>
+              <h2 className="font-serif text-[2rem] leading-tight text-balance sm:text-4xl lg:text-5xl">Antes de decidirte.</h2>
+            </Reveal>
+            <div>
+              {FAQ.map((item, i) => (
+                <Reveal key={item.q} delay={i * 60}>
+                  <FaqItem q={item.q} a={item.a} />
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="mx-auto max-w-6xl px-6 py-12 border-t border-ink/5 text-center lg:px-10">
+        <p className="text-[10px] font-medium uppercase tracking-widest opacity-40 italic">Hecho a mano por {NICO_NAME} para {businessName}</p>
+      </footer>
+
+      {/* Desktop FAB */}
+      <a href={waDefault} target="_blank" rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 hidden size-14 items-center justify-center rounded-full bg-ink text-paper shadow-xl shadow-ink/30 ring-1 ring-ink transition-transform hover:scale-110 active:scale-95 lg:flex lg:size-16"
+        aria-label="Hablar por WhatsApp">
+        <WhatsAppIcon size={22} />
+      </a>
+
+      {/* Mobile sticky WhatsApp bar */}
+      <a href={waDefault} target="_blank" rel="noopener noreferrer"
+        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center gap-2.5 bg-ink py-3.5 text-paper shadow-[0_-8px_32px_rgba(0,0,0,0.25)] transition-transform active:scale-[0.98] lg:hidden"
+        aria-label="Hablar por WhatsApp">
+        <WhatsAppIcon size={20} />
+        <span className="text-sm font-medium tracking-tight">Escríbeme por WhatsApp</span>
+      </a>
     </div>
   );
 }
 
-// ── Icono de WhatsApp (lucide-react ya no incluye marcas) ────────────────────
-
-function WhatsAppIcon() {
+function WhatsAppIcon({ size = 24 }: { size?: number }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 0 1 8.413 3.488 11.824 11.824 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.519 5.26l-.999 3.648 3.969-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden className="lg:size-6">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
     </svg>
   );
 }
 
-// ── Fallback cuando aún no hay captura de la web ─────────────────────────────
-
-function WebPreviewFallback({
-  liveUrl,
-  businessName,
-}: {
-  liveUrl: string | null;
-  businessName: string | null;
-}) {
-  const LORA = "Lora, Georgia, serif";
-  const INTER = "Inter, system-ui, sans-serif";
-
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div
-      style={{
-        height: "520px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: "1.5rem",
-        padding: "2rem",
-        background: "linear-gradient(135deg, #FAF8F4 0%, #F5F5F0 100%)",
-        textAlign: "center",
-      }}
-    >
-      {/* Icono decorativo */}
-      <div
-        style={{
-          width: "4rem", height: "4rem", borderRadius: "1rem",
-          background: "#1C1917", display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-        }}
-      >
-        <Monitor style={{ width: "2rem", height: "2rem", color: "#FAFAF9" }} />
+    <div className={`group rounded-sm border transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${open ? "border-ink/10 bg-ink/[0.02] shadow-sm" : "border-transparent hover:border-ink/5"}`}>
+      <button onClick={() => setOpen((o) => !o)} className="flex w-full items-center gap-4 px-5 py-5 text-left lg:px-6 lg:py-6">
+        <span className={`h-5 w-0.5 shrink-0 rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${open ? "bg-brick" : "bg-transparent group-hover:bg-ink/10"}`} />
+        <span className="flex-1 font-serif text-lg transition-colors duration-300 lg:text-xl">{q}</span>
+        <ChevronDown className={`shrink-0 size-5 text-brick transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${open ? "rotate-180" : ""}`} />
+      </button>
+      <div className={`grid transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+        <div className="overflow-hidden">
+          <p className="px-5 pb-5 text-sm leading-relaxed opacity-70 max-w-[60ch] lg:px-6 lg:pb-6 lg:text-base">{a}</p>
+        </div>
       </div>
+    </div>
+  );
+}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <p style={{ fontFamily: LORA, fontSize: "1.15rem", fontWeight: 600, color: "#1C1917" }}>
-          {businessName ? `La web de ${businessName} está lista.` : "Tu web está publicada y funcionando."}
-        </p>
-        <p style={{ fontFamily: INTER, fontSize: "0.875rem", color: "#78716C", lineHeight: 1.6, maxWidth: "22rem" }}>
-          Ábrela en una pestaña nueva para verla al 100 %. Está construida para verse perfecta en móvil y ordenador.
-        </p>
-      </div>
+function Field({ label, value, onChange, placeholder, type = "text", error }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; error?: string;
+}) {
+  return (
+    <div>
+      <label className="block text-[10px] font-medium uppercase tracking-widest mb-1.5 opacity-60">{label}</label>
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+        className="w-full rounded-sm border border-ink/10 bg-transparent px-4 py-3 text-sm outline-none focus:border-brick/40 focus:ring-2 focus:ring-brick/10 transition" />
+      {error && <p className="text-[11px] text-brick mt-1.5">{error}</p>}
+    </div>
+  );
+}
 
-      {liveUrl && (
-        <a
-          href={liveUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "inline-flex", alignItems: "center", gap: "0.5rem",
-            padding: "0.75rem 1.5rem", borderRadius: "0.75rem",
-            background: "#1C1917", color: "white",
-            fontSize: "0.875rem", fontWeight: 600, fontFamily: INTER,
-            textDecoration: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          }}
-        >
-          Ver mi web <ExternalLink style={{ width: "0.875rem", height: "0.875rem" }} />
-        </a>
-      )}
-
-      {liveUrl && (
-        <p style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#A8A29E" }}>
-          {liveUrl.replace(/^https?:\/\//, "")}
-        </p>
-      )}
+function MiniFaq({ q, a }: { q: string; a: string }) {
+  return (
+    <div className="flex gap-2 text-xs">
+      <span className="font-semibold text-brick shrink-0">{q}</span>
+      <span className="opacity-60">{a}</span>
     </div>
   );
 }
