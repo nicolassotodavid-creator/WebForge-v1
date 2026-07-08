@@ -1,0 +1,51 @@
+name: Aplicar auth cron_secret (followups + score-sites, manual)
+
+# Pone el secreto 'cron_secret' en el Vault de Supabase (= al secreto CRON_SECRET de GitHub) y
+# reprograma los jobs pg_cron de seguimientos y scoring para autenticar con él (migración 0019).
+# Arregla el 401 silencioso que dejaba sin ejecutar los Email 2/3 y el scoring tras la migración
+# de keys del proyecto. Ejecuta el SQL vía la Management API con SUPABASE_ACCESS_TOKEN (ya existente).
+# NO dispara las funciones (cron-followups mandaría emails reales): solo reprograma y verifica.
+# Botón: Actions → "Aplicar auth cron_secret" → Run workflow.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vault cron_secret + reprogramar pg_cron
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          PROJECT_REF: khscikqchvjxyvoaruas
+        run: |
+          set -euo pipefail
+          Q="https://api.supabase.com/v1/projects/$PROJECT_REF/database/query"
+          post()      { curl -sS -X POST "$Q" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" --data @-; echo; }
+          post_sql()  { jq -n --arg q "$1" '{query:$q}' | post; }
+          post_file() { jq -Rs '{query:.}' < "$1" | post; }
+
+          echo "== 1) upsert del secreto 'cron_secret' en el Vault (valor enmascarado) =="
+          cat > vault.sql <<SQL
+          do \$\$
+          declare sid uuid;
+          begin
+            select id into sid from vault.secrets where name = 'cron_secret';
+            if sid is null then
+              perform vault.create_secret('${CRON_SECRET}', 'cron_secret');
+            else
+              perform vault.update_secret(sid, '${CRON_SECRET}');
+            end if;
+          end \$\$;
+          SQL
+          post_file vault.sql
+
+          echo "== 2) reprogramar los jobs pg_cron (migración 0019) =="
+          post_file supabase/migrations/0019_cron_auth_cron_secret.sql
+
+          echo "== 3) verificar: secreto del Vault presente + jobs usando cron_secret =="
+          post_sql "select name from vault.secrets where name = 'cron_secret'"
+          post_sql "select jobname, schedule, (command like '%cron_secret%') as usa_cron_secret, (command like '%service_role_key%') as usa_service_key, active from cron.job where jobname in ('cron-followups-daily','cron-score-sites') order by jobname"
