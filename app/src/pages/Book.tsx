@@ -41,7 +41,7 @@ const INCLUDED = [
 const FAQ = [
   { q: "¿Y si no me gusta la web?", a: "Tienes 7 días de garantía total. Si no te convence, te devuelvo el dinero sin preguntas." },
   { q: "¿Necesito saber de tecnología?", a: "Nada. Yo me encargo del dominio, hosting, correos y todo lo técnico. Tú solo me das el visto bueno." },
-  { q: "¿Es caro comparado con hacerla yo?", a: "Una agencia te cobra 1.500€ o más. Conmigo pagas 397€ una sola vez y la web es tuya para siempre." },
+  { q: "¿Es caro comparado con hacerla yo?", a: "Una agencia te cobra 1.500€ o más. Conmigo pagas 397€ + IVA una sola vez y la web es tuya para siempre." },
   { q: "¿Y si ya tengo web?", a: "La reemplazamos. Esta está optimizada para móvil, velocidad y Google — lo que probablemente la tuya no hace." },
   { q: "¿Hay cuotas mensuales?", a: "Ninguna. Es un pago único y la web es tuya. El hosting del primer año va incluido." },
   { q: "¿Cuánto tarda en estar lista?", a: "La estructura ya está construida. En cuanto me confirmes, la adapto a tu negocio y está online en 48-72 horas." },
@@ -294,7 +294,7 @@ export default function Book() {
                   <div className="text-center lg:text-left">
                     <p className="text-[11px] uppercase tracking-widest text-brick mb-1">Conmigo</p>
                     <p className="font-serif text-4xl leading-none text-paper sm:text-5xl">397<span className="text-brick">€</span></p>
-                    <p className="text-xs opacity-70 mt-1.5">una sola vez · tuya para siempre</p>
+                    <p className="text-xs opacity-70 mt-1.5">+ IVA · una sola vez · tuya para siempre</p>
                   </div>
                 </div>
                 <div className="mt-5 pt-4 border-t border-paper/10 text-center sm:mt-6 sm:pt-5">
@@ -353,7 +353,7 @@ export default function Book() {
             <Reveal className="text-center lg:text-left lg:sticky lg:top-24 lg:self-start">
               <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Inversión única</p>
               <div className="font-serif text-[5.5rem] leading-none mb-3 lv-text-gradient sm:text-7xl sm:mb-4 lg:text-[9rem]">397€</div>
-              <p className="text-xs opacity-60 italic mb-10 sm:mb-12 lg:text-sm lg:mb-16">Sin cuotas ni contratos. La web es tuya.</p>
+              <p className="text-xs opacity-60 italic mb-10 sm:mb-12 lg:text-sm lg:mb-16">+ IVA · sin cuotas ni contratos. La web es tuya.</p>
               <div className="hidden lg:block">
                 <div className="flex gap-5 items-center">
                   <div className="shrink-0 size-20 rounded-full ring-2 ring-brick grid place-items-center">
@@ -386,7 +386,7 @@ export default function Book() {
                 {paying ? (
                   <><Loader2 className="size-4 animate-spin" /> Abriendo pago seguro…</>
                 ) : (
-                  <><Lock className="size-4" strokeWidth={2} /> Reservar mi web · 397€
+                  <><Lock className="size-4" strokeWidth={2} /> Reservar mi web · 397€ + IVA
                     <span className="transition-transform duration-300 group-hover:translate-x-1">→</span></>
                 )}
               </button>
@@ -463,9 +463,9 @@ export default function Book() {
       <div className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-ink shadow-[0_-8px_32px_rgba(0,0,0,0.25)] lg:hidden">
         <button type="button" onClick={goToCheckout} disabled={paying}
           className="flex flex-1 items-center justify-center gap-2 py-3.5 text-paper text-sm font-medium tracking-tight transition-transform active:scale-[0.98] disabled:opacity-70"
-          aria-label="Reservar mi web por 397 euros">
+          aria-label="Reservar mi web por 397 euros más IVA">
           {paying ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
-          <span>{paying ? "Abriendo pago…" : "Reservar mi web · 397€"}</span>
+          <span>{paying ? "Abriendo pago…" : "Reservar · 397€ + IVA"}</span>
         </button>
         <button type="button" onClick={goToWhatsapp}
           className="flex items-center justify-center px-6 bg-[#25D366] text-white transition-transform active:scale-[0.98]"
