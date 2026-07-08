@@ -20,7 +20,7 @@
 import "./env.ts";
 import { createClient } from "@supabase/supabase-js";
 import { writeFileSync } from "node:fs";
-import { renderEmail } from "../supabase/functions/_shared/emailTemplate.ts";
+import { renderEmail, withWhatsappFooter } from "../supabase/functions/_shared/emailTemplate.ts";
 
 function argValue(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -108,10 +108,24 @@ async function main() {
   // generate-outreach / cron-followups sustituyendo la live_url por el enlace de /book en el cuerpo.
   let linkDestino = liveUrl;
   if (bookLink) {
-    bodyText = bodyText.includes(liveUrl)
-      ? bodyText.split(liveUrl).join(bookLink)
-      : `${bodyText.trimEnd()}\n\n${bookLink}`;
+    if (bodyText.includes(liveUrl)) {
+      // Borrador que trae la live_url cruda (o cuerpo de respaldo): la cambiamos por el /book.
+      bodyText = bodyText.split(liveUrl).join(bookLink);
+    } else if (!bodyText.includes(bookLink)) {
+      // Ni live_url ni /book en el cuerpo → añadimos el enlace al final.
+      bodyText = `${bodyText.trimEnd()}\n\n${bookLink}`;
+    }
+    // Si el borrador REAL ya trae el /book (generate-outreach lo guarda así con BOOKING_BASE
+    // puesto), no tocamos nada: evitamos el enlace de /book duplicado.
     linkDestino = bookLink;
+  }
+
+  // Pie de WhatsApp (WHATSAPP_NUMBER): en producción lo añaden generate-outreach (email 1) y
+  // cron-followups (2/3) con withWhatsappFooter, como ÚLTIMO párrafo tras la firma. El borrador
+  // real del Email 1 ya puede traerlo guardado; los cuerpos de respaldo (2/3) no. Lo añadimos
+  // solo si no está ya, para no duplicar el botón verde. Así el email de prueba refleja producción.
+  if (!/WhatsApp:\s*https:\/\/wa\.me\//i.test(bodyText)) {
+    bodyText = withWhatsappFooter(bodyText, process.env.WHATSAPP_NUMBER);
   }
 
   // Showcase en los 3 emails: captura enmarcada + "Ver la web entera" (→ live_url) +
