@@ -7,6 +7,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
+import { isOptedOut } from "../_shared/contactability.ts";
 import {
   DEFAULT_REPLY_TO_LUVIA,
   DEFAULT_REPLY_TO_WEBFORGE,
@@ -102,7 +103,7 @@ Deno.serve(async (req: Request) => {
   // --- Destinatario: el email del lead ---
   const { data: lead, error: leadErr } = await supabase
     .from("leads")
-    .select("id,email,status,owner")
+    .select("id,email,status,owner,do_not_contact")
     .eq("id", msg.lead_id)
     .maybeSingle();
   if (leadErr) return jsonResponse({ error: leadErr.message }, 500);
@@ -111,6 +112,10 @@ Deno.serve(async (req: Request) => {
   // service_role del orquestador trae operator=null y se salta esta comprobación.
   if (lead && operator && !canAccessLead(lead.owner, operator)) {
     return jsonResponse({ error: "Este lead no es de tu cuenta." }, 403);
+  }
+  // BAJA (opt-out): honra la promesa de "responde BAJA y no vuelvo a escribir".
+  if (isOptedOut(lead)) {
+    return jsonResponse({ error: "Este lead pidió BAJA (do_not_contact); no se envía." }, 409);
   }
   if (!lead?.email) {
     return jsonResponse({ error: "El lead no tiene email; no se puede enviar." }, 422);
