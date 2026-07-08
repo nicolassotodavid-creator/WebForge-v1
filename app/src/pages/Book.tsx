@@ -1,12 +1,12 @@
 // /book/:leadId — Página PÚBLICA (sin auth). Diseño de Nico (portado de su proyecto
 // Lovable "warm-web-offer" / "Your New Web"): propuesta editorial paper/ink/brick,
 // Instrument Serif + DM Sans, marquee, comparativa 1.500€ vs 397€, garantía 7 días, FAQ.
-// Datos reales del lead vía get-booking-info. CTA = captación (WhatsApp/email a Nico),
-// NO Stripe: el prospecto deja sus datos y Nico cierra por WhatsApp.
-import { useState, useEffect, type FormEvent } from "react";
+// Datos reales del lead vía get-booking-info. CTA primaria = PAGO con Stripe Checkout
+// (create-checkout); respaldo = WhatsApp pre-escrito. Stripe recoge NIF/dirección, no la página.
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { Palette, Search, ClipboardList, Star, Zap, Smartphone, ChevronDown, Loader2 } from "lucide-react";
+import { Palette, Search, ClipboardList, Star, Zap, Smartphone, ChevronDown, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { CONTACT_EMAIL, whatsappLink } from "@/lib/business";
 import { Reveal } from "@/components/Reveal";
 import "./book.css";
@@ -66,8 +66,9 @@ export default function Book() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [form, setForm] = useState({ name: "", contact: "", phone: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+  const [waSent, setWaSent] = useState(false);
 
   useEffect(() => {
     if (!leadId) { setLoadError("Enlace no válido."); setLoading(false); return; }
@@ -117,30 +118,45 @@ export default function Book() {
   const greeting = info.contact_name ? `Hola ${info.contact_name}, ` : "Hola, ";
   const waDefault = whatsappLink(`Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quería preguntarte una cosa.`) ?? "#";
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (form.name.trim().length < 2) e.name = "Pon tu nombre";
-    if (form.contact.trim().length < 5) e.contact = "Email o teléfono";
-    setErrors(e);
-    return Object.keys(e).length === 0;
+  const isPreview = !leadId || leadId === "preview";
+  const waReserva = whatsappLink(
+    `Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quiero reservarla. ¿Cómo seguimos?`,
+  ) ?? "#";
+
+  // CTA primaria: pago con tarjeta. Abre Stripe Checkout (create-checkout). Nunca "muere":
+  // muestra carga y, si algo falla, un mensaje claro con salida por WhatsApp.
+  const goToCheckout = async () => {
+    if (paying) return;
+    if (isPreview) {
+      setPayError("Es una vista previa. En tu enlace real, este botón te lleva al pago seguro.");
+      return;
+    }
+    setPaying(true);
+    setPayError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { lead_id: leadId, contact: { name: info.contact_name ?? businessName } },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (!data?.checkout_url) throw new Error("sin checkout_url");
+      window.location.href = data.checkout_url as string;
+    } catch {
+      setPaying(false);
+      setPayError("No se pudo abrir el pago ahora mismo. Prueba otra vez o escríbeme por WhatsApp y lo resolvemos.");
+    }
   };
 
-  const submit = (ev: FormEvent) => {
-    ev.preventDefault();
-    if (!validate()) return;
-    const subject = `Quiero mi web · ${businessName}`;
-    const body =
-      `Hola ${NICO_NAME},\n\nSoy ${form.name} de ${businessName}. Vi la web que preparaste y me interesa.\n` +
-      `Contacto: ${form.contact}${form.phone ? `\nTeléfono: ${form.phone}` : ""}\n`;
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
-
-  const submitWhatsapp = () => {
-    const named = form.name.trim().length >= 2;
-    const msg = named
-      ? `Hola ${NICO_NAME}, soy ${form.name} de ${businessName}. Vi la web y quiero reservarla.${form.phone ? ` Mi teléfono: ${form.phone}.` : ""}`
-      : `Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quiero reservarla.`;
-    window.open(whatsappLink(msg) ?? "#", "_blank");
+  // CTA de respaldo: WhatsApp. Registra la intención (booking_started) para que quede en el
+  // panel aunque no llegue a enviar el mensaje, y deja un acuse en pantalla.
+  const goToWhatsapp = () => {
+    if (!isPreview) {
+      supabase.functions
+        .invoke("track-event", { body: { lead_id: leadId, type: "booking_started", payload: { channel: "whatsapp" } } })
+        .catch(() => {});
+    }
+    window.open(waReserva, "_blank");
+    setWaSent(true);
   };
 
   return (
@@ -356,7 +372,7 @@ export default function Book() {
 
             <Reveal delay={120} className="mt-2 bg-paper ring-1 ring-ink/10 rounded-sm p-5 shadow-2xl shadow-ink/5 sm:mt-4 sm:p-7 lg:p-10">
               <div className="grid grid-cols-3 gap-2 mb-7 pb-6 border-b border-ink/5">
-                {[["Contacto", "directo"], ["Garantía", "7 días"], ["Respuesta", "<1h"]].map(([k, v]) => (
+                {[["Garantía", "7 días"], ["Pago", "único"], ["Respuesta", "<1h"]].map(([k, v]) => (
                   <div key={k} className="text-center">
                     <p className="text-[9px] font-medium uppercase tracking-widest opacity-40">{k}</p>
                     <p className="text-xs font-medium mt-1">{v}</p>
@@ -364,20 +380,38 @@ export default function Book() {
                 ))}
               </div>
 
-              <form onSubmit={submit} className="space-y-4" noValidate>
-                <Field label="Tu nombre" value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} placeholder={info.contact_name || "Tu nombre"} error={errors.name} />
-                <Field label="Email o teléfono" value={form.contact} onChange={(v) => setForm((f) => ({ ...f, contact: v }))} placeholder={`hola@${domainHint}`} error={errors.contact} />
-                <Field label="Teléfono (opcional)" value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))} placeholder="+34 600 000 000" type="tel" error={errors.phone} />
-                <button type="submit"
-                  className="lv-shine-wrap w-full rounded-sm bg-brick py-4 text-[15px] font-medium text-paper ring-1 ring-brick shadow-lg shadow-brick/20 active:translate-y-px transition-all duration-300 hover:shadow-xl hover:shadow-brick/30 hover:-translate-y-0.5 mt-2 sm:text-sm lg:text-base lg:py-5">
-                  Reservar mi web por 397€
-                </button>
-              </form>
+              {/* Acción primaria: pago con tarjeta */}
+              <button type="button" onClick={goToCheckout} disabled={paying}
+                className="lv-shine-wrap group w-full flex items-center justify-center gap-2.5 rounded-sm bg-brick py-4 text-[15px] font-medium text-paper ring-1 ring-brick shadow-lg shadow-brick/20 transition-all duration-300 hover:shadow-xl hover:shadow-brick/30 hover:-translate-y-0.5 active:translate-y-px disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0 lg:text-base lg:py-5">
+                {paying ? (
+                  <><Loader2 className="size-4 animate-spin" /> Abriendo pago seguro…</>
+                ) : (
+                  <><Lock className="size-4" strokeWidth={2} /> Reservar mi web · 397€
+                    <span className="transition-transform duration-300 group-hover:translate-x-1">→</span></>
+                )}
+              </button>
+              {payError && <p className="mt-2.5 text-[13px] leading-snug text-brick">{payError}</p>}
 
-              <div className="mt-8 space-y-2 pt-6 border-t border-ink/5">
-                <MiniFaq q="¿Cuotas?" a="No. Pago único, la web es tuya." />
-                <MiniFaq q="¿Tecnología?" a="No necesitas saber nada. Yo lo gestiono todo." />
-                <MiniFaq q="¿Contratos?" a="Ninguno. Solo el pago con garantía de 7 días." />
+              {/* Acción de respaldo: WhatsApp */}
+              <button type="button" onClick={goToWhatsapp}
+                className="mt-3 w-full flex items-center justify-center gap-2.5 rounded-sm border border-ink/15 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:border-[#25D366]/60 hover:bg-[#25D366]/[0.06]">
+                <WhatsAppIcon size={18} /> ¿Prefieres hablar antes? Escríbeme
+              </button>
+              {waSent && (
+                <p className="mt-2.5 text-center text-[13px] leading-snug text-ink/70">
+                  Te espero en WhatsApp 👋 Te respondo en menos de una hora.
+                </p>
+              )}
+
+              {/* Confianza + salida por email */}
+              <div className="mt-6 pt-5 border-t border-ink/5 text-center">
+                <p className="inline-flex items-center gap-1.5 text-[11px] opacity-55">
+                  <ShieldCheck className="size-3.5 text-brick" /> Pagas en la pantalla segura de Stripe
+                </p>
+                <p className="mt-2 text-[11px] opacity-45">
+                  ¿Sin WhatsApp? Escríbeme a{" "}
+                  <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2 hover:opacity-100">{CONTACT_EMAIL}</a>
+                </p>
               </div>
             </Reveal>
 
@@ -394,23 +428,6 @@ export default function Book() {
               </div>
             </div>
           </div>
-        </section>
-
-        {/* WHATSAPP BLOCK */}
-        <section className="mx-auto max-w-3xl px-5 pb-14 sm:px-6 sm:pb-16 lg:px-10 lg:pb-24">
-          <Reveal>
-            <button onClick={submitWhatsapp}
-              className="group lv-shine-wrap w-full flex items-center gap-4 rounded-sm border border-ink/10 bg-ink/[0.03] px-5 py-4 text-left transition-all duration-300 hover:border-brick/40 hover:bg-brick/5 sm:gap-5 sm:px-6 sm:py-5">
-              <span className="shrink-0 grid place-items-center size-11 rounded-full bg-brick text-paper transition-transform duration-300 group-hover:scale-105 sm:size-12">
-                <WhatsAppIcon />
-              </span>
-              <span className="flex-1 min-w-0">
-                <span className="block text-[11px] uppercase tracking-widest text-brick font-medium mb-0.5">¿Prefieres hablarlo?</span>
-                <span className="block font-serif text-lg text-ink leading-tight sm:text-xl">Escríbeme un WhatsApp y te contesto yo mismo</span>
-              </span>
-              <span className="shrink-0 font-serif text-brick text-2xl transition-transform duration-300 group-hover:translate-x-1 sm:text-3xl">→</span>
-            </button>
-          </Reveal>
         </section>
 
         {/* FAQ */}
@@ -442,13 +459,20 @@ export default function Book() {
         <WhatsAppIcon size={22} />
       </a>
 
-      {/* Mobile sticky WhatsApp bar */}
-      <a href={waDefault} target="_blank" rel="noopener noreferrer"
-        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center gap-2.5 bg-ink py-3.5 text-paper shadow-[0_-8px_32px_rgba(0,0,0,0.25)] transition-transform active:scale-[0.98] lg:hidden"
-        aria-label="Hablar por WhatsApp">
-        <WhatsAppIcon size={20} />
-        <span className="text-sm font-medium tracking-tight">Escríbeme por WhatsApp</span>
-      </a>
+      {/* Mobile sticky buy bar: pago (primario) + WhatsApp (respaldo) */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-ink shadow-[0_-8px_32px_rgba(0,0,0,0.25)] lg:hidden">
+        <button type="button" onClick={goToCheckout} disabled={paying}
+          className="flex flex-1 items-center justify-center gap-2 py-3.5 text-paper text-sm font-medium tracking-tight transition-transform active:scale-[0.98] disabled:opacity-70"
+          aria-label="Reservar mi web por 397 euros">
+          {paying ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
+          <span>{paying ? "Abriendo pago…" : "Reservar mi web · 397€"}</span>
+        </button>
+        <button type="button" onClick={goToWhatsapp}
+          className="flex items-center justify-center px-6 bg-[#25D366] text-white transition-transform active:scale-[0.98]"
+          aria-label="Escribir por WhatsApp">
+          <WhatsAppIcon size={20} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -479,24 +503,3 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   );
 }
 
-function Field({ label, value, onChange, placeholder, type = "text", error }: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; error?: string;
-}) {
-  return (
-    <div>
-      <label className="block text-[10px] font-medium uppercase tracking-widest mb-1.5 opacity-60">{label}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-        className="w-full rounded-sm border border-ink/10 bg-transparent px-4 py-3 text-sm outline-none focus:border-brick/40 focus:ring-2 focus:ring-brick/10 transition" />
-      {error && <p className="text-[11px] text-brick mt-1.5">{error}</p>}
-    </div>
-  );
-}
-
-function MiniFaq({ q, a }: { q: string; a: string }) {
-  return (
-    <div className="flex gap-2 text-xs">
-      <span className="font-semibold text-brick shrink-0">{q}</span>
-      <span className="opacity-60">{a}</span>
-    </div>
-  );
-}

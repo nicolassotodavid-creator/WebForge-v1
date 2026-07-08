@@ -48,12 +48,12 @@ Deno.serve(async (req: Request) => {
 
   const { lead_id, contact, fiscal } = body ?? {};
   if (!lead_id) return jsonResponse({ error: "Falta lead_id." }, 400);
-  if (!contact?.name?.trim() || !contact?.email?.trim()) {
-    return jsonResponse({ error: "Faltan campos obligatorios: contact.name, contact.email." }, 400);
-  }
-  if (!fiscal?.empresa?.trim() || !fiscal?.nif?.trim() || !fiscal?.direccion?.trim() || !fiscal?.cp?.trim() || !fiscal?.ciudad?.trim()) {
-    return jsonResponse({ error: "Faltan datos fiscales para la factura (empresa, nif, dirección, CP, ciudad)." }, 400);
-  }
+  // contact y fiscal son OPCIONALES por diseño: Stripe Checkout recoge email, dirección de
+  // facturación y NIF (tax_id) en su propia pantalla. La página /book no pide nada por adelantado
+  // → cero fricción. `bookings.name/email` son nullable, así que el registro no se rompe sin datos.
+  const contactName = contact?.name?.trim() || "";
+  const contactEmail = contact?.email?.trim() || "";
+  const contactPhone = contact?.phone?.trim() || "";
 
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
 
@@ -84,19 +84,25 @@ Deno.serve(async (req: Request) => {
     "line_items[0][price_data][unit_amount]": String(PRECIO_CENTS),
     "line_items[0][price_data][product_data][name]": `${PRODUCT_NAME} — ${lead.name}`,
     "line_items[0][price_data][product_data][description]": PRODUCT_DESC,
-    customer_email: contact.email.trim(),
+    // Stripe recoge en su pantalla lo que antes exigíamos por adelantado (dirección + NIF).
+    // El webhook los lee de session.customer_details para la factura de Holded.
+    "billing_address_collection": "required",
+    "tax_id_collection[enabled]": "true",
+    "customer_creation": "always",
     "metadata[lead_id]": lead_id,
-    "metadata[contact_name]": contact.name.trim(),
-    "metadata[contact_phone]": contact.phone?.trim() ?? "",
-    "metadata[fiscal_empresa]": fiscal!.empresa!.trim(),
-    "metadata[fiscal_nif]": fiscal!.nif!.trim(),
-    "metadata[fiscal_direccion]": fiscal!.direccion!.trim(),
-    "metadata[fiscal_cp]": fiscal!.cp!.trim(),
-    "metadata[fiscal_ciudad]": fiscal!.ciudad!.trim(),
-    "metadata[fiscal_provincia]": fiscal!.provincia?.trim() ?? "",
+    "metadata[contact_name]": contactName,
+    "metadata[contact_phone]": contactPhone,
     success_url: `${APP_URL}/gracias?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${APP_URL}/book/${lead_id}`,
   });
+  // Pre-rellenos opcionales: si nos llegan datos, se pasan; si no, Stripe los pide.
+  if (contactEmail) stripeParams.set("customer_email", contactEmail);
+  if (fiscal?.empresa?.trim()) stripeParams.set("metadata[fiscal_empresa]", fiscal.empresa.trim());
+  if (fiscal?.nif?.trim()) stripeParams.set("metadata[fiscal_nif]", fiscal.nif.trim());
+  if (fiscal?.direccion?.trim()) stripeParams.set("metadata[fiscal_direccion]", fiscal.direccion.trim());
+  if (fiscal?.cp?.trim()) stripeParams.set("metadata[fiscal_cp]", fiscal.cp.trim());
+  if (fiscal?.ciudad?.trim()) stripeParams.set("metadata[fiscal_ciudad]", fiscal.ciudad.trim());
+  if (fiscal?.provincia?.trim()) stripeParams.set("metadata[fiscal_provincia]", fiscal.provincia.trim());
 
   const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
@@ -121,9 +127,9 @@ Deno.serve(async (req: Request) => {
     .insert({
       lead_id,
       site_id: site?.id ?? null,
-      name: contact.name.trim(),
-      email: contact.email.trim(),
-      phone: contact.phone?.trim() ?? null,
+      name: contactName || null,
+      email: contactEmail || null,
+      phone: contactPhone || null,
       plan: PLAN,
       deposit_amount: PRECIO_CENTS,
       stripe_session_id: (session as { id: string }).id,
