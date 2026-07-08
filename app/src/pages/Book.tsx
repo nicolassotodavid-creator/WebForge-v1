@@ -175,7 +175,7 @@ export default function Book() {
 
       <main>
         {/* HERO */}
-        <section className="relative mx-auto max-w-6xl px-5 pt-10 pb-14 sm:px-6 sm:pt-12 sm:pb-16 lg:grid lg:grid-cols-[1fr_1.2fr] lg:gap-14 lg:px-10 lg:pt-24 lg:pb-28">
+        <section className="relative mx-auto max-w-6xl px-5 pt-8 pb-10 sm:px-6 sm:pt-10 sm:pb-12 lg:grid lg:grid-cols-[1fr_1.2fr] lg:gap-14 lg:px-10 lg:pt-24 lg:pb-28">
           <div aria-hidden className="pointer-events-none absolute -top-20 -left-24 -z-10 size-[420px] rounded-full bg-brick/15 blur-3xl lv-blob" />
           <div aria-hidden className="pointer-events-none absolute top-40 right-0 -z-10 size-[360px] rounded-full bg-ink/10 blur-3xl lv-blob" style={{ animationDelay: "-7s" }} />
 
@@ -249,13 +249,13 @@ export default function Book() {
         </section>
 
         {/* OUTCOMES */}
-        <section className="bg-ink text-paper px-5 pt-16 pb-10 sm:px-6 sm:pt-20 sm:pb-12 lg:pt-32 lg:pb-16">
+        <section className="bg-ink text-paper px-5 pt-12 pb-8 sm:px-6 sm:pt-14 sm:pb-10 lg:pt-32 lg:pb-16">
           <div className="mx-auto max-w-6xl lg:px-4">
             <Reveal>
               <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Para qué sirve</p>
-              <h2 className="font-serif text-[2rem] leading-tight mb-10 sm:text-4xl sm:mb-12 lg:text-5xl lg:mb-16 lg:max-w-2xl">Lo que consigues con tu propia web.</h2>
+              <h2 className="font-serif text-[2rem] leading-tight mb-6 sm:text-4xl sm:mb-8 lg:text-5xl lg:mb-16 lg:max-w-2xl">Lo que consigues con tu propia web.</h2>
             </Reveal>
-            <div className="space-y-10 lg:grid lg:grid-cols-3 lg:gap-10 lg:space-y-0">
+            <div className="space-y-6 lg:grid lg:grid-cols-3 lg:gap-10 lg:space-y-0">
               {OUTCOMES.map((o, i) => (
                 <Reveal key={o.title} delay={i * 120} className="flex gap-5 lg:flex-col lg:gap-4">
                   <div className="shrink-0 font-serif text-brick text-2xl leading-none lg:text-4xl">{String(i + 1).padStart(2, "0")}</div>
@@ -307,11 +307,11 @@ export default function Book() {
         </section>
 
         {/* INCLUDED */}
-        <section id="incluye" className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-32">
+        <section id="incluye" className="mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-14 lg:px-10 lg:py-32">
           <Reveal>
             <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Qué incluye</p>
             <h2 className="font-serif text-[2rem] leading-tight mb-2 sm:text-4xl lg:text-5xl">Todo en un pago.</h2>
-            <p className="text-[15px] opacity-60 mb-8 sm:text-base sm:mb-10 lg:mb-14 lg:text-lg">Sin cuotas mensuales, sin sorpresas.</p>
+            <p className="text-[15px] opacity-60 mb-6 sm:text-base sm:mb-8 lg:mb-14 lg:text-lg">Sin cuotas mensuales, sin sorpresas.</p>
           </Reveal>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
             {INCLUDED.map((item, idx) => {
@@ -336,7 +336,7 @@ export default function Book() {
         </section>
 
         {/* ABOUT NICO */}
-        <section id="nico" className="bg-ink/[0.03] border-y border-ink/5 px-5 py-16 sm:px-6 sm:py-20 lg:py-28">
+        <section id="nico" className="bg-ink/[0.03] border-y border-ink/5 px-5 py-12 sm:px-6 sm:py-14 lg:py-28">
           <Reveal className="mx-auto flex max-w-3xl flex-col items-center text-center">
             <div className="size-20 rounded-full bg-ink/5 ring-1 ring-ink/10 mb-5 grid place-items-center font-serif italic text-2xl text-ink/60 lv-float sm:size-24 sm:mb-6 sm:text-3xl lg:size-28 lg:text-4xl">N</div>
             <p className="text-[10px] font-medium uppercase tracking-widest opacity-50 mb-3">Quién está detrás</p>
@@ -348,12 +348,12 @@ export default function Book() {
         </section>
 
         {/* PRICING + FORM */}
-        <section id="contact" className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-32">
+        <section id="contact" className="mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-14 lg:px-10 lg:py-32">
           <div className="lg:grid lg:grid-cols-[1fr_1.1fr] lg:gap-16">
             <Reveal className="text-center lg:text-left lg:sticky lg:top-24 lg:self-start">
               <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Inversión única</p>
               <div className="font-serif text-[5.5rem] leading-none mb-3 lv-text-gradient sm:text-7xl sm:mb-4 lg:text-[9rem]">397€</div>
-              <p className="text-xs opacity-60 italic mb-10 sm:mb-12 lg:text-sm lg:mb-16">+ IVA · sin cuotas ni contratos. La web es tuya.</p>
+              <p className="text-xs opacity-60 italic mb-6 sm:mb-8 lg:text-sm lg:mb-16">+ IVA · sin cuotas ni contratos. La web es tuya.</p>
               <div className="hidden lg:block">
                 <div className="flex gap-5 items-center">
                   <div className="shrink-0 size-20 rounded-full ring-2 ring-brick grid place-items-center">
@@ -415,7 +415,7 @@ export default function Book() {
               </div>
             </Reveal>
 
-            <div className="mt-10 flex gap-5 items-center lg:hidden">
+            <div className="mt-8 flex gap-5 items-center lg:hidden">
               <div className="shrink-0 size-20 rounded-full ring-2 ring-brick grid place-items-center">
                 <div className="text-center leading-none">
                   <div className="font-serif text-3xl text-brick">7</div>
@@ -431,7 +431,7 @@ export default function Book() {
         </section>
 
         {/* FAQ */}
-        <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 lg:px-10 lg:py-32">
+        <section className="mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-14 lg:px-10 lg:py-32">
           <div className="lg:grid lg:grid-cols-[1fr_2fr] lg:gap-16">
             <Reveal className="mb-8 lg:mb-0">
               <p className="text-[10px] font-medium uppercase tracking-widest text-brick mb-3">Dudas frecuentes</p>
