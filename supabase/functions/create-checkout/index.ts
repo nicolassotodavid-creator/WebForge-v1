@@ -6,10 +6,14 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 
-const PRECIO_CENTS = 39700; // 397 € (IVA incluido)
+// Precio: 397 € de BASE + 21 % IVA = 480,37 € total. Stripe cobra el total (bruto) y el webhook
+// desglosa la base (total / 1,21 = 397 €) para la factura de Holded.
+const PRECIO_BASE_CENTS = 39700; // 397 € base imponible
+const IVA = 0.21;
+const PRECIO_CENTS = Math.round(PRECIO_BASE_CENTS * (1 + IVA)); // 48037 = 480,37 € (IVA incl.)
 const PLAN = "web-starter";
 const PRODUCT_NAME = "Web profesional a medida";
-const PRODUCT_DESC = "Web one-page mobile-first, lista para publicar. Primer mes de soporte incluido.";
+const PRODUCT_DESC = "Web one-page mobile-first, lista para publicar. Primer mes de soporte incluido. Precio: 397 € + 21 % IVA.";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
