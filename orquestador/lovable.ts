@@ -318,6 +318,19 @@ function slugify(text: string): string {
 }
 
 /**
+ * Slug de deploy garantizado ≤45 chars (límite duro de Lovable: "project name can be at most 45
+ * characters"). Recorta la base para dejar sitio al sufijo único, así los negocios de nombre largo
+ * (clínicas) publican en vez de quedarse en preview. Ver #6 (re-deploy por slug largo).
+ */
+const MAX_DEPLOY_SLUG = 45;
+function buildDeploySlug(description: string, slugSuffix?: string): string {
+  const suffix = slugSuffix ? slugify(slugSuffix) : "";
+  const budget = MAX_DEPLOY_SLUG - (suffix ? suffix.length + 1 : 0);
+  const base = slugify(description).slice(0, budget).replace(/-+$/, "") || "webforge";
+  return suffix ? `${base}-${suffix}` : base;
+}
+
+/**
  * Obtiene la URL pública publicada (*.lovable.app sin preview--).
  * Prioriza el campo `url` (publicado) de deploy_project / get_project.
  * Si solo hay preview, lo devuelve como fallback con aviso.
@@ -370,6 +383,26 @@ export async function fetchProjectScreenshot(projectId: string): Promise<string 
   return pickScreenshot(proj);
 }
 
+/**
+ * Re-publica un proyecto YA construido con slug ≤45 chars. Arregla las webs que quedaron en
+ * `preview` porque su slug (nombre largo + sufijo) superaba el límite de Lovable. NO reconstruye
+ * ni gasta créditos de build: solo deploy_project + extracción de la URL publicada.
+ */
+export async function redeployProject(
+  projectId: string,
+  description: string,
+  slugSuffix?: string,
+): Promise<{ liveUrl: string; isPreview: boolean; slug: string }> {
+  const token = await getValidToken();
+  const slug = buildDeploySlug(description, slugSuffix);
+  const deployed = (await mcpCall(token, "deploy_project", {
+    project_id: projectId,
+    name:       slug,
+  }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
+  const { url: liveUrl, isPreview } = await extractPublicUrl(token, projectId, deployed);
+  return { liveUrl, isPreview, slug };
+}
+
 // ── export principal ──────────────────────────────────────────────────────────
 
 export async function lovableBuild(
@@ -414,8 +447,8 @@ export async function lovableBuild(
   const built = await waitForBuild(token, projectId);
   process.stdout.write(`\n  · build listo en ${elapsed()}\n`);
 
-  // 3. Publicar (deploy) con slug estable y único (descripción + sufijo) y reintentos.
-  const deploySlug = slugify(description) + (opts.slugSuffix ? `-${slugify(opts.slugSuffix)}` : "");
+  // 3. Publicar (deploy) con slug estable, único y ≤45 chars (descripción recortada + sufijo).
+  const deploySlug = buildDeploySlug(description, opts.slugSuffix);
   const deployed = (await mcpCall(token, "deploy_project", {
     project_id: projectId,
     name:       deploySlug,
