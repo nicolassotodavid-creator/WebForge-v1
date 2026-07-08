@@ -186,6 +186,18 @@ function isTransientError(e: unknown): boolean {
 }
 
 /**
+ * ¿Lovable rechazó el token (401)? No es transitorio, pero SÍ recuperable: el exp local
+ * del JWT no siempre refleja el estado real del servidor (token rotado/revocado, o token
+ * no-JWT que getValidToken no supo decodificar). Ante un 401 forzamos UN refresh y
+ * reintentamos con el token nuevo. Un 401 significa que la llamada NO llegó a ejecutarse,
+ * así que reintentar es seguro incluso para create_project (no gasta créditos).
+ */
+function isAuthError(e: unknown): boolean {
+  const m = e instanceof Error ? e.message : String(e);
+  return /→ HTTP 401/.test(m);
+}
+
+/**
  * Llama a una herramienta del MCP de Lovable con reintentos ante errores transitorios.
  * `retries` = reintentos extra (0 = sin reintentos). NO reintentar create_project:
  * recrear gastaría créditos. Sí para get_project / deploy_project (idempotentes).
@@ -198,11 +210,22 @@ async function mcpCall(
   retries = 0,
 ): Promise<unknown> {
   let lastErr: unknown;
+  let currentToken = token;
+  let refreshedOn401 = false;
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      return await mcpCallOnce(token, toolName, args, timeoutMs);
+      return await mcpCallOnce(currentToken, toolName, args, timeoutMs);
     } catch (e) {
       lastErr = e;
+      // 401 → el token fue rechazado por Lovable. Forzar UN refresh y reintentar con el
+      // token nuevo. No consume un intento transitorio (attempt--) ni gasta créditos.
+      if (!refreshedOn401 && isAuthError(e)) {
+        refreshedOn401 = true;
+        console.warn(`  · ${toolName} devolvió 401 (token rechazado) — forzando refresh y reintentando…`);
+        currentToken = await refreshAccessToken(); // si el refresh falla, propaga "Ejecuta: npm run auth"
+        attempt--;
+        continue;
+      }
       if (attempt < retries && isTransientError(e)) {
         const backoff = 2000 * (attempt + 1);
         console.warn(`  · ${toolName} error transitorio (intento ${attempt + 1}/${retries + 1}): ${e instanceof Error ? e.message : e}. Reintento en ${backoff / 1000}s…`);
