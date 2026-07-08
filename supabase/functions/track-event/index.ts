@@ -26,8 +26,11 @@ const PIXEL_GIF = new Uint8Array([
 
 // Tipos que el endpoint PÚBLICO (sin auth) acepta. Cualquier otro se rechaza para que un
 // tercero no pueda falsear demo_viewed (avanza el lead) ni email_opened, ni inflar `events`.
-// El resto de tipos (booking_*, email_sent, etc.) los insertan las funciones con service_role.
-const ALLOWED_PUBLIC_TYPES = new Set(["demo_viewed", "email_opened"]);
+// El resto de tipos (email_sent, booking_paid, etc.) los insertan las funciones con service_role.
+// booking_started SÍ es público: lo emite la página /book cuando el prospecto pulsa "Escríbeme
+// por WhatsApp" (intención de reserva). Es status-neutral — solo deja rastro en `events` para
+// que el operador vea la intención aunque no complete el WhatsApp; no avanza el lead.
+const ALLOWED_PUBLIC_TYPES = new Set(["demo_viewed", "email_opened", "booking_started"]);
 
 function pixelResponse(): Response {
   return new Response(PIXEL_GIF, {

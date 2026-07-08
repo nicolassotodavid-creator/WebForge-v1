@@ -182,7 +182,16 @@ Deno.serve(async (req: Request) => {
     const metadata = (session.metadata ?? {}) as Record<string, string>;
     const leadId = metadata.lead_id ?? "";
     const paymentStatus = String(session.payment_status ?? "");
-    const customerEmail = String(session.customer_email ?? metadata.contact_name ?? "");
+    // Datos que Stripe recoge en su pantalla (email, dirección de facturación, NIF/tax_id).
+    // Son el fallback cuando la reserva vino de /book sin datos fiscales por adelantado.
+    const details = (session.customer_details ?? {}) as {
+      email?: string;
+      name?: string;
+      address?: { line1?: string; line2?: string; city?: string; postal_code?: string; state?: string; country?: string };
+      tax_ids?: Array<{ type?: string; value?: string }>;
+    };
+    const customerEmail = String(session.customer_email ?? details.email ?? "");
+    const stripeNif = details.tax_ids?.find((t) => t?.value)?.value ?? "";
 
     if (paymentStatus === "paid" && sessionId) {
       // Marcar booking como pagado
@@ -218,15 +227,19 @@ Deno.serve(async (req: Request) => {
         });
 
         // ── Holded: crear contacto + factura + marcar cobrada ──
-        if (HOLDED_API_KEY && metadata.fiscal_nif) {
+        // Preferimos el metadata (si algún día llega); si no, usamos lo que Stripe recogió.
+        // Sin NIF por ninguna vía, se salta la factura sin petar (el operador la hace a mano).
+        const addr = details.address ?? {};
+        const fiscalNif = metadata.fiscal_nif || stripeNif;
+        if (HOLDED_API_KEY && fiscalNif) {
           try {
             const contactId = await upsertHoldedContact(HOLDED_API_KEY, {
-              empresa: metadata.fiscal_empresa ?? lead?.name ?? "Cliente",
-              nif: metadata.fiscal_nif,
-              direccion: metadata.fiscal_direccion ?? "",
-              cp: metadata.fiscal_cp ?? "",
-              ciudad: metadata.fiscal_ciudad ?? "",
-              provincia: metadata.fiscal_provincia ?? "",
+              empresa: metadata.fiscal_empresa || details.name || lead?.name || "Cliente",
+              nif: fiscalNif,
+              direccion: metadata.fiscal_direccion || [addr.line1, addr.line2].filter(Boolean).join(", ") || "",
+              cp: metadata.fiscal_cp || addr.postal_code || "",
+              ciudad: metadata.fiscal_ciudad || addr.city || "",
+              provincia: metadata.fiscal_provincia || addr.state || "",
               email: customerEmail,
             });
             const invoiceId = await createDraftHoldedInvoice(
