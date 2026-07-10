@@ -100,6 +100,9 @@ export default function LeadDetail() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendEmailError, setSendEmailError] = useState<string | null>(null);
   const [sendEmailDone, setSendEmailDone] = useState(false);
+  // Cierre del flujo Luvia: crea la clínica como cliente en la plataforma Luvia.
+  const [handingOff, setHandingOff] = useState(false);
+  const [handoffError, setHandoffError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [editingBody, setEditingBody] = useState(false);
   const [editedBody, setEditedBody] = useState("");
@@ -310,6 +313,33 @@ export default function LeadDetail() {
       setSendEmailError(await edgeFunctionErrorMessage(e, "Error al enviar el email."));
     } finally {
       setSendingEmail(false);
+    }
+  }
+
+  // Cierre del flujo Luvia: crea la clínica como cliente en la plataforma Luvia y marca won.
+  async function markAsLuviaClient() {
+    if (!lead) return;
+    if (!window.confirm(
+      "¿Marcar esta clínica como cliente y crearla en Luvia? El lead pasará a 'Ganado'."
+    )) return;
+    setHandingOff(true);
+    setHandoffError(null);
+    try {
+      const { error } = await supabase.functions.invoke("handoff-luvia", {
+        body: { lead_id: id },
+      });
+      if (error) throw error;
+      // Recargar el lead: ya viene con luvia_client_id y status 'won' → el botón desaparece.
+      const { data: leadData } = await supabase
+        .from("leads")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+      setLead(leadData as Lead | null);
+    } catch (e) {
+      setHandoffError(await edgeFunctionErrorMessage(e, "No se pudo crear el cliente en Luvia."));
+    } finally {
+      setHandingOff(false);
     }
   }
 
@@ -1271,6 +1301,23 @@ export default function LeadDetail() {
                 )}
               </div>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Cierre del flujo Luvia: entrega la clínica a la plataforma Luvia. Solo cuenta Luvia
+          (no-admin) y solo hasta que se entrega (luvia_client_id). La regla real la impone la
+          Edge Function con ADMIN_USER_ID; aquí solo se decide qué se pinta. */}
+      {!isAdmin && !lead.luvia_client_id && (
+        <Card>
+          <CardContent className="space-y-2 pt-6">
+            <Button onClick={markAsLuviaClient} disabled={handingOff} size="sm">
+              {handingOff ? "Creando cliente en Luvia…" : "Marcar como cliente"}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Crea la clínica en Luvia y cierra el lead como ganado.
+            </p>
+            {handoffError && <p className="text-xs text-red-600">{handoffError}</p>}
           </CardContent>
         </Card>
       )}
