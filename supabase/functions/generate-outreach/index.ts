@@ -6,7 +6,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { OUTREACH_PROMPT, LUVIA_OUTREACH_PROMPT } from "../_shared/prompts.ts";
-import { isLuviaLead, buildLuviaOutreachPayload } from "../_shared/luvia.ts";
+import { isLuviaLead, buildLuviaOutreachPayload, buildLuviaFinalBody } from "../_shared/luvia.ts";
 import { bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import { canAccessLead, isAdminEmail, type Operator } from "../_shared/leadAccess.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
@@ -350,7 +350,7 @@ Deno.serve(async (req: Request) => {
     ? (typeof draft.subject === "string" && draft.subject.trim() ? draft.subject.trim() : getLuviaSubject())
     : subject;
   const finalBody = luvia
-    ? bodyText
+    ? buildLuviaFinalBody(bodyText, lead.luvia_demo_url)
     : (channel === "email" ? `${bodyText}\n\n${emailLink}` : bodyText);
 
   const { data: inserted, error: insErr } = await supabase
