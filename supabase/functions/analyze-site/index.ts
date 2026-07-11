@@ -113,6 +113,7 @@ Deno.serve(async (req: Request) => {
       // null = no se pudo bajar la web (sin comprobar); true/false = comprobado.
       site_has_chat: page.signals ? page.signals.hasChat : null,
       site_has_whatsapp: page.signals ? page.signals.hasWhatsapp : null,
+      site_has_bot: page.signals ? page.signals.hasBot : null,
     })
     .eq("id", leadId);
   if (persistErr) console.error(`No se pudo guardar el análisis: ${persistErr.message}`);
