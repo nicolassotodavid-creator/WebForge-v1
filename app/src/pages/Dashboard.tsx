@@ -205,6 +205,14 @@ export default function Dashboard() {
     setSeen(lead, !lead.seen_at);
   };
 
+  // Abrir un lead lo marca como "visto" (como el correo: abrir = leído). Así la pestaña
+  // "No vistos" filtra de verdad conforme trabajas, en vez de quedar todo como no visto para
+  // siempre. Se puede revertir a mano con el ojo. Solo si la migración de flags está aplicada.
+  const openAndSeen = (lead: Lead) => {
+    if (flagsSupported && !lead.seen_at) setSeen(lead, true);
+    openLead(lead.id);
+  };
+
   // ── Selección múltiple ──────────────────────────────────────────────────────
   const toggleSelect = (id: string) =>
     setSelected((prev) => {
@@ -336,6 +344,7 @@ export default function Dashboard() {
     return {
       all: base.length,
       unseen: base.filter((l) => matchesView(l, "unseen")).length,
+      seen: base.filter((l) => matchesView(l, "seen")).length,
       favorites: base.filter((l) => matchesView(l, "favorites")).length,
       noweb: base.filter((l) => matchesView(l, "noweb")).length,
       chat: base.filter((l) => matchesView(l, "chat")).length,
@@ -427,7 +436,7 @@ export default function Dashboard() {
           break;
         case "Enter":
         case "o":
-          if (lead) { e.preventDefault(); openLead(lead.id); }
+          if (lead) { e.preventDefault(); openAndSeen(lead); }
           break;
       }
     };
@@ -448,6 +457,7 @@ export default function Dashboard() {
     ? [
         { key: "all", label: "Todos" },
         { key: "unseen", label: "No vistos" },
+        { key: "seen", label: "Vistos" },
         { key: "favorites", label: "Favoritos", star: true },
         { key: "noweb", label: "Sin web" },
         { key: "chat", label: "Con chat web" },
@@ -765,9 +775,12 @@ export default function Dashboard() {
                   <TableRow
                     key={l.id}
                     data-row-idx={idx}
-                    onClick={() => openLead(l.id)}
+                    onClick={() => openAndSeen(l)}
                     className={cn(
-                      "group cursor-pointer",
+                      "group cursor-pointer transition-colors",
+                      // Visto = fila atenuada (como un correo leído). Selección y foco pintan
+                      // su propio fondo y van después, así que ganan sobre este sombreado.
+                      l.seen_at && "bg-muted/40 text-muted-foreground",
                       isSelected && "bg-primary/5",
                       focused && "bg-accent/60 ring-1 ring-inset ring-primary/40",
                     )}

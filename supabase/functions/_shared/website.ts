@@ -99,3 +99,37 @@ export function detectWidgets(html: unknown): WidgetSignals {
     vendors,
   };
 }
+
+// ── Entrada manual de URL (panel → add-lead-by-url) ─────────────────────────────────────────
+// Normaliza lo que pega el operador: trim, https:// si falta esquema, y valida que sea una URL
+// http(s) con un dominio real (con punto). Null = no se puede usar.
+export function normalizeUrlInput(input: unknown): string | null {
+  if (typeof input !== "string") return null;
+  let u = input.trim();
+  if (!u) return null;
+  if (!/^https?:\/\//i.test(u)) u = `https://${u}`;
+  try {
+    const parsed = new URL(u);
+    if (!/^https?:$/.test(parsed.protocol)) return null;
+    if (!parsed.hostname.includes(".")) return null;
+    // Rechaza URLs con userinfo (usuario:contraseña@host). Un email pegado por error
+    // ("contacto@talleres.com") parsea como https://contacto@talleres.com/, con
+    // "contacto" como username — no es una URL válida para guardar como lead.
+    if (parsed.username || parsed.password) return null;
+    return parsed.toString();
+  } catch (_e) {
+    return null;
+  }
+}
+
+// Clave de comparación de duplicados: hostname en minúsculas, sin "www.". La misma web puede
+// estar guardada con o sin www / con distinto path; el host pelado las iguala.
+export function siteHost(url: unknown): string | null {
+  if (typeof url !== "string") return null;
+  try {
+    const h = new URL(url.trim()).hostname.toLowerCase().replace(/^www\./, "");
+    return h || null;
+  } catch (_e) {
+    return null;
+  }
+}
