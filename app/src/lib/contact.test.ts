@@ -1,6 +1,6 @@
 // Test de un solo uso (no hay framework): se ejecuta con
 //   node --experimental-strip-types src/lib/contact.test.ts
-import { waLink, whatsappOutreachText } from "./contact.ts";
+import { waLink, whatsappOutreachText, whatsappLuviaText } from "./contact.ts";
 
 let failures = 0;
 function assert(cond: boolean, msg: string) {
@@ -43,6 +43,13 @@ assert(
 );
 const t3 = whatsappOutreachText(null, "https://web.com/", "https://x.com/book/1");
 assert(!t3.includes("web para"), "negocio null → sin 'web para'");
+
+// whatsappLuviaText — link de demo + firma Nico
+const tl = whatsappLuviaText("Clínica X", "https://luvia-ia.es/demo/abc");
+assert(tl.includes("Nico"), "luvia: firma Nico");
+assert(tl.includes("Clínica X"), "luvia: nombre del negocio");
+assert(tl.includes("https://luvia-ia.es/demo/abc"), "luvia: incluye el link de demo");
+assert(whatsappLuviaText(null, "https://d").length > 0, "luvia: aguanta negocio null");
 
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures) process.exit(1);

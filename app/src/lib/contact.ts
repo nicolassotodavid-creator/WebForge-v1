@@ -48,3 +48,19 @@ export function whatsappOutreachText(
     `Un saludo.`
   );
 }
+
+// Texto de WhatsApp saliente manual para leads de Luvia: enlaza la demo ya montada, firma Nico.
+export function whatsappLuviaText(
+  negocio: string | null | undefined,
+  demoUrl: string,
+): string {
+  const n = (negocio ?? "").trim();
+  const saludo = n
+    ? `Hola 👋 soy Nico, de Luvia. Le monté un asistente a ${n} con vuestros datos, pruébalo:`
+    : `Hola 👋 soy Nico, de Luvia. Monté un asistente con vuestros datos, pruébalo:`;
+  return (
+    `${saludo}\n${demoUrl}\n\n` +
+    `Háblale como si fueras un cliente pidiendo cita. Si te encaja, lo dejamos atendiendo tu WhatsApp 24/7.\n\n` +
+    `Un saludo.`
+  );
+}
