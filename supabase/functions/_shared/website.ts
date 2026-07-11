@@ -54,6 +54,7 @@ export function getWebsiteUrl(raw: unknown): string | null {
 export interface WidgetSignals {
   hasChat: boolean;
   hasWhatsapp: boolean;
+  hasBot: boolean; // subconjunto de hasChat: bot-builder puro (Landbot/ManyChat/Chatfuel), no chat con humano
   vendors: string[]; // nombres legibles de los chats detectados (para mostrar en la ficha)
 }
 
@@ -76,11 +77,17 @@ const CHAT_VENDORS: { name: string; re: RegExp }[] = [
   { name: "Userlike", re: /userlike\.com|userlikecdn/ },
   { name: "Landbot", re: /landbot\.io|static\.landbot/ },
   { name: "ManyChat", re: /manychat\.com|mch_widget/ },
+  { name: "Chatfuel", re: /chatfuel\.com|static\.chatfuel/ },
 ];
 
 // Canal de WhatsApp: enlace o botón a un chat de WhatsApp (no un "compartir en WhatsApp", que es
 // raro en webs de negocio local). wa.link es el acortador oficial de WhatsApp Business.
 const WHATSAPP_RE = /wa\.me\/|api\.whatsapp\.com\/send|web\.whatsapp\.com|whatsapp:\/\/send|wa\.link\//;
+
+// Subconjunto de vendors que son bot-builders PUROS (su único fin es montar un bot conversacional),
+// no chats con operador humano. Es la señal de "ya automatizado" que usa el pitch de Luvia para no
+// ofrecer "te automatizo" a quien ya lo está. Los nombres deben coincidir con los de CHAT_VENDORS.
+const BOT_VENDORS = new Set(["Landbot", "ManyChat", "Chatfuel"]);
 
 export function detectWidgets(html: unknown): WidgetSignals {
   const hay = (typeof html === "string" ? html : "").toLowerCase();
@@ -88,6 +95,7 @@ export function detectWidgets(html: unknown): WidgetSignals {
   return {
     hasChat: vendors.length > 0,
     hasWhatsapp: WHATSAPP_RE.test(hay),
+    hasBot: vendors.some((v) => BOT_VENDORS.has(v)),
     vendors,
   };
 }

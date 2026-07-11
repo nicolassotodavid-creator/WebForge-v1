@@ -54,6 +54,8 @@ export interface Lead {
   // ver 0017_lead_site_widgets.sql). null = no comprobado (web caída o sin analizar).
   site_has_chat: boolean | null;
   site_has_whatsapp: boolean | null;
+  // Subconjunto de site_has_chat: bot-builder puro (Landbot/ManyChat/Chatfuel), ver 0022. null = sin comprobar.
+  site_has_bot: boolean | null;
   // Bandeja del operador (ver 0008_lead_flags.sql). Independientes del status `viewed`
   // del pipeline (ese es del cliente). seen_at null = no visto.
   is_favorite: boolean;
@@ -139,7 +141,7 @@ export interface SiteAnalysis {
   // al JSON). Los flags booleanos viven en columnas (site_has_chat/whatsapp); aquí guardamos
   // los nombres de los chats detectados para mostrarlos en la ficha. Opcional (análisis viejos
   // no lo tienen).
-  _widgets?: { hasChat: boolean; hasWhatsapp: boolean; vendors: string[] };
+  _widgets?: { hasChat: boolean; hasWhatsapp: boolean; hasBot?: boolean; vendors: string[] };
 }
 
 export interface Site {

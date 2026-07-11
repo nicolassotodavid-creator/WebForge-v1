@@ -76,6 +76,7 @@ export async function scoreExistingSites(
           // null = no se pudo bajar la web (sin comprobar); true/false = comprobado.
           site_has_chat: signals ? signals.hasChat : null,
           site_has_whatsapp: signals ? signals.hasWhatsapp : null,
+          site_has_bot: signals ? signals.hasBot : null,
         })
         .eq("id", lead.id);
       console.log(`  · web actual puntuada: ${lead.name} → ${score ?? "?"}/10`);

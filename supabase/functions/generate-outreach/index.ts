@@ -6,7 +6,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { OUTREACH_PROMPT, LUVIA_OUTREACH_PROMPT } from "../_shared/prompts.ts";
-import { isLuviaLead } from "../_shared/luvia.ts";
+import { isLuviaLead, buildLuviaOutreachPayload } from "../_shared/luvia.ts";
 import { bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import { canAccessLead, isAdminEmail, type Operator } from "../_shared/leadAccess.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
@@ -281,15 +281,7 @@ Deno.serve(async (req: Request) => {
   // ─────────────────────────────────────────────────────────────────────────────
   const systemPrompt = luvia ? LUVIA_OUTREACH_PROMPT : OUTREACH_PROMPT;
   const payload = luvia
-    ? {
-        business: {
-          name: lead.name,
-          category: lead.category,
-          city: lead.city,
-          rating: lead.rating,
-          review_count: lead.review_count,
-        },
-      }
+    ? buildLuviaOutreachPayload(lead)
     : {
         segment,
         channel,
