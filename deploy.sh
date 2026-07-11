@@ -65,7 +65,8 @@ SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN npx supabase functions deploy \
   score-sites \
   track-event \
   ingest-leads \
-  run-scrape
+  run-scrape \
+  handoff-luvia
 
 # 4. Verificar
 # Pingeamos sin auth: una función desplegada y viva responde 401 (exige cabecera de auth).
