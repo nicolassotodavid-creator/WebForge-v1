@@ -64,6 +64,9 @@ export interface Lead {
   // no recibe ningún email (lo respetan generate-outreach, send-email y cron-followups).
   do_not_contact?: boolean;
   unsubscribed_at?: string | null;
+  // Puente Luvia (ver 0021_lead_luvia_client.sql). Enlace/idempotencia con el cliente creado
+  // en la plataforma Luvia. null = aún no entregado; con valor = ya es cliente → el lead pasa a 'won'.
+  luvia_client_id?: string | null;
 }
 
 export interface BriefService {
