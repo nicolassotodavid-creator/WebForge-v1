@@ -24,6 +24,7 @@ import {
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { waLink, waNumber, whatsappOutreachText } from "@/lib/contact";
+import { luviaSiteState, type LuviaSiteState } from "@/lib/luvia";
 import type { Brief, Lead, Site, OutreachMessage } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -72,6 +73,19 @@ function Field({ label, value }: { label: string; value: ReactNode }) {
       <div className="text-sm">{value || "—"}</div>
     </div>
   );
+}
+
+const LUVIA_STATE_META: Record<LuviaSiteState, { label: string; className: string }> = {
+  hot:       { label: "🔥 Caliente para Luvia", className: "bg-orange-100 text-orange-800 hover:bg-orange-100" },
+  chat:      { label: "Tiene chat con humano",   className: "bg-blue-100 text-blue-800 hover:bg-blue-100" },
+  automated: { label: "Ya tiene bot",            className: "bg-purple-100 text-purple-800 hover:bg-purple-100" },
+  none:      { label: "Sin canal digital",       className: "bg-amber-100 text-amber-800 hover:bg-amber-100" },
+  unknown:   { label: "Web sin analizar",        className: "bg-muted text-muted-foreground hover:bg-muted" },
+};
+
+function LuviaStateBadge({ lead }: { lead: Lead }) {
+  const meta = LUVIA_STATE_META[luviaSiteState(lead)];
+  return <Badge className={`border-transparent ${meta.className}`}>{meta.label}</Badge>;
 }
 
 export default function LeadDetail() {
@@ -713,6 +727,7 @@ export default function LeadDetail() {
                         <>
                           {chip("Chat web", lead.site_has_chat, lead.site_analysis?._widgets?.vendors?.join(", "))}
                           {chip("WhatsApp", lead.site_has_whatsapp)}
+                          {chip("Bot", lead.site_has_bot)}
                         </>
                       );
                     })()}
@@ -1171,6 +1186,11 @@ export default function LeadDetail() {
                     ? "La web está aprobada. Genera el mensaje y envíalo."
                     : "Genera el mensaje de contacto y envíalo."}
               </CardDescription>
+              {!isAdmin && (
+                <div className="mt-2">
+                  <LuviaStateBadge lead={lead} />
+                </div>
+              )}
             </div>
             <Button
               onClick={generateOutreach}
