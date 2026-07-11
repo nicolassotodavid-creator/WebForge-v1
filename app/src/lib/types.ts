@@ -67,6 +67,10 @@ export interface Lead {
   // Puente Luvia (ver 0021_lead_luvia_client.sql). Enlace/idempotencia con el cliente creado
   // en la plataforma Luvia. null = aún no entregado; con valor = ya es cliente → el lead pasa a 'won'.
   luvia_client_id?: string | null;
+  // Demo de Luvia pre-extraída (ver 0023_lead_luvia_demo.sql). luvia_demo_url = link público
+  // (LUVIA_DEMO_BASE/demo/:id) que va en el email/WhatsApp; null = aún no preparada.
+  luvia_demo_id?: string | null;
+  luvia_demo_url?: string | null;
 }
 
 export interface BriefService {

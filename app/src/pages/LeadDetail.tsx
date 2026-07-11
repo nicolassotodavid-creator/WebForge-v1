@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { waLink, waNumber, whatsappOutreachText } from "@/lib/contact";
+import { waLink, waNumber, whatsappOutreachText, whatsappLuviaText } from "@/lib/contact";
 import { luviaSiteState, type LuviaSiteState } from "@/lib/luvia";
 import type { Brief, Lead, Site, OutreachMessage } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
@@ -105,6 +105,9 @@ export default function LeadDetail() {
   // Cierre del flujo Luvia: crea la clínica como cliente en la plataforma Luvia.
   const [handingOff, setHandingOff] = useState(false);
   const [handoffError, setHandoffError] = useState<string | null>(null);
+  // Demo de Luvia pre-extraída: se prepara desde la ficha y el operador la revisa antes de enviar.
+  const [preparingDemo, setPreparingDemo] = useState(false);
+  const [demoError, setDemoError] = useState<string | null>(null);
 
   // Outreach: `outreachMsg` = mensaje más reciente (el que se compone/envía).
   // `outreachHistory` = todos los mensajes del lead, para el timeline de seguimiento.
@@ -380,10 +383,36 @@ export default function LeadDetail() {
 
   /** Abre el composer de WhatsApp con el texto de plantilla prerellenado. */
   function openWhatsappComposer() {
-    if (!lead || !site?.live_url) return;
+    if (!lead) return;
+    // Lead Luvia con demo montada → texto con el link de la demo (no la web /book de WebForge).
+    if (!isAdmin && lead.luvia_demo_url) {
+      setWaText(whatsappLuviaText(lead.name, lead.luvia_demo_url));
+      setWaError(null);
+      return;
+    }
+    if (!site?.live_url) return;
     const bookUrl = `${window.location.origin}/book/${lead.id}`;
     setWaText(whatsappOutreachText(lead.name, site.live_url, bookUrl));
     setWaError(null);
+  }
+
+  /** Prepara la demo de Luvia para este lead (extrae + guarda snapshot en Luvia, guarda el link). */
+  async function prepareLuviaDemo() {
+    if (!lead) return;
+    setPreparingDemo(true);
+    setDemoError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("prepare-luvia-demo", {
+        body: { lead_id: lead.id },
+      });
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      await loadAll(); // refresca lead.luvia_demo_url
+    } catch (e) {
+      setDemoError(await edgeFunctionErrorMessage(e, "No se pudo preparar la demo de Luvia."));
+    } finally {
+      setPreparingDemo(false);
+    }
   }
 
   /** Abre WhatsApp con el texto (editado) y registra el envío en outreach_messages. */
@@ -1410,6 +1439,84 @@ export default function LeadDetail() {
                     </Button>
                   </div>
                 )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Demo de Luvia: monta el asistente cargado con los datos de la clínica, para mandar el
+          link en frío (email/WhatsApp). Solo Luvia (no-admin). El operador revisa la demo antes
+          de enviar = gate humano. */}
+      {!isAdmin && !lead.luvia_client_id && (
+        <Card>
+          <CardContent className="space-y-3 pt-6">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-medium">Demo de Luvia</span>
+              <Button onClick={prepareLuviaDemo} disabled={preparingDemo} variant="outline" size="sm">
+                {preparingDemo
+                  ? "Preparando demo…"
+                  : lead.luvia_demo_url
+                    ? "Regenerar demo"
+                    : "Preparar demo Luvia"}
+              </Button>
+            </div>
+            {lead.luvia_demo_url ? (
+              <a
+                href={lead.luvia_demo_url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-2 text-xs font-mono text-blue-600 hover:underline"
+              >
+                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                Revisar la demo → {lead.luvia_demo_url}
+              </a>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Monta un asistente con los tratamientos y horarios de la web de la clínica. Revísalo
+                antes de mandárselo.
+              </p>
+            )}
+            {demoError && <p className="text-xs text-red-600">{demoError}</p>}
+
+            {/* WhatsApp saliente manual con el link de la demo (gate: demo ya montada) */}
+            {lead.luvia_demo_url && waNumber(lead) && (
+              <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium">Enviar por WhatsApp</span>
+                  {waText == null && (
+                    <Button size="sm" variant="outline" onClick={openWhatsappComposer}>
+                      <MessageCircle className="h-4 w-4" /> Preparar mensaje
+                    </Button>
+                  )}
+                </div>
+                {waText != null && (
+                  <>
+                    <textarea
+                      value={waText}
+                      onChange={(e) => setWaText(e.target.value)}
+                      rows={6}
+                      className="w-full rounded-md border bg-background p-2 text-sm"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" onClick={sendWhatsapp} disabled={waSaving || !waText.trim()}>
+                        {waSaving ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <MessageCircle className="h-4 w-4" />
+                        )}
+                        Abrir WhatsApp
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setWaText(null)}>
+                        Cancelar
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Se abrirá WhatsApp con el mensaje ya escrito. Revísalo y dale a enviar tú.
+                    </p>
+                  </>
+                )}
+                {waError && <p className="text-xs text-amber-700">{waError}</p>}
               </div>
             )}
           </CardContent>
