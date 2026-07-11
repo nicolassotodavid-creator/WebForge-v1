@@ -46,5 +46,6 @@ jobs:
             track-event \
             ingest-leads \
             run-scrape \
+            handoff-luvia \
             --project-ref khscikqchvjxyvoaruas \
             --use-api
