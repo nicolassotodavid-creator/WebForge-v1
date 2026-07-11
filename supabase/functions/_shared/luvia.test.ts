@@ -1,5 +1,5 @@
 // node --experimental-strip-types supabase/functions/_shared/luvia.test.ts
-import { isLuviaLead, luviaSiteState, buildLuviaOutreachPayload } from "./luvia.ts";
+import { isLuviaLead, luviaSiteState, buildLuviaOutreachPayload, buildLuviaFinalBody } from "./luvia.ts";
 
 let failures = 0;
 function assertEq(actual: unknown, expected: unknown, msg: string) {
@@ -36,6 +36,22 @@ assertEq(p.site.url, "https://clinicax.es", "payload: url");
 assertEq(p.business.name, "Clínica X", "payload: business.name");
 assertEq((p as Record<string, unknown>).rating, undefined, "payload: SIN rating");
 assertEq((p as Record<string, unknown>).review_count, undefined, "payload: SIN review_count");
+assertEq((p as Record<string, unknown>).demo_url, null, "payload: demo_url null cuando no hay demo");
+
+// ── demo_url en el payload ─────────────────────────────────────────────────
+const pDemo = buildLuviaOutreachPayload({
+  name: "Clínica X", category: "estética", city: "València",
+  site_has_whatsapp: true, site_has_chat: false, site_has_bot: false,
+  website_url: "https://clinicax.es",
+  site_analysis: { _widgets: { vendors: [] } },
+  luvia_demo_url: "https://luvia-ia.es/demo/abc123",
+});
+assertEq((pDemo as Record<string, unknown>).demo_url, "https://luvia-ia.es/demo/abc123", "payload: demo_url presente");
+
+// ── buildLuviaFinalBody ────────────────────────────────────────────────────
+assertEq(buildLuviaFinalBody("Hola.\nNico", "https://luvia-ia.es/demo/x"), "Hola.\nNico\n\nhttps://luvia-ia.es/demo/x", "final body: link en su línea");
+assertEq(buildLuviaFinalBody("Hola.\nNico", null), "Hola.\nNico", "final body: sin link si demoUrl null");
+assertEq(buildLuviaFinalBody("  Hola.  ", "https://d"), "Hola.\n\nhttps://d", "final body: trim del body");
 
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures) process.exit(1);

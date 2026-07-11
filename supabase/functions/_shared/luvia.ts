@@ -45,6 +45,7 @@ export function buildLuviaOutreachPayload(lead: {
   site_has_bot?: boolean | null;
   website_url?: string | null;
   site_analysis?: { _widgets?: { vendors?: string[] } } | null;
+  luvia_demo_url?: string | null;
 }) {
   return {
     business: { name: lead.name, category: lead.category ?? null, city: lead.city ?? null },
@@ -56,5 +57,14 @@ export function buildLuviaOutreachPayload(lead: {
       vendors: lead.site_analysis?._widgets?.vendors ?? [],
       url: lead.website_url ?? null,
     },
+    // Si hay demo montada, el gancho pasa a "ya te lo monté, pruébalo"; el sistema añade el link.
+    demo_url: lead.luvia_demo_url ?? null,
   };
+}
+
+// Body final del Email 1 de Luvia: si hay demo, el sistema añade el link EN SU PROPIA LÍNEA al
+// final (para que la plantilla lo renderice como botón); la IA nunca escribe la URL.
+export function buildLuviaFinalBody(bodyText: string, demoUrl: string | null | undefined): string {
+  const b = bodyText.trim();
+  return demoUrl ? `${b}\n\n${demoUrl}` : b;
 }
