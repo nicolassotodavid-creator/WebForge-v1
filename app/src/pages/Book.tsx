@@ -380,22 +380,11 @@ export default function Book() {
                 ))}
               </div>
 
-              {/* Acción primaria: pago con tarjeta */}
-              <button type="button" onClick={goToCheckout} disabled={paying}
-                className="lv-shine-wrap group w-full flex items-center justify-center gap-2.5 rounded-sm bg-brick py-4 text-[15px] font-medium text-paper ring-1 ring-brick shadow-lg shadow-brick/20 transition-all duration-300 hover:shadow-xl hover:shadow-brick/30 hover:-translate-y-0.5 active:translate-y-px disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0 lg:text-base lg:py-5">
-                {paying ? (
-                  <><Loader2 className="size-4 animate-spin" /> Abriendo pago seguro…</>
-                ) : (
-                  <><Lock className="size-4" strokeWidth={2} /> Reservar mi web · 397€ + IVA
-                    <span className="transition-transform duration-300 group-hover:translate-x-1">→</span></>
-                )}
-              </button>
-              {payError && <p className="mt-2.5 text-[13px] leading-snug text-brick">{payError}</p>}
-
-              {/* Acción de respaldo: WhatsApp */}
+              {/* Acción primaria: WhatsApp (cerramos hablando; el pago va después, con conversación) */}
               <button type="button" onClick={goToWhatsapp}
-                className="mt-3 w-full flex items-center justify-center gap-2.5 rounded-sm border border-ink/15 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:border-[#25D366]/60 hover:bg-[#25D366]/[0.06]">
-                <WhatsAppIcon size={18} /> ¿Prefieres hablar antes? Escríbeme
+                className="lv-shine-wrap group w-full flex items-center justify-center gap-2.5 rounded-sm bg-[#25D366] py-4 text-[15px] font-medium text-white ring-1 ring-[#25D366] shadow-lg shadow-[#25D366]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#25D366]/30 hover:-translate-y-0.5 active:translate-y-px lg:text-base lg:py-5">
+                <WhatsAppIcon size={20} /> Me interesa — hablamos por WhatsApp
+                <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
               </button>
               {waSent && (
                 <p className="mt-2.5 text-center text-[13px] leading-snug text-ink/70">
@@ -403,10 +392,21 @@ export default function Book() {
                 </p>
               )}
 
+              {/* Acción secundaria: pago con tarjeta, para quien quiera cerrar ya */}
+              <button type="button" onClick={goToCheckout} disabled={paying}
+                className="mt-3 w-full flex items-center justify-center gap-2.5 rounded-sm border border-ink/15 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:border-brick/60 hover:bg-brick/[0.06] disabled:cursor-wait disabled:opacity-70">
+                {paying ? (
+                  <><Loader2 className="size-4 animate-spin" /> Abriendo pago seguro…</>
+                ) : (
+                  <><Lock className="size-4" strokeWidth={2} /> ¿Prefieres pagar ya? Págala aquí · 397€ + IVA</>
+                )}
+              </button>
+              {payError && <p className="mt-2.5 text-[13px] leading-snug text-brick">{payError}</p>}
+
               {/* Confianza + salida por email */}
               <div className="mt-6 pt-5 border-t border-ink/5 text-center">
                 <p className="inline-flex items-center gap-1.5 text-[11px] opacity-55">
-                  <ShieldCheck className="size-3.5 text-brick" /> Pagas en la pantalla segura de Stripe
+                  <ShieldCheck className="size-3.5 text-brick" /> Respondo en menos de 1h · pago seguro con Stripe
                 </p>
                 <p className="mt-2 text-[11px] opacity-45">
                   ¿Sin WhatsApp? Escríbeme a{" "}
@@ -459,18 +459,19 @@ export default function Book() {
         <WhatsAppIcon size={22} />
       </a>
 
-      {/* Mobile sticky buy bar: pago (primario) + WhatsApp (respaldo) */}
+      {/* Mobile sticky bar: WhatsApp (primario) + pago con tarjeta (respaldo) */}
       <div className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-ink shadow-[0_-8px_32px_rgba(0,0,0,0.25)] lg:hidden">
-        <button type="button" onClick={goToCheckout} disabled={paying}
-          className="flex flex-1 items-center justify-center gap-2 py-3.5 text-paper text-sm font-medium tracking-tight transition-transform active:scale-[0.98] disabled:opacity-70"
-          aria-label="Reservar mi web por 397 euros más IVA">
-          {paying ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
-          <span>{paying ? "Abriendo pago…" : "Reservar · 397€ + IVA"}</span>
-        </button>
         <button type="button" onClick={goToWhatsapp}
-          className="flex items-center justify-center px-6 bg-[#25D366] text-white transition-transform active:scale-[0.98]"
+          className="flex flex-1 items-center justify-center gap-2 py-3.5 bg-[#25D366] text-white text-sm font-medium tracking-tight transition-transform active:scale-[0.98]"
           aria-label="Escribir por WhatsApp">
           <WhatsAppIcon size={20} />
+          <span>Me interesa — WhatsApp</span>
+        </button>
+        <button type="button" onClick={goToCheckout} disabled={paying}
+          className="flex items-center justify-center gap-2 px-6 text-paper text-sm font-medium tracking-tight transition-transform active:scale-[0.98] disabled:opacity-70"
+          aria-label="Pagar mi web por 397 euros más IVA">
+          {paying ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
+          <span>Pagar</span>
         </button>
       </div>
     </div>
