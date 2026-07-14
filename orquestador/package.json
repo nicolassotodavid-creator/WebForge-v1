@@ -12,7 +12,8 @@
     "dry-run": "tsx run.ts --dry-run",
     "check-yuricar": "tsx check-yuricar.ts",
     "fix-yuricar": "tsx check-yuricar.ts --fix",
-    "backfill-previews": "tsx backfill-previews.ts"
+    "backfill-previews": "tsx backfill-previews.ts",
+    "check-previews": "tsx check-previews.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
