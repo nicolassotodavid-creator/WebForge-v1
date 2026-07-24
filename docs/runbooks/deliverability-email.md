@@ -22,11 +22,14 @@ resume lo que ya está vivo y el único paso manual pendiente.
   promociones), HTML y pie de baja renderizados. Confirma que el remitente real es
   `hola@nico-soto.es` (no `trywebforge-mail.com`).
 
-## Lo que está DESPLEGADO pero INERTE — falta el alta en Resend (paso manual)
+## Supresión de rebotes/quejas — ✅ ACTIVO (2026-07-24)
 
 Función `resend-webhook` (suprime rebotes duros y quejas de spam → `do_not_contact=true`,
-reutiliza la misma columna). Está desplegada y devuelve 500 "Config incompleta" hasta que
-tenga el secreto. Para activarla:
+reutiliza la misma columna). **Alta hecha en Resend + `RESEND_WEBHOOK_SECRET` puesto en
+Supabase.** Verificado E2E: firma Svix válida → 200, firma falsa → 401. A partir de ahora,
+cualquier `email.bounced` / `email.complained` auto-suprime al lead.
+
+Pasos de referencia (por si hay que rehacer el alta o rotar el secreto):
 
 1. **Resend → Webhooks → Add Endpoint.**
    - URL: `https://khscikqchvjxyvoaruas.supabase.co/functions/v1/resend-webhook`
