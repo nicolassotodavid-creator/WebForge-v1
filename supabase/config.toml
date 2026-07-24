@@ -52,3 +52,9 @@ verify_jwt = false
 # one-click y el botón "Cancelar suscripción" no funcionaría).
 [functions.unsubscribe]
 verify_jwt = false
+
+# resend-webhook lo llama Resend directamente (rebotes/quejas), no el browser, sin JWT de
+# Supabase: solo la firma Svix (svix-signature). La propia función la verifica con
+# RESEND_WEBHOOK_SECRET; por eso desactivamos el JWT (si no, Resend recibiría 401).
+[functions.resend-webhook]
+verify_jwt = false

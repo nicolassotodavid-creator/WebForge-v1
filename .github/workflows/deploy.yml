@@ -48,5 +48,6 @@ jobs:
             run-scrape \
             handoff-luvia \
             unsubscribe \
+            resend-webhook \
             --project-ref khscikqchvjxyvoaruas \
             --use-api
