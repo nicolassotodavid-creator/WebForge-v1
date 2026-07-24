@@ -113,14 +113,23 @@ export interface RenderEmailOptions {
   previewImageUrl?: string | null;
   // URL en vivo de la web (sites.live_url) → captura clicable + botón "Ver la web entera".
   webUrl?: string | null;
+  // Enlace de baja con un clic (RFC 8058). Si viene, el pie muestra "Darte de baja" clicable
+  // junto al "responde BAJA". La versión legible por máquina va en la cabecera List-Unsubscribe.
+  unsubscribeUrl?: string | null;
 }
 
 // Devuelve el HTML completo del email. NO añade firma (el cuerpo ya la trae) ni
 // botón de WhatsApp. Con captura → escaparate (captura enmarcada + 2 CTAs); sin
 // captura → texto plano + (enlace de compra opcional). Siempre: opt-out + píxel.
-export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY }: RenderEmailOptions): string {
+export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY, unsubscribeUrl }: RenderEmailOptions): string {
   const pixel = trackingPixelUrl
     ? `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`
+    : "";
+
+  // Enlace de baja clicable en el pie (opcional). El botón nativo "Cancelar suscripción" del
+  // cliente de correo sale de la cabecera List-Unsubscribe; esto es su equivalente visible.
+  const unsub = unsubscribeUrl
+    ? `<p style="margin:6px 0 0;color:#9ca3af;font-size:13px;line-height:1.5;"><a href="${unsubscribeUrl}" style="color:#9ca3af;text-decoration:underline;">Darte de baja con un clic</a></p>`
     : "";
 
   // ── Cuerpo ──────────────────────────────────────────────────────────────
@@ -168,6 +177,7 @@ export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingU
               <hr style="border:none;border-top:1px solid #eeeeee;margin:28px 0 16px;">
               <p style="margin:0 0 6px;color:#9ca3af;font-size:13px;line-height:1.5;">Te escribo a t&iacute;tulo profesional; encontr&eacute; tu contacto en tu ficha p&uacute;blica de actividad. Si no quieres recibir m&aacute;s propuestas o prefieres que borre tus datos, responde <strong>BAJA</strong> a este correo y lo hago de inmediato.</p>
               <p style="margin:0;color:#9ca3af;font-size:13px;line-height:1.5;">${senderIdentity}</p>
+              ${unsub}
               ${pixel}
             </td>
           </tr>

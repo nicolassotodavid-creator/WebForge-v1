@@ -8,6 +8,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
+import { signUnsubscribe, unsubscribeUrl } from "../_shared/unsubscribe.ts";
 import {
   DEFAULT_REPLY_TO_LUVIA,
   DEFAULT_REPLY_TO_WEBFORGE,
@@ -143,6 +144,11 @@ Deno.serve(async (req: Request) => {
   // Versión texto plano (fallback para clientes sin HTML). El cuerpo ya trae la firma.
   const textBody = msg.body;
 
+  // Baja one-click (RFC 8058): enlace firmado por lead. Va (a) en el pie clicable del email y
+  // (b) en la cabecera List-Unsubscribe → botón nativo de Gmail/Yahoo → menos spam, mejor bandeja.
+  const unsubSig = await signUnsubscribe(msg.lead_id, SERVICE_KEY);
+  const unsubUrl = unsubscribeUrl(SUPABASE_URL, msg.lead_id, unsubSig);
+
   // Showcase en los 3 emails: si el lead tiene captura → captura enmarcada + "Ver la web
   // entera" (→ live_url) + "Ver la propuesta" (→ /book). Sin captura → texto plano (la línea-URL
   // del cuerpo se vuelve botón "Ver la web →").
@@ -154,6 +160,7 @@ Deno.serve(async (req: Request) => {
     webUrl: site?.live_url ?? null,
     bookingUrl: bookingLink(Deno.env.get("BOOKING_BASE"), msg.lead_id),
     senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
+    unsubscribeUrl: unsubUrl,
   });
 
   // Reply-To por dueño: respuestas de leads Luvia → Miguel; WebForge → Nico.
@@ -178,6 +185,12 @@ Deno.serve(async (req: Request) => {
         html: htmlBody,
         text: textBody,
         ...(replyTo ? { reply_to: replyTo } : {}),
+        // Baja legible por máquina (RFC 8058): botón nativo "Cancelar suscripción" en Gmail/Yahoo.
+        // URL one-click + mailto de respaldo al buzón que ya lee las respuestas (reply-to/FROM).
+        headers: {
+          "List-Unsubscribe": `<${unsubUrl}>, <mailto:${replyTo ?? FROM_EMAIL}?subject=BAJA>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
       }),
     });
     const data = (await res.json().catch(() => ({}))) as {

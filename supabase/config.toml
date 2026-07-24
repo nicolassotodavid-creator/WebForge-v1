@@ -45,3 +45,10 @@ verify_jwt = false
 # desactivamos el JWT de la pasarela; si no, Stripe recibiría 401 y el webhook nunca correría.
 [functions.stripe-webhook]
 verify_jwt = false
+
+# unsubscribe: baja one-click (RFC 8058). La llaman el cliente de correo (Gmail/Yahoo, POST) y el
+# prospecto (GET), sin sesión de Supabase. La autorización es la FIRMA HMAC del enlace, que la
+# propia función verifica; por eso desactivamos el JWT (si no, Gmail recibiría 401 al hacer el
+# one-click y el botón "Cancelar suscripción" no funcionaría).
+[functions.unsubscribe]
+verify_jwt = false

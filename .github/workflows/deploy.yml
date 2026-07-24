@@ -47,5 +47,6 @@ jobs:
             ingest-leads \
             run-scrape \
             handoff-luvia \
+            unsubscribe \
             --project-ref khscikqchvjxyvoaruas \
             --use-api

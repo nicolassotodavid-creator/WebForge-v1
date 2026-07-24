@@ -5,6 +5,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { renderEmail, bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
+import { signUnsubscribe, unsubscribeUrl } from "../_shared/unsubscribe.ts";
 import {
   DEFAULT_REPLY_TO_LUVIA,
   DEFAULT_REPLY_TO_WEBFORGE,
@@ -94,6 +95,11 @@ async function sendFollowup(
     `${SUPABASE_URL}/functions/v1/track-event` +
     `?lead_id=${encodeURIComponent(lead.id)}&type=email_opened&message_id=${encodeURIComponent(msg.id)}`;
 
+  // Baja one-click (RFC 8058): mismo enlace firmado que el Email 1 (send-email). Pie clicable
+  // + cabecera List-Unsubscribe → botón nativo de Gmail/Yahoo → menos quejas, mejor bandeja.
+  const unsubSig = await signUnsubscribe(lead.id, SERVICE_KEY);
+  const unsubUrl = unsubscribeUrl(SUPABASE_URL, lead.id, unsubSig);
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
@@ -110,9 +116,15 @@ async function sendFollowup(
         webUrl: liveUrl,
         bookingUrl: bookUrl,
         senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
+        unsubscribeUrl: unsubUrl,
       }),
       text: bodyText,
       ...(replyTo ? { reply_to: replyTo } : {}),
+      // Baja legible por máquina (RFC 8058) — igual que el Email 1.
+      headers: {
+        "List-Unsubscribe": `<${unsubUrl}>, <mailto:${replyTo ?? FROM_EMAIL}?subject=BAJA>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     }),
   });
 
