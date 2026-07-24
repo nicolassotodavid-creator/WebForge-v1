@@ -17,6 +17,10 @@ resume lo que ya está vivo y el único paso manual pendiente.
     + evento `unsubscribed`. Los envíos ya respetan `do_not_contact` → no vuelve a escribir.
   - Firma: HMAC-SHA256 con `SUPABASE_SERVICE_ROLE_KEY` (etiqueta `unsub:v1:`). Sin secreto nuevo.
   - Verificado E2E en prod (GET→página, POST one-click→200, firma mala→400).
+- **Verificación desde la bandeja del destinatario** (2026-07-24): envío de prueba real
+  `hola@nico-soto.es` → Gmail de Nico → cayó en **INBOX + IMPORTANT** (no spam, no
+  promociones), HTML y pie de baja renderizados. Confirma que el remitente real es
+  `hola@nico-soto.es` (no `trywebforge-mail.com`).
 
 ## Lo que está DESPLEGADO pero INERTE — falta el alta en Resend (paso manual)
 
