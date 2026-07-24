@@ -225,7 +225,7 @@ ANTHROPIC_API_KEY=          # API key de runtime (distinta al plan Max de Claude
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=  # Bypasa RLS — solo en servidor
 RESEND_API_KEY=
-FROM_EMAIL=hola@trywebforge-mail.com   # dominio secundario
+FROM_EMAIL=hola@nico-soto.es   # dominio de envío real, autenticado en Resend (hoy = dominio personal; secundario propio = mejora futura)
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 APIFY_TOKEN=                # o OUTSCRAPER_API_KEY

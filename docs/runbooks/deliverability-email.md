@@ -50,5 +50,6 @@ Pasos de referencia (por si hay que rehacer el alta o rotar el secreto):
 - **Verificación de dirección** (MX/sintaxis) antes de enviar → menos rebotes de raspados.
 - **Pixel de apertura en frío**: imagen remota 1×1 es leve señal de spam; valorar apagarlo
   en frío o servirlo desde el propio dominio.
-- **Doc stale**: `ARQUITECTURA_webforge_v2.md` / `CONTEXTO_PARA_CLAUDE.md` aún citan
-  `trywebforge-mail.com` como dominio de envío; el real es `nico-soto.es` (aquel está vacío en DNS).
+- ~~Doc stale `trywebforge-mail.com`~~ → **corregido (2026-07-24)** en ARQUITECTURA,
+  CONTEXTO y `.env.example`: el dominio de envío real es `nico-soto.es`. (Los duplicados en
+  `.claude/worktrees/sesion-b/` se dejaron: worktree obsoleto.)

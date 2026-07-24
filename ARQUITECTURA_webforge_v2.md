@@ -381,7 +381,7 @@ SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 # Email
 RESEND_API_KEY=
-FROM_EMAIL=hola@trywebforge-mail.com     # DOMINIO SECUNDARIO
+FROM_EMAIL=hola@nico-soto.es             # dominio de envío real, autenticado en Resend (hoy = dominio personal; secundario propio = mejora futura)
 # Pagos
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
