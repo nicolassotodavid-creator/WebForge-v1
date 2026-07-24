@@ -8,7 +8,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { OUTREACH_PROMPT, LUVIA_OUTREACH_PROMPT } from "../_shared/prompts.ts";
 import { isLuviaLead, buildLuviaOutreachPayload, buildLuviaFinalBody } from "../_shared/luvia.ts";
 import { bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
-import { canAccessLead, isAdminEmail, type Operator } from "../_shared/leadAccess.ts";
+import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
@@ -135,11 +135,13 @@ Deno.serve(async (req: Request) => {
   }
 
   const ADMIN_USER_ID = Deno.env.get("ADMIN_USER_ID");
-  // La rama Luvia solo se activa cuando el LLAMADOR es un operador real no-admin
-  // (email = misma fuente de verdad que RLS / leadAccess.ts), de modo que el admin
-  // nunca puede disparar un email Luvia aunque ADMIN_USER_ID esté mal configurado.
-  const luvia =
-    isLuviaLead(lead.owner, ADMIN_USER_ID) && !!operator && !isAdminEmail(operator.email);
+  // QUÉ PRODUCTO se ofrece depende SOLO del DUEÑO del lead, nunca del rol de quien dispara:
+  // un lead de Luvia (owner != admin) SIEMPRE recibe el pitch de Luvia (agente de chat, sin
+  // web, sin reseñas, sin /book), lo genere el operador de Luvia, el admin o el orquestador;
+  // y un lead de WebForge SIEMPRE recibe el pitch de web. Así no se mezclan los dos productos.
+  // (Antes se colaba `!isAdminEmail(operator.email)` aquí, y el admin viendo un lead Luvia
+  //  acababa generándole el pitch de web — bug de "producto según el que mira".)
+  const luvia = isLuviaLead(lead.owner, ADMIN_USER_ID);
 
   if (!luvia && lead.status !== "approved" && lead.status !== "contacted") {
     return jsonResponse(

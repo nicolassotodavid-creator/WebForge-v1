@@ -385,7 +385,9 @@ export default function LeadDetail() {
   function openWhatsappComposer() {
     if (!lead) return;
     // Lead Luvia con demo montada → texto con el link de la demo (no la web /book de WebForge).
-    if (!isAdmin && lead.luvia_demo_url) {
+    // El producto lo marca el LEAD (tiene demo de Luvia), no el rol de quien mira: así el admin
+    // viendo un lead de Luvia tampoco genera el texto de web. No se mezclan productos.
+    if (lead.luvia_demo_url) {
       setWaText(whatsappLuviaText(lead.name, lead.luvia_demo_url));
       setWaError(null);
       return;
