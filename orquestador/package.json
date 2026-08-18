@@ -12,6 +12,7 @@
     "dry-run": "tsx run.ts --dry-run",
     "check-yuricar": "tsx check-yuricar.ts",
     "fix-yuricar": "tsx check-yuricar.ts --fix",
+    "score": "tsx run-score-sweep.ts",
     "backfill-previews": "tsx backfill-previews.ts",
     "check-previews": "tsx check-previews.ts"
   },
