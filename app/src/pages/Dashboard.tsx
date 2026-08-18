@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { waLink } from "@/lib/contact";
+import { waLink, waDisplay, phoneKind } from "@/lib/contact";
 import {
   matchesBaseFilters,
   matchesView,
@@ -835,7 +835,43 @@ export default function Dashboard() {
                       </div>
                     </TableCell>
                     <TableCell>{l.city ?? "—"}</TableCell>
-                    <TableCell>{l.phone ?? "—"}</TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      {(() => {
+                        if (!l.phone)
+                          return <span className="text-xs text-muted-foreground">—</span>;
+                        const kind = phoneKind(l.phone);
+                        return (
+                          <span className="inline-flex items-center gap-1.5">
+                            <a
+                              href={`tel:${l.phone.replace(/\s/g, "")}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="hover:underline"
+                            >
+                              {l.phone}
+                            </a>
+                            {kind && (
+                              <span
+                                title={
+                                  kind === "movil"
+                                    ? "Móvil — admite WhatsApp"
+                                    : kind === "gratuito"
+                                      ? "Número gratuito (800/900) — sin WhatsApp"
+                                      : "Fijo — sin WhatsApp"
+                                }
+                                className={cn(
+                                  "rounded px-1 py-0.5 text-[10px] font-semibold uppercase leading-none",
+                                  kind === "movil"
+                                    ? "bg-green-500/15 text-green-700 dark:text-green-400"
+                                    : "bg-muted text-muted-foreground",
+                                )}
+                              >
+                                {kind === "movil" ? "móvil" : kind === "gratuito" ? "800" : "fijo"}
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })()}
+                    </TableCell>
                     <TableCell className="max-w-[200px]">
                       {l.email ? (
                         <a
@@ -853,6 +889,7 @@ export default function Dashboard() {
                     <TableCell>
                       {(() => {
                         const wa = waLink(l);
+                        const waNum = waDisplay(l);
                         if (!wa && !l.facebook)
                           return <span className="text-xs text-muted-foreground">—</span>;
                         return (
@@ -863,10 +900,15 @@ export default function Dashboard() {
                                 target="_blank"
                                 rel="noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                title={`WhatsApp: ${wa.replace("https://wa.me/", "")}`}
-                                className="text-green-600 hover:text-green-700"
+                                title={
+                                  l.whatsapp
+                                    ? `WhatsApp verificado: ${waNum}`
+                                    : `Móvil con WhatsApp probable: ${waNum}`
+                                }
+                                className="inline-flex items-center gap-1 whitespace-nowrap text-green-600 hover:text-green-700"
                               >
-                                <MessageCircle className="h-4 w-4" />
+                                <MessageCircle className="h-4 w-4 shrink-0" />
+                                <span className="text-xs tabular-nums">{waNum}</span>
                               </a>
                             )}
                             {l.facebook && (

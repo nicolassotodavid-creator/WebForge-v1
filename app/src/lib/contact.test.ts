@@ -1,6 +1,6 @@
 // Test de un solo uso (no hay framework): se ejecuta con
 //   node --experimental-strip-types src/lib/contact.test.ts
-import { waLink, whatsappOutreachText, whatsappLuviaText } from "./contact.ts";
+import { waLink, whatsappOutreachText, whatsappLuviaText, phoneKind, formatPhone, waDisplay } from "./contact.ts";
 
 let failures = 0;
 function assert(cond: boolean, msg: string) {
@@ -50,6 +50,29 @@ assert(tl.includes("Nico"), "luvia: firma Nico");
 assert(tl.includes("Clínica X"), "luvia: nombre del negocio");
 assert(tl.includes("https://luvia-ia.es/demo/abc"), "luvia: incluye el link de demo");
 assert(whatsappLuviaText(null, "https://d").length > 0, "luvia: aguanta negocio null");
+
+
+// --- phoneKind / formatPhone / waDisplay ---
+assertEq(phoneKind("+34 610 45 69 27"), "movil", "6xx → móvil");
+assertEq(phoneKind("711223344"), "movil", "7xx → móvil");
+assertEq(phoneKind("+34 963 84 68 72"), "fijo", "9xx → fijo");
+assertEq(phoneKind("+34 800 808 292"), "gratuito", "800 → gratuito");
+assertEq(phoneKind("900123456"), "gratuito", "900 → gratuito");
+assertEq(phoneKind(null), null, "sin teléfono → null");
+assertEq(phoneKind("+1 415 555 0100"), null, "no español → null");
+assertEq(formatPhone("34670052958"), "+34 670 05 29 58", "formatPhone con prefijo");
+assertEq(formatPhone("670052958"), "+34 670 05 29 58", "formatPhone sin prefijo");
+assertEq(
+  waDisplay({ whatsapp: "+34 670 05 29 58", phone: "961857728" }),
+  "+34 670 05 29 58",
+  "waDisplay prioriza el whatsapp explícito sobre el fijo",
+);
+assertEq(
+  waDisplay({ whatsapp: null, phone: "+34 641 51 62 92" }),
+  "+34 641 51 62 92",
+  "waDisplay deriva del móvil cuando no hay whatsapp explícito",
+);
+assertEq(waDisplay({ whatsapp: null, phone: "+34 800 808 292" }), null, "800 no es WhatsApp");
 
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures) process.exit(1);

@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { waLink, waNumber, whatsappOutreachText, whatsappLuviaText } from "@/lib/contact";
+import { waLink, waNumber, waDisplay, phoneKind, whatsappOutreachText, whatsappLuviaText } from "@/lib/contact";
 import { luviaSiteState, type LuviaSiteState } from "@/lib/luvia";
 import type { Brief, Lead, Site, OutreachMessage } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
@@ -621,7 +621,40 @@ export default function LeadDetail() {
               </div>
             );
           })()}
-          <Field label="Teléfono" value={lead.phone} />
+          <div>
+            <div className="text-xs text-muted-foreground">Teléfono</div>
+            {lead.phone ? (
+              <div className="mt-0.5 flex items-center gap-1.5 text-sm">
+                <a href={`tel:${lead.phone.replace(/\s/g, "")}`} className="hover:underline">
+                  {lead.phone}
+                </a>
+                {(() => {
+                  const kind = phoneKind(lead.phone);
+                  if (!kind) return null;
+                  return (
+                    <span
+                      className={
+                        kind === "movil"
+                          ? "rounded bg-green-500/15 px-1 py-0.5 text-[10px] font-semibold uppercase leading-none text-green-700"
+                          : "rounded bg-muted px-1 py-0.5 text-[10px] font-semibold uppercase leading-none text-muted-foreground"
+                      }
+                      title={
+                        kind === "movil"
+                          ? "Móvil — admite WhatsApp"
+                          : kind === "gratuito"
+                            ? "Número gratuito (800/900) — sin WhatsApp"
+                            : "Fijo — sin WhatsApp"
+                      }
+                    >
+                      {kind === "movil" ? "móvil" : kind === "gratuito" ? "800" : "fijo"}
+                    </span>
+                  );
+                })()}
+              </div>
+            ) : (
+              <div className="text-sm">—</div>
+            )}
+          </div>
           <div>
             <div className="text-xs text-muted-foreground">WhatsApp</div>
             {(() => {
@@ -635,7 +668,7 @@ export default function LeadDetail() {
                   title={lead.whatsapp ? "WhatsApp" : "Móvil con WhatsApp probable"}
                 >
                   <MessageCircle className="h-3.5 w-3.5" />
-                  {wa.replace("https://wa.me/", "")}
+                  {waDisplay(lead)}
                 </a>
               ) : (
                 <div className="text-sm">—</div>
@@ -1378,15 +1411,25 @@ export default function LeadDetail() {
                       <div className="rounded-md border border-amber-200 bg-amber-50 p-3 space-y-2">
                         <p className="text-sm text-amber-800 font-medium">Sin email — contacta manualmente:</p>
                         <div className="flex flex-wrap gap-2">
-                          {lead.phone && (
+                          {waLink(lead) ? (
                             <a
-                              href={`https://wa.me/${lead.phone.replace(/\D/g, "")}`}
+                              href={waLink(lead)!}
                               target="_blank"
                               rel="noreferrer"
                               className="inline-flex items-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-sm text-white font-medium hover:bg-green-700"
                             >
-                              💬 WhatsApp {lead.phone}
+                              💬 WhatsApp {waDisplay(lead)}
                             </a>
+                          ) : (
+                            lead.phone && (
+                              <a
+                                href={`tel:${lead.phone.replace(/\s/g, "")}`}
+                                className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
+                                title="Línea fija o gratuita: no admite WhatsApp"
+                              >
+                                📞 Llamar {lead.phone}
+                              </a>
+                            )
                           )}
                           {websiteUrl && (
                             <a
