@@ -114,6 +114,21 @@ y el EQUIPO en contexto—, y (b) seguras para publicar: NADA de caras identific
 fotos borrosas u oscuras. Si ninguna cumple con confianza, devuelve { "order": [] }. Ante la duda,
 EXCLUYE (mejor sin foto que una foto mala).`;
 
+// Sube las candidatas a NUESTRO bucket y devuelve sus URLs públicas (las que sí se pueden descargar).
+// Se usa solo en el reintento: es el plan B cuando la visión no puede leer las URLs de Google.
+async function stageCandidates(
+  supabase: SupabaseClient,
+  leadId: string,
+  candidates: string[],
+): Promise<string[]> {
+  const staged: string[] = [];
+  for (let i = 0; i < candidates.length; i++) {
+    const url = await rehostToBucket(supabase, PREVIEW_BUCKET, `photos/${leadId}/cand${i}`, candidates[i]);
+    if (url) staged.push(url);
+  }
+  return staged;
+}
+
 // Curación por visión + re-host de solo las ganadoras. Degradación total ante cualquier fallo.
 export async function curatePhotos(
   supabase: SupabaseClient,
@@ -124,18 +139,39 @@ export async function curatePhotos(
   const empty: CuratedPhotos = { hero: null, gallery: [] };
   if (candidates.length === 0) return empty;
   try {
-    const userText = `Negocio: ${ctx.name}${ctx.category ? ` (${ctx.category})` : ""}${ctx.city ? ` en ${ctx.city}` : ""}. Hay ${candidates.length} imágenes numeradas 0..${candidates.length - 1} en el orden en que se te envían.`;
-    const parsed = await llmVisionJson<{ order?: unknown }>(CURATION_SYSTEM, candidates, userText);
-    const order = parseCurationResponse(JSON.stringify(parsed), candidates.length);
+    const describe = (n: number) =>
+      `Negocio: ${ctx.name}${ctx.category ? ` (${ctx.category})` : ""}${ctx.city ? ` en ${ctx.city}` : ""}. Hay ${n} imágenes numeradas 0..${n - 1} en el orden en que se te envían.`;
+
+    // Las URLs de fotos de Google (lh3.googleusercontent) a veces no las puede descargar la API de
+    // visión: devuelve 400 "Unable to download the file" y la web salía SIN NINGUNA foto aunque el
+    // negocio tuviera 16 (caso Climanía/FREDERIC). Plan B: subirlas a nuestro bucket —URLs públicas
+    // y estables— y reintentar la visión sobre ellas. Ahí las ganadoras YA están re-hospedadas.
+    let pool = candidates;
+    let alreadyHosted = false;
+    let parsed: { order?: unknown };
+    try {
+      parsed = await llmVisionJson<{ order?: unknown }>(CURATION_SYSTEM, pool, describe(pool.length));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`  ⚠ la visión no pudo leer las fotos (${msg.slice(0, 80)}) — re-hospedando y reintentando…`);
+      const staged = await stageCandidates(supabase, leadId, candidates);
+      if (staged.length === 0) throw e;
+      pool = staged;
+      alreadyHosted = true;
+      parsed = await llmVisionJson<{ order?: unknown }>(CURATION_SYSTEM, pool, describe(pool.length));
+    }
+    const order = parseCurationResponse(JSON.stringify(parsed), pool.length);
     if (order.length === 0) {
       console.log("  · curación de fotos: ninguna pasó el filtro → web sin fotos.");
       return empty;
     }
     // Re-hospedar en orden; hero = primera superviviente, galería = resto.
+    // Si venimos del plan B, el pool YA son URLs de nuestro bucket: no se re-suben.
     const survivors: string[] = [];
     for (let i = 0; i < order.length; i++) {
+      if (alreadyHosted) { survivors.push(pool[order[i]]); continue; }
       const slot = survivors.length === 0 ? "hero" : `g${survivors.length}`;
-      const rehosted = await rehostToBucket(supabase, PREVIEW_BUCKET, `photos/${leadId}/${slot}`, candidates[order[i]]);
+      const rehosted = await rehostToBucket(supabase, PREVIEW_BUCKET, `photos/${leadId}/${slot}`, pool[order[i]]);
       if (rehosted) survivors.push(rehosted);
     }
     if (survivors.length === 0) return empty;

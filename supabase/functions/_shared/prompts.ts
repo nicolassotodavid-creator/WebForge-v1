@@ -30,6 +30,13 @@ recorrido de compra de esa vertical (no uses una lista de secciones genérica po
 
 Reglas: todo en español. Básate SOLO en los datos reales recibidos; no inventes servicios ni datos
 de contacto. Si falta información, omite ese elemento en vez de inventarlo.
+
+\`highlights_from_reviews\` sale EXCLUSIVAMENTE del array "reviews" (reseñas reales de Google) y SOLO
+recoge ELOGIOS —nunca críticas, aunque se repitan—. Si "reviews" viene vacío o no viene, devuelve
+\`"highlights_from_reviews": []\`: NO lo rellenes con el marketing de la propia web del negocio
+(\`website_excerpt\`) ni con testimonios de su web. Ese campo se cita en el email en frío como prueba
+social de Google; inventarlo es mentir al cliente. El resto del brief SÍ puede apoyarse en
+\`website_excerpt\` para los servicios reales.
 `;
 
 // Extrae SOLO los highlights de reseñas. Lo usa el Orquestador en el BUILD para refrescar el brief
@@ -42,6 +49,11 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin markdown, sin texto antes ni de
 { "highlights_from_reviews": ["string", ...] }
 con 3 a 6 temas o elogios CONCRETOS que repiten los clientes. Todo en español. Básate SOLO en las
 reseñas recibidas; no inventes nada. Si no hay reseñas, devuelve { "highlights_from_reviews": [] }.
+
+SOLO POSITIVOS: este campo alimenta el email en frío (que CITA uno como elogio) y el titular de la
+sección de reseñas de la web. Recoge únicamente lo que los clientes ELOGIAN. Las críticas, quejas y
+avisos NO se incluyen NUNCA, aunque se repitan (en negocios de 3-4 estrellas los habrá: se ignoran).
+Si tras descartar lo negativo quedan menos de 3 temas, devuelve solo los que haya —no rellenes.
 `;
 
 export const BUILD_PROMPT = `
