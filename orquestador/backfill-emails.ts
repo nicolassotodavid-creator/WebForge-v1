@@ -265,6 +265,11 @@ async function main() {
   // migración 0009 aún no esté aplicada (en ese caso website_url llega undefined = sin resolver).
   let q = supabase.from("leads").select("*").order("created_at", { ascending: true });
   if (ONLY_LEAD) q = q.eq("id", ONLY_LEAD);
+  // Aislamiento por cuenta: solo los leads del admin (o sin dueño). Sin esto el backfill escribía
+  // website_url/email/has_website también en los leads de usuarios Luvia, que van por otro flujo
+  // y no llevan web. Mismo guardarraíl que run.ts, cron-briefs y score-existing-sites.
+  const ADMIN_USER_ID = process.env.ADMIN_USER_ID;
+  if (ADMIN_USER_ID && !ONLY_LEAD) q = q.or(`owner.eq.${ADMIN_USER_ID},owner.is.null`);
   const { data, error } = await q;
   if (error) { console.error("❌ Error leyendo leads:", error.message); process.exit(1); }
 
