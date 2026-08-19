@@ -1,4 +1,5 @@
 import type { Lead, LeadStatus } from "./types";
+import { sectorFamily } from "./sectors.ts";
 
 /** Pestañas de vista rápida de la bandeja. Mutuamente excluyentes. */
 export type ViewFilter = "all" | "unseen" | "seen" | "favorites" | "noweb" | "chat" | "whatsapp";
@@ -7,8 +8,27 @@ export type ViewFilter = "all" | "unseen" | "seen" | "favorites" | "noweb" | "ch
 export interface LeadFilterState {
   statusFilter: LeadStatus | "all";
   city: string;
+  /** Selección del selector de sector. Ver {@link matchesCategory}. */
   category: string;
   search: string;
+}
+
+/**
+ * ¿El lead casa con la selección del selector de sector?
+ *
+ * El valor viene codificado desde el <select> para no necesitar dos estados:
+ *   ""                → sin filtro
+ *   "fam:<familia>"   → toda la familia de sector (ver sectors.ts)
+ *   "cat:<categoría>" → esa categoría exacta de Google Maps
+ * Cualquier otro valor se trata como texto libre (compatibilidad con los
+ * filtros guardados en localStorage de cuando era un input de texto).
+ */
+export function matchesCategory(l: Lead, value: string): boolean {
+  if (!value) return true;
+  if (value.startsWith("fam:")) return sectorFamily(l.category) === value.slice(4);
+  if (value.startsWith("cat:"))
+    return (l.category ?? "").trim().toLowerCase() === value.slice(4).trim().toLowerCase();
+  return (l.category ?? "").toLowerCase().includes(value.toLowerCase());
 }
 
 /**
@@ -25,11 +45,7 @@ export function matchesBaseFilters(l: Lead, f: LeadFilterState): boolean {
   if (f.statusFilter !== "all" && l.status !== f.statusFilter) return false;
   if (f.city && !(l.city ?? "").toLowerCase().includes(f.city.toLowerCase()))
     return false;
-  if (
-    f.category &&
-    !(l.category ?? "").toLowerCase().includes(f.category.toLowerCase())
-  )
-    return false;
+  if (!matchesCategory(l, f.category)) return false;
   if (f.search) {
     const q = f.search.toLowerCase();
     const matches =

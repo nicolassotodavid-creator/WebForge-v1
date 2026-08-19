@@ -3,7 +3,12 @@
 // Reproduce el bug real: con el estado fijado en "new" (persistido en
 // localStorage), la pestaña "Sin web" prometía 6 pero abría una lista vacía,
 // porque ninguno de los leads sin web seguía en estado "new".
-import { matchesBaseFilters, matchesView, type LeadFilterState } from "./leadFilters.ts";
+import {
+  matchesBaseFilters,
+  matchesCategory,
+  matchesView,
+  type LeadFilterState,
+} from "./leadFilters.ts";
 import type { Lead } from "./types.ts";
 
 let failures = 0;
@@ -58,6 +63,45 @@ assertEq(countTab(allState, "noweb"), 6, "Sin web sin filtro: 6 (los candidatos 
 // --- La búsqueda también recorta las pestañas de forma coherente ---
 const searchState: LeadFilterState = { statusFilter: "all", city: "", category: "", search: "noexiste" };
 assertEq(countTab(searchState, "all"), 0, "Búsqueda sin coincidencias: 0 en todas las pestañas");
+
+// --- Filtro de SECTOR (selector: "fam:<familia>" / "cat:<categoría>") ---
+// Mezcla realista: la familia "Reformas y construcción" agrupa 3 categorías
+// distintas de Google Maps que antes había que buscar a mano una por una.
+const mixed: Lead[] = [
+  lead({ category: "Reformas" }),
+  lead({ category: "Reformas" }),
+  lead({ category: "Empresa constructora" }),
+  lead({ category: "Contratista general" }),
+  lead({ category: "Proveedor de equipos de energía solar" }),
+  lead({ category: "Clínica dental" }),
+  lead({ category: null }),
+];
+const countSector = (value: string) =>
+  mixed.filter((l) => matchesCategory(l, value)).length;
+
+assertEq(countSector(""), 7, "Sector vacío: no filtra (7)");
+assertEq(countSector("fam:Reformas y construcción"), 4, "Familia reformas: 4 (las 3 categorías juntas)");
+assertEq(countSector("cat:Reformas"), 2, "Categoría exacta 'Reformas': 2 (no arrastra 'Empresa constructora')");
+assertEq(countSector("cat:reformas"), 2, "Categoría exacta: insensible a mayúsculas");
+assertEq(countSector("fam:Energía e instalaciones"), 1, "Familia energía: 1");
+assertEq(countSector("fam:Salud y dental"), 1, "Familia salud: 1");
+assertEq(countSector("fam:Sin sector"), 1, "Familia 'Sin sector': el lead sin categoría");
+assertEq(countSector("cat:No existe"), 0, "Categoría inexistente: 0 (no revienta)");
+assertEq(countSector("reforma"), 2, "Texto libre heredado: 'contiene' (2), que es justo lo que NO agrupaba la familia");
+
+// El filtro de sector entra por matchesBaseFilters, así que tabla y contadores
+// de pestañas siguen usando el MISMO predicado (que es el punto de este test).
+const sectorState: LeadFilterState = {
+  statusFilter: "all",
+  city: "",
+  category: "fam:Reformas y construcción",
+  search: "",
+};
+assertEq(
+  mixed.filter((l) => matchesBaseFilters(l, sectorState) && matchesView(l, "all")).length,
+  4,
+  "Pestaña 'Todos' con familia reformas: 4 (mismo predicado que la tabla)",
+);
 
 console.log(failures === 0 ? "\nTODO OK" : `\n${failures} FALLO(S)`);
 process.exit(failures === 0 ? 0 : 1);

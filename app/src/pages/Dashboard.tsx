@@ -29,8 +29,9 @@ import {
   type LeadFilterState,
   type ViewFilter,
 } from "@/lib/leadFilters";
+import { sectorFamily } from "@/lib/sectors";
 
-type SortKey = "name" | "city" | "rating" | "status" | "created_at" | "score";
+type SortKey = "name" | "city" | "category" | "rating" | "status" | "created_at" | "score";
 type SortDir = "asc" | "desc";
 
 /** Filtros persistidos entre recargas (la vista no se pierde al refrescar). */
@@ -81,6 +82,11 @@ function getWebsiteUrl(lead: { website_url?: string | null; raw_json?: unknown }
   return null;
 }
 
+/** Etiqueta legible de un valor del selector de sector ("fam:…" / "cat:…"). */
+function sectorLabel(value: string): string {
+  return value.startsWith("fam:") || value.startsWith("cat:") ? value.slice(4) : value;
+}
+
 /** Color del badge de score: verde (buena), ámbar (revisar), rojo (floja). */
 function scoreClasses(score: number): string {
   if (score >= 8) return "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400";
@@ -123,7 +129,11 @@ export default function Dashboard() {
   const [saved] = useState(readSavedFilters);
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "all">(saved.statusFilter ?? "all");
   const [city, setCity] = useState(saved.city ?? "");
-  const [category, setCategory] = useState(saved.category ?? "");
+  // El sector ahora se elige con un selector ("fam:…"/"cat:…"). Los valores de
+  // texto libre guardados por la versión anterior se descartan al cargar.
+  const [category, setCategory] = useState(
+    /^(fam|cat):/.test(saved.category ?? "") ? saved.category! : "",
+  );
   const [view, setView] = useState<ViewFilter>(saved.view ?? "all");
   const [search, setSearch] = useState(saved.search ?? "");
   const [sortKey, setSortKey] = useState<SortKey>(saved.sortKey ?? "created_at");
@@ -352,6 +362,48 @@ export default function Dashboard() {
     };
   }, [leads, filterState]);
 
+  // Opciones del selector de sector: familias (que agrupan las categorías de
+  // Google Maps) y, dentro de cada una, las categorías concretas presentes.
+  // Los recuentos se calculan sobre el MISMO conjunto que verás al elegir la
+  // opción (todos los demás filtros aplicados, el de sector no), igual que los
+  // contadores de las pestañas: así el número nunca miente.
+  const sectorOptions = useMemo(() => {
+    const base = leads.filter(
+      (l) =>
+        matchesBaseFilters(l, { ...filterState, category: "" }) && matchesView(l, view),
+    );
+    const fams = new Map<string, { n: number; cats: Map<string, number> }>();
+    for (const l of base) {
+      const fam = sectorFamily(l.category);
+      const cat = (l.category ?? "").trim();
+      const entry = fams.get(fam) ?? { n: 0, cats: new Map<string, number>() };
+      entry.n += 1;
+      if (cat) entry.cats.set(cat, (entry.cats.get(cat) ?? 0) + 1);
+      fams.set(fam, entry);
+    }
+    return [...fams.entries()]
+      .sort((a, b) => b[1].n - a[1].n || a[0].localeCompare(b[0], "es"))
+      .map(([family, { n, cats }]) => ({
+        family,
+        count: n,
+        cats: [...cats.entries()]
+          .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "es"))
+          .map(([name, count]) => ({ name, count })),
+      }));
+  }, [leads, filterState, view]);
+
+  // ¿La selección actual sigue en la lista? Si el resto de filtros la deja a 0
+  // desaparecería del <select> y este se vería vacío: la añadimos aparte.
+  const sectorSelectionListed = useMemo(
+    () =>
+      !category ||
+      sectorOptions.some(
+        (s) =>
+          `fam:${s.family}` === category || s.cats.some((c) => `cat:${c.name}` === category),
+      ),
+    [category, sectorOptions],
+  );
+
   // IDs del último lote scrapeado. Al insertar, todas las filas de un lote comparten
   // created_at (un único upsert en ingest-leads), así que el lote más reciente = las
   // creadas dentro de una ventana corta respecto a la más nueva (la ventana absorbe el
@@ -383,6 +435,7 @@ export default function Dashboard() {
       let vb: string | number = "";
       if (sortKey === "name") { va = a.name ?? ""; vb = b.name ?? ""; }
       else if (sortKey === "city") { va = a.city ?? ""; vb = b.city ?? ""; }
+      else if (sortKey === "category") { va = a.category ?? ""; vb = b.category ?? ""; }
       else if (sortKey === "rating") { va = a.rating ?? 0; vb = b.rating ?? 0; }
       else if (sortKey === "status") { va = a.status ?? ""; vb = b.status ?? ""; }
       else if (sortKey === "created_at") { va = a.created_at ?? ""; vb = b.created_at ?? ""; }
@@ -476,7 +529,7 @@ export default function Dashboard() {
 
   // No-admin oculta 2 columnas (Web, Score), así que el colspan del estado vacío baja en 2.
   const colCount =
-    (flagsSupported ? 13 : 12) + (outreachSupported ? 1 : 0) - (isAdmin ? 0 : 2);
+    (flagsSupported ? 14 : 13) + (outreachSupported ? 1 : 0) - (isAdmin ? 0 : 2);
   const filtersActive =
     statusFilter !== "all" || city || category || view !== "all" || search;
   const selectedCount = selected.size;
@@ -611,12 +664,29 @@ export default function Dashboard() {
           onChange={(e) => setCity(e.target.value)}
           className="max-w-[160px]"
         />
-        <Input
-          placeholder="Categoría…"
+        <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="max-w-[160px]"
-        />
+          title="Sector: elige una familia entera o una categoría concreta de Google Maps"
+          className="h-10 max-w-[260px] rounded-md border border-input bg-background px-3 text-sm shadow-sm transition-[color,box-shadow,border-color] duration-150 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/30"
+        >
+          <option value="">Todos los sectores</option>
+          {!sectorSelectionListed && (
+            <option value={category}>{sectorLabel(category)} (0)</option>
+          )}
+          {sectorOptions.map((s) => (
+            <optgroup key={s.family} label={s.family}>
+              <option value={`fam:${s.family}`}>
+                {s.cats.length ? `Todo «${s.family}»` : s.family} ({s.count})
+              </option>
+              {s.cats.map((c) => (
+                <option key={c.name} value={`cat:${c.name}`}>
+                  {c.name} ({c.count})
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
         {filtersActive && (
           <Button
             variant="ghost"
@@ -725,6 +795,13 @@ export default function Dashboard() {
                   >
                     Ciudad<SortIcon col="city" />
                   </TableHead>
+                  <TableHead
+                    className="cursor-pointer select-none"
+                    onClick={() => handleSort("category")}
+                    title="Sector del negocio (categoría de Google Maps)"
+                  >
+                    Sector<SortIcon col="category" />
+                  </TableHead>
                   <TableHead>Teléfono</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Contacto</TableHead>
@@ -830,11 +907,20 @@ export default function Dashboard() {
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {l.category ?? "—"}
-                      </div>
                     </TableCell>
                     <TableCell>{l.city ?? "—"}</TableCell>
+                    <TableCell className="max-w-[180px]">
+                      {l.category ? (
+                        <span
+                          className="block truncate"
+                          title={`${l.category} · ${sectorFamily(l.category)}`}
+                        >
+                          {l.category}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {(() => {
                         if (!l.phone)
