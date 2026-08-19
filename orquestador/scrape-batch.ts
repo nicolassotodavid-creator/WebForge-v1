@@ -98,6 +98,10 @@ const num = (v: unknown): number => {
  * Lanza un run de Apify, espera a estado terminal y SIEMPRE lee el dataset (un run TIMED-OUT
  * deja igualmente sus parciales — perderlos sería tirar fichas ya pagadas).
  */
+interface ApifyRunStatus {
+  data?: { id?: string; defaultDatasetId?: string; status?: string };
+}
+
 async function runApify(runInput: Item, runTimeout = 180): Promise<Item[]> {
   const TERMINAL = new Set(["SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"]);
   const startRes = await fetch(
@@ -105,7 +109,7 @@ async function runApify(runInput: Item, runTimeout = 180): Promise<Item[]> {
     { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(runInput) },
   );
   if (!startRes.ok) throw new Error(`Apify ${startRes.status}: ${(await startRes.text()).slice(0, 200)}`);
-  const start = await startRes.json();
+  const start = (await startRes.json()) as ApifyRunStatus;
   const runId = String(start?.data?.id ?? "");
   const datasetId = String(start?.data?.defaultDatasetId ?? "");
   let status = String(start?.data?.status ?? "RUNNING");
@@ -115,7 +119,8 @@ async function runApify(runInput: Item, runTimeout = 180): Promise<Item[]> {
   while (!TERMINAL.has(status) && Date.now() - startedAt < (runTimeout + 40) * 1000) {
     const poll = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_TOKEN}&waitForFinish=20`);
     if (!poll.ok) break;
-    status = String((await poll.json().catch(() => null))?.data?.status ?? status);
+    const pollJson = (await poll.json().catch(() => null)) as ApifyRunStatus | null;
+    status = String(pollJson?.data?.status ?? status);
   }
 
   const items = await (await fetch(
@@ -172,6 +177,12 @@ async function pooled<T>(jobs: (() => Promise<T>)[], limit: number): Promise<T[]
   return out;
 }
 
+interface IngestResponse {
+  inserted?: number;
+  upserted?: number;
+  errors?: unknown[];
+}
+
 async function ingest(leads: Item[]): Promise<{ inserted: number; upserted: number; errors: string[] }> {
   const totals = { inserted: 0, upserted: 0, errors: [] as string[] };
   for (let i = 0; i < leads.length; i += 40) {
@@ -181,7 +192,7 @@ async function ingest(leads: Item[]): Promise<{ inserted: number; upserted: numb
       headers: { "Content-Type": "application/json", "x-ingest-secret": INGEST_SECRET },
       body: JSON.stringify({ leads: chunk, source: "apify", owner: OWNER || undefined }),
     });
-    const json = await res.json().catch(() => ({}));
+    const json = (await res.json().catch(() => ({}))) as IngestResponse;
     if (!res.ok) {
       totals.errors.push(`HTTP ${res.status}: ${JSON.stringify(json).slice(0, 200)}`);
       continue;
