@@ -108,9 +108,14 @@ async function main() {
   // generate-outreach / cron-followups sustituyendo la live_url por el enlace de /book en el cuerpo.
   let linkDestino = liveUrl;
   if (bookLink) {
+    // El borrador guardado YA suele traer el enlace de /book (generate-outreach lo sustituye al
+    // redactar). Si lo re-añadíamos, la prueba salía con un enlace suelto de más al final que
+    // producción no manda: renderEmail solo consume la PRIMERA línea-URL para el escaparate.
     bodyText = bodyText.includes(liveUrl)
       ? bodyText.split(liveUrl).join(bookLink)
-      : `${bodyText.trimEnd()}\n\n${bookLink}`;
+      : bodyText.includes(bookLink)
+        ? bodyText
+        : `${bodyText.trimEnd()}\n\n${bookLink}`;
     linkDestino = bookLink;
   }
 
