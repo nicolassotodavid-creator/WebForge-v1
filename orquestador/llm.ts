@@ -3,18 +3,42 @@
 // con prompt caching en el system. NO conduce Lovable: eso va por el MCP
 // (ver lovable.ts), donde la calidad la pone el build-prompt y las llamadas son deterministas.
 //
-// Modelo: claude-sonnet-4-6 por defecto (build-prompt + briefs complejos).
-// Para extracciones a volumen se puede bajar a claude-haiku-4-5-20251001
-// sobreescribiendo ORQUESTADOR_MODEL en el .env.
+// Anthropic sigue siendo el proveedor por defecto. OpenAI se puede activar únicamente para
+// el trabajo creativo (briefs, highlights y build-prompts) con CREATIVE_PROVIDER=openai.
+// Visión y scoring conservan Anthropic por coste y para no alterar el flujo ya probado.
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
+const OPENAI_RESPONSES_API = "https://api.openai.com/v1/responses";
 const ORQUESTADOR_MODEL = process.env.ORQUESTADOR_MODEL ?? "claude-sonnet-4-6";
+const DEFAULT_OPENAI_CREATIVE_MODEL = "gpt-5";
 // Visión para curar fotos: Haiku 4.5 (barato, ~céntimos por web). Independiente de ORQUESTADOR_MODEL.
 const VISION_MODEL = "claude-haiku-4-5-20251001";
 
 interface AnthropicResponse {
   content?: { type?: string; text?: string }[];
   error?: { message?: string };
+}
+
+interface OpenAiResponse {
+  output_text?: string;
+  output?: { content?: { type?: string; text?: string }[] }[];
+  error?: { message?: string };
+}
+
+type CreativeProvider = "anthropic" | "openai";
+
+// Se evalúa en cada solicitud para permitir cambiar el proveedor sin desplegar código nuevo.
+// Rechazamos valores desconocidos en lugar de degradar silenciosamente a un proveedor inesperado.
+export function creativeProvider(value = process.env.CREATIVE_PROVIDER): CreativeProvider {
+  if (!value || value === "anthropic") return "anthropic";
+  if (value === "openai") return "openai";
+  throw new Error("CREATIVE_PROVIDER debe ser 'anthropic' u 'openai'");
+}
+
+export function creativeModel(): string {
+  return creativeProvider() === "openai"
+    ? (process.env.OPENAI_CREATIVE_MODEL ?? DEFAULT_OPENAI_CREATIVE_MODEL)
+    : ORQUESTADOR_MODEL;
 }
 
 // Una reseña real del scraper, normalizada. Conservamos autor y estrellas (no solo el texto)
@@ -100,10 +124,46 @@ async function callAnthropic(
   return text;
 }
 
+async function callOpenAi(systemPrompt: string, input: unknown, maxTokens: number): Promise<string> {
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  if (!OPENAI_API_KEY) {
+    throw new Error("Falta OPENAI_API_KEY en el entorno del Orquestador (raíz .env).");
+  }
+  const content = typeof input === "string" ? input : JSON.stringify(input);
+  const res = await fetch(OPENAI_RESPONSES_API, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${OPENAI_API_KEY}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: creativeModel(),
+      instructions: systemPrompt,
+      input: [{ role: "user", content: [{ type: "input_text", text: content }] }],
+      max_output_tokens: maxTokens,
+    }),
+  });
+  const data = (await res.json()) as OpenAiResponse;
+  if (!res.ok) {
+    throw new Error(`OpenAI API devolvió ${res.status}: ${data?.error?.message ?? "error"}`);
+  }
+  const text = data.output_text ?? data.output
+    ?.flatMap((output) => output.content ?? [])
+    .find((contentBlock) => contentBlock.type === "output_text")?.text ?? "";
+  if (!text) throw new Error("OpenAI devolvió una respuesta vacía");
+  return text;
+}
+
 // Texto → texto (build/brief). Mantiene la firma que ya usan llmJson/llmText.
 async function callClaude(systemPrompt: string, input: unknown, maxTokens = 2000): Promise<string> {
   const content = typeof input === "string" ? input : JSON.stringify(input);
   return callAnthropic(systemPrompt, [{ role: "user", content }], maxTokens, ORQUESTADOR_MODEL);
+}
+
+async function callCreative(systemPrompt: string, input: unknown, maxTokens = 2000): Promise<string> {
+  return creativeProvider() === "openai"
+    ? callOpenAi(systemPrompt, input, maxTokens)
+    : callClaude(systemPrompt, input, maxTokens);
 }
 
 // Claude → JSON estricto (brief, outreach). Parsea con try/catch implícito en extractJson.
@@ -112,7 +172,7 @@ export async function llmJson<T = Record<string, unknown>>(
   input: unknown,
   maxTokens = 2000,
 ): Promise<T> {
-  const text = await callClaude(systemPrompt, input, maxTokens);
+  const text = await callCreative(systemPrompt, input, maxTokens);
   return extractJson<T>(text);
 }
 
@@ -122,7 +182,7 @@ export async function llmText(
   input: unknown,
   maxTokens = 2000,
 ): Promise<string> {
-  const text = await callClaude(systemPrompt, input, maxTokens);
+  const text = await callCreative(systemPrompt, input, maxTokens);
   return text.trim();
 }
 

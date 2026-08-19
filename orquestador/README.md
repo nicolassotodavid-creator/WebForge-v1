@@ -93,6 +93,9 @@ La máquina debe tener Claude Code instalado y el MCP de Lovable ya autenticado 
 | `BOOKING_BASE` | sí | — | Base del CTA de reserva (`/book/:leadId`) |
 | `BATCH_SIZE` | no | 5 | Webs por ejecución del lote |
 | `ORQUESTADOR_MODEL` | no | `claude-sonnet-4-6` | Modelo del orquestador en runtime (brief + build-prompt) |
+| `CREATIVE_PROVIDER` | no | `anthropic` | `openai` usa OpenAI para briefs, highlights y build-prompts; vacío mantiene Anthropic |
+| `OPENAI_API_KEY` | solo OpenAI | — | Clave de servidor de OpenAI; nunca se expone al panel |
+| `OPENAI_CREATIVE_MODEL` | no | `gpt-5` | Modelo OpenAI para la fase creativa |
 | `LOVABLE_WORKSPACE_ID` | no | (el 1º) | Workspace de Lovable donde crear los proyectos |
 | `LOVABLE_MCP_NAME` | no | `lovable` | Nombre con el que añadiste el MCP en Claude Code |
 | `CLAUDE_BIN` | no | `claude` | Ruta al binario de Claude Code |

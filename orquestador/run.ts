@@ -16,7 +16,7 @@
 import "./env.ts"; // debe ir el PRIMERO: carga ../.env antes de evaluar el resto
 import { createClient } from "@supabase/supabase-js";
 import { BRIEF_PROMPT, BUILD_PROMPT, REVIEW_HIGHLIGHTS_PROMPT, DESIGN_SYSTEM } from "../supabase/functions/_shared/prompts.ts";
-import { llmJson, llmText, extractReviews, ORQUESTADOR_MODEL } from "./llm.ts";
+import { llmJson, llmText, extractReviews, creativeModel } from "./llm.ts";
 import { fetchReviewsForPlace, placeIdFromLead, fetchPhotosForPlace } from "./reviews.ts";
 import { extractPhotoCandidates, curatePhotos, photoManifest } from "./photos.ts";
 import { lovableBuild } from "./lovable.ts";
@@ -132,7 +132,7 @@ async function processBrief(lead: Lead): Promise<Outcome> {
     services: brief.services ?? null,
     suggested_palette: brief.suggested_palette ?? null,
     hero_copy: brief.hero_copy ?? null,
-    model_used: ORQUESTADOR_MODEL,
+    model_used: creativeModel(),
   });
   await supabase.from("leads")
     .update({ status: "analyzed", updated_at: new Date().toISOString() })
@@ -470,7 +470,7 @@ async function selectSingleLead(id: string): Promise<Lead[]> {
 }
 
 async function run() {
-  console.log(`WebForge Orquestador — modelo ${ORQUESTADOR_MODEL}${DRY_RUN ? " (DRY-RUN)" : ""}`);
+  console.log(`WebForge Orquestador — modelo creativo ${creativeModel()}${DRY_RUN ? " (DRY-RUN)" : ""}`);
 
   const tally: Record<Outcome, number> = { ok: 0, dry: 0, failed: 0, skip: 0 };
 
