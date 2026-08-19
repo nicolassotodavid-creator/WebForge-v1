@@ -94,5 +94,24 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertIncludes(showcase, "book/lead-1", "escaparate: el 2º enlace a /book se mantiene");
 }
 
+// ── Imágenes bloqueadas (Outlook/Zoho las bloquean por defecto): la captura debe degradar
+// a un hueco con texto, no a un icono roto. El alt se estila EN EL <img> porque el <td>
+// lleva font-size:0 (hueco fantasma) y ahí el texto del alt sería invisible.
+{
+  const showcase = renderEmail({
+    bodyText: "Hola Ana, te hice una web.\n\nhttps://webforge.app/book/lead-1\n\nNico",
+    subject: "x",
+    previewImageUrl: "https://cdn/site-previews/lead-1.png",
+    webUrl: "https://clinica-ana.web.app",
+    bookingUrl: "https://webforge.app/book/lead-1",
+  });
+  const img = showcase.match(/<img[^>]*site-previews[^>]*>/)?.[0] ?? "";
+  assertIncludes(img, `height="304"`, "captura: reserva el hueco 16:9 (540x304) con imágenes bloqueadas");
+  assertIncludes(img, "haz clic para verla", "captura: el alt vende en vez de quedar en icono roto");
+  assertIncludes(img, "font-size:15px", "captura: el alt es legible (estilo en el propio <img>)");
+  assertIncludes(img, "color:#57534E", "captura: el alt lleva color de marca, no azul de enlace roto");
+  assertIncludes(showcase, `bgcolor="#FAFAF9"`, "captura: el hueco bloqueado tiene fondo, no un vacío blanco");
+}
+
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures) process.exit(1);

@@ -78,7 +78,15 @@ function showcaseBlock(previewImageUrl: string, webUrl?: string | null, bookUrl?
   const frameInner =
     `<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #E7E5E4;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(17,24,39,0.10);">` +
     `<tr><td style="background:#F5F5F4;padding:10px 14px;border-bottom:1px solid #E7E5E4;font-size:13px;color:#C4C0BB;letter-spacing:3px;line-height:1;">&#9679;&nbsp;&#9679;&nbsp;&#9679;</td></tr>` +
-    `<tr><td style="font-size:0;line-height:0;"><img src="${previewImageUrl}" width="540" alt="Vista previa de tu web" style="display:block;width:100%;height:auto;border:0;" /></td></tr>` +
+    // Degradación con imágenes bloqueadas (Outlook, Zoho y compañía las bloquean por defecto):
+    // el `height` reserva el hueco 16:9 de la captura (todas son 1920x1080 → 540x304) y el texto
+    // del `alt` va estilado EN EL PROPIO <img> (el alt hereda del img, no del <td>, por eso el
+    // font-size:0 de la celda —que mata el hueco fantasma bajo la imagen— no lo esconde).
+    // Sin esto el prospecto ve un icono roto diminuto en vez de la web.
+    `<tr><td bgcolor="#FAFAF9" style="background:#FAFAF9;font-size:0;line-height:0;">` +
+    `<img src="${previewImageUrl}" width="540" height="304" alt="Vista previa de tu web &#8212; haz clic para verla" ` +
+    `style="display:block;width:100%;height:auto;border:0;font-family:-apple-system,'Segoe UI',Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;font-weight:600;color:#57534E;text-align:center;" />` +
+    `</td></tr>` +
     `</table>`;
   const frame = webUrl
     ? `<a href="${webUrl}" style="text-decoration:none;color:inherit;display:block;margin:0 0 24px;">${frameInner}</a>`
