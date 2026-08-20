@@ -10,7 +10,7 @@
 | Leads totales en WebForge | 257 |
 | Leads del sector Reformas y construcción | 147 |
 | Con web propia (auditables) | 85 |
-| Webs auditadas con éxito | 83 |
+| Webs auditadas | 83 (82 por descarga automática + Rosacoloma a mano) |
 | No verificables (web caída) | 2 |
 | Sin web propia (fuera de esta auditoría) | 62 |
 
@@ -21,7 +21,7 @@ estimador, wizard, m², timing e inversión.
 
 ## El hallazgo, en una tabla
 
-De **83 empresas de reformas con web propia**:
+De las **82 empresas** con web descargada automáticamente:
 
 | Señal de cualificación | Empresas que la tienen |
 |---|---|
@@ -38,7 +38,7 @@ De **83 empresas de reformas con web propia**:
 
 La única empresa con un formulario realmente estructurado es **DOSIDOS** (tipo de propiedad, m², nº de
 baños, nº de habitaciones, armarios, aire, ascensor y rango de presupuesto). Es la excepción que
-confirma el resto: **1 de 83**.
+confirma el resto: **1 de 82**.
 
 ## Resultado
 
