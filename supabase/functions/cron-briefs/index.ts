@@ -11,6 +11,7 @@
 // Secrets SOLO en servidor.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { BRIEF_PROMPT } from "../_shared/prompts.ts";
+import { nextLeadTimeoutMs } from "./budget.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 // SERVICE_KEY: solo para el cliente de DB (bypass RLS). Supabase la inyecta y sirve para escribir.
@@ -25,9 +26,15 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 const ADMIN_USER_ID = Deno.env.get("ADMIN_USER_ID");
 // Sonnet 4.6 para briefs (calidad de la web). Override para abaratar a Haiku si hiciera falta.
 const BRIEF_MODEL = Deno.env.get("ORQUESTADOR_MODEL") ?? "claude-sonnet-4-6";
-// Leads por invocación. El workflow llama en bucle hasta drenar, así que un lote pequeño evita
-// el timeout de la función aunque haya un backlog grande.
-const BRIEF_BATCH = Number(Deno.env.get("BRIEF_BATCH") ?? 15);
+// Leads por invocación. El workflow llama en bucle hasta drenar, así que el default es
+// conservador: Sonnet + escrituras en DB llegó a agotar los 150 s del job cuando había backlog.
+const BRIEF_BATCH = Number(Deno.env.get("BRIEF_BATCH") ?? 6);
+// Presupuesto de tiempo para devolver SIEMPRE una respuesta al workflow antes del timeout del curl.
+const BRIEF_INVOCATION_BUDGET_MS = Number(Deno.env.get("BRIEF_INVOCATION_BUDGET_MS") ?? 120_000);
+const BRIEF_INVOCATION_GUARD_MS = Number(Deno.env.get("BRIEF_INVOCATION_GUARD_MS") ?? 5_000);
+// Si Claude se queda colgado, el lead sigue en 'new' y el siguiente tick reintenta; no tumbamos
+// todo el cron esperando 150 s sin responder.
+const BRIEF_CALL_TIMEOUT_MS = Number(Deno.env.get("BRIEF_CALL_TIMEOUT_MS") ?? 25_000);
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -95,6 +102,7 @@ function leadPayload(lead: Lead) {
 async function briefLead(
   supabase: ReturnType<typeof createClient>,
   lead: Lead,
+  anthropicTimeoutMs: number,
 ): Promise<boolean> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -103,6 +111,7 @@ async function briefLead(
       "anthropic-version": "2023-06-01",
       "content-type": "application/json",
     },
+    signal: AbortSignal.timeout(anthropicTimeoutMs),
     body: JSON.stringify({
       model: BRIEF_MODEL,
       max_tokens: 2000,
@@ -169,9 +178,20 @@ Deno.serve(async (req: Request) => {
   let processed = 0;
   let failed = 0;
   const errors: string[] = [];
+  const startedAt = Date.now();
   for (const lead of (leads ?? []) as Lead[]) {
+    const anthropicTimeoutMs = nextLeadTimeoutMs({
+      startedAt,
+      budgetMs: BRIEF_INVOCATION_BUDGET_MS,
+      guardMs: BRIEF_INVOCATION_GUARD_MS,
+      maxCallTimeoutMs: BRIEF_CALL_TIMEOUT_MS,
+    });
+    if (anthropicTimeoutMs === null) {
+      console.log(`[cron-briefs] corto el lote por presupuesto de tiempo: processed=${processed} failed=${failed}`);
+      break;
+    }
     try {
-      await briefLead(supabase, lead);
+      await briefLead(supabase, lead, anthropicTimeoutMs);
       processed++;
       console.log(`[cron-briefs] brief OK → ${lead.name} (${lead.id})`);
     } catch (e) {
