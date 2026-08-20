@@ -10,7 +10,7 @@
 | Leads totales en WebForge | 257 |
 | Leads del sector Reformas y construcción | 147 |
 | Con web propia (auditables) | 85 |
-| Webs auditadas | 83 (82 por descarga automática + Rosacoloma a mano) |
+| Webs auditadas con éxito | 83 |
 | No verificables (web caída) | 2 |
 | Sin web propia (fuera de esta auditoría) | 62 |
 
@@ -21,7 +21,7 @@ estimador, wizard, m², timing e inversión.
 
 ## El hallazgo, en una tabla
 
-De las **82 empresas** con web descargada automáticamente:
+De **83 empresas de reformas con web propia**:
 
 | Señal de cualificación | Empresas que la tienen |
 |---|---|
@@ -38,7 +38,7 @@ De las **82 empresas** con web descargada automáticamente:
 
 La única empresa con un formulario realmente estructurado es **DOSIDOS** (tipo de propiedad, m², nº de
 baños, nº de habitaciones, armarios, aire, ascensor y rango de presupuesto). Es la excepción que
-confirma el resto: **1 de 82**.
+confirma el resto: **1 de 83**.
 
 ## Resultado
 
@@ -93,7 +93,7 @@ confirma el resto: **1 de 82**.
 #### GrupoDMH Reformas Integrales SL — 9/10 · València
 
 - **Web:** https://grupodmh.es · **Google:** ⭐4.9 (133 reseñas) · categoría *Contratista general*
-- **Dónde pide presupuesto:** https://grupodmh.es/precio-de-la-tela-asfaltica-factores-y-consejos-para-presupuestar/
+- **Dónde pide presupuesto:** https://grupodmh.es/contacto/
 - **Cómo funciona hoy:** formulario de contacto + botón/enlace de WhatsApp + teléfono directo + email visible
 - **Campos del formulario:** nombre tu nombre form-field, telefono telefono form-fiel, name nombre form-field-name, field_8f09ab1 telefono form, email correo electronico fo, textarea:message texto form-field-me
 - **Contacto:** WhatsApp sí · email `grupodmh.es@gmail.com` · tel `+34 618 17 13 91`
@@ -253,7 +253,7 @@ confirma el resto: **1 de 82**.
 #### RDG REFORMAS — 7.5/10 · València
 
 - **Web:** https://www.reformasvalenciardg.es · **Google:** ⭐4.8 (36 reseñas) · categoría *Reformas*
-- **Dónde pide presupuesto:** https://reformasvalenciardg.es/presupuesto-para-la-reforma-de-piso-en-valencia-que-debe-incluir/
+- **Dónde pide presupuesto:** https://reformasvalenciardg.es/contacto/
 - **Cómo funciona hoy:** formulario de contacto + teléfono directo
 - **Campos del formulario:** name form-field-name, email form-field-email, field form-field-f, asunto indique el motivo de, textarea:field_dd4b41b expliquenos s
 - **Contacto:** WhatsApp no · email `info@reformasvalenciardg.es` · tel `+34 618 21 17 33`
@@ -874,7 +874,7 @@ confirma el resto: **1 de 82**.
 | [Obeen Obreros](https://www.obeenobreros.es) | Catarroja | Web caída: 'Servicio suspendido' (Webador). |
 | [Reformas Integral Gómez](https://flo.fun) | València | Dominio aparcado (flo.host), sin web. |
 | [DOME Interiorismo](https://domeinteriorismo.com) | Alfafar | Web rota: WordPress Error. |
-| [Rosacoloma](undefined) | Burjassot | Promotora inmobiliaria y constructora de obra nueva; el form es nombre/email/mensaje pero el negocio no es reforma residencial. |
+| [Rosacoloma](http://www.rosacoloma.es) | Burjassot | Promotora inmobiliaria y constructora de obra nueva; el form es nombre/email/mensaje pero el negocio no es reforma residencial. |
 | [CRAC Global Solutions / Reformas y Carpintería en Valencia](https://www.cracglobalsolutions.es) | Paterna | Web sin contenido comercial ni formulario detectable. |
 
 ## No verificables
