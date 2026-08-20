@@ -51,4 +51,4 @@ assertEq(
 );
 
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
-if (failures) process.exit(1);
+if (failures) throw new Error(`${failures} FALLO(S)`);
