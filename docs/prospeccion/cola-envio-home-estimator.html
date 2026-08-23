@@ -183,6 +183,19 @@
     color: var(--ink-faint); font-variant-numeric: tabular-nums; margin-left: auto;
   }
 
+  /* Corte entre los envíos del martes y los del miércoles. */
+  .daybreak {
+    display: flex; align-items: baseline; gap: 12px;
+    font-family: "IBM Plex Mono", monospace; font-size: 12px;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint);
+    padding: 10px 2px 2px;
+  }
+  .daybreak::after {
+    content: ""; flex: 1; height: 1px; background: var(--rule); order: 1;
+  }
+  .daybreak-n { order: 2; }
+  .queue > .daybreak:first-child { padding-top: 0; }
+
   .flags { display: flex; flex-direction: column; gap: 6px; }
   .flag {
     font-size: 13.5px; line-height: 1.45; padding: 7px 10px;
@@ -205,18 +218,18 @@
 <div class="wrap">
 
   <header class="masthead">
-    <p class="eyebrow">Prospección · reformas València · martes</p>
+    <p class="eyebrow">Prospección · reformas València · martes y miércoles</p>
     <h1>Cola de envío Home Estimator</h1>
-    <p class="standfirst">Quince empresas de la auditoría del 20 de agosto, ordenadas por Home Estimator Score. Cada una con su formulario y el mensaje ya en texto plano, listo para pegar.</p>
+    <p class="standfirst">Treinta empresas de la auditoría del 20 de agosto, ordenadas por Home Estimator Score y partidas en dos días: quince el martes, quince el miércoles. Cada una con su formulario y el mensaje ya en texto plano, listo para pegar.</p>
     <div class="meter">
-      <span class="meter-count" id="meter">0 / 15</span>
+      <span class="meter-count" id="meter">0 / 30</span>
       <span class="meter-label">marcadas como enviadas</span>
     </div>
   </header>
 
   <section class="notice">
-    <h2>Falta un paso para que los enlaces funcionen</h2>
-    <p>Las 15 demos están construidas y desplegadas (verificadas en local: las 15 cargan sin errores, cada una con su logo y su color). Pero <code>presupuestos.nico-soto.es</code> todavía no está dado de alta como dominio del proyecto en Vercel, así que hoy devuelve <strong>404</strong>. Añádelo en Vercel → Settings → Domains y los quince enlaces quedan vivos. Comprueba uno antes de pegar nada: los mensajes prometen “una demo con vuestra marca”, y si alguien pincha y no hay nada, ese lead se quema.</p>
+    <h2>Los enlaces ya no pasan por <code>presupuestos.nico-soto.es</code></h2>
+    <p>Ese subdominio <strong>no es de este proyecto</strong>: apunta a otro sitio que responde 404 en <code>/demo/…</code>, así que los enlaces del martes estaban muertos. Las 30 demos se sirven ahora desde <code>www.nico-soto.es/demo/…</code>, que está vivo y verificado. Aparte: el dominio raíz <code>nico-soto.es</code> (sin <code>www</code>) se ha quedado sin registro A y no resuelve — eso afecta también a <code>BOOKING_BASE</code> de los emails, no solo a esto.</p>
   </section>
 
   <ol class="queue" id="queue"></ol>
@@ -224,7 +237,7 @@
 </div>
 
 <script>
-  const BASE = "https://presupuestos.nico-soto.es/demo";
+  const BASE = "https://www.nico-soto.es/demo";
 
   const LEADS = [
     { n: 1, slug: "reformas-valencia-myj", empresa: "REFORMAS VALENCIA MyJ", score: "9.5",
@@ -301,6 +314,81 @@
       contacto: "https://reformasintegrales-valencia.com.es",
       msg: 'He visto que ya dejáis elegir el tipo de reforma, pero después todavía hay que preguntar metros, estancias, alcance, fotos, timing y presupuesto. Es decir, cada solicitud os sigue obligando a trabajar antes de saber si realmente merece la pena. He preparado una demo para enseñaros cómo podría llegaros todo eso ya recogido: ',
       flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home. Localiza el formulario antes del martes."] },
+
+    { n: 16, slug: "gabi-reformas", empresa: "Gabi Reformas", score: "7.5",
+      contacto: "https://gabireformas.com/contacto/",
+      msg: 'He visto que ofrecéis presupuesto sin compromiso, pero la solicitud os llega básicamente con nombre, email y un mensaje. Al final el compromiso de tiempo empieza después: entender la reforma, metros, alcance, inversión y decidir si merece la pena. He montado una demo con vuestra marca para que veáis cómo podría llegaros cada reforma ya explicada: ',
+      flags: [] },
+
+    { n: 17, slug: "reformas-bailen", empresa: "Reformas Bailén", score: "7.5",
+      contacto: "http://www.reformasbailen.es/contacto",
+      msg: 'He visto vuestro “solicita tu presupuesto gratis”, pero el formulario recoge nombre, email y mensaje. Cada solicitud todavía os obliga a hacer preguntas y entender el proyecto antes de saber si merece la pena presupuestarlo. He preparado una demo para enseñaros cómo podría llegaros ya cualificado: ',
+      flags: [] },
+
+    { n: 18, slug: "grupo-g-reformas", empresa: "Grupo G Reformas", score: "7.5",
+      contacto: "https://grupogreformas.es",
+      msg: 'Ya preguntáis el tipo de reforma, pero después el cliente tiene que describir el resto en texto libre. Ahí puede caber desde cambiar un baño hasta una integral de 120 m². Cada solicitud todavía requiere trabajo antes de saber si merece la pena. Os he montado una demo de cómo recoger todo eso antes de que llegue el lead: ',
+      flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home. El formulario está en la propia home; localízalo antes de pegar."] },
+
+    { n: 19, slug: "azahar-reformas", empresa: "Azahar Reformas Valencia", score: "7.5",
+      contacto: "https://azaharreformasvalencia.com/contacto/",
+      msg: 'He visto que vuestra solicitud recoge nombre, teléfono, email y “¿en qué podemos ayudarte?”. Es decir, prácticamente todo el trabajo de entender la reforma empieza después de recibir el lead. He montado una demo con vuestra marca para que cada solicitud os llegue con el proyecto mucho más claro antes de dedicarle tiempo: ',
+      flags: [] },
+
+    { n: 20, slug: "todo-reformas-valencia", empresa: "Todo Reformas Valencia", score: "7.5",
+      contacto: "https://www.todoreformasvalencia.com/contacto",
+      msg: 'Me llamó la atención que os posicionéis para búsquedas de presupuesto de reforma de piso en Valencia, pero cuando llega el cliente el formulario apenas recoge sus datos y un mensaje. Cada solicitud todavía os obliga a reconstruir el proyecto antes de saber si merece la pena. He preparado una demo de cómo podría funcionar ese paso: ',
+      flags: [] },
+
+    { n: 21, slug: "reformas-orcu", empresa: "Reformas Orcu", score: "7.5",
+      contacto: "https://reformasorcuhogar.com/contacto/",
+      msg: 'Hacéis reformas integrales, cocinas y baños, pero el cliente tiene que explicar lo que quiere prácticamente desde cero en un mensaje. Luego sois vosotros quienes convertís eso en metros, estancias, trabajos e inversión. He montado una demo para enseñaros cómo podría llegaros esa información ya estructurada: ',
+      flags: [] },
+
+    { n: 22, slug: "obras-vip", empresa: "OBRAS VIP", score: "7.5",
+      contacto: "https://www.obrasvip.com/solicita-un-presupuesto.html",
+      msg: 'He visto que vuestro formulario ya pregunta cuándo quiere realizar el trabajo, pero no recoge metros, estancias, alcance ni inversión. Sabéis cuándo quiere empezar, pero todavía tenéis que averiguar casi todo lo demás antes de saber si merece la pena. He preparado una demo para completar justo esa parte: ',
+      flags: ["Su web solo publica el logo a 50 px, así que su demo lleva el nombre compuesto en su color en vez del logo."] },
+
+    { n: 23, slug: "bono-proyectos", empresa: "BONO PROYECTOS", score: "7.0",
+      contacto: "https://bonoproyectos.es/contacto/",
+      msg: 'Vendéis proyectos llave en mano, pero cuando alguien pide información entra por un formulario genérico y todavía tenéis que averiguar todo el alcance del proyecto. Cada solicitud os obliga a trabajar antes de saber si encaja realmente. He preparado una demo para enseñaros cómo podría llegaros mucho más definida: ',
+      flags: [] },
+
+    { n: 24, slug: "vga-reformas", empresa: "VGA Proyectos y Reformas", score: "7.0",
+      contacto: "https://vgareformas.es",
+      msg: 'He visto que ya preguntáis el tipo de servicio, pero la cualificación se queda ahí: no metros, estancias, timing, fotos ni inversión prevista. Cada solicitud todavía os obliga a completar todo eso después. He montado una demo con vuestra marca para enseñaros cómo podría llegaros el proyecto ya explicado: ',
+      flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home, que lleva dos formularios duplicados. Elige uno antes de pegar."] },
+
+    { n: 25, slug: "reformspeed", empresa: "REFORMSPEED", score: "7.0",
+      contacto: "https://reformspeed.es/solicitar-presupuesto/",
+      msg: 'Tenéis una página específica para solicitar presupuesto, pero al final el cliente deja sus datos y os cuenta libremente lo que necesita. El trabajo de convertir eso en un proyecto presupuestable sigue siendo vuestro. He preparado una demo para que veáis cómo podría llegaros ya estructurado antes de dedicarle tiempo: ',
+      flags: [] },
+
+    { n: 26, slug: "grupo-expovall", empresa: "Valltro · Grupo Expovall", score: "7.0",
+      contacto: "https://grupoexpovall.com/contacto/",
+      msg: 'He visto que la petición de presupuesto os llega básicamente como datos de contacto y un mensaje. Eso significa que cada nuevo lead todavía necesita una conversación para saber qué quiere, cuánto, cuándo y si realmente merece la pena presupuestarlo. He montado una demo para enseñaros cómo podría llegaros esa reforma ya explicada: ',
+      flags: [] },
+
+    { n: 27, slug: "cecever", empresa: "Reformas Cecever", score: "7.0",
+      contacto: "https://www.cecever.com/contacto",
+      msg: 'Trabajáis cocinas, baños y reformas de pisos, pero la solicitud online no diferencia entre ninguno de esos proyectos. Cada lead os llega sin la información que determina el trabajo y sois vosotros quienes tenéis que sacársela después. He preparado una demo con vuestra marca para enseñaros otra forma de recibirlos: ',
+      flags: [] },
+
+    { n: 28, slug: "reformas-ferreira", empresa: "Reformas Ferreira", score: "7.0",
+      contacto: "http://www.reformasferreira.es",
+      msg: 'He visto que cuando alguien contacta os deja nombre, teléfono, email y un mensaje. Es decir, todo lo importante sobre la reforma empieza después. Cada solicitud todavía os obliga a trabajar antes de saber si merece la pena. He montado una demo para enseñaros cómo podría llegaros ya cualificada: ',
+      flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home. Localiza el formulario antes del miércoles."] },
+
+    { n: 29, slug: "dekorinex", empresa: "Dekorinex", score: "7.0",
+      contacto: "https://dekorinex.es/contacto/",
+      msg: 'Tenéis un CTA de “Solicita presupuesto Online”, pero el proceso termina en un formulario de cuatro campos. Online es la solicitud; el trabajo de entender y presupuestar la reforma sigue viniendo después. He preparado una demo para enseñaros cómo convertir ese “presupuesto online” en algo bastante más útil: ',
+      flags: [] },
+
+    { n: 30, slug: "incoval", empresa: "Incoval Reformas Integrales", score: "7.0",
+      contacto: "https://incoval.es/contacto/",
+      msg: 'Lleváis años haciendo reformas integrales, cocinas y baños, pero el formulario todavía deja prácticamente todo el proyecto dentro de un mensaje libre. Cada solicitud os obliga a interpretarla y cualificarla antes de saber si merece la pena. He montado una demo con vuestra marca para que veáis cómo podría llegaros cada reforma ya explicada: ',
+      flags: [] },
   ];
 
   const store = {
@@ -319,7 +407,22 @@
     meter.textContent = done.size + " / " + LEADS.length;
   }
 
+  // Los quince primeros salen el martes; del 16 en adelante, el miércoles.
+  const diaDe = (lead) => (lead.n >= 16 ? "miércoles" : "martes");
+  let diaActual = null;
+
   for (const lead of LEADS) {
+    const dia = diaDe(lead);
+    if (dia !== diaActual) {
+      diaActual = dia;
+      const cuantas = LEADS.filter((l) => diaDe(l) === dia).length;
+      const sep = document.createElement("li");
+      sep.className = "daybreak";
+      sep.innerHTML = '<span>' + dia + '</span><span class="daybreak-n">' +
+        cuantas + (cuantas === 1 ? ' empresa' : ' empresas') + '</span>';
+      queue.appendChild(sep);
+    }
+
     const demo = BASE + "/" + lead.slug;
     const texto = lead.msg + demo;
 

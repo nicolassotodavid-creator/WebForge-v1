@@ -99,6 +99,87 @@ export const BRANDS: Brand[] = [
     web: "https://reformasintegrales-valencia.com.es", logo: "",
     primary: "#2c3e50", secondary: "#f39c12",
   },
+
+  // ---- Lote del miércoles (16-30 de la auditoría) ----
+  // Cuando el color del logo no aguanta texto blanco encima (el lima de Bailén, el oro de
+  // Expovall, el naranja de Bono e Incoval), `primary` es ese mismo tono bajado hasta que
+  // el botón se lee, y el color literal del logo queda en `secondary`.
+  {
+    slug: "gabi-reformas", empresa: "Gabi Reformas", ciudad: "Torrent",
+    web: "https://gabireformas.com", logo: "/demo/logos/gabi-reformas.png",
+    primary: "#016a38", secondary: "#8dc54a",
+  },
+  {
+    slug: "reformas-bailen", empresa: "Reformas Bailén", ciudad: "Paterna",
+    web: "http://www.reformasbailen.es", logo: "/demo/logos/reformas-bailen.jpg",
+    primary: "#3f8a05", secondary: "#77fc04",
+  },
+  {
+    slug: "grupo-g-reformas", empresa: "Grupo G Reformas", ciudad: "Sagunt",
+    web: "https://grupogreformas.es", logo: "/demo/logos/grupo-g-reformas.jpg",
+    primary: "#172948", secondary: "#3d5478",
+  },
+  {
+    slug: "azahar-reformas", empresa: "Azahar Reformas Valencia", ciudad: "València",
+    web: "https://azaharreformasvalencia.com", logo: "/demo/logos/azahar-reformas.png",
+    logoOnDark: true, mono: true, primary: "#26211a", secondary: "#b3a48c",
+  },
+  {
+    slug: "todo-reformas-valencia", empresa: "Todo Reformas Valencia", ciudad: "València",
+    web: "https://www.todoreformasvalencia.com", logo: "/demo/logos/todo-reformas-valencia.png",
+    primary: "#262c3a", secondary: "#cbbdb2",
+  },
+  {
+    slug: "reformas-orcu", empresa: "Reformas Orcu", ciudad: "Picassent",
+    web: "http://reformasorcuhogar.com", logo: "/demo/logos/reformas-orcu.jpg",
+    primary: "#d0281a", secondary: "#17130c",
+  },
+  {
+    slug: "obras-vip", empresa: "OBRAS VIP", ciudad: "Xirivella",
+    // Su web solo publica el isotipo a 50 px: no da para pintarlo, así que va wordmark.
+    web: "https://www.obrasvip.com", logo: "",
+    primary: "#c33c00", secondary: "#2f3234",
+  },
+  {
+    slug: "bono-proyectos", empresa: "BONO PROYECTOS", ciudad: "Catarroja",
+    web: "http://www.bonoproyectos.es", logo: "/demo/logos/bono-proyectos.jpg",
+    primary: "#de6f00", secondary: "#7e7e7e",
+  },
+  {
+    slug: "vga-reformas", empresa: "VGA Proyectos y Reformas", ciudad: "Massamagrell",
+    web: "https://vgareformas.es", logo: "/demo/logos/vga-reformas.jpg",
+    primary: "#be0b30", secondary: "#231e1e",
+  },
+  {
+    slug: "reformspeed", empresa: "REFORMSPEED", ciudad: "València",
+    web: "https://reformspeed.es", logo: "/demo/logos/reformspeed.png",
+    primary: "#404e7c", secondary: "#6c78a3",
+  },
+  {
+    slug: "grupo-expovall", empresa: "Valltro · Grupo Expovall", ciudad: "Puerto de Sagunto",
+    web: "https://grupoexpovall.com", logo: "/demo/logos/grupo-expovall.png", logoOnDark: true,
+    primary: "#a87a00", secondary: "#e7a802",
+  },
+  {
+    slug: "cecever", empresa: "Reformas Cecever", ciudad: "Paterna",
+    web: "https://www.cecever.com", logo: "/demo/logos/cecever.png", logoOnDark: true,
+    primary: "#b3760a", secondary: "#fcb62a",
+  },
+  {
+    slug: "reformas-ferreira", empresa: "Reformas Ferreira", ciudad: "Manises",
+    web: "http://www.reformasferreira.es", logo: "/demo/logos/reformas-ferreira.svg",
+    primary: "#193665", secondary: "#ff631b",
+  },
+  {
+    slug: "dekorinex", empresa: "Dekorinex", ciudad: "Quart de Poblet",
+    web: "http://dekorinex.es", logo: "/demo/logos/dekorinex.jpg",
+    primary: "#254899", secondary: "#4a4a4a",
+  },
+  {
+    slug: "incoval", empresa: "Incoval Reformas Integrales", ciudad: "València",
+    web: "https://www.incoval.es", logo: "/demo/logos/incoval.png",
+    primary: "#e04a00", secondary: "#1e1916",
+  },
 ];
 
 export const findBrand = (slug: string | undefined): Brand | undefined =>
