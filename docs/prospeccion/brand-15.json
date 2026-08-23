@@ -1,0 +1,280 @@
+[
+  {
+    "slug": "reformas-valencia-myj",
+    "empresa": "REFORMAS VALENCIA MyJ",
+    "url": "https://reformasvalenciamj.es/",
+    "ok": true,
+    "logo": "https://reformasvalenciamj.es/wp-content/uploads/2023/03/Reformas-Integrales-Valencia-11.jpg",
+    "colors": [
+      "#0274be",
+      "#066aab",
+      "#128c7e"
+    ],
+    "css_bytes": 146063,
+    "logo_file": "/demo/logos/reformas-valencia-myj.jpg",
+    "logo_colors": [
+      "#001890",
+      "#00a890",
+      "#000090"
+    ],
+    "logo_transparent": false
+  },
+  {
+    "slug": "grupodmh",
+    "empresa": "GrupoDMH Reformas Integrales",
+    "url": "https://grupodmh.es/",
+    "ok": true,
+    "logo": "https://grupodmh.es/wp-content/uploads/2022/08/cropped-fav-180x180.jpg",
+    "colors": [
+      "#cc3366",
+      "#cf2e2e",
+      "#9b51e0"
+    ],
+    "css_bytes": 141861,
+    "logo_file": "/demo/logos/grupodmh.jpg",
+    "logo_colors": [
+      "#181830",
+      "#183030",
+      "#303048"
+    ],
+    "logo_transparent": false
+  },
+  {
+    "slug": "nou-cabanyal",
+    "empresa": "Reformas Nou Cabanyal",
+    "url": "https://noucabanyal.com/",
+    "ok": true,
+    "logo": "https://noucabanyal.com/wp-content/uploads/2022/08/logo-image.svg",
+    "colors": [
+      "#e80000",
+      "#d8000c",
+      "#5282ad"
+    ],
+    "css_bytes": 400347,
+    "logo_file": "/demo/logos/nou-cabanyal.svg",
+    "logo_colors": [
+      "#ec6a2b",
+      "#1e262e"
+    ],
+    "logo_transparent": false
+  },
+  {
+    "slug": "reformas-lujan",
+    "empresa": "Reformas LUJAN",
+    "url": "https://reformaslujan.es/",
+    "ok": true,
+    "logo": "https://reformaslujan.es/wp-content/uploads/2023/04/LOGO-1.png",
+    "colors": [
+      "#00d084",
+      "#0693e3",
+      "#7a00df"
+    ],
+    "css_bytes": 37722,
+    "logo_file": "/demo/logos/reformas-lujan.png",
+    "logo_colors": [
+      "#184890",
+      "#304890",
+      "#d83048"
+    ],
+    "logo_transparent": true
+  },
+  {
+    "slug": "reformas-claiz",
+    "empresa": "Reformas Claiz",
+    "url": "https://reformasclaiz.es/",
+    "ok": true,
+    "logo": "https://reformasclaiz.es/wp-content/uploads/2021/04/cropped-Logo-180x180.png",
+    "colors": [],
+    "css_bytes": 323,
+    "logo_file": "/demo/logos/reformas-claiz.png",
+    "logo_colors": [],
+    "logo_transparent": true
+  },
+  {
+    "slug": "geteco",
+    "empresa": "GETECO",
+    "url": "https://www.geteco.es/",
+    "ok": true,
+    "logo": "https://www.geteco.es/site/geteco/images/logo.png?v=1787473128",
+    "colors": [
+      "#a72a2a",
+      "#2aa768"
+    ],
+    "css_bytes": 284869,
+    "logo_file": "/demo/logos/geteco.png",
+    "logo_colors": [],
+    "logo_transparent": true
+  },
+  {
+    "slug": "reformas-rocha",
+    "empresa": "Reformas Rocha",
+    "url": "https://www.reformasrocha.es/",
+    "ok": true,
+    "logo": "https://www.reformasrocha.es/favImage.png",
+    "colors": [
+      "#d97706",
+      "#ff6565",
+      "#ff0000"
+    ],
+    "css_bytes": 40086,
+    "logo_file": "/demo/logos/reformas-rocha.png",
+    "logo_colors": [
+      "#003048",
+      "#001848",
+      "#a89078"
+    ],
+    "logo_transparent": false
+  },
+  {
+    "slug": "tas-obras-y-reformas",
+    "empresa": "tAs obrAs y reformAs",
+    "url": "https://tasobrasyreformas.es/",
+    "ok": true,
+    "logo": "https://media.v2.siweb.es/uploaded_thumb_medium/f827854c75d9edf8a1ecded342608d05/logo_tas.png",
+    "colors": [
+      "#00b2ff",
+      "#4a5464",
+      "#728197"
+    ],
+    "css_bytes": 234876,
+    "logo_file": "/demo/logos/tas-obras-y-reformas.png",
+    "logo_colors": [
+      "#909060",
+      "#606030",
+      "#78d8f0"
+    ],
+    "logo_transparent": false
+  },
+  {
+    "slug": "robles-home",
+    "empresa": "ROBLES Home",
+    "url": "https://robleshome.com/",
+    "ok": true,
+    "logo": "https://robleshome.com/wp-content/uploads/2021/11/cropped-R-Agenda-copia.png",
+    "colors": [
+      "#337ab7",
+      "#3c763d",
+      "#8a6d3b"
+    ],
+    "css_bytes": 249911,
+    "logo_file": "/demo/logos/robles-home.png",
+    "logo_colors": [
+      "#183090",
+      "#001860",
+      "#4860a8"
+    ],
+    "logo_transparent": true
+  },
+  {
+    "slug": "marcos-mym",
+    "empresa": "Marcos MyM",
+    "url": "https://reformasmarcosmym.com/",
+    "ok": true,
+    "logo": "https://reformasmarcosmym.com/wp-content/uploads/cropped-icon-1-180x180.png",
+    "colors": [
+      "#cc0000",
+      "#5eead4",
+      "#2eb0ed"
+    ],
+    "css_bytes": 235889,
+    "logo_file": "/demo/logos/marcos-mym.png",
+    "logo_colors": [
+      "#d8c090",
+      "#f0d878",
+      "#d8c078"
+    ],
+    "logo_transparent": true
+  },
+  {
+    "slug": "rfc-reformas",
+    "empresa": "RFC Reformas",
+    "url": "https://rfcreformas.es/",
+    "ok": true,
+    "logo": "https://rfcreformas.es/wp-content/uploads/2024/08/Servicios-y-reformas-RFC_Logo.png",
+    "colors": [
+      "#d9534f",
+      "#5cb85c",
+      "#0275d8"
+    ],
+    "css_bytes": 178417,
+    "logo_file": "/demo/logos/rfc-reformas.png",
+    "logo_colors": [
+      "#003048",
+      "#f0a800",
+      "#f0c000"
+    ],
+    "logo_transparent": true
+  },
+  {
+    "slug": "metrocuadrado",
+    "empresa": "Metrocuadrado Estudio",
+    "url": "https://metrocuadradoestudio.com/",
+    "ok": true,
+    "logo": "https://metrocuadradoestudio.com/wp-content/uploads/2023/11/cropped-favicon-metrocuadrado@4x-180x180.png",
+    "colors": [
+      "#dc3232",
+      "#f78da7",
+      "#cf2e2e"
+    ],
+    "css_bytes": 87288,
+    "logo_file": "/demo/logos/metrocuadrado.png",
+    "logo_colors": [],
+    "logo_transparent": true
+  },
+  {
+    "slug": "efenval",
+    "empresa": "Construcciones Efenval",
+    "url": "https://efenval.com/",
+    "ok": true,
+    "logo": "https://efenval.com/wp-content/uploads/2025/04/favicon-300x300.jpg",
+    "colors": [
+      "#cc3366",
+      "#f78da7",
+      "#cf2e2e"
+    ],
+    "css_bytes": 30720,
+    "logo_file": "/demo/logos/efenval.jpg",
+    "logo_colors": [],
+    "logo_transparent": false
+  },
+  {
+    "slug": "rdg-reformas",
+    "empresa": "RDG Reformas",
+    "url": "https://reformasvalenciardg.es/",
+    "ok": true,
+    "logo": "https://reformasvalenciardg.es/wp-content/uploads/2022/09/logo-rdg-nuevo.png",
+    "colors": [
+      "#0c4da2",
+      "#1e73be",
+      "#1da1f2"
+    ],
+    "css_bytes": 135222,
+    "logo_file": "/demo/logos/rdg-reformas.png",
+    "logo_colors": [
+      "#009030",
+      "#189030",
+      "#f0d860"
+    ],
+    "logo_transparent": true
+  },
+  {
+    "slug": "reformas-turia",
+    "empresa": "Reformas Turia",
+    "url": "https://reformasintegrales-valencia.com.es/",
+    "ok": true,
+    "logo": "https://reformasintegrales-valencia.com.es/images/og-image.jpg",
+    "colors": [
+      "#2c3e50",
+      "#d32f2f",
+      "#f39c12"
+    ],
+    "css_bytes": 28797,
+    "logo_file": "/demo/logos/reformas-turia.jpg",
+    "logo_colors": [
+      "#001830",
+      "#001848",
+      "#f07800"
+    ],
+    "logo_transparent": false
+  }
+]

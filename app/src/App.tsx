@@ -9,6 +9,7 @@ import Pagos from "@/pages/Pagos";
 import Emails from "@/pages/Emails";
 import Book from "@/pages/Book";
 import Gracias from "@/pages/Gracias";
+import Demo from "@/pages/Demo";
 import NotFound from "@/pages/NotFound";
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/book/:leadId" element={<Book />} />
       <Route path="/gracias" element={<Gracias />} />
+      <Route path="/demo/:slug" element={<Demo />} />
 
       {/* Back-office (requiere sesión de operador) */}
       <Route element={<ProtectedRoute />}>

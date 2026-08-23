@@ -1,0 +1,380 @@
+<title>Cola de envío Home Estimator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+  :root {
+    --paper:      #f2f5f6;
+    --surface:    #ffffff;
+    --surface-2:  #e8edef;
+    --ink:        #151a1f;
+    --ink-soft:   #4c585f;
+    --ink-faint:  #7d8a91;
+    --rule:       #d3dbde;
+    --accent:     #1d5488;
+    --accent-ink: #ffffff;
+    --warn:       #9a6412;
+    --warn-bg:    #f7ecd8;
+    --ok:         #376b45;
+    --ok-bg:      #dfeee3;
+    --shadow:     0 1px 2px rgba(21,26,31,.06), 0 8px 24px -16px rgba(21,26,31,.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:     #12171a;
+      --surface:   #1a2126;
+      --surface-2: #232c32;
+      --ink:       #e8eef1;
+      --ink-soft:  #a7b4bb;
+      --ink-faint: #74838b;
+      --rule:      #2e383f;
+      --accent:    #7fb3e0;
+      --accent-ink:#0e1418;
+      --warn:      #e0ab5f;
+      --warn-bg:   #3a2e18;
+      --ok:        #8ac79a;
+      --ok-bg:     #1d3324;
+      --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:     #12171a;
+    --surface:   #1a2126;
+    --surface-2: #232c32;
+    --ink:       #e8eef1;
+    --ink-soft:  #a7b4bb;
+    --ink-faint: #74838b;
+    --rule:      #2e383f;
+    --accent:    #7fb3e0;
+    --accent-ink:#0e1418;
+    --warn:      #e0ab5f;
+    --warn-bg:   #3a2e18;
+    --ok:        #8ac79a;
+    --ok-bg:     #1d3324;
+    --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 40px 24px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+
+  /* ---------- cabecera ---------- */
+  .masthead { display: flex; flex-direction: column; gap: 14px; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-faint); margin: 0;
+  }
+  h1 {
+    font-family: Archivo, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700; font-size: clamp(30px, 5vw, 42px); line-height: 1.08;
+    letter-spacing: -.02em; text-wrap: balance; margin: 0;
+  }
+  .standfirst { color: var(--ink-soft); max-width: 62ch; margin: 0; font-size: 17px; }
+
+  .meter {
+    display: flex; align-items: baseline; gap: 12px;
+    border-top: 2px solid var(--ink); padding-top: 12px;
+  }
+  .meter-count {
+    font-family: Archivo, sans-serif; font-weight: 700; font-size: 26px;
+    font-variant-numeric: tabular-nums; letter-spacing: -.01em;
+  }
+  .meter-label { color: var(--ink-soft); font-size: 15px; }
+
+  /* ---------- aviso global ---------- */
+  .notice {
+    background: var(--warn-bg); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .notice h2 {
+    font-family: Archivo, sans-serif; font-weight: 600; font-size: 15px;
+    letter-spacing: .01em; margin: 0; color: var(--warn);
+  }
+  .notice p { margin: 0; font-size: 15px; color: var(--ink-soft); }
+  .notice code {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px;
+    background: var(--surface); padding: 1px 5px; border: 1px solid var(--rule);
+  }
+
+  /* ---------- ficha ---------- */
+  .queue { display: flex; flex-direction: column; gap: 18px; list-style: none; margin: 0; padding: 0; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--rule);
+    box-shadow: var(--shadow); display: grid;
+    grid-template-columns: 56px 1fr; align-items: start;
+  }
+  .card.done { opacity: .5; }
+
+  .rank {
+    font-family: Archivo, sans-serif; font-weight: 700; font-size: 19px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint); padding: 20px 0 0 18px; line-height: 1;
+  }
+
+  .body { padding: 18px 20px 20px 4px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+  .name {
+    font-family: Archivo, sans-serif; font-weight: 600; font-size: 20px;
+    letter-spacing: -.01em; margin: 0; line-height: 1.2;
+  }
+  .score {
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    background: var(--surface-2); color: var(--ink-soft);
+    padding: 2px 7px; border: 1px solid var(--rule);
+  }
+
+  .links { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; }
+  .links a {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px;
+    color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    word-break: break-all;
+  }
+  .links a:hover { border-bottom-color: var(--accent); }
+  .links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .links .lbl {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .1em; color: var(--ink-faint);
+    display: block; margin-bottom: 2px;
+  }
+  .link-group { min-width: 0; }
+
+  .msg {
+    background: var(--surface-2); border: 1px solid var(--rule);
+    padding: 14px 16px; font-size: 15.5px; line-height: 1.62; color: var(--ink);
+    white-space: pre-wrap; margin: 0;
+  }
+
+  .foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+  button {
+    font-family: Archivo, sans-serif; font-weight: 600; font-size: 14px;
+    padding: 8px 14px; border: 1px solid transparent; cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+  }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .copy { background: var(--accent); color: var(--accent-ink); }
+  .copy:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
+  .copy.copied { background: var(--ok); }
+  .mark {
+    background: transparent; color: var(--ink-soft); border-color: var(--rule);
+  }
+  .mark:hover { background: var(--surface-2); color: var(--ink); }
+  .card.done .mark { background: var(--ok-bg); color: var(--ok); border-color: var(--ok); }
+
+  .chars {
+    font-family: "IBM Plex Mono", monospace; font-size: 12px;
+    color: var(--ink-faint); font-variant-numeric: tabular-nums; margin-left: auto;
+  }
+
+  .flags { display: flex; flex-direction: column; gap: 6px; }
+  .flag {
+    font-size: 13.5px; line-height: 1.45; padding: 7px 10px;
+    background: var(--warn-bg); color: var(--warn); border-left: 2px solid var(--warn);
+  }
+  .flag strong { font-weight: 600; }
+
+  @media (max-width: 560px) {
+    body { padding: 28px 14px 72px; }
+    .card { grid-template-columns: 1fr; }
+    .rank { padding: 16px 18px 0; }
+    .body { padding: 10px 18px 18px; }
+    .chars { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Prospección · reformas València · martes</p>
+    <h1>Cola de envío Home Estimator</h1>
+    <p class="standfirst">Quince empresas de la auditoría del 20 de agosto, ordenadas por Home Estimator Score. Cada una con su formulario y el mensaje ya en texto plano, listo para pegar.</p>
+    <div class="meter">
+      <span class="meter-count" id="meter">0 / 15</span>
+      <span class="meter-label">marcadas como enviadas</span>
+    </div>
+  </header>
+
+  <section class="notice">
+    <h2>Antes de mandar nada</h2>
+    <p>Los quince mensajes prometen “una demo con vuestra marca”. Hoy <code>presupuestos.nico-soto.es/demo/:slug</code> devuelve <strong>404</strong>: el subdominio apunta a Vercel pero la ruta no existe. Si alguien pincha y no hay nada, el lead se quema y no hay segunda oportunidad. Las demos vivas van primero, el mensaje después.</p>
+  </section>
+
+  <ol class="queue" id="queue"></ol>
+
+</div>
+
+<script>
+  const BASE = "https://presupuestos.nico-soto.es/demo";
+
+  const LEADS = [
+    { n: 1, slug: "reformas-valencia-myj", empresa: "REFORMAS VALENCIA MyJ", score: "9.5",
+      contacto: "https://reformasvalenciamj.es/presupuesto-online-reforma-integral-valencia/",
+      msg: 'He visto que ofrecéis "Presupuesto Online", pero al final el cliente os deja sus datos y un mensaje. Cada solicitud que os llega todavía os obliga a trabajar antes de saber si merece la pena: entender metros, estancias, alcance, presupuesto... He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["<strong>Ya tiene una web construida en WebForge</strong> (<code>sites.status = built</code>). Dos productos apuntando al mismo lead: hay que elegir uno antes de escribirle."] },
+
+    { n: 2, slug: "grupodmh", empresa: "GrupoDMH Reformas Integrales", score: "9.0",
+      contacto: "https://grupodmh.es/contacto/",
+      msg: 'Con más de 130 reseñas, imagino que solicitudes no os faltan. Me llamó la atención que sigan entrando básicamente como nombre, teléfono y mensaje. Eso significa que cada lead todavía os obliga a averiguar metros, estancias, alcance y presupuesto antes de saber si merece la pena. Os he montado una demo para enseñaros otra forma de recibirlas: ',
+      flags: [] },
+
+    { n: 3, slug: "nou-cabanyal", empresa: "Reformas Nou Cabanyal", score: "9.0",
+      contacto: "https://noucabanyal.com/contacto/",
+      msg: 'He visto que estáis muy centrados en reforma integral de vivienda, pero la solicitud de presupuesto prácticamente no recoge información sobre la propia vivienda. Al final cada solicitud os obliga a empezar después preguntando lo básico antes de saber si merece la pena. He montado una demo con vuestra marca para enseñaros cómo podría llegaros el proyecto ya explicado: ',
+      flags: [] },
+
+    { n: 4, slug: "reformas-lujan", empresa: "Reformas LUJAN", score: "8.5",
+      contacto: "https://reformaslujan.es/contacto/",
+      msg: 'Tenéis unas 130 reseñas, pero cuando alguien pide información la web recoge poco más que nombre, email y mensaje. Cada solicitud que entra todavía os obliga a reconstruir el proyecto después antes de saber si realmente merece la pena presupuestarlo. He preparado una demo para enseñaros cómo podría llegaros ya cualificado: ',
+      flags: [] },
+
+    { n: 5, slug: "reformas-claiz", empresa: "Reformas Claiz", score: "8.5",
+      contacto: "https://reformasclaiz.es/contacto/",
+      msg: 'Me llamó la atención que, teniendo 5 estrellas y casi 90 reseñas, la petición de presupuesto se reduzca prácticamente a tres campos. El trabajo de entender la reforma empieza cuando ya ha llegado el lead. He montado una demo con vuestra marca para que veáis cómo podría llegaros cada solicitud con metros, estancias, fotos, timing y presupuesto ya recogidos: ',
+      flags: [] },
+
+    { n: 6, slug: "geteco", empresa: "GETECO", score: "8.5",
+      contacto: "https://www.geteco.es/pide-tu-presupuesto-sin-compromisos",
+      msg: 'He visto que trabajáis reformas de pisos, chalets y casas, pero cuando alguien pide presupuesto la web no distingue prácticamente nada de eso. Cada solicitud os obliga después a averiguar qué quiere realmente el cliente antes de saber si merece la pena. He montado una demo sobre vuestra propia marca para enseñaros cómo podría funcionar: ',
+      flags: [] },
+
+    { n: 7, slug: "reformas-rocha", empresa: "Reformas Rocha", score: "8.5",
+      contacto: "https://www.reformasrocha.es/solicita-un-presupuesto",
+      msg: 'Vuestra solicitud ya pregunta cuándo quiere empezar el cliente, que es más de lo que hace casi todo el sector. Pero todavía os falta saber qué quiere reformar, cuántos metros, qué alcance tiene o qué inversión maneja. Es decir: cada solicitud todavía exige trabajo antes de saber si merece la pena. Os he preparado una demo de cómo completaría ese proceso: ',
+      flags: [] },
+
+    { n: 8, slug: "tas-obras-y-reformas", empresa: "tAs obrAs y reformAs", score: "8.0",
+      contacto: "http://www.tasobrasyreformas.es",
+      msg: 'He visto que prácticamente todo el contacto entra por WhatsApp o teléfono. Eso hace que cada nueva reforma empiece siempre igual: preguntar qué quiere hacer, metros, estancias, fotos, presupuesto... antes de saber siquiera si merece la pena. He montado una demo para que todo eso pueda llegaros recogido antes de empezar la conversación: ',
+      flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home. Y por tu propio texto, aquí contactan por WhatsApp o teléfono: puede que no haya caja donde pegar. Verifícalo antes."] },
+
+    { n: 9, slug: "robles-home", empresa: "ROBLES Home", score: "8.0",
+      contacto: "https://robleshome.com/contacto/",
+      msg: 'Me ha sorprendido que para una empresa centrada en reformas integrales, la solicitud online recoja prácticamente solo el email. Cada nuevo proyecto empieza entonces con vosotros pidiendo toda la información desde cero. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: [] },
+
+    { n: 10, slug: "marcos-mym", empresa: "Marcos MyM", score: "8.0",
+      contacto: "https://reformasmarcosmym.com",
+      msg: 'He visto que al cliente básicamente le pedís que "cuente su proyecto" en un campo de texto. El problema es que luego sois vosotros quienes tenéis que traducir ese mensaje a metros, estancias, trabajos y presupuesto antes de saber si merece la pena. He preparado una demo para enseñaros cómo estructuraría ese paso automáticamente: ',
+      flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home. Localiza el formulario antes del martes."] },
+
+    { n: 11, slug: "rfc-reformas", empresa: "RFC Reformas", score: "8.0",
+      contacto: "https://rfcreformas.es/solicita-presupuesto-gratis/",
+      msg: 'He visto vuestra página de "Solicita presupuesto gratis". Recogéis el código postal y qué tipo de reforma quiere, pero todavía queda prácticamente todo por averiguar después. Cada solicitud sigue requiriendo trabajo antes de saber si merece la pena. He montado una demo para enseñaros cómo podría llegaros ya completa: ',
+      flags: [] },
+
+    { n: 12, slug: "metrocuadrado", empresa: "Metrocuadrado Estudio", score: "7.5",
+      contacto: "https://metrocuadradoestudio.com/contacto/",
+      msg: 'Me gustó vuestro enfoque de hacer que una reforma sea un proceso más sencillo, pero el primer contacto sigue dependiendo de que el cliente explique en texto libre lo que necesita. Al final sois vosotros quienes tenéis que ordenar toda esa información después. He montado una demo para enseñaros cómo podría llegaros cada proyecto ya estructurado: ',
+      flags: [] },
+
+    { n: 13, slug: "efenval", empresa: "Construcciones Efenval", score: "7.5",
+      contacto: "https://efenval.com/contacto/",
+      msg: 'He visto que vuestra solicitud acaba dependiendo de que el cliente os cuente lo que necesita. El problema es que ese mensaje todavía hay que convertirlo después en metros, estancias, alcance, fotos y presupuesto para saber si el proyecto merece la pena. He preparado una demo con vuestra marca para enseñaros otra forma de hacerlo: ',
+      flags: [] },
+
+    { n: 14, slug: "rdg-reformas", empresa: "RDG Reformas", score: "7.5",
+      contacto: "https://reformasvalenciardg.es/contacto/",
+      msg: 'Ofrecéis presupuesto sin compromiso, pero hasta saber si el proyecto merece la pena el compromiso de tiempo lo asumís vosotros: llamadas, preguntas, mediciones, posible visita y preparación del presupuesto. He montado una demo para enseñaros cómo filtrar y entender mucho mejor el proyecto antes de dedicarle ese tiempo: ',
+      flags: [] },
+
+    { n: 15, slug: "reformas-turia", empresa: "Reformas Turia", score: "7.5",
+      contacto: "https://reformasintegrales-valencia.com.es",
+      msg: 'He visto que ya dejáis elegir el tipo de reforma, pero después todavía hay que preguntar metros, estancias, alcance, fotos, timing y presupuesto. Es decir, cada solicitud os sigue obligando a trabajar antes de saber si realmente merece la pena. He preparado una demo para enseñaros cómo podría llegaros todo eso ya recogido: ',
+      flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home. Localiza el formulario antes del martes."] },
+  ];
+
+  const store = {
+    read() { try { return JSON.parse(localStorage.getItem("he-cola") || "[]"); } catch { return []; } },
+    write(v) { try { localStorage.setItem("he-cola", JSON.stringify(v)); } catch {} },
+  };
+  let done = new Set(store.read());
+
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const pretty = (u) => u.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+  const queue = document.getElementById("queue");
+  const meter = document.getElementById("meter");
+
+  function paintMeter() {
+    meter.textContent = done.size + " / " + LEADS.length;
+  }
+
+  for (const lead of LEADS) {
+    const demo = BASE + "/" + lead.slug;
+    const texto = lead.msg + demo;
+
+    const li = document.createElement("li");
+    li.className = "card" + (done.has(lead.slug) ? " done" : "");
+
+    li.innerHTML =
+      '<div class="rank">' + String(lead.n).padStart(2, "0") + '</div>' +
+      '<div class="body">' +
+        '<div class="head">' +
+          '<h2 class="name">' + esc(lead.empresa) + '</h2>' +
+          '<span class="score">score ' + lead.score + '</span>' +
+        '</div>' +
+        '<div class="links">' +
+          '<span class="link-group"><span class="lbl">Formulario</span>' +
+            '<a href="' + lead.contacto + '" target="_blank" rel="noopener noreferrer">' + esc(pretty(lead.contacto)) + '</a></span>' +
+          '<span class="link-group"><span class="lbl">Demo prometida</span>' +
+            '<a href="' + demo + '" target="_blank" rel="noopener noreferrer">/demo/' + lead.slug + '</a></span>' +
+        '</div>' +
+        (lead.flags.length
+          ? '<div class="flags">' + lead.flags.map((f) => '<p class="flag">' + f + '</p>').join("") + '</div>'
+          : "") +
+        '<p class="msg">' + esc(texto) + '</p>' +
+        '<div class="foot">' +
+          '<button class="copy" type="button">Copiar mensaje</button>' +
+          '<button class="mark" type="button">' + (done.has(lead.slug) ? "Enviada" : "Marcar enviada") + '</button>' +
+          '<span class="chars">' + texto.length + ' car.</span>' +
+        '</div>' +
+      '</div>';
+
+    const copyBtn = li.querySelector(".copy");
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(texto);
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = texto; document.body.appendChild(ta); ta.select();
+        document.execCommand("copy"); ta.remove();
+      }
+      copyBtn.textContent = "Copiado";
+      copyBtn.classList.add("copied");
+      setTimeout(() => { copyBtn.textContent = "Copiar mensaje"; copyBtn.classList.remove("copied"); }, 1600);
+    });
+
+    const markBtn = li.querySelector(".mark");
+    markBtn.addEventListener("click", () => {
+      if (done.has(lead.slug)) { done.delete(lead.slug); } else { done.add(lead.slug); }
+      li.classList.toggle("done", done.has(lead.slug));
+      markBtn.textContent = done.has(lead.slug) ? "Enviada" : "Marcar enviada";
+      store.write([...done]);
+      paintMeter();
+    });
+
+    queue.appendChild(li);
+  }
+
+  paintMeter();
+</script>
