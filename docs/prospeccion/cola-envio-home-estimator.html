@@ -239,6 +239,41 @@
 <script>
   const BASE = "https://presupuestos.nico-soto.es/demo";
 
+  const NOMBRES = {
+    "reformas-valencia-myj": "Reformas Valencia M&J",
+    "grupodmh": "GrupoDMH Reformas Integrales",
+    "nou-cabanyal": "Reformas Nou Cabanyal",
+    "reformas-lujan": "Reformas Luján",
+    "reformas-claiz": "Reformas Claiz",
+    "geteco": "GETECO",
+    "reformas-rocha": "Reformas Rocha",
+    "tas-obras-y-reformas": "TAS Obras y Reformas",
+    "robles-home": "ROBLES Home",
+    "marcos-mym": "Reformas Marcos MyM",
+    "rfc-reformas": "RFC Reformas",
+    "metrocuadrado": "Metrocuadrado Estudio",
+    "efenval": "Construcciones Efenval",
+    "rdg-reformas": "RDG Reformas",
+    "reformas-turia": "Reformas Turia",
+    "gabi-reformas": "Gabi Reformas",
+    "reformas-bailen": "Reformas Bailén",
+    "grupo-g-reformas": "Grupo G Reformas",
+    "azahar-reformas": "Azahar Reformas Valencia",
+    "todo-reformas-valencia": "Todo Reformas Valencia",
+    "reformas-orcu": "Reformas Orcu",
+    "obras-vip": "OBRAS VIP",
+    "bono-proyectos": "BONO PROYECTOS",
+    "vga-reformas": "VGA Proyectos y Reformas",
+    "reformspeed": "REFORMSPEED",
+    "grupo-expovall": "Valltro",
+    "cecever": "Reformas Cecever",
+    "reformas-ferreira": "Reformas Ferreira",
+    "dekorinex": "Dekorinex",
+    "incoval": "Incoval Reformas Integrales",
+  };
+
+  const CIERRE = "Son solo dos minutos y sin compromiso.";
+
   const LEADS = [
     { n: 1, slug: "reformas-valencia-myj", empresa: "REFORMAS VALENCIA MyJ", score: "9.5",
       contacto: "https://reformasvalenciamj.es/presupuesto-online-reforma-integral-valencia/",
@@ -424,7 +459,9 @@
     }
 
     const demo = BASE + "/" + lead.slug;
-    const texto = lead.msg + demo;
+    const saludo = "Hola, equipo de " + (NOMBRES[lead.slug] || lead.empresa) + ":";
+    const cuerpo = lead.msg.trim().replace(/:$/, "");
+    const texto = saludo + "\n\n" + cuerpo + ":\n\n" + demo + "\n\n" + CIERRE;
 
     const li = document.createElement("li");
     li.className = "card" + (done.has(lead.slug) ? " done" : "");
