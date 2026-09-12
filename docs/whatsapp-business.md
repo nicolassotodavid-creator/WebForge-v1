@@ -62,6 +62,7 @@ Herramientas para empresas → **Respuestas rápidas**. Escribes el atajo y se e
 | `/como` | `Muy fácil: la web ya está hecha, la ves en el enlace. Si te gusta, reservas desde la página (pago seguro con Stripe) y en 24 h la dejo publicada bajo tu dominio.` |
 | `/garantia` | `Garantía de 7 días: si no estás contento, te devuelvo el dinero completo, sin preguntas. El riesgo es mío, no tuyo.` |
 | `/web` | `Aquí la tienes 👉 [pega aquí el enlace /book del negocio]` |
+| `/simulador` | `El simulador son 59 € al mes, sin permanencia: te puedes ir cuando quieras. Va con tus propios precios, así que la horquilla que ve el cliente es la tuya. Ojo: esto es el estimador de reformas, no la web (la web son 397 € pago único).` |
 
 ---
 
