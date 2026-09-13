@@ -103,8 +103,10 @@ Esos hechos son el material de TODA la web, no solo del carrusel de reseñas.
 PASO 2 — LA WEB. Pide una web one-page A MEDIDA. Parte de brief.recommended_sections (en ese orden) y AÑADE
 las secciones de abajo que tengan material real aunque el brief no las liste (el brief puede ser antiguo o
 haberse hecho sin reseñas). Omite las que no tengan material:
-- HERO: titular propio de ESTE negocio (su especialidad real + barrio o ciudad, o lo que más elogian); nada de
-  frases comodín que valdrían para cualquiera. Subtítulo con un hecho real. Señal de confianza: nota media y
+- HERO: titular propio de ESTE negocio (su especialidad real + barrio o ciudad, o lo que más elogian), de 12
+  palabras como mucho; nada de frases comodín que valdrían para cualquiera. En titulares y subtítulos NUNCA
+  nombres otras marcas o empresas ni hagas comparativas ("lo que Peugeot oficial no pudo", "a mitad de precio
+  que el concesionario"): eso solo puede aparecer dentro de una reseña citada. Subtítulo con un hecho real. Señal de confianza: nota media y
   nº de reseñas (business.rating y business.review_count) escrito como "N reseñas en Google", NUNCA como
   "N clientes".
 - SERVICIOS: tarjetas (icono + nombre + 1-2 frases) a partir de business.categories, additional_info y los
@@ -190,8 +192,8 @@ HERO
   confianza (⭐ nota media + nº de reseñas reales).
 - Con foto de hero: a pantalla completa con una CAPA OSCURA ENCIMA OBLIGATORIA (degradado negro de
   ~55% arriba a ~30% abajo, o velo sólido ~45%) para que el titular en BLANCO se lea con contraste AA
-  SEA CUAL SEA la foto. NUNCA texto oscuro sobre foto clara. El titular no debe quedar tapado por el
-  objeto principal de la foto.
+  SEA CUAL SEA la foto. NUNCA texto oscuro sobre foto clara. NUNCA sustituyas el velo por contorno, borde o
+  sombra dura en las letras. El titular no debe quedar tapado por el objeto principal de la foto.
 
 MICRO-INTERACCIONES
 - Transiciones sutiles (fade/slide suave al entrar en viewport). Nada de rebotes ni animaciones llamativas.
