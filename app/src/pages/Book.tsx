@@ -332,7 +332,7 @@ export default function Book() {
             {INCLUDED.map((item, idx) => {
               const Icon = item.title === "Diseño exclusivo" ? Palette
                 : item.title === "Optimización SEO local" ? Search
-                : item.title === "Servicios y tarifas visibles" ? ClipboardList
+                : item.title === "Servicios bien explicados" ? ClipboardList
                 : item.title === "Reseñas de Google integradas" ? Star
                 : item.title === "Carga ultra-rápida" ? Zap
                 : Smartphone;
