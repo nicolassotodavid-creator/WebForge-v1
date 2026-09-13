@@ -4,6 +4,21 @@ Dos backends: (1) APP = panel React (Vercel) + Supabase (Postgres+Auth+Edge Func
 (2) ORQUESTADOR = agente Node (Anthropic API + MCP de Lovable + modelo claude-sonnet-4-6) en VPS por cron,
 que construye las webs de cliente en Lovable y escribe en Supabase con la service key.
 
+## Etiquetas de proyecto (LEER PRIMERO)
+
+En este repo conviven varios productos. Nico empieza el mensaje con una etiqueta para decir de cuál habla.
+Con etiqueta, trabaja SOLO en ese producto: su código, su proyecto Lovable, su dominio y sus memorias.
+
+| Etiqueta | Producto | Dónde vive | Canal |
+|---|---|---|---|
+| `[WEBS]` | Webs automáticas para negocios (397 €) | `orquestador/`, `app/` (panel y `/book`), `supabase/functions/`, `*.lovable.app`, `nico-soto.es/book` | Email automático (Resend) + WhatsApp manual desde la ficha |
+| `[SIMULADOR]` | Home Estimator para empresas de reformas (59 €/mes) | Lovable `reform-wizard` (`4e13bf62…`) en `presupuestos.nico-soto.es`, `docs/prospeccion/` | MANUAL: Nico busca la empresa, pega el texto en su formulario y manda el enlace de la demo |
+| `[LUVIA]` | Clínicas de Luvia (handoff al CRM) | `handoff-luvia`, proyecto Supabase LUVIA CRM | Otro flujo, propio de Luvia |
+
+- **Sin etiqueta:** se hereda la última etiqueta usada en la conversación.
+- **"Reformas" NO sirve para distinguir:** hay empresas de reformas que son leads de `[WEBS]` y también prospectos de `[SIMULADOR]`. Si no hay etiqueta y el mensaje puede ser de los dos, pregunta "¿[WEBS] o [SIMULADOR]?" en una línea ANTES de investigar.
+- Las reglas duras de abajo son de `[WEBS]`. No se aplican al simulador.
+
 Reglas duras:
 - Secrets (ANTHROPIC_API_KEY, Resend, Stripe, OAuth Lovable, service key) SOLO en servidor. Nunca en el frontend.
 - Las webs de cliente se construyen en Lovable VÍA SU MCP desde el Orquestador. NO como Edge Function. NO plantillas estáticas.
