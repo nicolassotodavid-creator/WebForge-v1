@@ -238,9 +238,9 @@
 <div class="wrap">
 
   <header class="masthead">
-    <p class="eyebrow">Prospección · reformas València · actualizado 13 sep 2026</p>
+    <p class="eyebrow">Prospección · reformas València y Madrid · actualizado 13 sep 2026</p>
     <h1>Cola de envío Home Estimator</h1>
-    <p class="standfirst">Sesenta empresas de reformas ordenadas por Home Estimator Score. El lote 1 salió el 25 de agosto por formulario; los lotes 2, 3 y 4 están arriba, con el mensaje listo para pegar. El lote 3 sale de la auditoría del 13 de septiembre (la Safor y la Ribera); el 4, de lo mejor que quedaba de las auditorías.</p>
+    <p class="standfirst">Setenta y cinco empresas de reformas ordenadas por Home Estimator Score. El lote 1 salió el 25 de agosto por formulario; los lotes 2, 3 y 4 de València y el primero de Madrid están arriba, con el mensaje listo para pegar. Madrid 1 va justo debajo del lote 2 porque se envían a la vez: mismo mensaje, otra zona.</p>
     <div class="meter">
       <span class="meter-count" id="meter">15 / 60</span>
       <span class="meter-label">enviadas</span>
@@ -260,6 +260,11 @@
   <section class="notice">
     <h2>Lote 4: lo que quedaba de las auditorías</h2>
     <p>Quince fichas de score 6,5 a 5,5, casi la mitad de clase B (estudios de arquitectura e interiorismo que también reforman). El score no está validado: el lote 1, con los mejores, dio cero respuestas, así que esto es sobre todo más muestra. Se cayeron al revisar <strong>Gala Projectes</strong> (almacén de materiales), <strong>Ruiz Construcciones</strong> (contacto 404) y <strong>Reformas Moncada</strong> (sin formulario). Después de este lote ya no queda nada bueno sin enviar: hace falta buscar en otra provincia.</p>
+  </section>
+
+  <section class="notice">
+    <h2>Madrid 1: sur y este, a la vez que el lote 2</h2>
+    <p>Dieciocho municipios del sur, el este y el norte cercano (Getafe, Leganés, Alcorcón, Móstoles, Fuenlabrada, Torrejón, Alcalá, Rivas, Alcobendas…): 196 empresas con web y al menos 10 reseñas, 194 auditadas (77 A, 70 B, 47 C). Estos quince son los mejores A con formulario visible, revisados en Chrome. Se mandan <strong>el mismo día que el lote 2</strong>: mismo mensaje, otra zona, para comparar si Madrid abre más demos que València. Ojo: <strong>Varada, Iasa Design y Foydecor</strong> tienen más estructura de marketing y probablemente reciben más propuestas. Y aquí sí apareció competencia: <strong>Finalis</strong> (Fuenlabrada, 684 reseñas) ya tiene su propio configurador de precio en 11 pasos.</p>
   </section>
 
   <ol class="queue" id="queue"></ol>
@@ -330,6 +335,21 @@
     "dluxesolutions": "DLUXE Solutions",
     "salvicar": "Salvicar",
     "obraestil": "ObraEstil",
+    "reformas-blancor": "Reformas Blancor",
+    "varada": "Varada",
+    "raynadecor": "Raynadecor",
+    "construcciones-jdm": "Construcciones J.D.M.",
+    "reformas-areal": "Reformas Areal",
+    "quality-reform": "Quality Reform",
+    "iasa-design": "Iasa Design",
+    "foydecor": "Foydecor",
+    "reformas-el-baul": "Reformas El Baúl",
+    "reformas-alcomad": "AlcoMad",
+    "reformas-marian": "Reformas Marian",
+    "support-home": "Support Home",
+    "remacen": "Remacen",
+    "reformas-vegam": "Reformas Vegam",
+    "grupo-leon-reformas": "Grupo León Reformas",
   };
 
   const CIERRE = "Son solo dos minutos y sin compromiso.";
@@ -636,6 +656,82 @@
       contacto: "https://obraestil.es/contact/",
       msg: 'Os presentáis como especialistas en revestimientos, cocinas y baños, pero el formulario pide nombre, email, asunto y mensaje, sin teléfono ni nada de la obra. Cada solicitud empieza escribiendo al cliente para preguntarle lo básico. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
       flags: ["<strong>Entra por Gala Projectes</strong>, que se cae: es almacén y tienda de materiales de carpintería, no empresa de reformas."] },
+
+    // ---- Madrid 1 (13-sep): sur y este, auditoría de 194 webs (score 9–8,5). Se envía a la vez que el lote 2. ----
+    { n: 61, slug: "reformas-blancor", empresa: "Reformas Blancor · Alcorcón", score: "9.0",
+      contacto: "https://reformasblancor.es/presupuesto-para-reforma-integral-en-madrid/",
+      msg: 'En vuestra página de presupuesto explicáis que el coste de una reforma integral varía según los metros cuadrados de la vivienda, la calidad de los materiales y la complejidad de la redistribución. Pero el formulario solo pide nombre, email, teléfono y un mensaje opcional, así que todo eso lo tenéis que averiguar vosotros después, llamada a llamada. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma con esos datos ya contestados: ',
+      flags: ["Formulario sin captcha. 174 reseñas (4,8)."] },
+
+    { n: 62, slug: "varada", empresa: "Varada Reformas · Torrejón de Ardoz", score: "9.0",
+      contacto: "https://varada.es/",
+      msg: 'Prometéis "Respuesta en menos de 24h" y "Presupuesto cerrado", pero el formulario solo pide nombre, email, asunto y mensaje. Esas 24 horas empiezan con una llamada para saber qué quiere reformar el cliente, cuántos metros tiene y con qué presupuesto cuenta. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["Empresa con más estructura: fichas en Madrid y Guadalajara con enlaces de campaña en Google. Es de las que más propuestas reciben.", "El formulario (en la home) lleva reCAPTCHA. Sin email en la ficha."] },
+
+    { n: 63, slug: "raynadecor", empresa: "Raynadecor · Móstoles", score: "9.0",
+      contacto: "https://raynadecor.es/contacto/",
+      msg: 'Vuestra web dice "Calculamos tu Presupuesto sin Compromiso" y que cada cliente recibirá un presupuesto personalizado. Pero para calcularlo, el formulario solo os deja nombre, email, teléfono y un mensaje: qué reforma es, cuántos metros tiene y con cuánto cuenta lo tenéis que preguntar después. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario lleva reCAPTCHA."] },
+
+    { n: 64, slug: "construcciones-jdm", empresa: "Construcciones J.D.M. · Alcobendas", score: "9.0",
+      contacto: "https://construccionesjdm.com/contacto/",
+      msg: 'Vuestra página de contacto se llama "Pide ya tu presupuesto" y promete un presupuesto personalizado para cada reforma, pero el formulario pide nombre, apellidos, teléfono, email, asunto y mensaje: nada de la vivienda ni de la obra. Lo personalizado empieza después, preguntando lo básico. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario lleva reCAPTCHA. Sin email en la ficha."] },
+
+    { n: 65, slug: "reformas-areal", empresa: "Reformas Integrales Areal · Alcorcón", score: "9.0",
+      contacto: "https://reformasintegralesareal.es/contacto-reformas-integral-madrid",
+      msg: 'En vuestra página de contacto ofrecéis presupuesto sin compromiso y responder lo antes posible, pero el formulario solo recoge nombre, email, teléfono y un mensaje. Antes de poder contestar con algo concreto os toca preguntar los metros, las estancias y cuándo quiere empezar el cliente. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["Formulario sin captcha."] },
+
+    { n: 66, slug: "quality-reform", empresa: "Quality Reform · Fuenlabrada", score: "8.5",
+      contacto: "http://qualityreform.com/contacto/",
+      msg: 'Vuestra página de contacto dice "Pide presupuesto sin compromiso" y pide rellenar el formulario, pero el formulario solo recoge los datos de contacto y un comentario. Hacéis desde reformas integrales hasta pequeñas reparaciones, y por ahí os entra todo igual hasta que habláis con el cliente. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario lleva Turnstile de Cloudflare (casilla de verificación). Sin email en la ficha. También tiene WhatsApp (+34 643 85 91 35)."] },
+
+    { n: 67, slug: "iasa-design", empresa: "Iasa Design · Rivas-Vaciamadrid", score: "8.5",
+      contacto: "https://www.iasadesign.com/contacto/",
+      msg: 'Ya publicáis promociones con precio, desde 4.850 € un baño hasta 29.850 € una integral, así que quien os escribe quiere una cifra pronto. Pero al pulsar "Pedir presupuesto sin compromiso" llega a un formulario de nombre, email, teléfono y mensaje, sin decir qué quiere reformar ni cuántos metros tiene. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["Marketing más trabajado (promociones con precio, Kit Digital): de las que más propuestas reciben. El formulario lleva reCAPTCHA."] },
+
+    { n: 68, slug: "foydecor", empresa: "Reformas Foydecor · Móstoles", score: "8.5",
+      contacto: "https://foydecor.com/contacto/",
+      msg: 'Prometéis proyectos adaptados a las necesidades de cada cliente "y, como no, a su presupuesto", y además financiáis sin intereses. Pero el formulario pide nombre, correo, teléfono, asunto y "Escriba aquí su consulta": con cuánto cuenta el cliente y qué quiere reformar lo tenéis que preguntar después. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["Hacen anuncio en Telemadrid: empresa con más estructura. El formulario lleva reCAPTCHA."] },
+
+    { n: 69, slug: "reformas-el-baul", empresa: "Reformas El Baúl · Móstoles", score: "8.5",
+      contacto: "https://www.reformaselbaul.com/contacto/",
+      msg: 'Vuestra web dice "Llámenos y le daremos el mejor presupuesto", pero quien prefiere escribir llega a un formulario de nombre, email, teléfono y mensaje. Sin saber qué quiere reformar ni cuántos metros tiene, ese mejor presupuesto empieza con varias llamadas. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario lleva reCAPTCHA. También tiene WhatsApp (+34 656 68 48 85)."] },
+
+    { n: 70, slug: "reformas-alcomad", empresa: "Reformas AlcoMad · Alcorcón", score: "8.5",
+      contacto: "https://www.reformasalcomad.es/",
+      msg: 'Vuestro formulario ya pregunta si es reforma integral, cocina, baño o local, que es más de lo que pregunta la mayoría. Pero después de "¡Solicite presupuesto sin compromiso!" seguís sin saber los metros, las calidades ni cuándo quiere empezar el cliente, y eso sale en la primera llamada. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario está en la home, sin captcha."] },
+
+    { n: 71, slug: "reformas-marian", empresa: "Reformas Marian · Torrejón de Ardoz", score: "8.5",
+      contacto: "https://reformasmarian.es/contacto/",
+      msg: 'En vuestra página de contacto invitáis a "pedir un presupuesto sin compromiso", pero el formulario solo pide nombre, email, móvil y mensaje. Hasta que no habláis con el cliente no sabéis si es un baño, una cocina o un piso entero, ni cuántos metros tiene. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario lleva reCAPTCHA. Sin logo en imagen: la demo compone el nombre con su amarillo."] },
+
+    { n: 72, slug: "support-home", empresa: "Support Home · Valdemoro", score: "8.5",
+      contacto: "https://supporthome.es/contacto/",
+      msg: 'Decís que entregáis el presupuesto "con total transparencia en cuanto a materiales, mano de obra y tiempo de ejecución", pero para pedirlo el formulario solo recoge nombre, email, teléfono, asunto y un mensaje. Esa transparencia empieza después de preguntarle al cliente qué quiere reformar y cuántos metros tiene. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["Reformas y servicios (algo de multiservicio). reCAPTCHA invisible. También tiene WhatsApp (667 93 95 11)."] },
+
+    { n: 73, slug: "remacen", empresa: "Remacen Reparaciones · Alcalá de Henares", score: "8.5",
+      contacto: "https://www.reformasmadridcentro.com/contacto",
+      msg: 'En vuestra web ofrecéis presupuesto gratuito y respuesta rápida, pero el formulario pide nombre, apellidos, email, teléfono y mensaje, sin nada de la obra. Esa respuesta rápida empieza preguntando lo básico: qué reforma es, cuántos metros tiene y con qué presupuesto cuenta el cliente. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["reCAPTCHA invisible. Sin logo en imagen: la demo compone el nombre con su dorado. También tiene WhatsApp (+34 601 23 84 93)."] },
+
+    { n: 74, slug: "reformas-vegam", empresa: "Reformas Vegam · Alcobendas", score: "8.5",
+      contacto: "https://www.reformasvegam.es/contacto",
+      msg: 'Entre lo que os distingue ponéis "Presupuestos sin compromiso" y "Claridad total desde el primer momento". Pero ese primer momento es un formulario de nombre, email, teléfono y mensaje, y la claridad llega después, cuando ya habéis preguntado qué quiere reformar el cliente y cuántos metros tiene. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["reCAPTCHA invisible. El email de su ficha es personal (hotmail): usa el formulario. También tiene WhatsApp (+34 659 20 10 03)."] },
+
+    { n: 75, slug: "grupo-leon-reformas", empresa: "Grupo León Reformas · Getafe", score: "8.5",
+      contacto: "https://grupoleonreformas.com/contacto/",
+      msg: 'Vuestro botón dice "Consigue Tu Presupuesto Sin Compromiso", pero el formulario pide nombre, email, teléfono e "Información", un campo libre. Cada solicitud os obliga a volver a preguntar qué quiere reformar el cliente, cuántos metros tiene y con qué presupuesto cuenta. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario lleva Turnstile de Cloudflare. Sin logo en imagen: la demo va en tinta con el nombre compuesto."] },
   ];
 
   const store = {
@@ -681,8 +777,9 @@
   // Primero lo pendiente (lotes 2, 3 y 4, en orden), debajo lo ya contactado (lote 1).
   const GRUPOS = [
     { titulo: "Lote 2 · pendiente", leads: LEADS.filter((l) => !esEnviado(l) && l.n <= 30) },
+    { titulo: "Madrid 1 · pendiente · sur y este · enviar a la vez que el lote 2", leads: LEADS.filter((l) => !esEnviado(l) && l.n > 60) },
     { titulo: "Lote 3 · pendiente · Safor y Ribera", leads: LEADS.filter((l) => !esEnviado(l) && l.n > 30 && l.n <= 45) },
-    { titulo: "Lote 4 · pendiente · lo que quedaba de las auditorías", leads: LEADS.filter((l) => !esEnviado(l) && l.n > 45) },
+    { titulo: "Lote 4 · pendiente · lo que quedaba de las auditorías", leads: LEADS.filter((l) => !esEnviado(l) && l.n > 45 && l.n <= 60) },
     { titulo: "Lote 1 · enviado el " + ENVIADO_L1, leads: LEADS.filter(esEnviado) },
   ];
 
