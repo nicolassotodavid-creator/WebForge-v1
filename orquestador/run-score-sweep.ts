@@ -6,6 +6,7 @@
 // decide a quién vale la pena entrarle ("buenas reseñas + web mala"). Esto lo vacía en minutos.
 //
 // Uso:  npm run score          (o: SITE_SCORE_BATCH=25 npx tsx run-score-sweep.ts)
+//       npx tsx run-score-sweep.ts --ids <id1,id2,…>   → solo esos leads (un barrido concreto)
 // Coste: ~medio céntimo por web (Haiku 4.5). No contacta a nadie ni toca el gate humano.
 import "./env.ts";
 import { createClient } from "@supabase/supabase-js";
@@ -21,9 +22,13 @@ async function main() {
     auth: { persistSession: false },
   });
 
+  // --ids a,b,c → puntúa solo esos leads (un barrido concreto), no toda la cola pendiente.
+  const i = process.argv.indexOf("--ids");
+  const leadIds = i >= 0 ? (process.argv[i + 1] ?? "").split(",").map((s) => s.trim()).filter(Boolean) : undefined;
+
   let total = 0;
   for (let round = 1; round <= MAX_ROUNDS; round++) {
-    const { scored, skipped, failed } = await scoreExistingSites(supabase, ADMIN_USER_ID);
+    const { scored, skipped, failed } = await scoreExistingSites(supabase, ADMIN_USER_ID, leadIds);
     total += scored;
     console.log(`— ronda ${round}: ${scored} puntuadas · ${skipped} saltadas · ${failed} fallos`);
     // Ronda vacía = no quedan leads con web propia sin analizar. Los `failed` NO marcan

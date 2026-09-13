@@ -29,16 +29,20 @@ export interface SweepResult {
 export async function scoreExistingSites(
   supabase: SupabaseClient,
   adminUserId?: string,
+  leadIds?: string[],
 ): Promise<SweepResult> {
   // Leads con web propia y sin analizar, los más antiguos primero. Tope por corrida.
   // Si hay admin definido, solo sus leads (o sin dueño): no puntuamos las webs de Luvia.
+  // Con `leadIds`, solo esos: sirve para puntuar un barrido concreto sin gastar Haiku en el resto
+  // de la cola (p. ej. los ~200 leads de reformas que son prospectos del simulador, no de webs).
   let q = supabase
     .from("leads")
     .select("id,name,category,city,rating,review_count,raw_json,website_url")
     .eq("has_website", true)
     .is("site_analyzed_at", null)
     .order("created_at", { ascending: true })
-    .limit(SWEEP_BATCH);
+    .limit(leadIds?.length ? leadIds.length : SWEEP_BATCH);
+  if (leadIds?.length) q = q.in("id", leadIds);
   if (adminUserId) q = q.or(`owner.eq.${adminUserId},owner.is.null`);
   const { data, error } = await q;
   if (error) throw new Error(error.message);
