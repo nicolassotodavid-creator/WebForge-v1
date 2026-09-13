@@ -776,7 +776,7 @@ export default function LeadDetail() {
                 <p className="text-sm text-muted-foreground">
                   {lead.site_analyzed_at
                     ? "Sin nota guardada para esta web."
-                    : "Aún sin analizar. Se hace solo en el barrido diario, o pulsa «Analizar web actual»."}
+                    : "Aún sin analizar. Pulsa «Analizar web actual» para puntuarla."}
                 </p>
               )}
 

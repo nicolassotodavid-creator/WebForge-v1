@@ -1,17 +1,19 @@
-name: Brief automático (leads new → analyzed)
+name: Briefs en lote (manual, leads new → analyzed)
 
 # Dispara la Edge Function cron-briefs para generar los briefs de los leads 'new' SIN depender
 # del Mac. Es el PASO 1 del Orquestador movido a la nube (ver docs/superpowers/specs/
 # 2026-07-03-brief-cron-servidor-design.md). El build en Lovable sigue en local (fase 2 aparte).
+#
+# 2026-09-13: SIN horario. Las webs están aparcadas y el cron gastaba Sonnet en cada lead que
+# entraba (también en los de prospección del Home Estimator, que nunca van a tener web). El brief
+# de un lead se genera con el botón «Generar brief» de su ficha; este workflow solo corre si se
+# lanza a mano (Actions → Run workflow) y drena TODOS los 'new', así que mira antes cuántos hay.
 #
 # Auth con el secreto CRON_SECRET (secreto dedicado del cron, NO la service key). Está en:
 #   - GitHub → Secrets and variables → Actions → CRON_SECRET
 #   - Supabase (lo fija el workflow deploy.yml con `supabase secrets set`)
 
 on:
-  schedule:
-    # Cada 2 horas (UTC, best-effort). Los briefs no son tiempo real; ajusta a gusto.
-    - cron: '0 */2 * * *'
   workflow_dispatch: {}
 
 concurrency:
