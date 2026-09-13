@@ -11,12 +11,14 @@
 import "./env.ts";
 import { createClient } from "@supabase/supabase-js";
 import { scoreExistingSites } from "./score-existing-sites.ts";
+import { requireAdminUserId } from "./owner-scope.ts";
 
 const MAX_ROUNDS = Number(process.env.SCORE_ROUNDS ?? 12);
 
 async function main() {
-  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ADMIN_USER_ID } = process.env;
+  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Faltan vars de Supabase en .env");
+  const ADMIN_USER_ID = requireAdminUserId(process.env.ADMIN_USER_ID);
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false },

@@ -28,11 +28,13 @@ export interface SweepResult {
 
 export async function scoreExistingSites(
   supabase: SupabaseClient,
-  adminUserId?: string,
+  adminUserId: string,
   leadIds?: string[],
 ): Promise<SweepResult> {
+  // Sin admin no hay aislamiento: se puntuarían también las webs de Luvia. No seguir.
+  if (!adminUserId) throw new Error("scoreExistingSites: falta adminUserId (ADMIN_USER_ID).");
   // Leads con web propia y sin analizar, los más antiguos primero. Tope por corrida.
-  // Si hay admin definido, solo sus leads (o sin dueño): no puntuamos las webs de Luvia.
+  // Solo los del admin (o sin dueño): no puntuamos las webs de Luvia.
   // Con `leadIds`, solo esos: sirve para puntuar un barrido concreto sin gastar Haiku en el resto
   // de la cola (p. ej. los ~200 leads de reformas que son prospectos del simulador, no de webs).
   let q = supabase
@@ -43,7 +45,7 @@ export async function scoreExistingSites(
     .order("created_at", { ascending: true })
     .limit(leadIds?.length ? leadIds.length : SWEEP_BATCH);
   if (leadIds?.length) q = q.in("id", leadIds);
-  if (adminUserId) q = q.or(`owner.eq.${adminUserId},owner.is.null`);
+  q = q.or(`owner.eq.${adminUserId},owner.is.null`);
   const { data, error } = await q;
   if (error) throw new Error(error.message);
 

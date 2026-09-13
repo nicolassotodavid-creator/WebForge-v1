@@ -28,6 +28,7 @@ import "./env.ts";
 import { createClient } from "@supabase/supabase-js";
 import { isRealWebsite, realWebsiteFromRaw } from "../supabase/functions/_shared/website.ts";
 import { emailScore, extractEmails, pickBestEmail } from "../supabase/functions/_shared/email.ts";
+import { requireAdminUserId, adminOwnerFilter } from "./owner-scope.ts";
 
 const DRY_RUN = process.argv.includes("--dry-run");
 const SELF_TEST = process.argv.includes("--self-test");
@@ -243,9 +244,9 @@ async function main() {
   if (ONLY_LEAD) q = q.eq("id", ONLY_LEAD);
   // Aislamiento por cuenta: solo los leads del admin (o sin dueño). Sin esto el backfill escribía
   // website_url/email/has_website también en los leads de usuarios Luvia, que van por otro flujo
-  // y no llevan web. Mismo guardarraíl que run.ts, cron-briefs y score-existing-sites.
-  const ADMIN_USER_ID = process.env.ADMIN_USER_ID;
-  if (ADMIN_USER_ID && !ONLY_LEAD) q = q.or(`owner.eq.${ADMIN_USER_ID},owner.is.null`);
+  // y no llevan web. Mismo guardarraíl que run.ts, cron-briefs y score-existing-sites. Obligatorio
+  // (sin ADMIN_USER_ID no arranca) y también con --lead: un lead de Luvia no se toca ni a mano.
+  q = q.or(adminOwnerFilter(requireAdminUserId(process.env.ADMIN_USER_ID)));
   const { data, error } = await q;
   if (error) { console.error("❌ Error leyendo leads:", error.message); process.exit(1); }
 
