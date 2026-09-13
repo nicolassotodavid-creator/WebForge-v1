@@ -27,6 +27,7 @@
 import "./env.ts";
 import { createClient } from "@supabase/supabase-js";
 import { isRealWebsite, realWebsiteFromRaw } from "../supabase/functions/_shared/website.ts";
+import { emailScore, extractEmails, pickBestEmail } from "../supabase/functions/_shared/email.ts";
 
 const DRY_RUN = process.argv.includes("--dry-run");
 const SELF_TEST = process.argv.includes("--self-test");
@@ -38,11 +39,6 @@ function argValue(flag: string): string | undefined {
   return i >= 0 ? process.argv[i + 1] : undefined;
 }
 
-// OJO: para escanear texto necesitamos /g (matchAll). Para VALIDAR un email suelto usamos
-// una regex SIN /g (EMAIL_ONE): reusar la global con .test() es stateful (lastIndex) y se
-// salta resultados de forma intermitente.
-const EMAIL_RX_G = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
-const EMAIL_ONE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 const CONTACT_PATHS = ["", "contacto", "contacto/", "contact", "contacta", "contacta/", "aviso-legal", "aviso-legal/", "avisolegal", "legal", "privacidad"];
 
@@ -52,14 +48,6 @@ const GENERIC = new Set([
   "centro", "grupo", "auto", "autos", "car", "cars", "motor", "garaje", "garage", "the", "el", "la",
   "los", "las", "de", "del", "y", "en", "sl", "sa", "slu",
 ]);
-
-function isJunkEmail(e: string): boolean {
-  const x = e.toLowerCase();
-  return (
-    /\.(png|jpe?g|gif|webp|svg|css|js)$/.test(x) ||
-    /(example|sentry|wixpress|\.wix|godaddy|placeholder|yourdomain|email@|user@|name@|@sentry|@2x)/.test(x)
-  );
-}
 
 function stripAccents(s: string): string {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -137,33 +125,21 @@ async function fetchText(url: string): Promise<string> {
   }
 }
 
-function extractEmail(html: string, domainHost: string): string | null {
-  const found = new Set<string>();
-  for (const m of html.matchAll(/mailto:([^"'?>\s]+)/gi)) {
-    const e = decodeURIComponent(m[1]).trim().toLowerCase();
-    if (EMAIL_ONE.test(e) && !isJunkEmail(e)) found.add(e);
-  }
-  for (const m of html.matchAll(EMAIL_RX_G)) {
-    const e = m[0].toLowerCase();
-    if (!isJunkEmail(e)) found.add(e);
-  }
-  if (found.size === 0) return null;
-  const list = [...found];
-  const host = domainHost.replace(/^www\./, "");
-  const sameDomain = list.find((e) => e.endsWith(`@${host}`) || e.endsWith(`.${host}`));
-  return sameDomain ?? list[0];
-}
-
+// Recorre home + contacto + legal y se queda con el MEJOR email (mismo dominio > misma marca >
+// gmail/hotmail > otro), no con el primero que aparezca. Para en cuanto hay uno del propio dominio.
+// Antes paraba en la primera página con cualquier email: BONO PROYECTOS se quedó con la errata
+// de su home aunque el bueno estaba en /aviso-legal.
 async function findEmailForSite(origin: string): Promise<string | null> {
   const host = new URL(origin).hostname;
+  const all: string[] = [];
   for (const path of CONTACT_PATHS) {
     const url = path ? `${origin}/${path}` : origin;
     const html = await fetchText(url);
     if (!html) continue;
-    const email = extractEmail(html, host);
-    if (email) return email;
+    for (const e of extractEmails(html)) if (!all.includes(e)) all.push(e);
+    if (all.some((e) => emailScore(e, host) === 3)) break;
   }
-  return null;
+  return pickBestEmail(all, host);
 }
 
 // Dominios de resultados de DuckDuckGo (HTML, sin API key). Best-effort: si DDG bloquea, [].
@@ -276,8 +252,13 @@ async function main() {
   const all = (data ?? []) as LeadRow[];
   // Pendientes de resolver: sin website_url y sin web real ya presente en el scrape... salvo que
   // les falte el email (esos también los reprocesamos para intentar sacarlo de su web real).
+  // Primero los que ya tienen web conocida (columna o scrape): son los que pueden dar email. Antes
+  // iban solo por antigüedad y los ~45 más viejos, sin web localizable, se reprocesaban en cada
+  // corrida y tapaban a los ~200 de los barridos nuevos (web solo en raw_json) con --limit 50.
+  const hasKnownWeb = (l: LeadRow) => isRealWebsite(l.website_url) || !!realWebsiteFromRaw(l.raw_json);
   const todo = all
     .filter((l) => ONLY_LEAD || !l.website_url || !l.email)
+    .sort((a, b) => Number(hasKnownWeb(b)) - Number(hasKnownWeb(a)))
     .slice(0, LIMIT);
 
   if (!todo.length) { console.log("No hay leads que resolver. Nada que hacer."); return; }

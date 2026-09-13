@@ -36,15 +36,10 @@ function pick(o: RawLead, keys: string[]): unknown {
   return undefined;
 }
 
-// Descarta correos basura típicos del HTML (assets, ejemplos, trackers).
+// Descarta correos basura típicos del HTML (assets, ejemplos, trackers). La lista vive en
+// _shared/email.ts y es la misma que usa backfill-emails.ts.
+import { isJunkEmail } from "../_shared/email.ts";
 const EMAIL_RX = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
-function isJunkEmail(e: string): boolean {
-  const x = e.toLowerCase();
-  return (
-    /\.(png|jpe?g|gif|webp|svg|css|js)$/.test(x) ||
-    /(example|sentry|wixpress|\.wix|godaddy|placeholder|yourdomain|email@|user@|name@)/.test(x)
-  );
-}
 function pickEmail(v: unknown): string | null {
   if (typeof v === "string") {
     const m = v.match(EMAIL_RX);
