@@ -203,6 +203,26 @@
   }
   .flag strong { font-weight: 600; }
 
+  /* Fichas ya enviadas: resultado en lugar del mensaje. */
+  .card.sent { background: transparent; box-shadow: none; }
+  .card.sent.hot { background: var(--surface); border-color: var(--accent); box-shadow: var(--shadow); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; line-height: 1.5;
+    padding: 1px 8px; border: 1px solid var(--rule);
+    background: var(--surface-2); color: var(--ink-soft);
+  }
+  .chip.ok  { background: var(--ok-bg); color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+  .chip.hot { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .outcome { margin: 0; font-size: 15px; color: var(--ink-soft); max-width: 70ch; }
+  .card.hot .outcome { color: var(--ink); }
+  details.sent-msg summary {
+    cursor: pointer; font-family: "IBM Plex Mono", monospace; font-size: 12px;
+    color: var(--ink-faint); letter-spacing: .04em;
+  }
+  details.sent-msg summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  details.sent-msg[open] summary { margin-bottom: 10px; }
+
   @media (max-width: 560px) {
     body { padding: 28px 14px 72px; }
     .card { grid-template-columns: 1fr; }
@@ -218,18 +238,18 @@
 <div class="wrap">
 
   <header class="masthead">
-    <p class="eyebrow">Prospección · reformas València · martes y miércoles</p>
+    <p class="eyebrow">Prospección · reformas València · actualizado 12 sep 2026</p>
     <h1>Cola de envío Home Estimator</h1>
-    <p class="standfirst">Treinta empresas de la auditoría del 20 de agosto, ordenadas por Home Estimator Score y partidas en dos días: quince el martes, quince el miércoles. Cada una con su formulario y el mensaje ya en texto plano, listo para pegar.</p>
+    <p class="standfirst">Treinta empresas de la auditoría del 20 de agosto, ordenadas por Home Estimator Score. El lote 1 salió el 25 de agosto por formulario; el lote 2 está preparado arriba, con el mensaje listo para pegar.</p>
     <div class="meter">
-      <span class="meter-count" id="meter">0 / 30</span>
-      <span class="meter-label">marcadas como enviadas</span>
+      <span class="meter-count" id="meter">15 / 30</span>
+      <span class="meter-label">enviadas</span>
     </div>
   </header>
 
   <section class="notice">
-    <h2>Comprueba un enlace antes de pegar nada</h2>
-    <p>Las 30 demos están construidas y verificadas (las 30 cargan sin errores, cada una con su logo y su color). Los mensajes prometen “una demo con vuestra marca”: si alguien pincha y no hay nada, ese lead se quema. Abre una de <code>presupuestos.nico-soto.es/demo/…</code> antes de empezar la ronda.</p>
+    <h2>Lote 1: 7 de 15 abrieron la demo, 1 la completó</h2>
+    <p>Cero respuestas, pero <strong>ROBLES Home</strong> recorrió el wizard entero el 25/08 (seguimiento por email enviado el 12/09). Ocho demos no se abrieron nunca: el formulario pierde la mitad de los envíos. Las 15 demos y formularios del lote 2 dan 200 a 12/09, salvo el formulario de <code>reformspeed.es</code>, que daba error 500.</p>
   </section>
 
   <ol class="queue" id="queue"></ol>
@@ -388,7 +408,7 @@
     { n: 23, slug: "bono-proyectos", empresa: "BONO PROYECTOS", score: "7.0",
       contacto: "https://bonoproyectos.es/contacto/",
       msg: 'Vendéis proyectos llave en mano, pero cuando alguien pide información entra por un formulario genérico y todavía tenéis que averiguar todo el alcance del proyecto. Cada solicitud os obliga a trabajar antes de saber si encaja realmente. He preparado una demo para enseñaros cómo podría llegaros mucho más definida: ',
-      flags: [] },
+      flags: ["El email de su ficha tiene una errata (<code>info@bonoporyectos.com</code>, la web es bonoproyectos.es). Usa el formulario, no ese email."] },
 
     { n: 24, slug: "vga-reformas", empresa: "VGA Proyectos y Reformas", score: "7.0",
       contacto: "https://vgareformas.es",
@@ -398,7 +418,7 @@
     { n: 25, slug: "reformspeed", empresa: "REFORMSPEED", score: "7.0",
       contacto: "https://reformspeed.es/solicitar-presupuesto/",
       msg: 'Tenéis una página específica para solicitar presupuesto, pero al final el cliente deja sus datos y os cuenta libremente lo que necesita. El trabajo de convertir eso en un proyecto presupuestable sigue siendo vuestro. He preparado una demo para que veáis cómo podría llegaros ya estructurado antes de dedicarle tiempo: ',
-      flags: [] },
+      flags: ["<strong>Sin email y el formulario daba error 500</strong> el 12/09. Ábrelo antes de pegar; si sigue caído, déjalo para el final."] },
 
     { n: 26, slug: "grupo-expovall", empresa: "Valltro · Grupo Expovall", score: "7.0",
       contacto: "https://grupoexpovall.com/contacto/",
@@ -413,7 +433,7 @@
     { n: 28, slug: "reformas-ferreira", empresa: "Reformas Ferreira", score: "7.0",
       contacto: "http://www.reformasferreira.es",
       msg: 'He visto que cuando alguien contacta os deja nombre, teléfono, email y un mensaje. Es decir, todo lo importante sobre la reforma empieza después. Cada solicitud todavía os obliga a trabajar antes de saber si merece la pena. He montado una demo para enseñaros cómo podría llegaros ya cualificada: ',
-      flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home. Localiza el formulario antes del miércoles."] },
+      flags: ["<strong>Sin página de contacto identificada</strong> — el enlace es la home. Localiza el formulario antes de pegar."] },
 
     { n: 29, slug: "dekorinex", empresa: "Dekorinex", score: "7.0",
       contacto: "https://dekorinex.es/contacto/",
@@ -430,7 +450,30 @@
     read() { try { return JSON.parse(localStorage.getItem("he-cola") || "[]"); } catch { return []; } },
     write(v) { try { localStorage.setItem("he-cola", JSON.stringify(v)); } catch {} },
   };
-  let done = new Set(store.read());
+  // Resultado real del lote 1 (enviado el 25-ago por formulario). Visitas = analítica del
+  // proyecto Lovable reform-wizard del 25-ago al 12-sep; pueden incluir pruebas propias.
+  const ENVIADO_L1 = "25 ago";
+  const RESULTADO = {
+    "reformas-valencia-myj": { visitas: 2, nota: "Abrió la demo, no dejó datos. También tiene web construida en WebForge: elegir un producto antes de insistir." },
+    "grupodmh":              { visitas: 1, nota: "Abrió la demo, no dejó datos." },
+    "nou-cabanyal":          { visitas: 3, nota: "Abrió la demo, no dejó datos." },
+    "reformas-lujan":        { visitas: 0, nota: "Nunca abrió la demo." },
+    "reformas-claiz":        { visitas: 0, nota: "Nunca abrió la demo." },
+    "geteco":                { visitas: 0, nota: "Nunca abrió la demo." },
+    "reformas-rocha":        { visitas: 4, nota: "El «lead» del 26/08 era una prueba propia (tel 600782211), no el cliente." },
+    "tas-obras-y-reformas":  { visitas: 0, nota: "Nunca abrió la demo. Contactan por WhatsApp o teléfono." },
+    "robles-home":           { visitas: 5, interesado: true, nota: "Completó el wizard el 25/08 a las 13:15: casa de 65 m² en 46900, integral + ventanas + puertas + climatización, 50-100K €, horquilla 40.010 – 74.300 €. Seguimiento por email enviado el 12/09 a info@robleshome.com." },
+    "marcos-mym":            { visitas: 1, nota: "Abrió la demo, no dejó datos." },
+    "rfc-reformas":          { visitas: 0, nota: "Nunca abrió la demo." },
+    "metrocuadrado":         { visitas: 0, nota: "Nunca abrió la demo." },
+    "efenval":               { visitas: 2, nota: "Abrió la demo, no dejó datos." },
+    "rdg-reformas":          { visitas: 0, nota: "Nunca abrió la demo." },
+    "reformas-turia":        { visitas: 0, nota: "Nunca abrió la demo." },
+  };
+  const esEnviado = (lead) => lead.slug in RESULTADO;
+
+  // Solo cuentan las marcas del lote 2; el lote 1 ya está enviado.
+  let done = new Set(store.read().filter((s) => LEADS.some((l) => l.slug === s && !esEnviado(l))));
 
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const pretty = (u) => u.replace(/^https?:\/\//, "").replace(/\/$/, "");
@@ -439,31 +482,62 @@
   const meter = document.getElementById("meter");
 
   function paintMeter() {
-    meter.textContent = done.size + " / " + LEADS.length;
+    const enviados = LEADS.filter(esEnviado).length + done.size;
+    meter.textContent = enviados + " / " + LEADS.length;
   }
 
-  // Los quince primeros salen el martes; del 16 en adelante, el miércoles.
-  const diaDe = (lead) => (lead.n >= 16 ? "miércoles" : "martes");
-  let diaActual = null;
+  // Primero lo pendiente (lote 2), debajo lo ya contactado (lote 1).
+  const GRUPOS = [
+    { titulo: "Lote 2 · pendiente", leads: LEADS.filter((l) => !esEnviado(l)) },
+    { titulo: "Lote 1 · enviado el " + ENVIADO_L1, leads: LEADS.filter(esEnviado) },
+  ];
 
-  for (const lead of LEADS) {
-    const dia = diaDe(lead);
-    if (dia !== diaActual) {
-      diaActual = dia;
-      const cuantas = LEADS.filter((l) => diaDe(l) === dia).length;
-      const sep = document.createElement("li");
-      sep.className = "daybreak";
-      sep.innerHTML = '<span>' + dia + '</span><span class="daybreak-n">' +
-        cuantas + (cuantas === 1 ? ' empresa' : ' empresas') + '</span>';
-      queue.appendChild(sep);
-    }
+  for (const grupo of GRUPOS) {
+    const sep = document.createElement("li");
+    sep.className = "daybreak";
+    sep.innerHTML = '<span>' + grupo.titulo + '</span><span class="daybreak-n">' +
+      grupo.leads.length + ' empresas</span>';
+    queue.appendChild(sep);
 
+  for (const lead of grupo.leads) {
     const demo = BASE + "/" + lead.slug;
     const saludo = "Hola, equipo de " + (NOMBRES[lead.slug] || lead.empresa) + ":";
     const cuerpo = lead.msg.trim().replace(/:$/, "");
     const texto = saludo + "\n\n" + cuerpo + ":\n\n" + demo + "\n\n" + CIERRE;
 
     const li = document.createElement("li");
+
+    if (esEnviado(lead)) {
+      const r = RESULTADO[lead.slug];
+      li.className = "card sent" + (r.interesado ? " hot" : "");
+      li.innerHTML =
+        '<div class="rank">' + String(lead.n).padStart(2, "0") + '</div>' +
+        '<div class="body">' +
+          '<div class="head">' +
+            '<h2 class="name">' + esc(lead.empresa) + '</h2>' +
+            '<span class="score">score ' + lead.score + '</span>' +
+          '</div>' +
+          '<div class="chips">' +
+            '<span class="chip">Enviada ' + ENVIADO_L1 + '</span>' +
+            (r.visitas
+              ? '<span class="chip ok">Demo abierta · ' + r.visitas + (r.visitas === 1 ? ' visita' : ' visitas') + '</span>'
+              : '<span class="chip">Demo sin abrir</span>') +
+            (r.interesado ? '<span class="chip hot">Interesado real</span>' : '') +
+          '</div>' +
+          '<p class="outcome">' + esc(r.nota) + '</p>' +
+          '<details class="sent-msg"><summary>Ver mensaje enviado</summary>' +
+            '<p class="msg">' + esc(texto) + '</p></details>' +
+          '<div class="links">' +
+            '<span class="link-group"><span class="lbl">Formulario</span>' +
+              '<a href="' + lead.contacto + '" target="_blank" rel="noopener noreferrer">' + esc(pretty(lead.contacto)) + '</a></span>' +
+            '<span class="link-group"><span class="lbl">Demo</span>' +
+              '<a href="' + demo + '" target="_blank" rel="noopener noreferrer">/demo/' + lead.slug + '</a></span>' +
+          '</div>' +
+        '</div>';
+      queue.appendChild(li);
+      continue;
+    }
+
     li.className = "card" + (done.has(lead.slug) ? " done" : "");
 
     li.innerHTML =
@@ -514,6 +588,7 @@
     });
 
     queue.appendChild(li);
+  }
   }
 
   paintMeter();
