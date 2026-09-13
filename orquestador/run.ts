@@ -26,12 +26,13 @@ import { scoreExistingSites } from "./score-existing-sites.ts";
 import { rehostScreenshot } from "./preview.ts";
 import { sendFollowupEmail, getLiveUrl, supabase as supabaseFollowup } from "./followup-mailer.ts";
 import { runPool } from "./pool.ts";
+import { requireAdminUserId, adminOwnerFilter, isAdminScopedOwner } from "./owner-scope.ts";
 
 const BATCH = Number(process.env.BATCH_SIZE ?? 5);
 const BOOKING_BASE = process.env.BOOKING_BASE ?? "";
-// Solo el admin construye webs. Si está definido, el cron procesa SOLO sus leads (o sin dueño):
-// los leads de otros usuarios (Luvia) no se analizan ni se les genera brief.
-const ADMIN_USER_ID = process.env.ADMIN_USER_ID;
+// Solo el admin construye webs: el orquestador procesa SOLO sus leads (o sin dueño); los de otros
+// usuarios (Luvia) no se analizan ni se les genera brief. OBLIGATORIO: sin él no arranca.
+const ADMIN_USER_ID = requireAdminUserId(process.env.ADMIN_USER_ID);
 // Un build se considera abandonado pasado este tiempo: permite re-reclamar el lead si el
 // proceso anterior murió a mitad. > BUILD_DEADLINE_MS de lovable.ts (15 min).
 const BUILD_LOCK_STALE_MS = Number(process.env.BUILD_LOCK_STALE_MS ?? 20 * 60 * 1000);
@@ -432,9 +433,12 @@ async function processFollowups(): Promise<void> {
 }
 
 async function selectLeadsByStatus(status: string): Promise<Lead[]> {
-  let q = supabase.from("leads").select("*").eq("status", status).limit(BATCH);
-  if (ADMIN_USER_ID) q = q.or(`owner.eq.${ADMIN_USER_ID},owner.is.null`);
-  const { data, error } = await q;
+  const { data, error } = await supabase
+    .from("leads")
+    .select("*")
+    .eq("status", status)
+    .or(adminOwnerFilter(ADMIN_USER_ID))
+    .limit(BATCH);
   if (error) throw new Error(error.message);
   return (data ?? []) as Lead[];
 }
@@ -459,6 +463,11 @@ async function run() {
       return;
     }
     const lead = leads[0];
+    const owner = (lead as { owner?: string | null }).owner;
+    if (!isAdminScopedOwner(owner, ADMIN_USER_ID)) {
+      console.log(`  · El lead ${lead.id} es de otra cuenta (Luvia): el orquestador no le hace brief ni web.`);
+      return;
+    }
     try {
       if (lead.status === "new" || lead.status === "analyzed") {
         // En modo prueba se puede forzar el build completo
