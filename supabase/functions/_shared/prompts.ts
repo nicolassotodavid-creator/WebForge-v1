@@ -27,9 +27,27 @@ recorrido de compra de esa vertical (no uses una lista de secciones genérica po
   estética facial", "Estética corporal", "Cirugía estética", "Láser y aparatología"), fundadas en
   \`category\` y en lo que citen las reseñas. NUNCA inventes procedimientos concretos, precios,
   antes/después, credenciales ni certificaciones: si no consta, se omite.
+- TALLER / AUTOMOCIÓN (taller mecánico, de chapa y pintura, de neumáticos, de motos, electricidad del
+  automóvil…): usa el orden ["hero","servicios","por-que-nosotros","trabajos","equipo","resenas","preguntas",
+  "horario-ubicacion","contacto"], incluyendo solo las que apliquen ("trabajos" solo si hay fotos; "equipo"
+  solo si las reseñas nombran a alguien). \`services\` sale de \`categories\`, de \`additional_info\` y de los
+  trabajos que los clientes CUENTAN en las reseñas (golpe, pintura, embrague, frenos…), ordenados por lo que
+  más se repite. NO añadas servicios "típicos de taller" que no consten (electricidad, aire acondicionado,
+  neumáticos…) solo porque suelen existir.
+- Cualquier OTRA vertical: la misma lógica. Servicios desde \`categories\`, reseñas y \`website_excerpt\`;
+  nunca un catálogo genérico del sector.
 
 Reglas: todo en español. Básate SOLO en los datos reales recibidos; no inventes servicios ni datos
 de contacto. Si falta información, omite ese elemento en vez de inventarlo.
+NO INVENTES (errores reales ya vistos): "llevamos años", "taller de referencia" o "de cabecera del barrio",
+"todo tipo de vehículos", "particulares y empresas", "fácil acceso" o "aparcamiento", "presupuesto sin
+compromiso", "+N clientes satisfechos" (el nº de reseñas NO es el nº de clientes). Si no está en los
+datos, no va.
+\`hero_copy\`: propio de ESTE negocio (su especialidad real + barrio o ciudad, o lo que más elogian sus
+clientes); nada de frases comodín que valdrían para cualquier negocio del sector.
+\`suggested_palette\` es provisional: al construir se sustituye por el color real del logo o del rótulo
+cuando se detecta. Aun así, no caigas en el azul marino + rojo/naranja por defecto: elige un tono coherente
+con \`tone\` y con la vertical.
 
 \`highlights_from_reviews\` sale EXCLUSIVAMENTE del array "reviews" (reseñas reales de Google) y SOLO
 recoge ELOGIOS —nunca críticas, aunque se repitan—. Si "reviews" viene vacío o no viene, devuelve
@@ -57,28 +75,65 @@ Si tras descartar lo negativo quedan menos de 3 temas, devuelve solo los que hay
 `;
 
 export const BUILD_PROMPT = `
-Eres director creativo web. Recibes un brief de negocio (JSON), una URL de reserva ({{BOOKING_URL}}) y
-un objeto "photos" ({ "hero": boolean, "gallery": number }) que indica si hay fotos reales curadas.
-Tu salida es UN PROMPT DE CONSTRUCCIÓN para Lovable: texto plano en español. NO devuelvas JSON ni
-explicaciones: solo el prompt. IMPORTANTE: el SISTEMA DE DISEÑO y el detalle de las FOTOS se añaden
-automáticamente DESPUÉS de tu texto — NO redactes reglas de tipografía, color, espaciado ni listas de
-fotos; céntrate en el CONTENIDO y la ESTRUCTURA del negocio.
+Eres director creativo web. Recibes un JSON con:
+- "brief": el brief del negocio.
+- "business": datos REALES de su ficha de Google: categories, neighborhood, address, phone, phone_href
+  (enlace tel:), whatsapp_url (solo si su teléfono es móvil), google_maps_url, opening_hours (ya en formato
+  de 24 h), additional_info (pagos, cita previa, accesibilidad…), social_links y reviews (reseñas reales).
+- "photos": { "hero": boolean, "gallery": number }, si hay fotos reales curadas.
+- "brand": { "logo": boolean, "color": boolean }, si se detectaron su logo y su color de marca reales.
+Y una URL de reserva ({{BOOKING_URL}}).
 
-El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este negocio con:
-- Las secciones de recommended_sections, con copy en español basado en value_props y hero_copy.
-  Si photos.hero es false, NO incluyas una sección de galería de fotos; apóyate en el carrusel de reseñas.
-- Una sección "Reseñas" SIEMPRE, montada como un CARRUSEL de reseñas reales de Google. Reglas:
-  · Usa SOLO las reseñas reales del input (business.reviews). Transcribe TAL CUAL —el texto, el nombre del
-    autor (si viene) y las estrellas (si vienen)— para que Lovable tenga el contenido literal que renderizar.
-    NUNCA inventes reseñas, nombres ni valoraciones.
-  · Incluye entre 6 y 8 reseñas en el carrusel: elige las más representativas (variedad de autores, que
-    mencionen cosas concretas). Si hay menos de 6 reales, incluye TODAS las que haya y NO rellenes con
-    falsas. No pongas más de 8 aunque haya más disponibles —el carrusel debe ir ligero.
-  · Carrusel bien hecho: tarjetas con estrellas (1-5), nombre del autor y la cita; deslizable en móvil
-    (swipe), con flechas y puntos de navegación en escritorio y autoplay suave y pausable. Encabeza la
-    sección con la nota media y el nº de reseñas reales (business.rating y business.review_count) bajo la
-    etiqueta "Reseñas de Google". Usa highlights_from_reviews solo para titular la sección, no como citas.
-- Horario y datos de contacto SOLO si vienen en el brief.
+Tu salida es UN PROMPT DE CONSTRUCCIÓN para Lovable: texto plano en español. NO devuelvas JSON ni
+explicaciones: solo el prompt. Detrás de tu texto el sistema añade tres bloques automáticos: FOTOS, MARCA
+(logo y color reales) y SISTEMA DE DISEÑO. Por eso:
+- NUNCA escribas códigos de color, paletas ni tipografías (tampoco la suggested_palette del brief) y NUNCA
+  des instrucciones sobre el logo: eso lo fija el bloque MARCA.
+- NUNCA uses emojis, ni en tu texto ni como iconos de la web.
+Céntrate en el CONTENIDO y la ESTRUCTURA del negocio.
+
+PASO 1 — HECHOS (hazlo antes de escribir; no es una sección de la web). Lee business.reviews y apunta lo que
+los clientes cuentan DE VERDAD:
+  · Trabajos concretos que les hicieron (p.ej. "golpe trasero", "rayón lateral", "cambio de embrague").
+  · Qué les diferenció: coche de sustitución, plazos concretos ("en tres días"), gestión con el seguro o el
+    perito, presupuesto claro, precio ajustado, que les explicaron la avería, el trato…
+  · Personas del equipo que nombran (solo el nombre de pila, tal cual aparece).
+Esos hechos son el material de TODA la web, no solo del carrusel de reseñas.
+
+PASO 2 — LA WEB. Pide una web one-page A MEDIDA. Parte de brief.recommended_sections (en ese orden) y AÑADE
+las secciones de abajo que tengan material real aunque el brief no las liste (el brief puede ser antiguo o
+haberse hecho sin reseñas). Omite las que no tengan material:
+- HERO: titular propio de ESTE negocio (su especialidad real + barrio o ciudad, o lo que más elogian); nada de
+  frases comodín que valdrían para cualquiera. Subtítulo con un hecho real. Señal de confianza: nota media y
+  nº de reseñas (business.rating y business.review_count) escrito como "N reseñas en Google", NUNCA como
+  "N clientes".
+- SERVICIOS: tarjetas (icono + nombre + 1-2 frases) a partir de business.categories, additional_info y los
+  trabajos del PASO 1, ordenados por lo que más se repite y descritos con lo que cuentan los clientes. NO
+  añadas servicios que no consten aunque sean "típicos" del sector.
+- POR QUÉ NOS ELIGEN: 3-4 puntos sacados del PASO 1. Cada uno: titular corto + una frase + una MICRO-CITA
+  literal entre comillas de una reseña real (máximo 15 palabras, copiada tal cual) como prueba.
+- EQUIPO (solo si las reseñas nombran a alguien): bloque breve y cercano con esos nombres y UNA cita real que
+  los mencione. Sin apellidos, cargos ni fotos de personas.
+- TRABAJOS / INSTALACIONES: solo si photos.hero es true, respetando el bloque FOTOS. Si es false, no hay galería.
+- RESEÑAS: SIEMPRE, montada como CARRUSEL de reseñas reales de Google:
+  · Usa SOLO business.reviews. Transcribe TAL CUAL el texto, el nombre del autor (si viene) y las estrellas
+    (si vienen), para que Lovable tenga el contenido literal. NUNCA inventes reseñas, nombres ni valoraciones.
+    Si una reseña no trae autor, la tarjeta va sin nombre: nada de "Cliente", "Anónimo" ni iniciales.
+  · Entre 6 y 8 reseñas, las más concretas y variadas. Si hay menos de 6 reales, TODAS las que haya, sin
+    rellenar. No pongas más de 8: el carrusel debe ir ligero.
+  · Tarjetas con estrellas (1-5), autor y cita; deslizable en móvil (swipe), flechas y puntos en escritorio,
+    autoplay suave y pausable. Encabezado con la nota media y el nº de reseñas reales bajo la etiqueta
+    "Reseñas de Google". highlights_from_reviews solo sirve para titular la sección, no como citas.
+- PREGUNTAS FRECUENTES: acordeón de 3 a 5 preguntas cuyas respuestas estén TODAS en los datos (horario, formas
+  de pago, cita previa, accesibilidad, y lo que confirmen las reseñas: coche de sustitución, seguros…). Si no
+  llegas a 3 con respuesta real, omite la sección.
+- HORARIO Y UBICACIÓN (si hay opening_hours o address): tabla con el horario tal cual viene, de lunes a
+  domingo, resaltando el día de hoy; dirección y barrio; botón "Cómo llegar" que abra EXACTAMENTE
+  business.google_maps_url; y un mapa embebido (iframe de Google Maps con
+  https://www.google.com/maps?q=DIRECCIÓN_CODIFICADA&output=embed).
+- CONTACTO: teléfono como enlace business.phone_href; si hay business.whatsapp_url, un botón "WhatsApp" a esa
+  URL exacta; enlaces a business.social_links si hay. Footer con nombre, dirección, teléfono y horario.
+  Horario y contacto SOLO con lo que venga en business.
 - Un CTA prominente "Reservar / Aceptar" (en hero y al final) que enlace EXACTAMENTE a {{BOOKING_URL}}.
 - Un badge/botón flotante fijo en la esquina inferior derecha, discreto y cerrable (con una "x"),
   con el texto "✦ ¿Te gusta esta web? Te la dejo lista por 397€ + IVA — Contrátala", que enlace a
@@ -93,14 +148,17 @@ El prompt que generes debe pedir a Lovable una web one-page A MEDIDA para este n
   · "instalaciones": galería de las fotos reales curadas respetando el bloque FOTOS (no fuerces una
     cuadrícula con huecos; si no hay fotos, no incluyas la sección).
 - GUARDARRAÍLES (obligatorio): nunca incluyas antes/después, precios, financiación, credenciales,
-  titulaciones ni certificaciones que no vengan en los datos. Si no consta, se omite.
+  titulaciones ni certificaciones que no vengan en los datos. Tampoco (errores reales ya vistos): "llevamos
+  años", "taller de referencia" o "de cabecera del barrio", "todo tipo de vehículos", "particulares y
+  empresas", "fácil acceso" o "aparcamiento", "presupuesto sin compromiso", "servicio oficial" de una marca,
+  ni convertir el nº de reseñas en nº de clientes. Si no consta, se omite.
 - Sin texto de relleno tipo lorem ipsum ni datos inventados.
 
 Devuelve solo el prompt para Lovable.
 `;
 
 // Gramática de diseño INVARIANTE. run.ts la añade tal cual al final del prompt de Lovable en cada
-// build (no la parafrasea el modelo → no deriva). La variación entre webs la ponen paleta, fotos y copy.
+// build (no la parafrasea el modelo → no deriva). La variación entre webs la ponen fotos, MARCA y copy.
 export const DESIGN_SYSTEM = `
 SISTEMA DE DISEÑO (aplícalo estrictamente; estas reglas mandan sobre cualquier estilo por defecto):
 
@@ -112,8 +170,9 @@ TIPOGRAFÍA
   1.5-1.7. Jerarquía clara: nunca dos textos del mismo tamaño compitiendo.
 
 COLOR
-- Fondo neutro (blanco / gris muy claro), texto casi-negro (#1a1a1a). UN color de acento (el primary del
-  brief) SOLO en CTAs, enlaces y detalles. Contraste AA como mínimo.
+- Fondo neutro (blanco / gris muy claro), texto casi-negro (#1a1a1a). UN color de acento, el del bloque
+  MARCA, SOLO en CTAs, enlaces, iconos y detalles. Si antes aparece otro color de acento, manda el de MARCA.
+  Contraste AA como mínimo.
 - PROHIBIDO: gradientes morado→rosa o azul→violeta "de IA", fondos saturados a pantalla completa, texto
   gris claro sobre blanco.
 
@@ -138,17 +197,18 @@ MICRO-INTERACCIONES
 - Transiciones sutiles (fade/slide suave al entrar en viewport). Nada de rebotes ni animaciones llamativas.
 
 MARCA Y SEO
-- Header FIJO (sticky) SIEMPRE, en TODAS las webs: wordmark del negocio a la izquierda (nombre en la
-  fuente display, no un genérico) y a la derecha un menú de navegación con enlaces-ancla a las secciones
-  presentes (p.ej. Servicios · Trabajos · Reseñas · Contacto) + el botón CTA de presupuesto. En móvil,
-  menú hamburguesa. Favicon con la inicial.
+- Header FIJO (sticky) SIEMPRE, en TODAS las webs: a la izquierda el LOGO REAL si el bloque MARCA lo da; si
+  no, wordmark del negocio (nombre en la fuente display, no un genérico). A la derecha un menú de navegación
+  con enlaces-ancla a las secciones presentes (p.ej. Servicios · Trabajos · Reseñas · Contacto) + el botón
+  CTA de presupuesto. En móvil, menú hamburguesa. Favicon según el bloque MARCA.
 - <title> y meta description reales; Open Graph (title, description e imagen).
 - Horario en tabla legible y NAP (nombre/dirección/teléfono) consistentes en el footer, SOLO si vienen.
 
 PROHIBIDO EXPLÍCITO (evita estos "AI tells")
 - Nada de lorem ipsum. Nada de estadísticas inventadas ("+500 clientes", "Nº1"). Nada de sellos/badges
   falsos. Nada de todo centrado por defecto. Nada de secciones vacías de relleno. Nada de stock genérico
-  (solo las fotos que se te indiquen). Nada de emojis como iconos.
+  (solo las fotos que se te indiquen). Nada de emojis como iconos. Nada de logos, isotipos o monogramas
+  inventados, ni de fotos usadas como logo.
 `;
 
 export const OUTREACH_PROMPT = `

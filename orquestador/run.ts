@@ -15,10 +15,11 @@
 
 import "./env.ts"; // debe ir el PRIMERO: carga ../.env antes de evaluar el resto
 import { createClient } from "@supabase/supabase-js";
-import { BRIEF_PROMPT, BUILD_PROMPT, REVIEW_HIGHLIGHTS_PROMPT, DESIGN_SYSTEM } from "../supabase/functions/_shared/prompts.ts";
-import { llmJson, llmText, extractReviews, creativeModel } from "./llm.ts";
+import { BRIEF_PROMPT, REVIEW_HIGHLIGHTS_PROMPT } from "../supabase/functions/_shared/prompts.ts";
+import { llmJson, extractReviews, creativeModel } from "./llm.ts";
 import { fetchReviewsForPlace, placeIdFromLead, fetchPhotosForPlace } from "./reviews.ts";
-import { extractPhotoCandidates, curatePhotos, photoManifest } from "./photos.ts";
+import { extractPhotoCandidates } from "./photos.ts";
+import { composeBuildPrompt, leadPayload } from "./compose-build.ts";
 import { lovableBuild } from "./lovable.ts";
 import { analyzeSite } from "./analyze.ts";
 import { scoreExistingSites } from "./score-existing-sites.ts";
@@ -65,6 +66,8 @@ interface Lead {
   review_count?: number | null;
   google_place_id?: string | null;
   raw_json?: unknown;
+  website_url?: string | null;
+  facebook?: string | null;
   status: string;
 }
 
@@ -92,20 +95,6 @@ if (!DRY_RUN && !BOOKING_BASE) {
 
 // El Orquestador escribe con la SERVICE KEY (bypassa RLS). Nunca exponer esta clave en el frontend.
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
-
-// Payload compacto para el modelo (solo datos reales, sin inventar nada).
-function leadPayload(lead: Lead) {
-  return {
-    name: lead.name,
-    category: lead.category,
-    city: lead.city,
-    address: lead.address,
-    phone: lead.phone,
-    rating: lead.rating,
-    review_count: lead.review_count,
-    reviews: extractReviews(lead.raw_json),
-  };
-}
 
 // ─── PASO 1: Generar brief (barato — Sonnet/Haiku) ─────────────────────────────
 // Lee leads 'new', genera el brief y los pasa a 'analyzed'.
@@ -236,24 +225,12 @@ async function processBuild(lead: Lead): Promise<Outcome> {
     }
   }
 
-  // ── Curación por visión (Haiku): solo ganadoras, re-hospedadas. Fallback: sin fotos ────────────
-  const curated = DRY_RUN
-    ? { hero: null, gallery: [] as string[] }
-    : await curatePhotos(supabase, lead.id, extractPhotoCandidates(lead.raw_json), {
-        name: lead.name,
-        category: lead.category ?? null,
-        city: lead.city ?? null,
-      });
-
+  // ── Fotos curadas (Haiku visión) + marca real (logo y colores de su web) + build-prompt (Sonnet) ──
   const bookingUrl = `${BOOKING_BASE.replace(/\/$/, "")}/${lead.id}`;
-  const variablePrompt = await llmText(
-    BUILD_PROMPT.replaceAll("{{BOOKING_URL}}", bookingUrl),
-    { brief, business: leadPayload(lead), photos: { hero: curated.hero != null, gallery: curated.gallery.length } },
-    2800, // tope holgado: transcribir 6-8 reseñas reales (autor + estrellas + texto) + resto de secciones sin truncar el CTA/badge del final
+  const { buildPrompt, curated, brand } = await composeBuildPrompt(
+    supabase, lead, brief as unknown as Record<string, unknown>, bookingUrl, DRY_RUN,
   );
-  // Prompt final a Lovable = parte variable (Sonnet) + manifiesto de fotos + design-system invariante.
-  const buildPrompt = `${variablePrompt}\n\n${photoManifest(curated)}\n\n${DESIGN_SYSTEM}`;
-  console.log(`  · build-prompt listo (${buildPrompt.length} chars; fotos: hero=${curated.hero != null}, galería=${curated.gallery.length}), reserva → ${bookingUrl}`);
+  console.log(`  · build-prompt listo (${buildPrompt.length} chars; fotos: hero=${curated.hero != null}, galería=${curated.gallery.length}; logo=${brand?.logoUrl != null}), reserva → ${bookingUrl}`);
 
   if (DRY_RUN) {
     console.log("  · DRY-RUN: no se construye en Lovable ni se escribe en `sites`.");

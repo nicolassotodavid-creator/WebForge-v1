@@ -12,7 +12,8 @@ export async function rehostToBucket(
 ): Promise<string | null> {
   if (!url) return null;
   try {
-    const res = await fetch(url);
+    // Con user-agent de navegador: algunos CDN de webs de negocio (website-editor.net) dan 403 sin él.
+    const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" } });
     if (!res.ok) {
       console.warn(`  ⚠ imagen HTTP ${res.status} (${url.slice(0, 60)}…) — no re-hospedada`);
       return null;

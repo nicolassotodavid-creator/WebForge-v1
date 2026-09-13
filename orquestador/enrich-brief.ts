@@ -34,6 +34,7 @@ import { createClient } from "@supabase/supabase-js";
 import { BRIEF_PROMPT, REVIEW_HIGHLIGHTS_PROMPT } from "../supabase/functions/_shared/prompts.ts";
 import { llmJson, extractReviews, ORQUESTADOR_MODEL } from "./llm.ts";
 import { placeIdFromLead } from "./reviews.ts";
+import { businessFacts, type FactsLeadInput } from "./facts.ts";
 
 const APIFY_ACTOR = "compass~crawler-google-places";
 const APIFY_SYNC = `https://api.apify.com/v2/acts/${APIFY_ACTOR}/run-sync-get-dataset-items`;
@@ -311,17 +312,8 @@ async function main() {
     result = { ...latest, highlights_from_reviews: list };
   } else {
     const payload = {
-      name: lead.name,
-      category: categoryName,
-      categories: raw.categories ?? [],
-      city: lead.city,
-      address: lead.address,
-      phone: lead.phone,
-      rating: lead.rating,
-      review_count: lead.review_count,
-      google_description: raw.description ?? null,
-      opening_hours: raw.openingHours ?? null,
-      reviews,
+      // Hechos reales de la ficha: categorías, horario en 24 h, pagos/cita previa, barrio, Maps, WhatsApp.
+      ...businessFacts({ ...(lead as unknown as FactsLeadInput), category: categoryName }, raw, reviews),
       // Texto REAL de la web del negocio: de aquí salen los servicios concretos en vez de perífrasis.
       website_excerpt: siteText || null,
     };
