@@ -506,6 +506,45 @@ async function ensureBuilt(token: string, projectId: string): Promise<void> {
   console.log("  · plan aprobado: la web ya tiene contenido.");
 }
 
+// ── después del deploy: esperar a la versión nueva ────────────────────────────
+
+// deploy_project responde antes de que la URL pública sirva la versión nueva: durante unos minutos sigue
+// saliendo la anterior (en un build nuevo, la plantilla "Lovable App"). Si en ese hueco se pide la captura
+// o se puntúa la web, se guardan la captura en blanco (la que va en los emails) y un 3/10 falso. Lote de
+// talleres del 13-sep: 9 de 9.
+const LIVE_WAIT_MS = 4 * 60_000;
+
+/** Espera a que la URL pública deje de servir la plantilla vacía. false si no llega a tiempo. */
+async function waitForLive(liveUrl: string): Promise<boolean> {
+  const deadline = Date.now() + LIVE_WAIT_MS;
+  while (Date.now() < deadline) {
+    try {
+      const url = `${liveUrl}${liveUrl.includes("?") ? "&" : "?"}cb=${Date.now()}`;
+      const res = await fetchWithTimeout(url, { headers: { "user-agent": "Mozilla/5.0" } }, 20_000, "web publicada");
+      const html = await res.text();
+      if (res.ok && !/<title>\s*Lovable App\s*<\/title>/i.test(html) && !html.includes("blank-app")) return true;
+    } catch { /* red: reintentar */ }
+    await sleep(10_000);
+  }
+  console.warn(`  ⚠ ${liveUrl} sigue sirviendo la plantilla tras ${LIVE_WAIT_MS / 60_000} min`);
+  return false;
+}
+
+/** Captura del commit ACTUAL del proyecto (la URL lleva "id-preview-<sha8>--"). undefined si no llega a
+ *  tiempo: mejor sin captura (backfill-previews la rellena luego) que con la de la versión anterior. */
+async function freshScreenshot(token: string, projectId: string): Promise<string | undefined> {
+  const deadline = Date.now() + LIVE_WAIT_MS;
+  while (Date.now() < deadline) {
+    const proj = (await mcpCall(token, "get_project", { project_id: projectId }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
+    const sha = String(proj?.latest_commit_sha ?? "").slice(0, 8);
+    const shot = pickScreenshot(proj);
+    if (shot && (!sha || shot.includes(sha))) return shot;
+    await sleep(POLL_MS);
+  }
+  console.warn(`  ⚠ Lovable no generó la captura del último commit a tiempo — se deja sin captura`);
+  return undefined;
+}
+
 // ── export principal ──────────────────────────────────────────────────────────
 
 export async function lovableBuild(
@@ -564,10 +603,10 @@ export async function lovableBuild(
   const { url: liveUrl, isPreview } = await extractPublicUrl(token, projectId, deployed);
   console.log(`  · publicado en ${elapsed()}: ${liveUrl}${isPreview ? " (preview, no publicada)" : ""}`);
 
-  // 5. Captura del build (la re-hospeda el orquestador para la preview de /book). Se pide DESPUÉS de
-  //    ensureBuilt: la del paso 2 puede ser la de la plantilla en blanco.
-  const proj = (await mcpCall(token, "get_project", { project_id: projectId }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
-  const screenshotUrl = pickScreenshot(deployed) ?? pickScreenshot(proj);
+  // 5. Esperar a que la URL sirva la versión nueva (el scoring del llamador la lee) y quedarse con la
+  //    captura del commit actual (la re-hospeda el orquestador para /book y los emails).
+  if (!isPreview) await waitForLive(liveUrl);
+  const screenshotUrl = await freshScreenshot(token, projectId);
 
   return { projectId, liveUrl, isPreview, screenshotUrl };
 }
@@ -602,9 +641,9 @@ export async function lovableUpdate(
   const { url: liveUrl, isPreview } = await extractPublicUrl(token, projectId, deployed);
   console.log(`  · re-publicado en ${elapsed()}: ${liveUrl}${isPreview ? " (preview, no publicada)" : ""}`);
 
-  // 4. Captura tras la edición (puede tardar en regenerarse; el caller decide si esperar una nueva).
-  const proj = (await mcpCall(token, "get_project", { project_id: projectId }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
-  const screenshotUrl = pickScreenshot(deployed) ?? pickScreenshot(proj);
+  // 4. Versión nueva servida + captura del commit actual (ver waitForLive / freshScreenshot).
+  if (!isPreview) await waitForLive(liveUrl);
+  const screenshotUrl = await freshScreenshot(token, projectId);
 
   return { projectId, liveUrl, isPreview, screenshotUrl };
 }
