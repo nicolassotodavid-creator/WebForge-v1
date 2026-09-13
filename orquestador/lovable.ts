@@ -433,6 +433,79 @@ export async function fetchProjectScreenshot(projectId: string): Promise<string 
   return pickScreenshot(proj);
 }
 
+// ── plantilla en blanco / plan sin aprobar ───────────────────────────────────
+
+// Desde sep-2026 el agente de Lovable a veces responde al primer mensaje con un PLAN (.lovable/plan.md +
+// plan--show) y se para sin tocar código: el proyecto queda "completed" con la plantilla en blanco y
+// publicábamos una web vacía (lote de talleres del 13-sep, 9 de 9). Se le pide construir directamente y,
+// si aun así deja la plantilla, se aprueba el plan con un segundo mensaje.
+const DIRECT_BUILD_NOTE =
+  "\n\nIMPORTANTE: construye la web completa directamente en este turno. No uses modo plan, no escribas un plan ni pidas aprobación.";
+const APPROVE_PLAN_MESSAGE =
+  "Plan aprobado. Implementa ahora la web completa tal como se describe en el primer mensaje (todas las secciones, fotos, marca, carrusel, contacto y badge flotante, con el sistema de diseño). No vuelvas a pedir aprobación: construye directamente.";
+// Marca que Lovable pone en el index.tsx de la plantilla vacía.
+const BLANK_PLACEHOLDER = "data-lovable-blank-page-placeholder";
+
+/** Envía un mensaje al agente y espera a que termine (get_message si el servidor agota sus 600 s).
+ *  NO se reintenta el envío: reenviar duplicaría el gasto de créditos del agente. */
+async function sendMessageAndWait(token: string, projectId: string, message: string): Promise<void> {
+  const sent = (await mcpCall(token, "send_message", {
+    project_id:      projectId,
+    message,
+    wait:            true,
+    timeout_seconds: 600,
+  }, CREATE_TIMEOUT_MS)) as Record<string, unknown>;
+
+  const sentStatus = String(sent?.status ?? "").toLowerCase();
+  const messageId = String(sent?.message_id ?? sent?.messageId ?? "");
+  if (FAIL_STATUSES.includes(sentStatus)) {
+    throw new Error(`Mensaje a Lovable falló (status=${sentStatus}): ${JSON.stringify(sent).slice(0, 300)}`);
+  }
+  if (IN_PROGRESS_STATUSES.includes(sentStatus) && messageId) {
+    const deadline = Date.now() + BUILD_DEADLINE_MS;
+    process.stdout.write("  · agente aún trabajando; esperando con get_message");
+    for (;;) {
+      if (Date.now() >= deadline) {
+        throw new Error(`Timeout (${Math.round(BUILD_DEADLINE_MS / 60_000)} min) esperando al agente de Lovable (${projectId})`);
+      }
+      await sleep(POLL_MS);
+      process.stdout.write(".");
+      const msg = (await mcpCall(token, "get_message", {
+        project_id: projectId,
+        message_id: messageId,
+      }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
+      const st = String(msg?.status ?? "").toLowerCase();
+      if (DONE_STATUSES.includes(st)) break;
+      if (FAIL_STATUSES.includes(st)) {
+        throw new Error(`Mensaje a Lovable falló (status=${st}): ${JSON.stringify(msg).slice(0, 300)}`);
+      }
+    }
+    process.stdout.write("\n");
+  }
+}
+
+/** ¿El proyecto sigue con la página de la plantilla vacía? Si no se puede leer, no bloquea (false). */
+async function isBlankScaffold(token: string, projectId: string): Promise<boolean> {
+  try {
+    const content = await mcpCall(token, "read_file", { project_id: projectId, path: "src/routes/index.tsx" }, SHORT_TIMEOUT_MS, 2);
+    return String(typeof content === "string" ? content : JSON.stringify(content)).includes(BLANK_PLACEHOLDER);
+  } catch (e) {
+    console.warn(`  ⚠ no se pudo comprobar si la web quedó en blanco: ${e instanceof Error ? e.message : e}`);
+    return false;
+  }
+}
+
+/** Si Lovable dejó la plantilla en blanco, aprueba el plan y espera la construcción. Lanza si sigue vacía. */
+async function ensureBuilt(token: string, projectId: string): Promise<void> {
+  if (!(await isBlankScaffold(token, projectId))) return;
+  console.warn("  ⚠ Lovable dejó la plantilla en blanco (plan sin aprobar) — aprobando y construyendo…");
+  await sendMessageAndWait(token, projectId, APPROVE_PLAN_MESSAGE);
+  if (await isBlankScaffold(token, projectId)) {
+    throw new Error(`Lovable no construyó la web (${projectId}): la plantilla sigue en blanco tras aprobar el plan`);
+  }
+  console.log("  · plan aprobado: la web ya tiene contenido.");
+}
+
 // ── export principal ──────────────────────────────────────────────────────────
 
 export async function lovableBuild(
@@ -457,7 +530,7 @@ export async function lovableBuild(
     const created = (await mcpCall(token, "create_project", {
       workspace_id:    workspaceId,
       // Lovable renombró este parámetro: antes `prompt`, ahora `initial_message` (requerido).
-      initial_message: buildPrompt,
+      initial_message: `${buildPrompt}${DIRECT_BUILD_NOTE}`,
       wait:            true,
       timeout_seconds: 600,
     }, CREATE_TIMEOUT_MS)) as Record<string, unknown>;
@@ -474,8 +547,11 @@ export async function lovableBuild(
 
   // 2. Confirmar que el build está listo. Robusto aunque create_project devuelva antes de
   //    terminar (build > 600 s → status 'in_progress').
-  const built = await waitForBuild(token, projectId);
+  await waitForBuild(token, projectId);
   process.stdout.write(`\n  · build listo en ${elapsed()}\n`);
+
+  // 2b. Que no sea la plantilla en blanco (plan de Lovable sin aprobar): si lo es, aprobar y construir.
+  await ensureBuilt(token, projectId);
 
   // 3. Publicar (deploy) con slug estable y único (descripción + sufijo, ≤45 chars) y reintentos.
   const deploySlug = composeDeploySlug(description, opts.slugSuffix);
@@ -488,8 +564,10 @@ export async function lovableBuild(
   const { url: liveUrl, isPreview } = await extractPublicUrl(token, projectId, deployed);
   console.log(`  · publicado en ${elapsed()}: ${liveUrl}${isPreview ? " (preview, no publicada)" : ""}`);
 
-  // 5. Captura del build (la re-hospeda el orquestador para la preview de /book)
-  const screenshotUrl = pickScreenshot(built) ?? pickScreenshot(deployed);
+  // 5. Captura del build (la re-hospeda el orquestador para la preview de /book). Se pide DESPUÉS de
+  //    ensureBuilt: la del paso 2 puede ser la de la plantilla en blanco.
+  const proj = (await mcpCall(token, "get_project", { project_id: projectId }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
+  const screenshotUrl = pickScreenshot(deployed) ?? pickScreenshot(proj);
 
   return { projectId, liveUrl, isPreview, screenshotUrl };
 }
@@ -510,44 +588,10 @@ export async function lovableUpdate(
   const t0 = Date.now();
   const elapsed = () => `${Math.round((Date.now() - t0) / 1000)}s`;
 
-  // 1. Mensaje de edición al agente (bloquea hasta terminar o hasta el timeout del servidor).
-  //    NO se reintenta: reenviar duplicaría el gasto de créditos del agente.
-  const sent = (await mcpCall(token, "send_message", {
-    project_id:      projectId,
-    message,
-    wait:            true,
-    timeout_seconds: 600,
-  }, CREATE_TIMEOUT_MS)) as Record<string, unknown>;
-
-  // 2. Si el servidor agotó sus 600 s con el agente aún trabajando, seguimos con get_message
-  //    (idempotente, sí se reintenta) hasta el deadline global del build.
-  const sentStatus = String(sent?.status ?? "").toLowerCase();
-  const messageId = String(sent?.message_id ?? sent?.messageId ?? "");
-  if (FAIL_STATUSES.includes(sentStatus)) {
-    throw new Error(`Edición de Lovable falló (status=${sentStatus}): ${JSON.stringify(sent).slice(0, 300)}`);
-  }
-  if (IN_PROGRESS_STATUSES.includes(sentStatus) && messageId) {
-    const deadline = Date.now() + BUILD_DEADLINE_MS;
-    process.stdout.write("  · agente aún trabajando; esperando con get_message");
-    for (;;) {
-      if (Date.now() >= deadline) {
-        throw new Error(`Timeout (${Math.round(BUILD_DEADLINE_MS / 60_000)} min) esperando la edición de Lovable (${projectId})`);
-      }
-      await sleep(POLL_MS);
-      process.stdout.write(".");
-      const msg = (await mcpCall(token, "get_message", {
-        project_id: projectId,
-        message_id: messageId,
-      }, SHORT_TIMEOUT_MS, 2)) as Record<string, unknown>;
-      const st = String(msg?.status ?? "").toLowerCase();
-      if (DONE_STATUSES.includes(st)) break;
-      if (FAIL_STATUSES.includes(st)) {
-        throw new Error(`Edición de Lovable falló (status=${st}): ${JSON.stringify(msg).slice(0, 300)}`);
-      }
-    }
-    process.stdout.write("\n");
-  }
+  // 1-2. Mensaje de edición al agente y espera hasta que termine.
+  await sendMessageAndWait(token, projectId, message);
   console.log(`  · edición aplicada en ${elapsed()}`);
+  await ensureBuilt(token, projectId);
 
   // 3. Re-publicar con el slug indicado (el actual → misma URL pública).
   const deployed = (await mcpCall(token, "deploy_project", {
