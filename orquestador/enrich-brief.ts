@@ -204,8 +204,14 @@ function gate(brief: BriefRow, others: { name: string; brief: BriefRow }[]): str
   const pk = paletteKey(brief);
   for (const o of others) {
     if (pk && pk === paletteKey(o.brief)) problems.push(`paleta CLÓNICA de "${o.name}" (${pk})`);
-    const shared = svc.filter((n) => svcNames(o.brief).includes(n));
-    if (shared.length >= 2) problems.push(`servicios clónicos de "${o.name}": ${shared.join(", ")}`);
+    // Dos negocios del mismo sector comparten nombres de servicio por fuerza ("chapa y pintura",
+    // "mecánica general"): con el umbral de 2 daban FAIL todos los talleres (13-sep-2026). Clon =
+    // casi todo el catálogo idéntico: al menos 3 servicios y ≥75 % del catálogo más corto.
+    const otherSvc = svcNames(o.brief);
+    const shared = svc.filter((n) => otherSvc.includes(n));
+    if (shared.length >= 3 && shared.length >= Math.ceil(0.75 * Math.min(svc.length, otherSvc.length))) {
+      problems.push(`servicios clónicos de "${o.name}": ${shared.join(", ")}`);
+    }
   }
   return problems;
 }
