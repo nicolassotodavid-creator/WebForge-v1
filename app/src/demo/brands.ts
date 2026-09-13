@@ -256,6 +256,82 @@ export const BRANDS: Brand[] = [
     web: "https://www.multiserviciosamlevante.es", logo: "/demo/logos/multiservicios-am-levante.jpeg",
     primary: "#008429", secondary: "#074d89",
   },
+  // Lote 4 (13-sep): lo mejor que quedaba de las auditorías.
+  {
+    slug: "ecerotres", empresa: "Ecerotres Arquitectos", ciudad: "Alboraya",
+    web: "https://ecerotresarquitectos.com", logo: "/demo/logos/ecerotres.png", logoOnDark: true,
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "extramurs", empresa: "extraMURS Arquitectura", ciudad: "Alboraya",
+    web: "https://extramurs.com", logo: "/demo/logos/extramurs.svg",
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "proyecta-lara", empresa: "Proyecta Lara", ciudad: "Paterna",
+    web: "https://proyectalara.es", logo: "/demo/logos/proyecta-lara.png",
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "construcciones-olbe", empresa: "Construcciones OLBE", ciudad: "Aldaia",
+    web: "https://www.construccionesolbe.com", logo: "/demo/logos/construcciones-olbe.png",
+    primary: "#a06c09", secondary: "#f4b63f",
+  },
+  {
+    slug: "clurjor", empresa: "Construcciones y Reformas Clurjor", ciudad: "Aldaia",
+    web: "http://www.clurjor.com", logo: "/demo/logos/clurjor.png",
+    primary: "#98203f", secondary: "#1a1a1a",
+  },
+  {
+    slug: "nca-interiores", empresa: "NCA Interiores", ciudad: "Alaquàs",
+    web: "https://ncainteriores.es", logo: "/demo/logos/nca-interiores.svg",
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "obralis", empresa: "Obralis", ciudad: "València",
+    web: "https://obralis.es", logo: "/demo/logos/obralis.png",
+    primary: "#a76807", secondary: "#f59a10",
+  },
+  {
+    slug: "mesform", empresa: "Mesform Interiorismo", ciudad: "Cullera",
+    web: "https://www.mesform.es", logo: "/demo/logos/mesform.png",
+    primary: "#3f853d", secondary: "#469544",
+  },
+  {
+    slug: "tres-i-tres", empresa: "Tres i Tres Interiorismo", ciudad: "Paterna",
+    web: "https://3itres.com", logo: "/demo/logos/tres-i-tres.png",
+    primary: "#6d004a", secondary: "#9d9fa0",
+  },
+  {
+    slug: "escriva-sanjuan", empresa: "Reformas Escrivá Sanjuan", ciudad: "Gandia",
+    web: "https://escrivasanjuan.com", logo: "/demo/logos/escriva-sanjuan.png",
+    primary: "#c22227", secondary: "#2d2d2c",
+  },
+  {
+    slug: "mya-instaladores", empresa: "M&A Instaladores", ciudad: "Torrent",
+    web: "https://myainstaladores.com", logo: "/demo/logos/mya-instaladores.png",
+    primary: "#2a7bba", secondary: "#318bd1",
+  },
+  {
+    slug: "vimoa", empresa: "Vimoa", ciudad: "Burjassot",
+    web: "https://vimoa.es", logo: "/demo/logos/vimoa.png",
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "dluxesolutions", empresa: "DLUXE Solutions · Reformas en Oliva", ciudad: "Oliva",
+    web: "https://reformasenoliva.es", logo: "/demo/logos/dluxesolutions.png", logoOnDark: true,
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "salvicar", empresa: "Construcciones y Reformas Salvicar", ciudad: "Carlet",
+    web: "https://reformas.salvicar.com", logo: "",
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "obraestil", empresa: "ObraEstil", ciudad: "Ontinyent",
+    web: "https://obraestil.es", logo: "/demo/logos/obraestil.png",
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
 ];
 
 export const findBrand = (slug: string | undefined): Brand | undefined =>

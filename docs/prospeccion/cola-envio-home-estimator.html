@@ -240,9 +240,9 @@
   <header class="masthead">
     <p class="eyebrow">Prospección · reformas València · actualizado 13 sep 2026</p>
     <h1>Cola de envío Home Estimator</h1>
-    <p class="standfirst">Cuarenta y cinco empresas de reformas ordenadas por Home Estimator Score. El lote 1 salió el 25 de agosto por formulario; los lotes 2 y 3 están arriba, con el mensaje listo para pegar. El lote 3 sale de la auditoría del 13 de septiembre (la Safor y la Ribera).</p>
+    <p class="standfirst">Sesenta empresas de reformas ordenadas por Home Estimator Score. El lote 1 salió el 25 de agosto por formulario; los lotes 2, 3 y 4 están arriba, con el mensaje listo para pegar. El lote 3 sale de la auditoría del 13 de septiembre (la Safor y la Ribera); el 4, de lo mejor que quedaba de las auditorías.</p>
     <div class="meter">
-      <span class="meter-count" id="meter">15 / 45</span>
+      <span class="meter-count" id="meter">15 / 60</span>
       <span class="meter-label">enviadas</span>
     </div>
   </header>
@@ -255,6 +255,11 @@
   <section class="notice">
     <h2>Lote 3: 15 más, montado el 13/09</h2>
     <p>Diez de la Safor y la Ribera (auditoría del 13/09) y cinco fichas A que quedaban de agosto, cada una con su demo de marca. <strong>Estil Nou Miravet</strong> no tiene formulario: va por WhatsApp. <strong>Aquí tu Reforma</strong> se cayó al revisar (cadena nacional con franquicias y su propio formulario de 7 pasos); entra en su lugar <strong>Reformas Génesis</strong>, la primera reserva. Descartadas antes: Cocinas Levante (ya tiene web de WebForge) y Tu Reforma Mola (ya tiene calculadora).</p>
+  </section>
+
+  <section class="notice">
+    <h2>Lote 4: lo que quedaba de las auditorías</h2>
+    <p>Quince fichas de score 6,5 a 5,5, casi la mitad de clase B (estudios de arquitectura e interiorismo que también reforman). El score no está validado: el lote 1, con los mejores, dio cero respuestas, así que esto es sobre todo más muestra. Se cayeron al revisar <strong>Gala Projectes</strong> (almacén de materiales), <strong>Ruiz Construcciones</strong> (contacto 404) y <strong>Reformas Moncada</strong> (sin formulario). Después de este lote ya no queda nada bueno sin enviar: hace falta buscar en otra provincia.</p>
   </section>
 
   <ol class="queue" id="queue"></ol>
@@ -310,6 +315,21 @@
     "sacaber": "Reformas Sacaber",
     "ramirez-castaneda": "Construcciones y Reformas Ramírez Castañeda",
     "multiservicios-am-levante": "Multiservicios AM Levante",
+    "ecerotres": "Ecerotres Arquitectos",
+    "extramurs": "extraMURS",
+    "proyecta-lara": "Proyecta Lara",
+    "construcciones-olbe": "Construcciones OLBE",
+    "clurjor": "Clurjor",
+    "nca-interiores": "NCA Interiores",
+    "obralis": "Obralis",
+    "mesform": "Mesform",
+    "tres-i-tres": "Tres i Tres",
+    "escriva-sanjuan": "Reformas Escrivá Sanjuan",
+    "mya-instaladores": "M&A Instaladores",
+    "vimoa": "Vimoa",
+    "dluxesolutions": "DLUXE Solutions",
+    "salvicar": "Salvicar",
+    "obraestil": "ObraEstil",
   };
 
   const CIERRE = "Son solo dos minutos y sin compromiso.";
@@ -540,6 +560,82 @@
       contacto: "https://www.multiserviciosamlevante.es/contactanos",
       msg: 'Hacéis reformas integrales y ofrecéis presupuesto sin compromiso, pero hasta saber si el proyecto es real el compromiso lo ponéis vosotros: llamadas, visita, medición y preparar el presupuesto. Por la web solo os llegan unos datos y un mensaje. He montado una demo con vuestra marca para enseñaros cómo entender el proyecto antes de dedicarle ese tiempo: ',
       flags: ["También tiene WhatsApp (+34 623 26 65 67), por si el formulario falla."] },
+
+    // ---- Lote 4 (13-sep): lo mejor que quedaba de las auditorías (score 6,5–5,5) ----
+    { n: 46, slug: "ecerotres", empresa: "Ecerotres Arquitectos", score: "6.5",
+      contacto: "https://ecerotresarquitectos.com/contacto/",
+      msg: 'En vuestra web explicáis bien el método: mediciones por partidas, presupuesto de obra, plan de obra y plazos. Pero antes de llegar ahí, el formulario solo os deja nombre, correo, teléfono y un mensaje, y cada solicitud empieza con una conversación para saber qué quiere reformar el cliente, cuántos metros tiene y con qué presupuesto cuenta. He montado una demo con vuestra marca para enseñaros cómo podría llegaros ese primer paso ya hecho: ',
+      flags: ["Clase B: estudio de arquitectura que hace reformas íntegras de vivienda y locales (56 reseñas, 4,9)."] },
+
+    { n: 47, slug: "extramurs", empresa: "extraMURS Arquitectura", score: "6.5",
+      contacto: "https://extramurs.com/contacto/",
+      msg: 'Vuestro blog responde cuánto cuesta construir una casa o una licencia de obra, y ofrecéis calcular una estimación de precio y plazos. Pero quien llega al formulario solo puede contaros en "¿Qué necesitas?" lo que tiene en mente, y esa estimación la preparáis vosotros después, a mano. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada, con metros, alcance, plazo e inversión: ',
+      flags: ["Clase B: constructora y estudio de arquitectura, con obra nueva además de reformas."] },
+
+    { n: 48, slug: "proyecta-lara", empresa: "Proyecta Lara", score: "6.5",
+      contacto: "https://proyectalara.es/",
+      msg: 'Prometéis reformas llave en mano con plazo y presupuesto cerrado, ajustadas a lo que puede invertir cada cliente. Pero para pediros información, en la web solo se puede dejar un email y poco más: no sabéis qué quiere reformar, cuántos metros tiene ni con cuánto cuenta hasta que habláis con él. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada proyecto ya definido: ',
+      flags: ["Clase B: estudio de interiorismo. El formulario está al pie de la home (email y un campo más) y lleva reCAPTCHA; la página «Contacta con nosotros» no tiene formulario."] },
+
+    { n: 49, slug: "construcciones-olbe", empresa: "Construcciones OLBE", score: "6.5",
+      contacto: "https://construccionesolbe.com/",
+      msg: 'Hacéis desde obra pequeña, una cocina o un baño, hasta reformas integrales llave en mano y trabajos en fincas, y todo os llega por el mismo formulario de nombre, email y mensaje. Hasta que no habláis con el cliente no sabéis cuál de todos es ni si merece la pena ir a verlo. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada solicitud ya explicada: ',
+      flags: ["El formulario está al final de la home (no hay página de contacto aparte). El email de su ficha es de otro dominio (construccionesoliver.es): usa el formulario."] },
+
+    { n: 50, slug: "clurjor", empresa: "Construcciones y Reformas Clurjor", score: "6.5",
+      contacto: "http://clurjor.com/contacto/",
+      msg: 'Vuestro formulario pregunta "¿Qué necesitas?" y "Explícanos un poco más", que ya es más que muchos. Pero ahí cabe igual un baño que un local entero, y los metros, el plazo o la inversión los tenéis que sacar después, llamada a llamada. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["Hacen también obra nueva, locales y naves: la reforma de vivienda es una parte."] },
+
+    { n: 51, slug: "nca-interiores", empresa: "NCA Interiores", score: "6.5",
+      contacto: "https://ncainteriores.es/contacto/",
+      msg: 'Ya enseñáis la cocina en un 3D realista antes de hacerla, así que vuestro cliente entiende el valor de saber cómo quedará antes de decidir. Pero para llegar a ese punto la solicitud sigue siendo nombre, teléfono y un comentario, y las medidas, el alcance y la inversión los recogéis vosotros después. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada proyecto ya explicado: ',
+      flags: ["Clase B: cocinas, armarios y carpintería a medida más que reforma integral. El formulario lleva reCAPTCHA."] },
+
+    { n: 52, slug: "obralis", empresa: "Obralis", score: "6.5",
+      contacto: "https://obralis.es/contacto/",
+      msg: 'Vuestra web promete "Presupuesto Ahora" y un presupuesto ágil y gratis, pero el formulario pide nombre, teléfono, email y asunto, y después toca llamar y hacer la visita. El "ahora" empieza varios días más tarde. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada antes de coger el teléfono: ',
+      flags: ["No tiene email en la ficha. También tiene WhatsApp en la web, por si el formulario falla."] },
+
+    { n: 53, slug: "mesform", empresa: "Mesform Interiorismo", score: "6.0",
+      contacto: "https://www.mesform.es/contactame/",
+      msg: 'Hacéis desde muebles y vestidores a medida hasta reformas integrales, y vuestro "Contáctame" lo recibe todo igual: nombre, email y mensaje. Hasta que no habláis con el cliente no sabéis si es un armario o un piso entero. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada proyecto ya explicado: ',
+      flags: ["Clase B: interiorismo y carpintería a medida con reformas. El email de su ficha es de relleno (<code>contacto@ejemplo.com</code>); el real de su web es info@mesform.es. Usa el formulario."] },
+
+    { n: 54, slug: "tres-i-tres", empresa: "Tres i Tres Interiorismo", score: "6.0",
+      contacto: "https://3itres.com/contacto/",
+      msg: 'Ponéis mucho el foco en la gestión de plazos y en garantizar las fechas de entrega, pero cada "pídenos presupuesto" os llega como nombre, email, teléfono, asunto y mensaje. Los días que se van en entender qué quiere el cliente antes de presupuestar también cuentan en el plazo. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["Clase B: reformas e interiorismo. El formulario lleva reCAPTCHA."] },
+
+    { n: 55, slug: "escriva-sanjuan", empresa: "Reformas Escrivá Sanjuan", score: "6.0",
+      contacto: "https://escrivasanjuan.com/contacto",
+      msg: 'Lleváis más de 35 años haciendo reformas en Gandia y la Safor y ofrecéis presupuesto sin compromiso, pero el formulario pregunta nombre, email, teléfono y asunto, y nada de la reforma. Todo lo que determina el presupuesto lo averiguáis después. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada solicitud ya explicada: ',
+      flags: ["También tiene WhatsApp (+34 607 64 14 32), por si el formulario falla."] },
+
+    { n: 56, slug: "mya-instaladores", empresa: "M&A Instaladores", score: "6.0",
+      contacto: "https://myainstaladores.com/contacto/",
+      msg: 'Hacéis pladur, aislamiento y reformas integrales, y la web le pide al cliente que os "cuente su proyecto" en un mensaje. Luego sois vosotros los que tenéis que traducir ese texto a metros, trabajos y presupuesto antes de saber si merece la pena. He montado una demo con vuestra marca para enseñaros cómo podría llegaros ya estructurado: ',
+      flags: ["Clase B: pladur y aislamientos además de reformas."] },
+
+    { n: 57, slug: "vimoa", empresa: "Vimoa", score: "6.0",
+      contacto: "https://vimoa.es/contacto",
+      msg: 'Vuestro formulario de contacto pide solo un email y un mensaje, ni siquiera un teléfono. Y hacéis de todo, desde carpintería y armarios hasta reformas integrales, así que cada solicitud empieza con varios correos de ida y vuelta para saber qué quiere el cliente. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario lleva reCAPTCHA."] },
+
+    { n: 58, slug: "dluxesolutions", empresa: "DLUXE Solutions · Reformas en Oliva", score: "6.0",
+      contacto: "https://reformasenoliva.es/",
+      msg: 'Vuestra web dice "solicita tu presupuesto y sorpréndete con el precio", pero el formulario solo recoge nombre, email, teléfono, código postal y qué tipo de reforma quiere. La sorpresa llega después de llamar, medir y preparar el presupuesto. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada, con metros, alcance, plazo e inversión: ',
+      flags: ["El formulario está en la home. Solo 6 reseñas. También tiene WhatsApp (+34 679 37 36 75)."] },
+
+    { n: 59, slug: "salvicar", empresa: "Construcciones y Reformas Salvicar", score: "5.5",
+      contacto: "https://reformas.salvicar.com/contacto/",
+      msg: 'Vuestra web dice "Por fin, tenemos la solución para tus reformas" y que personalizáis cada proyecto y presupuesto. Pero para pedirlo, el cliente solo puede dejar nombre, email y un mensaje, después de resolver un captcha. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["El formulario lleva un código antispam de Jimdo que hay que teclear a mano."] },
+
+    { n: 60, slug: "obraestil", empresa: "ObraEstil", score: "5.5",
+      contacto: "https://obraestil.es/contact/",
+      msg: 'Os presentáis como especialistas en revestimientos, cocinas y baños, pero el formulario pide nombre, email, asunto y mensaje, sin teléfono ni nada de la obra. Cada solicitud empieza escribiendo al cliente para preguntarle lo básico. He montado una demo con vuestra marca para enseñaros cómo podría llegaros cada reforma ya explicada: ',
+      flags: ["<strong>Entra por Gala Projectes</strong>, que se cae: es almacén y tienda de materiales de carpintería, no empresa de reformas."] },
   ];
 
   const store = {
@@ -582,10 +678,11 @@
     meter.textContent = enviados + " / " + LEADS.length;
   }
 
-  // Primero lo pendiente (lote 2 y, a continuación, lote 3), debajo lo ya contactado (lote 1).
+  // Primero lo pendiente (lotes 2, 3 y 4, en orden), debajo lo ya contactado (lote 1).
   const GRUPOS = [
     { titulo: "Lote 2 · pendiente", leads: LEADS.filter((l) => !esEnviado(l) && l.n <= 30) },
-    { titulo: "Lote 3 · pendiente · Safor y Ribera", leads: LEADS.filter((l) => !esEnviado(l) && l.n > 30) },
+    { titulo: "Lote 3 · pendiente · Safor y Ribera", leads: LEADS.filter((l) => !esEnviado(l) && l.n > 30 && l.n <= 45) },
+    { titulo: "Lote 4 · pendiente · lo que quedaba de las auditorías", leads: LEADS.filter((l) => !esEnviado(l) && l.n > 45) },
     { titulo: "Lote 1 · enviado el " + ENVIADO_L1, leads: LEADS.filter(esEnviado) },
   ];
 
