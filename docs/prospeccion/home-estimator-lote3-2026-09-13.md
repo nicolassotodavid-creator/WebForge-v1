@@ -52,6 +52,25 @@ Arquitectos (Alboraya, 6.5 B, 56 reseñas), extraMURS Arquitectura (Alboraya, 6.
 - **Datos malos en la base** (fuera del top 15): MESFORM tiene email de relleno (`contacto@ejemplo.com`), Felipe
   Cebrià un email con errata y Gabriela Carbó un email distinto al de su web.
 
+## Montado (13-sep, tarde): demos, mensajes y cola
+
+En la cola como **31–45**, debajo del lote 2 ([cola-envio-home-estimator.html](cola-envio-home-estimator.html),
+hoja "Lote 3 (31-45)" del Excel y [home-estimator-outreach-31-45.csv](home-estimator-outreach-31-45.csv)).
+Las 15 demos `presupuestos.nico-soto.es/demo/<slug>` dan 200 con su nombre, y sus logos se sirven desde
+`www.nico-soto.es/demo/logos/`.
+
+- **Aquí tu Reforma (#12) se cae** al revisar el formulario: es una cadena nacional con tiendas y franquicias
+  ("Abre tu tienda", teléfonos de Barcelona y Madrid) y su `/presupuesto/` ya es un formulario propio de 7 pasos.
+  **Entra Reformas Génesis** (primera reserva) en el puesto 42, con formulario de 3 campos en la home.
+- **Captcha, comprobado en Chrome:** el formulario de la home de Pintores Nico y el de Antoine llevan reCAPTCHA;
+  Macamon, v3 invisible. En Renovat, Hidro2, Cuinex, Jesbal, Gytech y Multiservicios no hay captcha visible.
+  Jesbal da 403 a curl, pero en navegador carga normal.
+- **Logos blancos** (Renovat, Estil Nou): la demo de Lovable pinta el logo a 36 px sobre fondo claro, así que su
+  `logo_url` apunta a una versión sobre fondo oscuro (`*-fondo.png`). El de Génesis sale recortado de la cabecera
+  de su web (Blogger, sin logo suelto) y ya trae fondo negro.
+- Colores sacados del logo; donde el literal no aguantaba texto blanco (Renovat, Mestre, Jesbal, Génesis) el
+  `brand_color` es ese tono oscurecido hasta ≥ 4,5:1 y el literal va en `accent_color`.
+
 ## Descartadas en la auditoría de hoy (C)
 
 Construcciones Caren (obra nueva/pública), Finestres Fercu (solo ventanas), Avant Gestió Tècnica (arquitectura
