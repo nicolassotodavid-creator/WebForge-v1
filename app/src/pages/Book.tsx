@@ -22,6 +22,7 @@ interface BookingInfo {
   rating: number | null;
   review_count: number | null;
   contact_name: string | null;
+  has_website?: boolean | null;
 }
 
 // Contenido estático (idéntico al diseño de Nico) — igual para todos los negocios.
@@ -75,8 +76,9 @@ export default function Book() {
     if (leadId === "preview") {
       setInfo({
         business_name: "Talleres YuriCar", category: "taller", city: "Valencia",
-        live_url: "https://yuricars-landing-joy.lovable.app", preview_image_url: null,
-        rating: 4.9, review_count: 87, contact_name: "Yuri",
+        live_url: "https://yuricars-landing-joy.lovable.app",
+        preview_image_url: "https://khscikqchvjxyvoaruas.supabase.co/storage/v1/object/public/site-previews/d24a9295-ba22-4ba1-a3ef-c4ab32c44d3e.png",
+        rating: 4.6, review_count: 177, contact_name: "Yuri", has_website: true,
       });
       setLoading(false);
       return;
@@ -88,7 +90,11 @@ export default function Book() {
         setInfo(data as BookingInfo);
         supabase.functions.invoke("track-event", { body: { lead_id: leadId, type: "demo_viewed" } }).catch(() => {});
       })
-      .catch((e: Error) => setLoadError(e.message))
+      .catch((e: Error) => {
+        // El prospecto no tiene que ver "Edge Function returned a non-2xx status code".
+        console.error("get-booking-info:", e.message);
+        setLoadError("Este enlace no es válido o la propuesta ya no está disponible.");
+      })
       .finally(() => setLoading(false));
   }, [leadId]);
 
@@ -113,9 +119,16 @@ export default function Book() {
   const category = (info.category ?? "negocio").toLowerCase();
   const previewUrl = info.live_url ?? "#";
   const screenshotUrl = info.preview_image_url;
-  const rating = info.rating != null ? String(info.rating) : "4.9";
+  // Nota REAL de Google o nada: antes caía a "4.9" inventado si el lead no tenía nota, y decía
+  // "los clientes hablan bien de ti" también a negocios con 3,8.
+  const showRating = info.rating != null && info.rating >= 4.3;
+  const rating = info.rating != null ? info.rating.toLocaleString("es-ES", { maximumFractionDigits: 1 }) : "";
   const domainHint = domainHintFrom(businessName);
   const greeting = info.contact_name ? `Hola ${info.contact_name}, ` : "Hola, ";
+  // 9 de las 17 webs aprobadas son de negocios SIN web: a esos no se les dice que su web "no les hace justicia".
+  const intro = info.has_website === false
+    ? "estuve mirando negocios locales con buena reputación en Google que todavía no tienen web."
+    : "estuve mirando negocios locales con buena reputación en Google pero con una web que no les hace justicia.";
   const waDefault = whatsappLink(`Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quería preguntarte una cosa.`) ?? "#";
 
   const isPreview = !leadId || leadId === "preview";
@@ -194,7 +207,7 @@ export default function Book() {
             </h1>
 
             <p className="max-w-[44ch] text-[15px] leading-relaxed text-pretty opacity-80 mb-7 sm:text-base sm:mb-8 lg:text-lg">
-              {greeting}estuve mirando negocios locales con buena reputación en Google pero con una web que no les hace justicia. El tuyo me llamó la atención, así que me tomé la libertad de montarla. Si te gusta, es tuya.
+              {greeting}{intro} El tuyo me llamó la atención, así que me tomé la libertad de montarla. Si te gusta, es tuya.
             </p>
 
             <div className="flex flex-col gap-2.5 mb-10 sm:flex-row sm:gap-3 sm:mb-12 lg:mb-0">
@@ -230,7 +243,8 @@ export default function Book() {
           </Reveal>
         </section>
 
-        {/* TRUST — marquee */}
+        {/* TRUST — marquee (solo con nota real ≥ 4,3) */}
+        {showRating && (
         <section className="border-y border-ink/10 bg-ink text-paper py-5 overflow-hidden">
           <div className="flex w-max lv-marquee-track gap-12 whitespace-nowrap">
             {Array.from({ length: 2 }).map((_, dup) => (
@@ -247,6 +261,7 @@ export default function Book() {
             ))}
           </div>
         </section>
+        )}
 
         {/* OUTCOMES */}
         <section className="bg-ink text-paper px-5 pt-12 pb-8 sm:px-6 sm:pt-14 sm:pb-10 lg:pt-20 lg:pb-12">
@@ -448,7 +463,8 @@ export default function Book() {
         </section>
       </main>
 
-      <footer className="mx-auto max-w-6xl px-6 py-12 border-t border-ink/5 text-center lg:px-10">
+      {/* pb-24 en móvil: la barra fija de WhatsApp/Pagar tapaba el pie */}
+      <footer className="mx-auto max-w-6xl px-6 pt-12 pb-24 border-t border-ink/5 text-center lg:px-10 lg:pb-12">
         <p className="text-[10px] font-medium uppercase tracking-widest opacity-40 italic">Hecho a mano por {NICO_NAME} para {businessName}</p>
       </footer>
 

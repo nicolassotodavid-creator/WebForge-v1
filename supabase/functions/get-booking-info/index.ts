@@ -35,7 +35,7 @@ Deno.serve(async (req: Request) => {
 
   const { data: lead } = await supabase
     .from("leads")
-    .select("name, category, city, rating, review_count, contact_name")
+    .select("name, category, city, rating, review_count, contact_name, has_website")
     .eq("id", lead_id)
     .maybeSingle();
 
@@ -56,6 +56,8 @@ Deno.serve(async (req: Request) => {
     rating: lead.rating ?? null,
     review_count: lead.review_count ?? null,
     contact_name: lead.contact_name ?? null,
+    // /book adapta el saludo: no es lo mismo "tu web no te hace justicia" que "aún no tienes web".
+    has_website: lead.has_website ?? null,
     live_url: site?.live_url ?? null,
     preview_image_url: site?.preview_image_url ?? null,
   });
