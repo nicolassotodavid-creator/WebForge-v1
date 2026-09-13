@@ -111,7 +111,8 @@ muy saturadas de objetos y las de escaparate/mostrador desordenado. Incluye SOLO
 negocio —para clínicas de salud/estética son muy relevantes las INSTALACIONES, la APARATOLOGÍA/tecnología
 y el EQUIPO en contexto; para talleres, el TALLER por dentro (elevadores, zona de trabajo, cabina de
 pintura), la FACHADA con su rótulo y los TRABAJOS terminados—, y (b) seguras para publicar: NADA de caras identificables en primer plano
-(fuera fotos de pacientes y antes/después), capturas de pantalla, tiques, menús como texto, memes,
+(fuera fotos de pacientes), NADA de montajes antes/después, collages ni fotos con texto, flechas o marcas de
+agua sobreimpresos (en ningún sector), capturas de pantalla, tiques, menús como texto, memes,
 logotipos sueltos, carteles, flyers o imágenes con mucho texto (el logo se trata aparte), primeros planos
 de matrículas legibles, ni fotos borrosas u oscuras. Si ninguna cumple con confianza, devuelve { "order": [] }. Ante la duda,
 EXCLUYE (mejor sin foto que una foto mala).`;

@@ -258,7 +258,9 @@ logo_background = "dark" si el logo es blanco o muy claro y solo se lee sobre fo
 COLOR: primary = el color corporativo dominante del negocio. Si hay logo válido, sácalo del logo
 (color_source "logo"). Si no, SOLO si en las fotos se ve con claridad un color de marca propio y repetido
 (rótulo, fachada pintada, uniformes, toldo, vehículos rotulados del negocio), color_source "fotos". NUNCA el
-color del coche de un cliente, de una pared cualquiera, del cielo ni de productos de otras marcas. Blancos,
+color del coche de un cliente, de una pared cualquiera, del cielo ni de productos de otras marcas, y NUNCA de
+texto o gráficos sobreimpresos en la foto (etiquetas "ANTES"/"DESPUÉS", flechas, marcas de agua, collages o
+montajes editados): eso lo añadió quien editó la foto, no es la marca. Blancos,
 grises y negros no cuentan como color de marca. secondary = un segundo color de marca claro si existe; si no,
 null. Ante la duda, null: mejor sin color que con uno inventado. evidence = de dónde sale, en pocas palabras
 (p.ej. "verde del logo", "rótulo rojo de la fachada").`;
