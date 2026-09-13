@@ -28,20 +28,20 @@ interface BookingInfo {
 // Contenido estático (idéntico al diseño de Nico) — igual para todos los negocios.
 const OUTCOMES = [
   { title: "Captar clientes nuevos", body: "La gente que busca calidad está dispuesta a venir si tu imagen transmite confianza desde el primer clic." },
-  { title: "Mostrar servicios y precios", body: "Que vean qué hacéis y tarifas antes de decidirse." },
+  { title: "Mostrar lo que hacéis", body: "Que vean vuestros servicios y trabajos antes de decidirse." },
   { title: "Aparecer en Google", body: "Web optimizada para que te encuentren cuando alguien busca tu servicio en tu zona." },
 ];
 const INCLUDED = [
   { title: "Diseño exclusivo", body: "Hecho a medida para tu negocio, sin plantillas genéricas." },
   { title: "Optimización SEO local", body: "Apareces cuando buscan tu servicio en tu zona." },
-  { title: "Servicios y tarifas visibles", body: "Tus clientes ven qué ofreces y cuánto cuesta antes de contactar." },
+  { title: "Servicios bien explicados", body: "Tus clientes ven qué ofreces antes de contactar." },
   { title: "Reseñas de Google integradas", body: "Tus valoraciones reales, visibles desde el primer momento." },
   { title: "Carga ultra-rápida", body: "Web ligera que abre al instante en cualquier dispositivo." },
   { title: "Adaptado a móviles", body: "Se ve y funciona perfecto en cualquier pantalla." },
 ];
 const FAQ = [
   { q: "¿Y si no me gusta la web?", a: "Tienes 7 días de garantía total. Si no te convence, te devuelvo el dinero sin preguntas." },
-  { q: "¿Necesito saber de tecnología?", a: "Nada. Yo me encargo del dominio, hosting, correos y todo lo técnico. Tú solo me das el visto bueno." },
+  { q: "¿Necesito saber de tecnología?", a: "Nada. Yo me encargo del dominio, el hosting y todo lo técnico. Tú solo me das el visto bueno." },
   { q: "¿Es caro comparado con hacerla yo?", a: "Una agencia te cobra 1.500€ o más. Conmigo pagas 397€ + IVA una sola vez y la web es tuya para siempre." },
   { q: "¿Y si ya tengo web?", a: "La reemplazamos. Esta está optimizada para móvil, velocidad y Google — lo que probablemente la tuya no hace." },
   { q: "¿Hay cuotas mensuales?", a: "Ninguna. Es un pago único y la web es tuya. El hosting del primer año va incluido." },
