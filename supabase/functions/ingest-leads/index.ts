@@ -360,6 +360,27 @@ Deno.serve(async (req: Request) => {
   if (withPid.length) {
     const map = new Map<string, (typeof withPid)[number]>();
     for (const l of withPid) map.set(l.google_place_id as string, l);
+
+    // Un re-scrape NO puede borrar lo que ya sabíamos del lead. El actor corre sin contactos, así
+    // que trae email/WhatsApp vacíos, y si en Maps figura el Instagram, has_website=false. El
+    // upsert pisaba eso: el 13-sep TALLERES PRO CARS perdió su email (sacado de su web real) y
+    // quedó "sin web" siendo uno de los leads listos para enviar. Conservamos lo existente.
+    const { data: existing } = await supabase
+      .from("leads")
+      .select("google_place_id, email, whatsapp, facebook, has_website")
+      .in("google_place_id", [...map.keys()]);
+    for (const prev of existing ?? []) {
+      const next = map.get(prev.google_place_id as string);
+      if (!next) continue;
+      map.set(prev.google_place_id as string, {
+        ...next,
+        email: next.email ?? prev.email ?? null,
+        whatsapp: next.whatsapp ?? prev.whatsapp ?? null,
+        facebook: next.facebook ?? prev.facebook ?? null,
+        has_website: Boolean(next.has_website || prev.has_website),
+      });
+    }
+
     const { data, error } = await supabase
       .from("leads")
       .upsert([...map.values()], { onConflict: "google_place_id" })
