@@ -180,6 +180,82 @@ export const BRANDS: Brand[] = [
     web: "https://www.incoval.es", logo: "/demo/logos/incoval.png",
     primary: "#d14500", secondary: "#1e1916",
   },
+  // Lote 3 (13-sep): Safor y Ribera + fichas A de agosto.
+  {
+    slug: "renovat-reformas", empresa: "Renovat Reformas", ciudad: "Alzira",
+    web: "https://www.reformasrenovat.com", logo: "/demo/logos/renovat-reformas.png", logoOnDark: true,
+    primary: "#927204", secondary: "#f8c40c",
+  },
+  {
+    slug: "reformas-pintores-nico", empresa: "Reformas y Pintores Nico", ciudad: "Gandia",
+    web: "https://xn--reformaypintoresnicoespaa-woc.com", logo: "/demo/logos/reformas-pintores-nico.png",
+    primary: "#d44141", secondary: "#db5e5e",
+  },
+  {
+    slug: "mestre-reformas", empresa: "Mestre Reformas", ciudad: "Gandia",
+    web: "https://www.mestrereformas.com", logo: "/demo/logos/mestre-reformas.png",
+    primary: "#937138", secondary: "#c09a5b",
+  },
+  {
+    slug: "reformas-villa", empresa: "Reformas Villa", ciudad: "Cullera",
+    web: "https://www.reformasvilla.com", logo: "/demo/logos/reformas-villa.png",
+    primary: "#eb1412", secondary: "#3a3a44",
+  },
+  {
+    slug: "macamon-reformas", empresa: "Macamon Reformas Integrales", ciudad: "Gandia",
+    web: "https://macamoncho.es", logo: "/demo/logos/macamon-reformas.png",
+    primary: "#e2001a", secondary: "#1a171b",
+  },
+  {
+    slug: "hidro2-grup", empresa: "Hidro2 Grup", ciudad: "Gandia",
+    web: "https://www.hidro2grup.com", logo: "/demo/logos/hidro2-grup.png",
+    primary: "#312783", secondary: "#2daae1",
+  },
+  {
+    slug: "estil-nou-miravet", empresa: "Estil Nou Miravet", ciudad: "Algemesí",
+    web: "https://estilnoumiravet.com", logo: "/demo/logos/estil-nou-miravet.png", logoOnDark: true,
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "reformas-antoine", empresa: "Reformas Antoine", ciudad: "Gandia",
+    web: "https://reformasytrasterosantuine.com", logo: "/demo/logos/reformas-antoine.png",
+    primary: "#bf4e86", secondary: "#d07ea7",
+  },
+  {
+    slug: "cuinex", empresa: "Reformas integrales Cuinex", ciudad: "Alzira",
+    web: "https://www.cuinexreformas.es", logo: "/demo/logos/cuinex.png",
+    primary: "#d8241c", secondary: "#71706e",
+  },
+  {
+    slug: "jesbal-habitatge", empresa: "Jesbal Habitatge", ciudad: "Gandia",
+    web: "https://jesbalhabitatge.es", logo: "/demo/logos/jesbal-habitatge.jpg",
+    primary: "#b95e00", secondary: "#e47400",
+  },
+  {
+    slug: "gytech-group", empresa: "Gytech group", ciudad: "Llíria",
+    web: "https://gytechgroup.com", logo: "/demo/logos/gytech-group.png",
+    primary: "#0d589e", secondary: "#6c6c6d",
+  },
+  {
+    slug: "reformas-genesis", empresa: "Construcciones y Reformas Génesis", ciudad: "L'Eliana",
+    web: "https://www.reformasgenesis.com.es", logo: "/demo/logos/reformas-genesis.png", logoOnDark: true,
+    primary: "#88743b", secondary: "#b8a05c",
+  },
+  {
+    slug: "sacaber", empresa: "Reformas y Proyectos Sacaber", ciudad: "Torrent",
+    web: "http://sacaber.com", logo: "/demo/logos/sacaber.svg",
+    primary: "#0d1d5c", secondary: "#d96e3f",
+  },
+  {
+    slug: "ramirez-castaneda", empresa: "Construcciones y Reformas Ramírez Castañeda", ciudad: "Catarroja",
+    web: "https://www.xn--construccionesyreformasramirezcastaedasl-n2d.es", logo: "/demo/logos/ramirez-castaneda.png",
+    primary: "#a4150b", secondary: "#013e1c",
+  },
+  {
+    slug: "multiservicios-am-levante", empresa: "Multiservicios AM Levante", ciudad: "Picassent",
+    web: "https://www.multiserviciosamlevante.es", logo: "/demo/logos/multiservicios-am-levante.jpeg",
+    primary: "#008429", secondary: "#074d89",
+  },
 ];
 
 export const findBrand = (slug: string | undefined): Brand | undefined =>
