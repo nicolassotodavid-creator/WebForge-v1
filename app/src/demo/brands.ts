@@ -112,7 +112,7 @@ export const BRANDS: Brand[] = [
   {
     slug: "reformas-bailen", empresa: "Reformas Bailén", ciudad: "Paterna",
     web: "http://www.reformasbailen.es", logo: "/demo/logos/reformas-bailen.jpg",
-    primary: "#3f8a05", secondary: "#77fc04",
+    primary: "#3d8505", secondary: "#77fc04",
   },
   {
     slug: "grupo-g-reformas", empresa: "Grupo G Reformas", ciudad: "Sagunt",
@@ -143,7 +143,7 @@ export const BRANDS: Brand[] = [
   {
     slug: "bono-proyectos", empresa: "BONO PROYECTOS", ciudad: "Catarroja",
     web: "http://www.bonoproyectos.es", logo: "/demo/logos/bono-proyectos.jpg",
-    primary: "#de6f00", secondary: "#7e7e7e",
+    primary: "#b55b00", secondary: "#7e7e7e",
   },
   {
     slug: "vga-reformas", empresa: "VGA Proyectos y Reformas", ciudad: "Massamagrell",
@@ -158,12 +158,12 @@ export const BRANDS: Brand[] = [
   {
     slug: "grupo-expovall", empresa: "Valltro · Grupo Expovall", ciudad: "Puerto de Sagunto",
     web: "https://grupoexpovall.com", logo: "/demo/logos/grupo-expovall.png", logoOnDark: true,
-    primary: "#a87a00", secondary: "#e7a802",
+    primary: "#966d00", secondary: "#e7a802",
   },
   {
     slug: "cecever", empresa: "Reformas Cecever", ciudad: "Paterna",
     web: "https://www.cecever.com", logo: "/demo/logos/cecever.png", logoOnDark: true,
-    primary: "#b3760a", secondary: "#fcb62a",
+    primary: "#a06909", secondary: "#fcb62a",
   },
   {
     slug: "reformas-ferreira", empresa: "Reformas Ferreira", ciudad: "Manises",
@@ -178,7 +178,7 @@ export const BRANDS: Brand[] = [
   {
     slug: "incoval", empresa: "Incoval Reformas Integrales", ciudad: "València",
     web: "https://www.incoval.es", logo: "/demo/logos/incoval.png",
-    primary: "#e04a00", secondary: "#1e1916",
+    primary: "#d14500", secondary: "#1e1916",
   },
 ];
 
