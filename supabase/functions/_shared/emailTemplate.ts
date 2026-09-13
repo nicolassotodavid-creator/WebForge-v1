@@ -4,6 +4,8 @@
 // y píxel de apertura opcional. Email-safe: tablas + estilos inline, una columna.
 // Diseño: docs/superpowers/specs/2026-06-20-email-template-personal-design.md
 
+import { trackEmailLinks } from "./clickTracking.ts";
+
 // Identidad del remitente para el pie legal (LSSI Art. 10 + principio de transparencia
 // del RGPD: toda comunicación comercial debe identificar a quien la envía). Sobrescribible
 // por los callers vía la opción `senderIdentity` (p.ej. Deno.env.get("SENDER_LEGAL_IDENTITY"))
@@ -124,12 +126,15 @@ export interface RenderEmailOptions {
   // Enlace de baja con un clic (RFC 8058). Si viene, el pie muestra "Darte de baja" clicable
   // junto al "responde BAJA". La versión legible por máquina va en la cabecera List-Unsubscribe.
   unsubscribeUrl?: string | null;
+  // Seguimiento de clics (ver clickTracking.ts): si viene, los enlaces a la web, a /book y al
+  // WhatsApp del pie salen por <base>/<leadId>/<destino>. null/undefined (o base null) → enlaces directos.
+  clickTracking?: { base: string | null; leadId: string; messageId?: string | null } | null;
 }
 
 // Devuelve el HTML completo del email. NO añade firma (el cuerpo ya la trae) ni
 // botón de WhatsApp. Con captura → escaparate (captura enmarcada + 2 CTAs); sin
 // captura → texto plano + (enlace de compra opcional). Siempre: opt-out + píxel.
-export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY, unsubscribeUrl }: RenderEmailOptions): string {
+export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY, unsubscribeUrl, clickTracking }: RenderEmailOptions): string {
   const pixel = trackingPixelUrl
     ? `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`
     : "";
@@ -165,7 +170,7 @@ export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingU
       : "";
   }
 
-  return `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -195,4 +200,8 @@ export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingU
   </table>
 </body>
 </html>`;
+
+  return clickTracking?.base
+    ? trackEmailLinks(html, { ...clickTracking, base: clickTracking.base, webUrl, bookUrl: bookingUrl })
+    : html;
 }

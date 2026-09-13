@@ -3,12 +3,18 @@
 // GET  ?lead_id=&type=email_opened&message_id= → pixel 1x1 para tracking de aperturas.
 //
 // Tipos soportados:
-//   demo_viewed    → lead status='viewed' (solo si está en 'contacted')
-//   email_opened   → outreach_messages.opened_at = now() (solo primera apertura)
+//   demo_viewed    → lead status='viewed' (solo si está en 'contacted' y no es el operador)
+//   email_opened   → outreach_messages.opened_at = now() (solo primera apertura humana)
+//
+// Ruido: una apertura a <60 s del envío (o antes) es un escáner del correo o una prueba → se apunta
+// con too_soon=true pero NO marca opened_at. /book manda operator=true si quien la abre tiene
+// sesión del panel → queda en events pero no avanza el lead. Se guarda el user-agent para auditar.
+// Los clics en los enlaces los registra track-click (link_clicked).
 //
 // PÚBLICO: sin auth — el negocio llega desde el enlace del email, sin sesión.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { isTooSoonAfterSend } from "../_shared/clickTracking.ts";
 
 // GIF 1×1 transparente (formato GIF89a mínimo válido).
 const PIXEL_GIF = new Uint8Array([
@@ -56,16 +62,36 @@ async function handleEvent(
   type: string,
   payload: unknown,
   messageId?: string | null,
+  ua?: string | null,
 ) {
+  let tooSoon = false;
+  if (type === "email_opened" && messageId) {
+    const { data: msg } = await supabase
+      .from("outreach_messages")
+      .select("sent_at")
+      .eq("id", messageId)
+      .maybeSingle();
+    tooSoon = isTooSoonAfterSend((msg as { sent_at?: string } | null)?.sent_at, new Date());
+  }
+  const extra = payload && typeof payload === "object" && !Array.isArray(payload)
+    ? payload as Record<string, unknown>
+    : {};
+  const operator = extra.operator === true;
+
   // Insertar evento de auditoría (best-effort — no lanzamos error si falla)
   await supabase.from("events").insert({
     lead_id: leadId,
     type,
-    payload: payload ?? (messageId ? { message_id: messageId } : {}),
+    payload: {
+      ...extra,
+      ...(messageId ? { message_id: messageId } : {}),
+      ...(tooSoon ? { too_soon: true } : {}),
+      ...(ua ? { ua: ua.slice(0, 200) } : {}),
+    },
   });
 
   // demo_viewed → avanzar lead a 'viewed' (solo si está en 'contacted', para no retroceder)
-  if (type === "demo_viewed") {
+  if (type === "demo_viewed" && !operator) {
     await supabase
       .from("leads")
       .update({ status: "viewed", updated_at: new Date().toISOString() })
@@ -74,7 +100,7 @@ async function handleEvent(
   }
 
   // email_opened → marcar la primera apertura en outreach_messages
-  if (type === "email_opened" && messageId) {
+  if (type === "email_opened" && messageId && !tooSoon) {
     await supabase
       .from("outreach_messages")
       .update({ opened_at: new Date().toISOString() })
@@ -105,7 +131,7 @@ Deno.serve(async (req: Request) => {
 
     // Siempre devolvemos el pixel, aunque los params sean incorrectos o el tipo no esté permitido.
     if (leadId && type && ALLOWED_PUBLIC_TYPES.has(type)) {
-      await handleEvent(supabase, leadId, type, null, messageId).catch(() => {});
+      await handleEvent(supabase, leadId, type, null, messageId, req.headers.get("user-agent")).catch(() => {});
     }
     return pixelResponse();
   }
@@ -127,7 +153,7 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Tipo de evento no permitido." }, 400);
   }
 
-  await handleEvent(supabase, lead_id, type, payload, null);
+  await handleEvent(supabase, lead_id, type, payload, null, req.headers.get("user-agent"));
 
   return jsonResponse({ ok: true });
 });

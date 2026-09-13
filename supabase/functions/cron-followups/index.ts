@@ -4,6 +4,7 @@
 // Lógica idéntica al PASO 3 del orquestador Node — ahora vive en la nube.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { renderEmail, bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
+import { clickBase } from "../_shared/clickTracking.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
 import { signUnsubscribe, unsubscribeUrl } from "../_shared/unsubscribe.ts";
 import {
@@ -117,6 +118,8 @@ async function sendFollowup(
         bookingUrl: bookUrl,
         senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
         unsubscribeUrl: unsubUrl,
+        // Clics en la web, la propuesta y el WhatsApp → www.nico-soto.es/r/… (función track-click).
+        clickTracking: { base: clickBase(Deno.env.get("APP_URL"), SUPABASE_URL), leadId: lead.id, messageId: msg.id },
       }),
       text: bodyText,
       ...(replyTo ? { reply_to: replyTo } : {}),

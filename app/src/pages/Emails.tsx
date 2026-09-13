@@ -1,12 +1,14 @@
 // app/src/pages/Emails.tsx
-// Vista de seguimiento de los emails enviados a clientes: enviado / abierto / respondido.
-// Aprovecha el tracking que ya vive en outreach_messages (sent_at, opened_at, email_number,
-// migración 0003_followup_tracking.sql). Solo lectura.
+// Vista de seguimiento de los emails enviados a clientes: enviado / abierto / clic / respondido.
+// Envíos y respuestas salen de outreach_messages; aperturas y clics, de `events` (pixel de
+// track-event y redirector track-click), separando lo automático (escáneres, vistas previas y
+// aperturas a <1 min del envío) con messageEngagement. Solo lectura.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, Eye, EyeOff, Check, MessageCircle, Loader2 } from "lucide-react";
+import { Mail, Eye, EyeOff, Check, MessageCircle, Loader2, MousePointerClick } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
+import { messageEngagement, type LeadEvent } from "@/lib/activity";
 
 /** Fila de outreach con el nombre/email del lead (join). */
 type EmailRow = {
@@ -25,6 +27,8 @@ type EmailRow = {
 const COLS =
   "id, lead_id, channel, subject, status, email_number, sent_at, opened_at, created_at, leads(name, email)";
 
+const TARGET_SHORT: Record<string, string> = { web: "Web", book: "Propuesta", wa: "WhatsApp" };
+
 /** Fecha + hora corta en es-ES ("21 jun, 14:32"). "—" si no hay fecha. */
 function fmtWhen(iso: string | null): string {
   if (!iso) return "—";
@@ -38,18 +42,27 @@ function fmtWhen(iso: string | null): string {
 
 export default function Emails() {
   const [rows, setRows] = useState<EmailRow[]>([]);
+  const [events, setEvents] = useState<LeadEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setError(null);
     setLoading(true);
-    const { data, error } = await supabase
-      .from("outreach_messages")
-      .select(COLS)
-      .order("sent_at", { ascending: false, nullsFirst: false });
-    if (error) setError(error.message);
-    else setRows((data ?? []) as unknown as EmailRow[]);
+    const [msgRes, evRes] = await Promise.all([
+      supabase
+        .from("outreach_messages")
+        .select(COLS)
+        .order("sent_at", { ascending: false, nullsFirst: false }),
+      supabase
+        .from("events")
+        .select("id,lead_id,type,payload,created_at")
+        .in("type", ["email_opened", "link_clicked"]),
+    ]);
+    if (msgRes.error) setError(msgRes.error.message);
+    else setRows((msgRes.data ?? []) as unknown as EmailRow[]);
+    // Si no se pueden leer los eventos, la tabla sigue funcionando con opened_at.
+    if (!evRes.error) setEvents((evRes.data ?? []) as LeadEvent[]);
     setLoading(false);
   }, []);
 
@@ -68,13 +81,24 @@ export default function Emails() {
     [rows],
   );
 
+  const engagement = useMemo(() => messageEngagement(events, sent), [events, sent]);
+
   const kpis = useMemo(() => {
     const enviados = sent.length;
-    const abiertos = sent.filter((m) => m.opened_at).length;
+    const abiertos = sent.filter((m) => engagement[m.id]?.firstOpen).length;
+    const conClic = sent.filter((m) => (engagement[m.id]?.clicks.length ?? 0) > 0).length;
     const respondidos = sent.filter((m) => m.status === "replied").length;
-    const openRate = enviados ? Math.round((abiertos / enviados) * 100) : 0;
-    return { enviados, abiertos, respondidos, openRate, sinAbrir: enviados - abiertos };
-  }, [sent]);
+    const pct = (n: number) => (enviados ? Math.round((n / enviados) * 100) : 0);
+    return {
+      enviados,
+      abiertos,
+      conClic,
+      respondidos,
+      openRate: pct(abiertos),
+      clickRate: pct(conClic),
+      sinAbrir: enviados - abiertos,
+    };
+  }, [sent, engagement]);
 
   return (
     <div className="space-y-6">
@@ -83,15 +107,16 @@ export default function Emails() {
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Emails</h1>
           <p className="text-sm text-muted-foreground">
-            Seguimiento de los correos enviados a clientes: enviados, aperturas y respuestas.
+            Seguimiento de los correos enviados a clientes: enviados, aperturas, clics y respuestas.
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {([
           ["Enviados", String(kpis.enviados)],
           ["Abiertos", `${kpis.abiertos} · ${kpis.openRate}%`],
+          ["Con clic", `${kpis.conClic} · ${kpis.clickRate}%`],
           ["Sin abrir", String(kpis.sinAbrir)],
           ["Respondidos", String(kpis.respondidos)],
         ] as const).map(([label, value]) => (
@@ -124,61 +149,93 @@ export default function Emails() {
                 <th scope="col" className="px-3 py-2">Secuencia</th>
                 <th scope="col" className="px-3 py-2">Enviado</th>
                 <th scope="col" className="px-3 py-2">Apertura</th>
+                <th scope="col" className="px-3 py-2">Clics</th>
                 <th scope="col" className="px-3 py-2">Respuesta</th>
               </tr>
             </thead>
             <tbody>
-              {sent.map((m) => (
-                <tr key={m.id} className="border-t border-border/60">
-                  <td className="px-3 py-2">
-                    {m.lead_id ? (
-                      <Link
-                        to={`/leads/${m.lead_id}`}
-                        className="font-medium text-primary hover:underline"
-                      >
-                        {m.leads?.name ?? "—"}
-                      </Link>
-                    ) : (
-                      m.leads?.name ?? "—"
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-muted-foreground">
-                    {m.leads?.email ?? "—"}
-                  </td>
-                  <td className="px-3 py-2">Email {m.email_number ?? 1}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{fmtWhen(m.sent_at)}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">
-                    {m.opened_at ? (
-                      <Badge variant="default" className="gap-1">
-                        <Eye className="h-3 w-3" /> {fmtWhen(m.opened_at)}
-                      </Badge>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <EyeOff className="h-3 w-3" /> Sin abrir
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2">
-                    {m.status === "replied" ? (
-                      <Badge variant="success" className="gap-1">
-                        <MessageCircle className="h-3 w-3" /> Respondió
-                      </Badge>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Check className="h-3 w-3" /> —
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {sent.map((m) => {
+                const eng = engagement[m.id];
+                const targets = eng
+                  ? Array.from(new Set(eng.clicks.map((c) => TARGET_SHORT[c.target] ?? c.target)))
+                  : [];
+                return (
+                  <tr key={m.id} className="border-t border-border/60">
+                    <td className="px-3 py-2">
+                      {m.lead_id ? (
+                        <Link
+                          to={`/leads/${m.lead_id}`}
+                          className="font-medium text-primary hover:underline"
+                        >
+                          {m.leads?.name ?? "—"}
+                        </Link>
+                      ) : (
+                        m.leads?.name ?? "—"
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">
+                      {m.leads?.email ?? "—"}
+                    </td>
+                    <td className="px-3 py-2">Email {m.email_number ?? 1}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{fmtWhen(m.sent_at)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {eng?.firstOpen ? (
+                        <Badge variant="default" className="gap-1">
+                          <Eye className="h-3 w-3" /> {fmtWhen(eng.firstOpen)}
+                        </Badge>
+                      ) : eng?.autoOpens ? (
+                        <span
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground"
+                          title="Apertura a menos de 1 min del envío: escáner del correo o prueba"
+                        >
+                          <EyeOff className="h-3 w-3" /> Solo automática
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                          <EyeOff className="h-3 w-3" /> Sin abrir
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {targets.length > 0 ? (
+                        <Badge variant="default" className="gap-1">
+                          <MousePointerClick className="h-3 w-3" /> {targets.join(" · ")}
+                        </Badge>
+                      ) : eng?.autoClicks ? (
+                        <span
+                          className="text-xs text-muted-foreground"
+                          title="Clic de un escáner, una vista previa o una prueba"
+                        >
+                          Solo automáticos
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      {m.status === "replied" ? (
+                        <Badge variant="success" className="gap-1">
+                          <MessageCircle className="h-3 w-3" /> Respondió
+                        </Badge>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                          <Check className="h-3 w-3" /> —
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
 
       <p className="text-[11px] text-muted-foreground">
-        La apertura se detecta con un píxel de seguimiento (puede no registrarse si el cliente
-        bloquea imágenes). «Respondió» aún no se captura automáticamente.
+        La apertura se detecta con un píxel (puede no registrarse si el cliente bloquea imágenes) y
+        los clics con los enlaces de seguimiento (desde el 13-sep-2026). No cuentan los escáneres, las
+        vistas previas ni las aperturas a menos de 1 min del envío. «Respondió» aún no se captura
+        automáticamente.
       </p>
     </div>
   );

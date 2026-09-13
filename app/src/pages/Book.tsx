@@ -61,6 +61,23 @@ const Stars = ({ size = "text-lg" }: { size?: string }) => (
   </div>
 );
 
+// Eventos de /book. Si quien la abre tiene sesión del panel (Nico revisando la propuesta) van con
+// operator=true: quedan en la actividad del lead pero no cuentan como interés del prospecto.
+function trackBookEvent(
+  leadId: string,
+  type: "demo_viewed" | "booking_started",
+  payload: Record<string, unknown> = {},
+) {
+  supabase.auth
+    .getSession()
+    .then(({ data }) =>
+      supabase.functions.invoke("track-event", {
+        body: { lead_id: leadId, type, payload: data.session ? { ...payload, operator: true } : payload },
+      }),
+    )
+    .catch(() => {});
+}
+
 export default function Book() {
   const { leadId } = useParams<{ leadId: string }>();
   const [info, setInfo] = useState<BookingInfo | null>(null);
@@ -88,7 +105,7 @@ export default function Book() {
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
         setInfo(data as BookingInfo);
-        supabase.functions.invoke("track-event", { body: { lead_id: leadId, type: "demo_viewed" } }).catch(() => {});
+        if (leadId) trackBookEvent(leadId, "demo_viewed");
       })
       .catch((e: Error) => {
         // El prospecto no tiene que ver "Edge Function returned a non-2xx status code".
@@ -163,11 +180,7 @@ export default function Book() {
   // CTA de respaldo: WhatsApp. Registra la intención (booking_started) para que quede en el
   // panel aunque no llegue a enviar el mensaje, y deja un acuse en pantalla.
   const goToWhatsapp = () => {
-    if (!isPreview) {
-      supabase.functions
-        .invoke("track-event", { body: { lead_id: leadId, type: "booking_started", payload: { channel: "whatsapp" } } })
-        .catch(() => {});
-    }
+    if (!isPreview && leadId) trackBookEvent(leadId, "booking_started", { channel: "whatsapp" });
     window.open(waReserva, "_blank");
     setWaSent(true);
   };

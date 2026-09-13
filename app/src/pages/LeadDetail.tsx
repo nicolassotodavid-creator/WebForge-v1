@@ -25,6 +25,8 @@ import { supabase, edgeFunctionErrorMessage } from "@/lib/supabase";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { waLink, waNumber, waDisplay, phoneKind, whatsappOutreachText, whatsappLuviaText } from "@/lib/contact";
 import { luviaSiteState, type LuviaSiteState } from "@/lib/luvia";
+import { trackedLink } from "@/lib/activity";
+import { LeadActivity } from "@/components/LeadActivity";
 import type { Brief, Lead, Site, OutreachMessage } from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -393,8 +395,11 @@ export default function LeadDetail() {
       return;
     }
     if (!site?.live_url) return;
-    const bookUrl = `${window.location.origin}/book/${lead.id}`;
-    setWaText(whatsappOutreachText(lead.name, site.live_url, bookUrl));
+    // Enlaces con seguimiento (/r → track-click): la actividad del lead muestra si los pulsa.
+    const origin = window.location.origin;
+    setWaText(
+      whatsappOutreachText(lead.name, trackedLink(origin, lead.id, "web"), trackedLink(origin, lead.id, "book")),
+    );
     setWaError(null);
   }
 
@@ -1349,6 +1354,8 @@ export default function LeadDetail() {
                 </p>
               </div>
             )}
+
+            {lead && <LeadActivity leadId={lead.id} messages={outreachHistory} />}
 
             {outreachError && (
               <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{outreachError}</p>

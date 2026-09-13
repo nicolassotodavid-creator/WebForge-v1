@@ -113,5 +113,33 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertIncludes(showcase, `bgcolor="#FAFAF9"`, "captura: el hueco bloqueado tiene fondo, no un vacío blanco");
 }
 
+// ── Seguimiento de clics: web, propuesta y WhatsApp salen por /r; la captura y la baja no ──
+{
+  const bookUrl = "https://www.nico-soto.es/book/lead-1";
+  const tracked = renderEmail({
+    bodyText: withWhatsappFooter(`Hola Ana, te hice una web.\n\n${bookUrl}`, "34600782211"),
+    subject: "x",
+    previewImageUrl: "https://cdn/site-previews/lead-1.png",
+    webUrl: "https://clinica-ana.web.app",
+    bookingUrl: bookUrl,
+    unsubscribeUrl: "https://x/unsubscribe?lead=lead-1&sig=s",
+    clickTracking: { base: "https://www.nico-soto.es/r", leadId: "lead-1", messageId: "msg-1" },
+  });
+  assertIncludes(tracked, `href="https://www.nico-soto.es/r/lead-1/web?m=msg-1&amp;c=email"`, "clics: la web sale por /r");
+  assertIncludes(tracked, `href="https://www.nico-soto.es/r/lead-1/book?m=msg-1&amp;c=email"`, "clics: la propuesta sale por /r");
+  assertIncludes(tracked, `href="https://www.nico-soto.es/r/lead-1/wa?m=msg-1&amp;c=email"`, "clics: el WhatsApp sale por /r");
+  assertExcludes(tracked, `href="https://clinica-ana.web.app"`, "clics: no queda enlace directo a la web");
+  assertIncludes(tracked, `src="https://cdn/site-previews/lead-1.png"`, "clics: la captura sigue siendo estática");
+  assertIncludes(tracked, `href="https://x/unsubscribe?lead=lead-1&sig=s"`, "clics: la baja no pasa por el seguimiento");
+
+  const direct = renderEmail({
+    bodyText: "Hola\n\nhttps://clinica-ana.web.app\n\nNico",
+    subject: "x",
+    webUrl: "https://clinica-ana.web.app",
+    clickTracking: { base: null, leadId: "lead-1" },
+  });
+  assertIncludes(direct, `href="https://clinica-ana.web.app"`, "clics: sin base → enlaces directos");
+}
+
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures) process.exit(1);

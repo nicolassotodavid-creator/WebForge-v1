@@ -4,6 +4,7 @@
 // salto HTTP de service_role → Edge Function y mantener la lógica en el orquestador.
 
 import { createClient } from "@supabase/supabase-js";
+import { clickBase, trackEmailLinks } from "../supabase/functions/_shared/clickTracking.ts";
 
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -162,7 +163,12 @@ export async function sendFollowupEmail(
     `&message_id=${encodeURIComponent(msg.id)}`;
   const trackingPixel = `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`;
 
-  const htmlBody = buildHtml(bodyText, subject, trackingPixel);
+  // Clics en la web y en el WhatsApp → <APP_URL>/r/… (función track-click), igual que cron-followups.
+  const trackingBase = clickBase(process.env.APP_URL, SUPABASE_URL);
+  const rawHtml = buildHtml(bodyText, subject, trackingPixel);
+  const htmlBody = trackingBase
+    ? trackEmailLinks(rawHtml, { base: trackingBase, leadId: lead.id, messageId: msg.id, webUrl: liveUrl })
+    : rawHtml;
 
   // Enviar vía Resend
   const res = await fetch("https://api.resend.com/emails", {

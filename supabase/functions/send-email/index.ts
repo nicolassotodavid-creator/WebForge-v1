@@ -6,6 +6,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
+import { clickBase } from "../_shared/clickTracking.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
 import { signUnsubscribe, unsubscribeUrl } from "../_shared/unsubscribe.ts";
@@ -161,6 +162,8 @@ Deno.serve(async (req: Request) => {
     bookingUrl: bookingLink(Deno.env.get("BOOKING_BASE"), msg.lead_id),
     senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
     unsubscribeUrl: unsubUrl,
+    // Clics en la web, la propuesta y el WhatsApp → www.nico-soto.es/r/… (función track-click).
+    clickTracking: { base: clickBase(Deno.env.get("APP_URL"), SUPABASE_URL), leadId: msg.lead_id, messageId },
   });
 
   // Reply-To por dueño: respuestas de leads Luvia → Miguel; WebForge → Nico.

@@ -1,4 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/r/:path*",
+      "destination": "https://khscikqchvjxyvoaruas.supabase.co/functions/v1/track-click/:path*"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
