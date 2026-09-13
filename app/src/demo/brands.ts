@@ -332,6 +332,82 @@ export const BRANDS: Brand[] = [
     web: "https://obraestil.es", logo: "/demo/logos/obraestil.png",
     mono: true, primary: "#23232e", secondary: "#5c5c6b",
   },
+  // ---- Madrid sur y este, lote 1 (13-sep) ----
+  {
+    slug: "reformas-blancor", empresa: "Reformas Blancor", ciudad: "Alcorcón",
+    web: "https://reformasblancor.es", logo: "/demo/logos/reformas-blancor.png",
+    primary: "#637d1d", secondary: "#abd342",
+  },
+  {
+    slug: "varada", empresa: "Varada Reformas", ciudad: "Torrejón de Ardoz",
+    web: "https://varada.es", logo: "/demo/logos/varada.png",
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "raynadecor", empresa: "Raynadecor", ciudad: "Móstoles",
+    web: "https://raynadecor.es", logo: "/demo/logos/raynadecor.jpg",
+    primary: "#667c2a", secondary: "#a5c260",
+  },
+  {
+    slug: "construcciones-jdm", empresa: "Construcciones J.D.M.", ciudad: "Alcobendas",
+    web: "https://construccionesjdm.com", logo: "/demo/logos/construcciones-jdm.png",
+    primary: "#36046f", secondary: "#ff3900",
+  },
+  {
+    slug: "reformas-areal", empresa: "Reformas Integrales Areal", ciudad: "Alcorcón",
+    web: "https://reformasintegralesareal.es", logo: "/demo/logos/reformas-areal.png",
+    primary: "#a86300", secondary: "#ff9600",
+  },
+  {
+    slug: "quality-reform", empresa: "Quality Reform", ciudad: "Fuenlabrada",
+    web: "https://qualityreform.com", logo: "/demo/logos/quality-reform.png",
+    primary: "#147ba8", secondary: "#8e1216",
+  },
+  {
+    slug: "iasa-design", empresa: "Iasa Design", ciudad: "Rivas-Vaciamadrid",
+    web: "https://www.iasadesign.com", logo: "/demo/logos/iasa-design-fondo.png", logoOnDark: true,
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "foydecor", empresa: "Foydecor", ciudad: "Móstoles",
+    web: "https://foydecor.com", logo: "/demo/logos/foydecor.png",
+    primary: "#29579e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "reformas-el-baul", empresa: "Reformas El Baúl", ciudad: "Móstoles",
+    web: "https://www.reformaselbaul.com", logo: "/demo/logos/reformas-el-baul.png",
+    primary: "#690202", secondary: "#ff3535",
+  },
+  {
+    slug: "reformas-alcomad", empresa: "Reformas AlcoMad", ciudad: "Alcorcón",
+    web: "https://www.reformasalcomad.es", logo: "/demo/logos/reformas-alcomad.jpg",
+    primary: "#057cb1", secondary: "#079fe2",
+  },
+  {
+    slug: "reformas-marian", empresa: "Reformas Marian", ciudad: "Torrejón de Ardoz",
+    web: "https://reformasmarian.es", logo: "",
+    primary: "#996d00", secondary: "#ffb600",
+  },
+  {
+    slug: "support-home", empresa: "Support Home", ciudad: "Valdemoro",
+    web: "https://supporthome.es", logo: "/demo/logos/support-home.jpg",
+    primary: "#0262bd", secondary: "#bfe1b2",
+  },
+  {
+    slug: "remacen", empresa: "Remacen Reparaciones", ciudad: "Alcalá de Henares",
+    web: "https://www.reformasmadridcentro.com", logo: "",
+    primary: "#986c18", secondary: "#eac378",
+  },
+  {
+    slug: "reformas-vegam", empresa: "Reformas Vegam", ciudad: "Alcobendas",
+    web: "https://www.reformasvegam.es", logo: "/demo/logos/reformas-vegam.jpeg",
+    primary: "#9c6b01", secondary: "#feb619",
+  },
+  {
+    slug: "grupo-leon-reformas", empresa: "Grupo León Reformas", ciudad: "Getafe",
+    web: "https://grupoleonreformas.com", logo: "",
+    mono: true, primary: "#23232e", secondary: "#5c5c6b",
+  },
 ];
 
 export const findBrand = (slug: string | undefined): Brand | undefined =>
