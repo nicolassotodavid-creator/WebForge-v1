@@ -260,7 +260,9 @@ COLOR: primary = el color corporativo dominante del negocio. Si hay logo válido
 (rótulo, fachada pintada, uniformes, toldo, vehículos rotulados del negocio), color_source "fotos". NUNCA el
 color del coche de un cliente, de una pared cualquiera, del cielo ni de productos de otras marcas, y NUNCA de
 texto o gráficos sobreimpresos en la foto (etiquetas "ANTES"/"DESPUÉS", flechas, marcas de agua, collages o
-montajes editados): eso lo añadió quien editó la foto, no es la marca. Blancos,
+montajes editados): eso lo añadió quien editó la foto, no es la marca. Tampoco el color de la MAQUINARIA,
+herramientas, elevadores, estanterías o productos (son del fabricante, no del negocio): en Garaje 34 el azul de
+los elevadores salió como "color corporativo" y no lo es. Blancos,
 grises y negros no cuentan como color de marca. secondary = un segundo color de marca claro si existe; si no,
 null. Ante la duda, null: mejor sin color que con uno inventado. evidence = de dónde sale, en pocas palabras
 (p.ej. "verde del logo", "rótulo rojo de la fachada").`;
