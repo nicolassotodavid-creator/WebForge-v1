@@ -30,6 +30,7 @@ import {
   type ViewFilter,
 } from "@/lib/leadFilters";
 import { sectorFamily } from "@/lib/sectors";
+import { messageProduct } from "@/lib/product";
 
 type SortKey = "name" | "city" | "category" | "rating" | "status" | "created_at" | "score";
 type SortDir = "asc" | "desc";
@@ -125,6 +126,8 @@ export default function Dashboard() {
   // outreachSupported=false si la query falla (p. ej. migración 0003 sin aplicar).
   const [outreachByLead, setOutreachByLead] = useState<Map<string, LeadEmailState>>(new Map());
   const [outreachSupported, setOutreachSupported] = useState(false);
+  // Leads a los que se ha escrito por el simulador (Home Estimator): etiqueta y pestaña propias.
+  const [simuladorIds, setSimuladorIds] = useState<Set<string>>(new Set());
 
   const [saved] = useState(readSavedFilters);
   const [statusFilter, setStatusFilter] = useState<LeadStatus | "all">(saved.statusFilter ?? "all");
@@ -275,7 +278,7 @@ export default function Dashboard() {
       supabase.from("leads").select("*").order("created_at", { ascending: false }),
       supabase
         .from("outreach_messages")
-        .select("lead_id,status,sent_at,opened_at")
+        .select("lead_id,status,sent_at,opened_at,email_number")
         // Solo email: la columna se rotula "Email" y el WhatsApp manual (channel='whatsapp')
         // no debe contar como email enviado. Mismo criterio que Emails.tsx.
         .eq("channel", "email"),
@@ -293,13 +296,21 @@ export default function Dashboard() {
       setOutreachByLead(new Map());
     } else {
       const map = new Map<string, LeadEmailState>();
+      const sim = new Set<string>();
       for (const m of outreachRes.data as Array<{
         lead_id: string | null;
         status: string | null;
         sent_at: string | null;
         opened_at: string | null;
+        email_number: number | null;
       }>) {
         if (!m.lead_id) continue;
+        // Los del simulador no cuentan en la columna Email (es la secuencia de webs):
+        // van a la etiqueta "Simulador" del nombre.
+        if (messageProduct(m) === "simulador") {
+          sim.add(m.lead_id);
+          continue;
+        }
         const cur =
           map.get(m.lead_id) ??
           { sent: false, opened: false, replied: false, lastSentAt: null, lastOpenedAt: null, count: 0 };
@@ -317,6 +328,7 @@ export default function Dashboard() {
         map.set(m.lead_id, cur);
       }
       setOutreachByLead(map);
+      setSimuladorIds(sim);
       setOutreachSupported(true);
     }
     setLoading(false);
@@ -359,8 +371,9 @@ export default function Dashboard() {
       noweb: base.filter((l) => matchesView(l, "noweb")).length,
       chat: base.filter((l) => matchesView(l, "chat")).length,
       whatsapp: base.filter((l) => matchesView(l, "whatsapp")).length,
+      simulador: base.filter((l) => matchesView(l, "simulador", simuladorIds)).length,
     };
-  }, [leads, filterState]);
+  }, [leads, filterState, simuladorIds]);
 
   // Opciones del selector de sector: familias (que agrupan las categorías de
   // Google Maps) y, dentro de cada una, las categorías concretas presentes.
@@ -370,7 +383,8 @@ export default function Dashboard() {
   const sectorOptions = useMemo(() => {
     const base = leads.filter(
       (l) =>
-        matchesBaseFilters(l, { ...filterState, category: "" }) && matchesView(l, view),
+        matchesBaseFilters(l, { ...filterState, category: "" }) &&
+        matchesView(l, view, simuladorIds),
     );
     const fams = new Map<string, { n: number; cats: Map<string, number> }>();
     for (const l of base) {
@@ -390,7 +404,7 @@ export default function Dashboard() {
           .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "es"))
           .map(([name, count]) => ({ name, count })),
       }));
-  }, [leads, filterState, view]);
+  }, [leads, filterState, view, simuladorIds]);
 
   // ¿La selección actual sigue en la lista? Si el resto de filtros la deja a 0
   // desaparecería del <select> y este se vería vacío: la añadimos aparte.
@@ -427,7 +441,7 @@ export default function Dashboard() {
 
   const filtered = useMemo(() => {
     let result = leads.filter(
-      (l) => matchesBaseFilters(l, filterState) && matchesView(l, view),
+      (l) => matchesBaseFilters(l, filterState) && matchesView(l, view, simuladorIds),
     );
 
     result = [...result].sort((a, b) => {
@@ -446,7 +460,7 @@ export default function Dashboard() {
     });
 
     return result;
-  }, [leads, filterState, view, sortKey, sortDir]);
+  }, [leads, filterState, view, simuladorIds, sortKey, sortDir]);
 
   // Atajos de teclado estilo bandeja (se ignoran si escribes en un input).
   useEffect(() => {
@@ -515,16 +529,18 @@ export default function Dashboard() {
         { key: "noweb", label: "Sin web" },
         { key: "chat", label: "Con chat web" },
         { key: "whatsapp", label: "Con WhatsApp" },
+        { key: "simulador", label: "Simulador" },
       ]
     : [
         { key: "all", label: "Todos" },
         { key: "noweb", label: "Sin web" },
         { key: "chat", label: "Con chat web" },
         { key: "whatsapp", label: "Con WhatsApp" },
+        { key: "simulador", label: "Simulador" },
       ];
-  // No-admin (Luvia) no tiene webs: fuera los chips de web. "Con WhatsApp" se queda.
+  // No-admin (Luvia) no tiene webs ni simulador: fuera esos chips. "Con WhatsApp" se queda.
   const chips = allChips.filter(
-    (c) => isAdmin || (c.key !== "noweb" && c.key !== "chat"),
+    (c) => isAdmin || (c.key !== "noweb" && c.key !== "chat" && c.key !== "simulador"),
   );
 
   // No-admin oculta 2 columnas (Web, Score), así que el colspan del estado vacío baja en 2.
@@ -898,6 +914,14 @@ export default function Dashboard() {
                         <span className={cn(unseen ? "font-semibold" : "font-medium")}>
                           {l.name}
                         </span>
+                        {simuladorIds.has(l.id) && (
+                          <span
+                            title="Se le ha escrito ofreciendo el simulador de presupuestos (Home Estimator)"
+                            className="inline-flex items-center rounded-full bg-violet-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase leading-none tracking-wide text-violet-600 dark:text-violet-400"
+                          >
+                            Simulador
+                          </span>
+                        )}
                         {latestBatchIds.has(l.id) && (
                           <span
                             title="Del último lote scrapeado"

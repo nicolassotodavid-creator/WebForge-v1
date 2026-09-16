@@ -32,6 +32,8 @@ import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { messageLabel, messageProduct } from "@/lib/product";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -1320,18 +1322,26 @@ export default function LeadDetail() {
                     .sort((a, b) => (a.sent_at ?? "").localeCompare(b.sent_at ?? ""))
                     .map((m) => (
                       <li key={m.id} className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm">
-                        <span className="font-medium">
-                          {m.channel === "whatsapp"
-                            ? "WhatsApp"
-                            : m.channel === "linkedin"
-                              ? "LinkedIn"
-                              : `Email ${m.email_number ?? 1}`}
+                        <span
+                          className={cn(
+                            "font-medium",
+                            messageProduct(m) === "simulador" && "text-violet-600 dark:text-violet-400",
+                          )}
+                        >
+                          {messageLabel(m)}
                         </span>
                         <span className="inline-flex items-center gap-1 text-xs text-green-600">
                           <Check className="h-3.5 w-3.5" />
                           Enviado{m.sent_at ? ` ${fmtWhen(m.sent_at)}` : ""}
                         </span>
-                        {m.opened_at ? (
+                        {messageProduct(m) === "simulador" ? (
+                          <span
+                            className="text-xs text-muted-foreground"
+                            title="Correo de texto plano enviado por script: sin píxel de apertura"
+                          >
+                            Sin seguimiento de apertura
+                          </span>
+                        ) : m.opened_at ? (
                           <span className="inline-flex items-center gap-1 text-xs text-blue-600">
                             <Eye className="h-3.5 w-3.5" /> Abierto {fmtWhen(m.opened_at)}
                           </span>

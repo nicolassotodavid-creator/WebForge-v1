@@ -2,7 +2,15 @@ import type { Lead, LeadStatus } from "./types";
 import { sectorFamily } from "./sectors.ts";
 
 /** Pestañas de vista rápida de la bandeja. Mutuamente excluyentes. */
-export type ViewFilter = "all" | "unseen" | "seen" | "favorites" | "noweb" | "chat" | "whatsapp";
+export type ViewFilter =
+  | "all"
+  | "unseen"
+  | "seen"
+  | "favorites"
+  | "noweb"
+  | "chat"
+  | "whatsapp"
+  | "simulador";
 
 /** Filtros que NO dependen de la pestaña de vista. */
 export interface LeadFilterState {
@@ -58,8 +66,15 @@ export function matchesBaseFilters(l: Lead, f: LeadFilterState): boolean {
   return true;
 }
 
-/** ¿El lead pertenece a la pestaña de vista rápida indicada? */
-export function matchesView(l: Lead, view: ViewFilter): boolean {
+/**
+ * ¿El lead pertenece a la pestaña de vista rápida indicada?
+ * `simuladorIds`: leads a los que se les ha escrito por el simulador (sale de outreach_messages).
+ */
+export function matchesView(
+  l: Lead,
+  view: ViewFilter,
+  simuladorIds: ReadonlySet<string> = new Set(),
+): boolean {
   switch (view) {
     case "unseen":
       return !l.seen_at;
@@ -73,6 +88,8 @@ export function matchesView(l: Lead, view: ViewFilter): boolean {
       return l.site_has_chat === true;
     case "whatsapp":
       return l.site_has_whatsapp === true;
+    case "simulador":
+      return simuladorIds.has(l.id);
     case "all":
     default:
       return true;

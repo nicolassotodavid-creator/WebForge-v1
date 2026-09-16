@@ -9,6 +9,14 @@ import { Mail, Eye, EyeOff, Check, MessageCircle, Loader2, MousePointerClick } f
 import { supabase } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
 import { messageEngagement, type LeadEvent } from "@/lib/activity";
+import { messageLabel, messageProduct, type Product } from "@/lib/product";
+import { cn } from "@/lib/utils";
+
+const PRODUCT_TABS: { key: Product | "all"; label: string }[] = [
+  { key: "all", label: "Todos" },
+  { key: "webs", label: "Webs" },
+  { key: "simulador", label: "Simulador" },
+];
 
 /** Fila de outreach con el nombre/email del lead (join). */
 type EmailRow = {
@@ -45,6 +53,7 @@ export default function Emails() {
   const [events, setEvents] = useState<LeadEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [product, setProduct] = useState<Product | "all">("all");
 
   const load = useCallback(async () => {
     setError(null);
@@ -71,7 +80,7 @@ export default function Emails() {
   }, [load]);
 
   // Solo emails (no notas de LinkedIn) que se hayan enviado de verdad.
-  const sent = useMemo(
+  const allSent = useMemo(
     () =>
       rows.filter(
         (m) =>
@@ -79,6 +88,18 @@ export default function Emails() {
           (!!m.sent_at || m.status === "sent" || m.status === "replied"),
       ),
     [rows],
+  );
+  const counts = useMemo(
+    () => ({
+      all: allSent.length,
+      webs: allSent.filter((m) => messageProduct(m) === "webs").length,
+      simulador: allSent.filter((m) => messageProduct(m) === "simulador").length,
+    }),
+    [allSent],
+  );
+  const sent = useMemo(
+    () => (product === "all" ? allSent : allSent.filter((m) => messageProduct(m) === product)),
+    [allSent, product],
   );
 
   const engagement = useMemo(() => messageEngagement(events, sent), [events, sent]);
@@ -110,6 +131,34 @@ export default function Emails() {
             Seguimiento de los correos enviados a clientes: enviados, aperturas, clics y respuestas.
           </p>
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {PRODUCT_TABS.map((t) => {
+          const active = product === t.key;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setProduct(t.key)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                active
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-border/70 text-muted-foreground hover:bg-accent hover:text-foreground",
+              )}
+            >
+              {t.label}
+              <span
+                className={cn(
+                  "tabular-nums text-xs",
+                  active ? "text-primary/70" : "text-muted-foreground/70",
+                )}
+              >
+                {counts[t.key]}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
@@ -156,6 +205,7 @@ export default function Emails() {
             <tbody>
               {sent.map((m) => {
                 const eng = engagement[m.id];
+                const simulador = messageProduct(m) === "simulador";
                 const targets = eng
                   ? Array.from(new Set(eng.clicks.map((c) => TARGET_SHORT[c.target] ?? c.target)))
                   : [];
@@ -176,10 +226,24 @@ export default function Emails() {
                     <td className="px-3 py-2 text-muted-foreground">
                       {m.leads?.email ?? "—"}
                     </td>
-                    <td className="px-3 py-2">Email {m.email_number ?? 1}</td>
+                    <td
+                      className={cn(
+                        "px-3 py-2 whitespace-nowrap",
+                        simulador && "font-medium text-violet-600 dark:text-violet-400",
+                      )}
+                    >
+                      {messageLabel(m)}
+                    </td>
                     <td className="px-3 py-2 whitespace-nowrap">{fmtWhen(m.sent_at)}</td>
                     <td className="px-3 py-2 whitespace-nowrap">
-                      {eng?.firstOpen ? (
+                      {simulador ? (
+                        <span
+                          className="text-xs text-muted-foreground"
+                          title="Correo de texto plano enviado por script: sin píxel de apertura ni enlaces de seguimiento"
+                        >
+                          Sin seguimiento
+                        </span>
+                      ) : eng?.firstOpen ? (
                         <Badge variant="default" className="gap-1">
                           <Eye className="h-3 w-3" /> {fmtWhen(eng.firstOpen)}
                         </Badge>
