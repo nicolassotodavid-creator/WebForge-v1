@@ -1,4 +1,4 @@
-// [SIMULADOR] Lotes 2 y 3 por email (nunca contactados antes), desde hola@nico-soto.es vía Resend. Mismo flujo que enviar-email-lote1.mjs.
+// [SIMULADOR] Lotes 2, 3, 4 y Madrid 1 por email (nunca contactados antes), desde hola@nico-soto.es vía Resend. Mismo flujo que enviar-email-lote1.mjs.
 // Fuente: outreach_reformas_lote<N>.csv (asunto/cuerpo/seguimiento por cluster). {link_demo} = demo_url de la cola (home-estimator-outreach-<rango>.csv).
 // Uso: node docs/prospeccion/enviar-email-lote.mjs --lote 3                          → simulación
 //      node docs/prospeccion/enviar-email-lote.mjs --lote 3 --enviar                 → email 1
@@ -16,8 +16,14 @@ const ENVIAR = process.argv.includes("--enviar");
 const SEGUIMIENTO = process.argv.includes("--seguimiento");
 const REGISTRAR = process.argv.includes("--registrar");
 const LOTE = process.argv[process.argv.indexOf("--lote") + 1];
-const LOTES = { 2: "home-estimator-outreach-16-30.csv", 3: "home-estimator-outreach-31-45.csv" };
-if (!process.argv.includes("--lote") || !LOTES[LOTE]) { console.error("Falta --lote 2 o --lote 3"); process.exit(1); }
+// lote → [CSV de clusters, cola con demo_url]
+const LOTES = {
+  2: ["outreach_reformas_lote2.csv", "home-estimator-outreach-16-30.csv"],
+  3: ["outreach_reformas_lote3.csv", "home-estimator-outreach-31-45.csv"],
+  4: ["outreach_reformas_lote4.csv", "home-estimator-outreach-46-60.csv"],
+  madrid1: ["outreach_reformas_madrid1.csv", "home-estimator-outreach-madrid-61-75.csv"],
+};
+if (!process.argv.includes("--lote") || !LOTES[LOTE]) { console.error(`Falta --lote ${Object.keys(LOTES).join(" | ")}`); process.exit(1); }
 // Emails corregidos respecto a la cola: email del CSV de clusters → email que figura en la cola.
 const ALIAS = { "administracion@bonoproyectos.com": "info@bonoporyectos.com" };
 const EMAIL_NUMBER = SEGUIMIENTO ? 102 : 101;
@@ -48,10 +54,10 @@ function parseCsv(txt, sep) {
   return resto.map((f) => Object.fromEntries(cab.map((k, j) => [k, f[j] ?? ""])));
 }
 
-const cola = parseCsv(fs.readFileSync(path.join(DIR, LOTES[LOTE]), "utf8"), ";");
+const cola = parseCsv(fs.readFileSync(path.join(DIR, LOTES[LOTE][1]), "utf8"), ";");
 const demoPorEmail = new Map(cola.map((r) => [r.email.trim().toLowerCase(), r]));
 
-const LEADS = parseCsv(fs.readFileSync(path.join(DIR, `outreach_reformas_lote${LOTE}.csv`), "utf8"), ",")
+const LEADS = parseCsv(fs.readFileSync(path.join(DIR, LOTES[LOTE][0]), "utf8"), ",")
   .filter((r) => r.enviar === "TRUE")
   .map((r) => {
     const c = demoPorEmail.get(ALIAS[r.email.trim().toLowerCase()] || r.email.trim().toLowerCase());
