@@ -275,16 +275,14 @@ export default function LeadDetail() {
   async function markReplied() {
     if (!lead) return;
     if (!confirm(`¿Marcar que "${lead.name}" ha respondido? No recibirá más recordatorios automáticos.`)) return;
-    const { error } = await supabase
-      .from("outreach_messages")
-      .update({ status: "replied" })
-      .eq("lead_id", lead.id)
-      .eq("status", "sent");
-    if (error) {
-      alert("No se pudo marcar la respuesta: " + error.message);
+    // Por la función (service role): marca los mensajes y guarda el evento `replied` en la actividad.
+    const { data, error } = await supabase.functions.invoke("mark-replied", {
+      body: { lead_id: lead.id, channel: "manual" },
+    });
+    if (error || data?.error) {
+      alert("No se pudo marcar la respuesta: " + (data?.error ?? error?.message));
       return;
     }
-    await supabase.from("events").insert({ lead_id: lead.id, type: "replied", payload: {} });
     await loadAll();
   }
 

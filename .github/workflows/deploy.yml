@@ -45,6 +45,7 @@ jobs:
             cron-briefs \
             track-event \
             track-click \
+            mark-replied \
             ingest-leads \
             run-scrape \
             handoff-luvia \

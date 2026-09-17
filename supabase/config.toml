@@ -63,3 +63,8 @@ verify_jwt = false
 # RESEND_WEBHOOK_SECRET; por eso desactivamos el JWT (si no, Resend recibiría 401).
 [functions.resend-webhook]
 verify_jwt = false
+
+# mark-replied: lo llama el webhook saliente del buzón (Zoho Mail) al recibir un email, sin JWT de
+# Supabase; la función exige ?token=INBOUND_REPLY_SECRET. El botón "Respondió" entra con la sesión.
+[functions.mark-replied]
+verify_jwt = false
