@@ -270,6 +270,24 @@ export default function LeadDetail() {
     }
   }
 
+  // RESPONDIÓ: el negocio contestó (email, WhatsApp o teléfono). Marca sus mensajes enviados como
+  // 'replied' → cron-followups ya no le manda el Email 2 ni el 3. Deja rastro en la actividad.
+  async function markReplied() {
+    if (!lead) return;
+    if (!confirm(`¿Marcar que "${lead.name}" ha respondido? No recibirá más recordatorios automáticos.`)) return;
+    const { error } = await supabase
+      .from("outreach_messages")
+      .update({ status: "replied" })
+      .eq("lead_id", lead.id)
+      .eq("status", "sent");
+    if (error) {
+      alert("No se pudo marcar la respuesta: " + error.message);
+      return;
+    }
+    await supabase.from("events").insert({ lead_id: lead.id, type: "replied", payload: {} });
+    await loadAll();
+  }
+
   async function generateBrief() {
     setGenerating(true);
     setGenError(null);
@@ -588,6 +606,13 @@ export default function LeadDetail() {
             className={`rounded-md p-1.5 transition-colors hover:text-destructive ${lead.do_not_contact ? "text-destructive" : "text-muted-foreground"}`}
           >
             <Ban className="h-5 w-5" />
+          </button>
+          <button
+            onClick={markReplied}
+            title="Ha respondido: parar recordatorios"
+            className="rounded-md px-2 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border transition-colors hover:text-foreground"
+          >
+            Respondió
           </button>
           {lead.do_not_contact && (
             <span className="rounded-md bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">BAJA</span>

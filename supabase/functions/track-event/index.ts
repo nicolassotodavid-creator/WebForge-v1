@@ -36,7 +36,8 @@ const PIXEL_GIF = new Uint8Array([
 // booking_started SÍ es público: lo emite la página /book cuando el prospecto pulsa "Escríbeme
 // por WhatsApp" (intención de reserva). Es status-neutral — solo deja rastro en `events` para
 // que el operador vea la intención aunque no complete el WhatsApp; no avanza el lead.
-const ALLOWED_PUBLIC_TYPES = new Set(["demo_viewed", "email_opened", "booking_started"]);
+// book_link_clicked: enlaces secundarios de /book (ver web, WhatsApp de dudas, email). Neutro.
+const ALLOWED_PUBLIC_TYPES = new Set(["demo_viewed", "email_opened", "booking_started", "book_link_clicked"]);
 
 function pixelResponse(): Response {
   return new Response(PIXEL_GIF, {
@@ -71,7 +72,10 @@ async function handleEvent(
       .select("sent_at")
       .eq("id", messageId)
       .maybeSingle();
-    tooSoon = isTooSoonAfterSend((msg as { sent_at?: string } | null)?.sent_at, new Date());
+    // Mensaje existente aún sin sent_at = el píxel se cargó antes de que send-email guardase el
+    // envío → escáner del correo al entregar, no una persona.
+    tooSoon = msg ? isTooSoonAfterSend((msg as { sent_at?: string | null }).sent_at, new Date()) ||
+      !(msg as { sent_at?: string | null }).sent_at : false;
   }
   const extra = payload && typeof payload === "object" && !Array.isArray(payload)
     ? payload as Record<string, unknown>

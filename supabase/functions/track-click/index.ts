@@ -73,7 +73,9 @@ Deno.serve(async (req: Request) => {
 
     const ua = req.headers.get("user-agent");
     const tooSoon = isTooSoonAfterSend((msgRes.data as { sent_at?: string } | null)?.sent_at, new Date());
-    const automatic = req.method === "HEAD" || isLikelyBot(ua) || tooSoon;
+    // Cookie wf_op la pone el panel (useSession) en .nico-soto.es: el clic es de Nico, no del negocio.
+    const operator = /(?:^|;\s*)wf_op=1(?:;|$)/.test(req.headers.get("cookie") ?? "");
+    const automatic = req.method === "HEAD" || isLikelyBot(ua) || tooSoon || operator;
 
     await supabase.from("events").insert({
       lead_id: leadId,
@@ -84,6 +86,7 @@ Deno.serve(async (req: Request) => {
         message_id: messageId,
         automatic,
         ...(tooSoon ? { too_soon: true } : {}),
+        ...(operator ? { operator: true } : {}),
         ua: ua ? ua.slice(0, 200) : null,
       },
     });

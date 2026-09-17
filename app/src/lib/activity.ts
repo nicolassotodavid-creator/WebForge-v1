@@ -98,10 +98,16 @@ export function describeEvent(e: LeadEvent, messages: ActivityMessage[]): Activi
         automatic: auto,
       };
     }
+    case "replied":
+      return { ...base, kind: "intent", label: "Respondió", detail: str(p.channel), automatic: false };
     case "demo_viewed":
       return { ...base, kind: "visit", label: "Abrió la propuesta (/book)", detail: operator ? "tú, con sesión del panel" : null, automatic: operator };
     case "booking_started":
       return { ...base, kind: "intent", label: "Pulsó WhatsApp en la propuesta", detail: operator ? "tú, con sesión del panel" : null, automatic: operator };
+    case "book_link_clicked": {
+      const t = { web: "Ver la web", whatsapp_dudas: "WhatsApp (dudas)", email: "el email" }[str(p.target) ?? ""] ?? "un enlace";
+      return { ...base, kind: "intent", label: `Pulsó ${t} en la propuesta`, detail: operator ? "tú (este dispositivo es del panel)" : null, automatic: operator };
+    }
     case "booking_paid":
       return { ...base, kind: "paid", label: "Pagó la reserva", detail: null, automatic: false };
     case "luvia_handoff":

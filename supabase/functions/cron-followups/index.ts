@@ -37,14 +37,16 @@ function getSubject(hasWebsite: boolean): string {
   return `Re: ${base}`;
 }
 
+const saludo = (nombre: string) => (nombre ? `Hola ${nombre},` : "Hola,");
+
 // `link` va SOLO en su propia línea para que la plantilla lo renderice como botón "Ver la web →".
 function buildBody(emailNumber: 2 | 3, hasWebsite: boolean, nombre: string, link: string): string {
   if (emailNumber === 2) {
-    return `Hola ${nombre},\nSolo por si no lo viste.\n\n${link}\n\nNico`;
+    return `${saludo(nombre)}\nSolo por si no lo viste.\n\n${link}\n\nNico`;
   }
   return (
-    `Hola ${nombre},\n` +
-    `Es el último email que te mando. ${hasWebsite ? "Voy a retirar tu web" : "Voy a darla de baja"} en las próximas 48 h — tengo otros negocios esperando y no puedo mantenerla activa indefinidamente.\n` +
+    `${saludo(nombre)}\n` +
+    `Es el último email que te mando. ${hasWebsite ? "Voy a retirar la web que te preparé" : "Voy a darla de baja"} en las próximas 48 h — tengo otros negocios esperando y no puedo mantenerla activa indefinidamente.\n` +
     `Si la quieres activa, es ahora o la suelto:\n\n${link}\n\nNico`
   );
 }
@@ -57,7 +59,8 @@ async function sendFollowup(
   previewImageUrl: string | null,
 ): Promise<void> {
   const hasWebsite = lead.has_website === true;
-  const nombre = lead.contact_name ?? lead.name;
+  // Sin nombre de persona → "Hola," (el nombre de Google Maps con emojis y "S.L." canta a plantilla).
+  const nombre = lead.contact_name?.trim() || "";
   const subject = getSubject(hasWebsite);
   // /book como destino de compra (cae a la web cruda si no hay BOOKING_BASE).
   const bookUrl = bookingLink(BOOKING_BASE, lead.id);
@@ -148,6 +151,9 @@ async function sendFollowup(
   console.log(`[followup] Email ${emailNumber} → ${lead.name} <${lead.email}>`);
 }
 
+// Estados en los que un lead sigue recibiendo recordatorios.
+const FOLLOWUP_STATUSES = ["contacted", "viewed"];
+
 Deno.serve(async (req: Request) => {
   // Auth: Bearer <CRON_SECRET> (lo manda pg_cron o el operador). Ver nota en las env vars.
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
@@ -166,19 +172,23 @@ Deno.serve(async (req: Request) => {
 
   // ── EMAIL 2: leads 'contacted' desde hace 4+ días ───────────────────────
   // do_not_contact=false: no seguir a quien pidió BAJA (LSSI/RGPD — ver 0020).
+  // 'viewed' también sigue: un clic o una visita a /book (a veces nuestra o de un escáner) no es
+  // una respuesta. El reloj va desde el envío del Email 1, no desde leads.updated_at (que se mueve
+  // con cualquier cambio en el panel o con el paso a 'viewed').
   const { data: staleLeads } = await supabase
     .from("leads")
     .select("id, name, email, contact_name, has_website, owner, do_not_contact")
-    .eq("status", "contacted")
-    .eq("do_not_contact", false)
-    .lt("updated_at", day4Ago);
+    .in("status", FOLLOWUP_STATUSES)
+    .eq("do_not_contact", false);
 
   for (const lead of staleLeads ?? []) {
     if (!lead.email) continue;
-    const { data: existing } = await supabase
-      .from("outreach_messages").select("id")
-      .eq("lead_id", lead.id).eq("email_number", 2).maybeSingle();
-    if (existing) continue;
+    const { data: msgs } = await supabase
+      .from("outreach_messages").select("email_number, status, sent_at")
+      .eq("lead_id", lead.id);
+    if ((msgs ?? []).some((m) => m.email_number === 2 || m.status === "replied")) continue;
+    const email1 = (msgs ?? []).find((m) => m.email_number === 1 && m.sent_at);
+    if (!email1 || new Date(email1.sent_at).getTime() > new Date(day4Ago).getTime()) continue;
 
     const { data: site } = await supabase
       .from("sites").select("live_url, preview_image_url")
@@ -204,10 +214,15 @@ Deno.serve(async (req: Request) => {
     if (existing) continue;
 
     const { data: lead } = await supabase
-      .from("leads").select("id, name, email, contact_name, has_website, owner, do_not_contact")
+      .from("leads").select("id, name, email, contact_name, has_website, owner, do_not_contact, status")
       .eq("id", msg.lead_id).maybeSingle();
     if (!lead?.email) continue;
     if (isOptedOut(lead)) continue; // BAJA: no mandar el Email 3 aunque exista el Email 2.
+    if (!FOLLOWUP_STATUSES.includes(lead.status)) continue; // ya reservó / ganado / perdido
+    const { data: replied } = await supabase
+      .from("outreach_messages").select("id")
+      .eq("lead_id", lead.id).eq("status", "replied").limit(1);
+    if (replied?.length) continue; // respondió (botón "Respondió" de la ficha)
 
     const { data: site } = await supabase
       .from("sites").select("live_url, preview_image_url")

@@ -537,9 +537,9 @@ async function run() {
 
   // PASADA 3 — Seguimientos automáticos (Email 2 día 4, Email 3 día 7 si no abrió Email 2)
   // No aplica en dry-run ni en modo --lead (son pruebas puntuales, no el ciclo completo).
-  if (!DRY_RUN && !ONLY_LEAD && !BUILDS_ONLY) {
-    await processFollowups();
-  }
+  // DESACTIVADO (17-sep-2026): los seguimientos salen SOLO de cron-followups (pg_cron), que filtra
+  // bajas, respuestas y estado y lleva captura + baja one-click. Esta vía antigua no lo hacía.
+  void processFollowups;
 
   console.log(`\nResumen: ${tally.ok} ok · ${tally.dry} dry · ${tally.skip} saltados · ${tally.failed} fallidos.`);
 }

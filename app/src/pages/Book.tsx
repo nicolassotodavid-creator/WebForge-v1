@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { Palette, Search, ClipboardList, Star, Zap, Smartphone, ChevronDown, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { CONTACT_EMAIL, whatsappLink } from "@/lib/business";
 import { Reveal } from "@/components/Reveal";
+import { isOperatorDevice } from "@/hooks/useSession";
 import "./book.css";
 
 const NICO_NAME = "Nico";
@@ -65,14 +66,18 @@ const Stars = ({ size = "text-lg" }: { size?: string }) => (
 // operator=true: quedan en la actividad del lead pero no cuentan como interés del prospecto.
 function trackBookEvent(
   leadId: string,
-  type: "demo_viewed" | "booking_started",
+  type: "demo_viewed" | "booking_started" | "book_link_clicked",
   payload: Record<string, unknown> = {},
 ) {
   supabase.auth
     .getSession()
     .then(({ data }) =>
       supabase.functions.invoke("track-event", {
-        body: { lead_id: leadId, type, payload: data.session ? { ...payload, operator: true } : payload },
+        body: {
+          lead_id: leadId,
+          type,
+          payload: data.session || isOperatorDevice() ? { ...payload, operator: true } : payload,
+        },
       }),
     )
     .catch(() => {});
@@ -179,6 +184,11 @@ export default function Book() {
 
   // CTA de respaldo: WhatsApp. Registra la intención (booking_started) para que quede en el
   // panel aunque no llegue a enviar el mensaje, y deja un acuse en pantalla.
+  // Enlaces secundarios (ver web, WhatsApp de dudas, email): solo dejan rastro, no mueven el lead.
+  const trackLink = (target: string, where: string) => {
+    if (!isPreview && leadId) trackBookEvent(leadId, "book_link_clicked", { target, where });
+  };
+
   const goToWhatsapp = () => {
     if (!isPreview && leadId) trackBookEvent(leadId, "booking_started", { channel: "whatsapp" });
     window.open(waReserva, "_blank");
@@ -224,12 +234,12 @@ export default function Book() {
             </p>
 
             <div className="flex flex-col gap-2.5 mb-10 sm:flex-row sm:gap-3 sm:mb-12 lg:mb-0">
-              <a href={previewUrl} target="_blank" rel="noopener noreferrer"
+              <a href={previewUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackLink("web", "hero")}
                 className="lv-shine-wrap group flex items-center justify-center gap-2 rounded-sm bg-ink px-5 py-3.5 text-sm font-medium text-paper ring-1 ring-ink transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-6">
                 <span>Ver la web completa</span>
                 <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
               </a>
-              <a href={waDefault} target="_blank" rel="noopener noreferrer"
+              <a href={waDefault} target="_blank" rel="noopener noreferrer" onClick={() => trackLink("whatsapp_dudas", "hero")}
                 className="flex items-center justify-center gap-2 rounded-sm border border-ink/15 px-5 py-3.5 text-sm font-medium transition-all duration-500 hover:bg-ink/5 hover:border-ink/30 sm:px-6">
                 Preguntar por WhatsApp
               </a>
@@ -248,7 +258,7 @@ export default function Book() {
               {screenshotUrl && (
                 <img src={screenshotUrl} alt="Vista previa de la web" className="block w-full h-auto" />
               )}
-              <a href={previewUrl} target="_blank" rel="noopener noreferrer"
+              <a href={previewUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackLink("web", "hero2")}
                 className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-paper via-paper/90 to-transparent flex items-end justify-center pb-4">
                 <span className="font-serif italic text-brick text-base lv-underline-grow pb-0.5">Abrir web completa →</span>
               </a>
@@ -438,7 +448,7 @@ export default function Book() {
                 </p>
                 <p className="mt-2 text-[11px] opacity-45">
                   ¿Sin WhatsApp? Escríbeme a{" "}
-                  <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2 hover:opacity-100">{CONTACT_EMAIL}</a>
+                  <a href={`mailto:${CONTACT_EMAIL}`} onClick={() => trackLink("email", "contacto")} className="underline underline-offset-2 hover:opacity-100">{CONTACT_EMAIL}</a>
                 </p>
               </div>
             </Reveal>
@@ -482,7 +492,7 @@ export default function Book() {
       </footer>
 
       {/* Desktop FAB */}
-      <a href={waDefault} target="_blank" rel="noopener noreferrer"
+      <a href={waDefault} target="_blank" rel="noopener noreferrer" onClick={() => trackLink("whatsapp_dudas", "flotante")}
         className="fixed bottom-6 right-6 z-50 hidden size-14 items-center justify-center rounded-full bg-ink text-paper shadow-xl shadow-ink/30 ring-1 ring-ink transition-transform hover:scale-110 active:scale-95 lg:flex lg:size-16"
         aria-label="Hablar por WhatsApp">
         <WhatsAppIcon size={22} />
