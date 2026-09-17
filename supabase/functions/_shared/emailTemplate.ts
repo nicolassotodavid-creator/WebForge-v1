@@ -141,6 +141,11 @@ export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingU
 
   // Enlace de baja clicable en el pie (opcional). El botón nativo "Cancelar suscripción" del
   // cliente de correo sale de la cabecera List-Unsubscribe; esto es su equivalente visible.
+  // Aviso legal (NIF y domicilio, LSSI art. 10) en la web de la marca: mismo dominio que /book.
+  let legalUrl: string | null = null;
+  try {
+    if (bookingUrl) legalUrl = `${new URL(bookingUrl).origin}/aviso-legal`;
+  } catch { /* bookingUrl inválida → sin enlace */ }
   const unsub = unsubscribeUrl
     ? `<p style="margin:6px 0 0;color:#9ca3af;font-size:13px;line-height:1.5;"><a href="${unsubscribeUrl}" style="color:#9ca3af;text-decoration:underline;">Darte de baja con un clic</a></p>`
     : "";
@@ -189,7 +194,7 @@ export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingU
               ${buyLink}
               <hr style="border:none;border-top:1px solid #eeeeee;margin:28px 0 16px;">
               <p style="margin:0 0 6px;color:#9ca3af;font-size:13px;line-height:1.5;">Te escribo a t&iacute;tulo profesional; encontr&eacute; tu contacto en tu ficha p&uacute;blica de actividad. Si no quieres recibir m&aacute;s propuestas o prefieres que borre tus datos, responde <strong>BAJA</strong> a este correo y lo hago de inmediato.</p>
-              <p style="margin:0;color:#9ca3af;font-size:13px;line-height:1.5;">${senderIdentity}</p>
+              <p style="margin:0;color:#9ca3af;font-size:13px;line-height:1.5;">${senderIdentity}${legalUrl ? ` · <a href="${legalUrl}" style="color:#9ca3af;text-decoration:underline;">Aviso legal</a>` : ""}</p>
               ${unsub}
               ${pixel}
             </td>

@@ -1,12 +1,12 @@
 // /book/:leadId — Página PÚBLICA (sin auth). Diseño de Nico (portado de su proyecto
 // Lovable "warm-web-offer" / "Your New Web"): propuesta editorial paper/ink/brick,
 // Instrument Serif + DM Sans, marquee, comparativa 1.500€ vs 397€, garantía 7 días, FAQ.
-// Datos reales del lead vía get-booking-info. CTA primaria = PAGO con Stripe Checkout
-// (create-checkout); respaldo = WhatsApp pre-escrito. Stripe recoge NIF/dirección, no la página.
+// Datos reales del lead vía get-booking-info. CTA única = WhatsApp pre-escrito (el cierre y el cobro
+// se hacen hablando). El pago con Stripe se retiró el 17-sep-2026: estaba en modo real sin probar.
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { Palette, Search, ClipboardList, Star, Zap, Smartphone, ChevronDown, Loader2, Lock, ShieldCheck, RotateCw } from "lucide-react";
+import { Palette, Search, ClipboardList, Star, Zap, Smartphone, ChevronDown, Loader2, ShieldCheck, RotateCw } from "lucide-react";
 import { CONTACT_EMAIL, whatsappLink } from "@/lib/business";
 import { Reveal } from "@/components/Reveal";
 import { isOperatorDevice } from "@/hooks/useSession";
@@ -47,7 +47,7 @@ const FAQ: Array<{ q: string; a: string; onlyWithWebsite?: boolean }> = [
   { q: "¿Necesito saber de tecnología?", a: "Nada. Yo me encargo del dominio, el hosting y todo lo técnico. Tú solo me das el visto bueno." },
   { q: "¿Es caro comparado con una agencia?", a: "Una agencia te cobra 1.500€ o más. Conmigo pagas 397€ + IVA una sola vez y la web es tuya para siempre." },
   { q: "¿Y si ya tengo web?", onlyWithWebsite: true, a: "Perfecto: la nueva puede sustituirla cuando tú quieras y yo me encargo del cambio. Está pensada para móvil, velocidad y Google, para que quien ya te busca te encuentre y te contacte todavía más fácil." },
-  { q: "¿Hay cuotas mensuales?", a: "Ninguna. Es un pago único y la web es tuya. El hosting del primer año va incluido." },
+  { q: "¿Hay cuotas mensuales?", a: "Ninguna. Es un pago único y la web es tuya para siempre: sin cuotas ni renovaciones." },
   { q: "¿Cuánto tarda en estar lista?", a: "La estructura ya está construida. En cuanto me confirmes, la adapto a tu negocio y está online en 48-72 horas." },
 ];
 
@@ -88,8 +88,6 @@ export default function Book() {
   const [loadError, setLoadError] = useState<"not_found" | "network" | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const [paying, setPaying] = useState(false);
-  const [payError, setPayError] = useState<string | null>(null);
   const [waSent, setWaSent] = useState(false);
 
   useEffect(() => {
@@ -188,30 +186,6 @@ export default function Book() {
   const waReserva = whatsappLink(
     `Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quiero reservarla. ¿Cómo seguimos?`,
   ) ?? "#";
-
-  // CTA primaria: pago con tarjeta. Abre Stripe Checkout (create-checkout). Nunca "muere":
-  // muestra carga y, si algo falla, un mensaje claro con salida por WhatsApp.
-  const goToCheckout = async () => {
-    if (paying) return;
-    if (isPreview) {
-      setPayError("Es una vista previa. En tu enlace real, este botón te lleva al pago seguro.");
-      return;
-    }
-    setPaying(true);
-    setPayError(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { lead_id: leadId, contact: { name: info.contact_name ?? businessName } },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      if (!data?.checkout_url) throw new Error("sin checkout_url");
-      window.location.href = data.checkout_url as string;
-    } catch {
-      setPaying(false);
-      setPayError("No se pudo abrir el pago ahora mismo. Prueba otra vez o escríbeme por WhatsApp y lo resolvemos.");
-    }
-  };
 
   // CTA de respaldo: WhatsApp. Registra la intención (booking_started) para que quede en el
   // panel aunque no llegue a enviar el mensaje, y deja un acuse en pantalla.
@@ -461,21 +435,10 @@ export default function Book() {
                 </p>
               )}
 
-              {/* Acción secundaria: pago con tarjeta, para quien quiera cerrar ya */}
-              <button type="button" onClick={goToCheckout} disabled={paying}
-                className="mt-3 w-full flex items-center justify-center gap-2.5 rounded-sm border border-ink/15 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:border-brick/60 hover:bg-brick/[0.06] disabled:cursor-wait disabled:opacity-70">
-                {paying ? (
-                  <><Loader2 className="size-4 animate-spin" /> Abriendo pago seguro…</>
-                ) : (
-                  <><Lock className="size-4" strokeWidth={2} /> ¿Prefieres pagar ya? Págala aquí · 397€ + IVA</>
-                )}
-              </button>
-              {payError && <p className="mt-2.5 text-[13px] leading-snug text-brick">{payError}</p>}
-
               {/* Confianza + salida por email */}
               <div className="mt-6 pt-5 border-t border-ink/5 text-center">
                 <p className="inline-flex items-center gap-1.5 text-[11px] opacity-55">
-                  <ShieldCheck className="size-3.5 text-brick" /> Te respondo el mismo día · pago seguro con Stripe
+                  <ShieldCheck className="size-3.5 text-brick" /> Te respondo el mismo día · sin compromiso
                 </p>
                 <p className="mt-2 text-[11px] opacity-45">
                   ¿Sin WhatsApp? Escríbeme a{" "}
@@ -517,9 +480,10 @@ export default function Book() {
         </section>
       </main>
 
-      {/* pb-24 en móvil: la barra fija de WhatsApp/Pagar tapaba el pie */}
+      {/* pb-24 en móvil: la barra fija de WhatsApp tapaba el pie */}
       <footer className="mx-auto max-w-6xl px-6 pt-12 pb-24 border-t border-ink/5 text-center lg:px-10 lg:pb-12">
         <p className="text-[10px] font-medium uppercase tracking-widest opacity-40 italic">Hecho a mano por {NICO_NAME} para {businessName}</p>
+        <a href="/aviso-legal" className="mt-3 inline-block text-[10px] opacity-40 underline underline-offset-2 hover:opacity-80">Aviso legal y privacidad</a>
       </footer>
 
       {/* Desktop FAB */}
@@ -529,19 +493,13 @@ export default function Book() {
         <WhatsAppIcon size={22} />
       </a>
 
-      {/* Mobile sticky bar: WhatsApp (primario) + pago con tarjeta (respaldo) */}
+      {/* Mobile sticky bar: WhatsApp */}
       <div className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-ink shadow-[0_-8px_32px_rgba(0,0,0,0.25)] lg:hidden">
         <button type="button" onClick={goToWhatsapp}
           className="flex flex-1 items-center justify-center gap-2 py-3.5 bg-[#25D366] text-white text-sm font-medium tracking-tight transition-transform active:scale-[0.98]"
           aria-label="Escribir por WhatsApp">
           <WhatsAppIcon size={20} />
           <span>Me interesa — WhatsApp</span>
-        </button>
-        <button type="button" onClick={goToCheckout} disabled={paying}
-          className="flex items-center justify-center gap-2 px-6 text-paper text-sm font-medium tracking-tight transition-transform active:scale-[0.98] disabled:opacity-70"
-          aria-label="Pagar mi web por 397 euros más IVA">
-          {paying ? <Loader2 className="size-4 animate-spin" /> : <Lock className="size-4" />}
-          <span>Pagar</span>
         </button>
       </div>
     </div>

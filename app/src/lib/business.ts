@@ -4,6 +4,12 @@
 
 export const CONTACT_EMAIL = "hola@nico-soto.es";
 
+// ── Datos legales (LSSI art. 10 / RGPD) ── se muestran en /aviso-legal, enlazada desde /book y
+// desde el pie de los emails. NIF y domicilio: mientras estén vacíos, esas líneas no se pintan.
+export const LEGAL_NAME = "David Nicolás Soto";
+export const LEGAL_NIF = "";
+export const LEGAL_ADDRESS = "";
+
 // ── WhatsApp ─────────────────────────────────────────────────────────────────
 // Dígitos en formato internacional, sin "+" ni espacios. Ej. España: "34600000000".
 // Mientras esté vacío, el botón de WhatsApp simplemente NO se muestra (sin enlaces rotos).

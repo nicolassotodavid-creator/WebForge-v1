@@ -7,6 +7,7 @@ import LeadDetail from "@/pages/LeadDetail";
 import Settings from "@/pages/Settings";
 import Pagos from "@/pages/Pagos";
 import Emails from "@/pages/Emails";
+import AvisoLegal from "@/pages/AvisoLegal";
 import Book from "@/pages/Book";
 import Gracias from "@/pages/Gracias";
 import Demo from "@/pages/Demo";
@@ -19,6 +20,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/book/:leadId" element={<Book />} />
       <Route path="/gracias" element={<Gracias />} />
+      <Route path="/aviso-legal" element={<AvisoLegal />} />
       <Route path="/demo/:slug" element={<Demo />} />
 
       {/* Back-office (requiere sesión de operador) */}
