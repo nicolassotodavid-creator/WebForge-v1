@@ -10,6 +10,14 @@ import { isLuviaLead, buildLuviaOutreachPayload, buildLuviaFinalBody } from "../
 import { bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
+import {
+  assembleEmail1Body,
+  cleanBusinessName,
+  cleanIntro,
+  email1Issues,
+  greetingLine,
+  pickReviewQuotes,
+} from "../_shared/outreachEmail1.ts";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
@@ -51,12 +59,12 @@ function buildTemplateBody(
   link: string,
 ): string {
   if (emailNumber === 2) {
-    return `Hola ${nombre},\nSolo por si no lo viste.\n\n${link}\n\nNico`;
+    return `${greetingLine(nombre)}\nSolo por si no lo viste.\n\n${link}\n\nNico`;
   }
   // Email 3
   const verb = hasWebsite ? "lo dejo caer" : "la doy de baja";
   return (
-    `Hola ${nombre},\n` +
+    `${greetingLine(nombre)}\n` +
     `Esta semana ${verb} — tengo otros negocios esperando y no puedo tenerlo activo indefinidamente.\n` +
     `Por si acaso, aquí la tienes:\n\n${link}\n\nNico`
   );
@@ -244,7 +252,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const subject = getSubject(hasWebsite, emailNumber);
-  const nombre = lead.contact_name ?? lead.name;
+  const nombre = lead.contact_name ?? ""; // sin persona → "Hola," (nunca el nombre de Maps)
 
   // TODOS los emails (1, 2 y 3) llevan UNA sola CTA → la página de venta /book (no la web cruda):
   // /book muestra la captura de la web + la oferta + el botón de pago, así el prospecto puede COMPRAR.
@@ -282,78 +290,130 @@ Deno.serve(async (req: Request) => {
   //  - Luvia (LUVIA_OUTREACH_PROMPT): ofrece el agente de chat; SIN link (CTA = responder).
   // ─────────────────────────────────────────────────────────────────────────────
   const systemPrompt = luvia ? LUVIA_OUTREACH_PROMPT : OUTREACH_PROMPT;
+  // Web: citas SOLO de fragmentos literales de reseñas reales (raw_json.reviews). Los
+  // highlights_from_reviews del brief son RESÚMENES del analista → van como review_themes y el
+  // prompt prohíbe citarlos entre comillas.
+  const reviewQuotes = luvia ? [] : pickReviewQuotes(lead.raw_json, 2);
+  const facts = { rating: lead.rating ?? null, review_count: lead.review_count ?? null, name: cleanBusinessName(lead.name) };
   const payload = luvia
     ? buildLuviaOutreachPayload(lead)
     : {
         segment,
         channel,
         has_website: hasWebsite,
-        live_url: liveUrl,
-        business: { name: lead.name, category: lead.category, city: lead.city },
+        business: {
+          name: facts.name,
+          category: lead.category,
+          city: lead.city,
+          rating: facts.rating,
+          review_count: facts.review_count,
+        },
         contact: { name: lead.contact_name ?? null, role: lead.contact_role ?? null },
         brief: brief
           ? {
               business_summary: brief.business_summary,
               tone: brief.tone,
               value_props: brief.value_props,
-              highlights_from_reviews: brief.highlights_from_reviews,
               services: brief.services,
               hero_copy: brief.hero_copy,
+              review_themes: brief.highlights_from_reviews,
             }
           : null,
+        review_quotes: reviewQuotes,
       };
 
-  let anthropicData: { content?: { text?: string }[]; error?: { message?: string } };
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": ANTHROPIC_API_KEY!,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: ANTHROPIC_MODEL,
-        max_tokens: 1200,
-        system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
-        messages: [{ role: "user", content: JSON.stringify(payload) }],
-      }),
-    });
-    anthropicData = await res.json();
-    if (!res.ok) {
+  type AnthropicMsg = { role: "user" | "assistant"; content: string };
+  // Llama a Claude y parsea el JSON estricto. Devuelve { draft, text } o una Response de error.
+  async function askClaude(
+    messages: AnthropicMsg[],
+  ): Promise<{ draft: Record<string, unknown>; text: string } | Response> {
+    let anthropicData: { content?: { text?: string }[]; error?: { message?: string } };
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": ANTHROPIC_API_KEY!,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: ANTHROPIC_MODEL,
+          max_tokens: 1200,
+          system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
+          messages,
+        }),
+      });
+      anthropicData = await res.json();
+      if (!res.ok) {
+        return jsonResponse(
+          { error: `Claude devolvió ${res.status}: ${anthropicData?.error?.message ?? "error"}` },
+          502,
+        );
+      }
+    } catch (e) {
       return jsonResponse(
-        { error: `Claude devolvió ${res.status}: ${anthropicData?.error?.message ?? "error"}` },
+        { error: `No se pudo contactar con Claude: ${e instanceof Error ? e.message : "error"}` },
         502,
       );
     }
-  } catch (e) {
-    return jsonResponse(
-      { error: `No se pudo contactar con Claude: ${e instanceof Error ? e.message : "error"}` },
-      502,
-    );
+    const text = anthropicData.content?.[0]?.text ?? "";
+    try {
+      return { draft: extractJson(text), text };
+    } catch (_e) {
+      return jsonResponse({ error: "Claude no devolvió un JSON válido.", raw: text.slice(0, 500) }, 422);
+    }
   }
 
-  const text = anthropicData.content?.[0]?.text ?? "";
-  let draft: Record<string, unknown>;
-  try {
-    draft = extractJson(text);
-  } catch (_e) {
-    return jsonResponse({ error: "Claude no devolvió un JSON válido.", raw: text.slice(0, 500) }, 422);
+  const messages: AnthropicMsg[] = [{ role: "user", content: JSON.stringify(payload) }];
+  const first = await askClaude(messages);
+  if (first instanceof Response) return first;
+  let { draft, text } = first;
+
+  // Web por email: si la intro rompe reglas que no se arreglan a máquina (longitud, "vosotros",
+  // cifras inventadas, citas no literales) → UNA corrección. Si la 2ª sale peor o falla, se queda la 1ª.
+  if (!luvia && channel === "email" && typeof draft.body === "string") {
+    const issues = email1Issues(cleanIntro(draft.body), reviewQuotes, facts);
+    if (issues.length) {
+      const retry = await askClaude([
+        ...messages,
+        { role: "assistant", content: text },
+        {
+          role: "user",
+          content:
+            `Corrige el body. Problemas: ${issues.join("; ")}. Recuerda: máximo 80 palabras en 2 párrafos, ` +
+            `siempre de "tú", sin saludo ni firma, sin cifras que no estén en los datos y comillas solo ` +
+            `para fragmentos literales de review_quotes. Devuelve solo el JSON.`,
+        },
+      ]);
+      if (!(retry instanceof Response) && typeof retry.draft.body === "string" && retry.draft.body.trim()) {
+        const retryIssues = email1Issues(cleanIntro(retry.draft.body), reviewQuotes, facts);
+        if (retryIssues.length <= issues.length) ({ draft, text } = retry);
+      }
+    }
   }
 
   const bodyText = typeof draft.body === "string" ? draft.body.trim() : "";
-  if (!bodyText) {
+  if (!bodyText || (!luvia && channel === "email" && !cleanIntro(bodyText))) {
     return jsonResponse({ error: "El mensaje redactado vino vacío.", raw: text.slice(0, 500) }, 422);
   }
 
-  // Web: asunto fijo del sistema + CTA → /book añadida por el sistema.
+  // Web: asunto fijo del sistema. El cuerpo lo ensambla el SISTEMA (no la IA) en el orden del diseño
+  // canónico: saludo → intro → línea-URL (captura + CTAs en renderEmail) → firma "Nico". Las comillas
+  // que no sean cita literal de review_quotes se quitan. El pie de WhatsApp va después, bajo la firma.
   // Luvia: asunto lo propone la IA (con respaldo fijo) y NO se añade ningún link.
   const finalSubject = luvia
     ? (typeof draft.subject === "string" && draft.subject.trim() ? draft.subject.trim() : getLuviaSubject())
     : subject;
   const finalBody = luvia
     ? buildLuviaFinalBody(bodyText, lead.luvia_demo_url)
-    : (channel === "email" ? `${bodyText}\n\n${emailLink}` : bodyText);
+    : (channel === "email"
+      ? assembleEmail1Body({
+        intro: bodyText,
+        greeting: greetingLine(lead.contact_name),
+        link: emailLink,
+        quotes: reviewQuotes,
+      })
+      : bodyText);
 
   const { data: inserted, error: insErr } = await supabase
     .from("outreach_messages")
