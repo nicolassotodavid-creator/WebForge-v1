@@ -408,6 +408,193 @@ export const BRANDS: Brand[] = [
     web: "https://grupoleonreformas.com", logo: "",
     mono: true, primary: "#23232e", secondary: "#5c5c6b",
   },
+
+// --- Madrid 2 (2026-09-17): segunda tanda del sur, este y norte de Madrid ---
+  {
+    slug: "irc-service", empresa: "IRC Service", ciudad: "Torrejón de Ardoz",
+    web: "https://reformasentorrejon.com", logo: "/demo/logos/irc-service.png", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "sigueplac", empresa: "Sigueplac SGP Home", ciudad: "Alcorcón",
+    web: "https://sigueplac.com", logo: "/demo/logos/sigueplac.png", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "refordomus", empresa: "Refordomus Obras y Servicios", ciudad: "Móstoles",
+    web: "https://refordomus.es", logo: "/demo/logos/refordomus.png",
+    primary: "#fe621b", secondary: "#feb999",
+  },
+  {
+    slug: "rehabiliti", empresa: "Rehabiliti", ciudad: "San Sebastián de los Reyes",
+    web: "https://rehabiliti.com", logo: "/demo/logos/rehabiliti.png",
+    primary: "#4b4c99", secondary: "#a1a1d1",
+  },
+  {
+    slug: "reformax", empresa: "ReformaX", ciudad: "San Sebastián de los Reyes",
+    web: "https://reformax.es", logo: "/demo/logos/reformax.png", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "spacioh", empresa: "Spacioh", ciudad: "Fuenlabrada",
+    web: "https://spacioh.com", logo: "/demo/logos/spacioh.svg",
+    primary: "#e4092f", secondary: "#161616",
+  },
+  {
+    slug: "reformas-europa", empresa: "Reformas Europa", ciudad: "Torrejón de Ardoz",
+    web: "https://www.reformaseuropa.es", logo: "/demo/logos/reformas-europa.png",
+    primary: "#003298", secondary: "#fdcf04",
+  },
+  {
+    slug: "decojust", empresa: "Reformas Integrales DecoJust", ciudad: "Móstoles",
+    web: "https://decojust.es", logo: "/demo/logos/decojust.png",
+    primary: "#b8211e", secondary: "#e97d7b",
+  },
+  {
+    slug: "juropa", empresa: "Juropa Reformas", ciudad: "Fuenlabrada",
+    web: "https://www.juropareformas.es", logo: "/demo/logos/juropa.png",
+    primary: "#fd8221", secondary: "#056899",
+  },
+  {
+    slug: "fusion-reformas", empresa: "Fusión Reformas", ciudad: "Móstoles",
+    web: "https://fusionreformas.com", logo: "/demo/logos/fusion-reformas.png",
+    primary: "#1f074e", secondary: "#e1b71d",
+  },
+  {
+    slug: "gesamarcos", empresa: "Gesamarcos", ciudad: "Rivas-Vaciamadrid",
+    web: "https://www.gesamarcos.es", logo: "/demo/logos/gesamarcos.jpg",
+    primary: "#e8434f", secondary: "#1f9ed9",
+  },
+  {
+    slug: "areareforma", empresa: "AreaReforma", ciudad: "Leganés",
+    web: "https://areareforma.com", logo: "/demo/logos/areareforma.jpg",
+    primary: "#fae223", secondary: "#fcf19b",
+  },
+  {
+    slug: "reformas-sucon", empresa: "Reformas Sucon", ciudad: "Parla",
+    web: "https://reformassucon.com", logo: "/demo/logos/reformas-sucon.png",
+    primary: "#006333", secondary: "#2e9e63",
+  },
+  {
+    slug: "midan-home", empresa: "Midan Home", ciudad: "Getafe",
+    web: "https://reformasmidanhome.com", logo: "/demo/logos/midan-home.png", mono: true,
+    primary: "#23232e", secondary: "#c8922a",
+  },
+  {
+    slug: "hometailor", empresa: "HomeTailor", ciudad: "San Sebastián de los Reyes",
+    web: "https://hometailor.es", logo: "/demo/logos/hometailor.png",
+    primary: "#1a3156", secondary: "#3b6fc3",
+  },
+  {
+    slug: "integral-dgm", empresa: "Integral DGM", ciudad: "Móstoles",
+    web: "https://reformainterior.es", logo: "/demo/logos/integral-dgm.png",
+    primary: "#e02020", secondary: "#1a1a1a",
+  },
+  {
+    slug: "waris-reformas", empresa: "Waris Reformas", ciudad: "Rivas-Vaciamadrid",
+    web: "https://warisreformas.com", logo: "", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "construpolis", empresa: "Construpolis", ciudad: "Alcalá de Henares",
+    web: "https://construpolis.net", logo: "/demo/logos/construpolis.png",
+    primary: "#03376b", secondary: "#067ef5",
+  },
+  {
+    slug: "narvoa", empresa: "Narvoa Construcciones", ciudad: "Alcobendas",
+    web: "https://narvoa.com", logo: "/demo/logos/narvoa.png", logoOnDark: true, mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "reformas-torrejon", empresa: "Reformas Torrejón de Ardoz", ciudad: "Torrejón de Ardoz",
+    web: "https://reformastorrejondeardoz.com", logo: "", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "jukave", empresa: "Jukave Construcciones y Reformas", ciudad: "Coslada",
+    web: "https://cys-construccionesyreformasjukave.com", logo: "/demo/logos/jukave.png",
+    primary: "#1b4f9c", secondary: "#d0202a",
+  },
+  {
+    slug: "cocinas-plaza", empresa: "Cocinas y Reformas Plaza", ciudad: "Rivas-Vaciamadrid",
+    web: "https://cocinasyreformasplaza.com", logo: "/demo/logos/cocinas-plaza.png",
+    primary: "#d8232a", secondary: "#1b9ad6",
+  },
+  {
+    slug: "caldisban", empresa: "Caldisban", ciudad: "Alcobendas",
+    web: "http://www.caldisban.com", logo: "", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "pro-reforma", empresa: "Pro Reforma", ciudad: "Rivas-Vaciamadrid",
+    web: "https://www.proreforma.es", logo: "/demo/logos/pro-reforma.png",
+    primary: "#c1121f", secondary: "#23232e",
+  },
+  {
+    slug: "garcia-romero", empresa: "Grupo García Romero e Hijos", ciudad: "Rivas-Vaciamadrid",
+    web: "https://www.reformasgarciaromero.es", logo: "/demo/logos/garcia-romero.png",
+    primary: "#e30414", secondary: "#fc7982",
+  },
+  {
+    slug: "180-grados", empresa: "180 Grados Obras y Proyectos", ciudad: "Alcobendas",
+    web: "https://180grados.es", logo: "/demo/logos/180-grados.png",
+    primary: "#00ae85", secondary: "#3dfed1",
+  },
+  {
+    slug: "a-reformas", empresa: "A-Reformas", ciudad: "Alcobendas",
+    web: "http://www.areformas.es", logo: "/demo/logos/a-reformas.png",
+    primary: "#1ea7e1", secondary: "#111111",
+  },
+  {
+    slug: "clc-reformas", empresa: "CLC Reformas", ciudad: "Arganda del Rey",
+    web: "https://clcreformas.com", logo: "/demo/logos/clc-reformas.png", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "reformas-valentin", empresa: "Reformas Valentín", ciudad: "Coslada",
+    web: "https://www.reformasvalentin.es", logo: "/demo/logos/reformas-valentin.png",
+    primary: "#08d2a0", secondary: "#6ff9d7",
+  },
+  {
+    slug: "reformas-pio", empresa: "Reformas Integrales Pío", ciudad: "Mejorada del Campo",
+    web: "https://www.reformasintegralespio.es", logo: "", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "reformas-velez", empresa: "Reformas Vélez", ciudad: "Fuenlabrada",
+    web: "https://reformasvelez.es", logo: "/demo/logos/reformas-velez.png",
+    primary: "#124ca6", secondary: "#5993ed",
+  },
+  {
+    slug: "auge-reformas", empresa: "Auge Reformas Madrid", ciudad: "Getafe",
+    web: "https://augereformasmadrid.com", logo: "/demo/logos/auge-reformas.png", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "juan-salcedo", empresa: "Reformas Juan Salcedo", ciudad: "Alcalá de Henares",
+    web: "https://reformasjuansalcedo.com", logo: "", mono: true,
+    primary: "#23232e", secondary: "#5c5c6b",
+  },
+  {
+    slug: "hegasa", empresa: "Hegasa Construcciones y Reformas", ciudad: "Fuenlabrada",
+    web: "https://reformasintegralesmadridhegasa.com", logo: "/demo/logos/hegasa.png",
+    primary: "#5c2028", secondary: "#c04a5a",
+  },
+  {
+    slug: "mhd-reformas", empresa: "MHD Reformas Integrales", ciudad: "Valdemoro",
+    web: "https://mhdreformasintegrales.com", logo: "/demo/logos/mhd-reformas.png",
+    primary: "#00b7c9", secondary: "#aa752a",
+  },
+  {
+    slug: "reformas-daniel", empresa: "Decoración y Reformas Daniel", ciudad: "Leganés",
+    web: "https://reformasdaniel.net", logo: "/demo/logos/reformas-daniel.png",
+    primary: "#e01b24", secondary: "#23232e",
+  },
+  {
+    slug: "mlc", empresa: "MLC Trabajos Integrales", ciudad: "Móstoles",
+    web: "https://mlctrabajosintegrales.com", logo: "/demo/logos/mlc.jpg",
+    primary: "#e8a800", secondary: "#23232e",
+  },
 ];
 
 export const findBrand = (slug: string | undefined): Brand | undefined =>

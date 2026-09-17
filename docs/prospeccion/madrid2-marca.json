@@ -1,0 +1,842 @@
+[
+ {
+  "slug": "construcciones-jdm",
+  "empresa": "Construcciones J.D.M. - Reformas integrales de viviendas Alcobendas, zona norte de Madrid",
+  "ciudad": "Alcobendas",
+  "email": "construccionesj.d.m@hotmail.com",
+  "url": "https://construccionesjdm.com/",
+  "logo": {
+   "file": "construcciones-jdm.png",
+   "bytes": 11477,
+   "from": "https://construccionesjdm.com/wp-content/uploads/2024/03/logojdm.png"
+  },
+  "n_cands": 3,
+  "color": {
+   "mono": false,
+   "primary": "#1c2b6b",
+   "secondary": "#fecc00",
+   "logo_claro": false
+  },
+  "slug_scrape": "construcciones-j-d-m",
+  "nombre_comercial": "Construcciones J.D.M.",
+  "config_key": "a3472cc2da84dbcca2c75dda",
+  "demo_ya_existe": true
+ },
+ {
+  "slug": "quality-reform",
+  "empresa": "Quality Reform - Reformas integrales",
+  "ciudad": "Fuenlabrada",
+  "email": "info@qualityreform.com",
+  "url": "http://qualityreform.com/",
+  "logo": null,
+  "n_cands": 4,
+  "color": {
+   "mono": false,
+   "primary": "#168bbe",
+   "secondary": "#931014",
+   "logo_claro": false
+  },
+  "slug_scrape": "quality-reform-reformas-integrales",
+  "nombre_comercial": "Quality Reform",
+  "config_key": "6404140add9c3ca5ab6cb8e9",
+  "demo_ya_existe": true
+ },
+ {
+  "slug": "irc-service",
+  "empresa": "IRC Service - Reforma Integral con Garantía",
+  "ciudad": "Torrejón de Ardoz",
+  "email": "info@ircservice.es",
+  "url": "https://reformasentorrejon.com/",
+  "logo": {
+   "file": "irc-service.png",
+   "bytes": 11636,
+   "from": "https://reformasentorrejon.com/wp-content/uploads/2026/03/10-1.png"
+  },
+  "n_cands": 3,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "slug_scrape": "irc-service-reforma-integral",
+  "nombre_comercial": "IRC Service",
+  "config_key": "b4d5c0e12ecf921319de2fc3"
+ },
+ {
+  "slug": "sigueplac",
+  "empresa": "SIGUEPLAC SGPHOME. REFORMAS INTEGRALES COCINAS BAÑOS SALONES TERRAZAS PROYECTOS INTERIORISMO Y DECORACIÓN INTERIORES ALCORCÓN",
+  "ciudad": "Alcorcón",
+  "email": "sigueplac@sigueplac.com",
+  "url": "https://sigueplac.com/",
+  "logo": {
+   "file": "sigueplac.png",
+   "bytes": 3057,
+   "from": "https://sigueplac.com/wp-content/uploads/2020/03/logotipo-sigueplac-retina-1.png"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "slug_scrape": "sigueplac-sgphome-reformas-integrales",
+  "nombre_comercial": "Sigueplac SGP Home",
+  "config_key": "55862b06e47401b58330f037"
+ },
+ {
+  "slug": "reformas-vegam",
+  "empresa": "Reformas Vegam",
+  "ciudad": "Alcobendas",
+  "email": "roniegio9@hotmail.com",
+  "url": "https://www.reformasvegam.es/",
+  "logo": null,
+  "n_cands": 3,
+  "color": {
+   "mono": false,
+   "primary": "#fcae08",
+   "secondary": "#fddc95",
+   "logo_claro": false
+  },
+  "slug_scrape": "reformas-vegam",
+  "nombre_comercial": "Reformas Vegam",
+  "config_key": "ca56009081d970f60a2a2e8c",
+  "demo_ya_existe": true
+ },
+ {
+  "slug": "refordomus",
+  "empresa": "Refordomus Obras y Servicios - ROS",
+  "ciudad": "Móstoles",
+  "email": "info@refordomus.es",
+  "url": "https://refordomus.es/",
+  "logo": {
+   "file": "refordomus.png",
+   "bytes": 24490,
+   "from": "https://refordomus.es/wp-content/uploads/2025/06/refordomus.png#6095"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": false,
+   "primary": "#fe621b",
+   "secondary": "#feb999",
+   "logo_claro": false
+  },
+  "slug_scrape": "refordomus-obras-y-servicios",
+  "nombre_comercial": "Refordomus Obras y Servicios",
+  "config_key": "71e8e86f30c3a80d2e798340"
+ },
+ {
+  "slug": "rehabiliti",
+  "empresa": "Rehabiliti",
+  "ciudad": "San Sebastián de los Reyes",
+  "email": "reformas@rehabiliti.com",
+  "url": "https://rehabiliti.com/",
+  "logo": {
+   "file": "rehabiliti.png",
+   "bytes": 10153,
+   "from": "https://rehabiliti.com/wp-content/uploads/rehability-logo.png"
+  },
+  "n_cands": 1,
+  "color": {
+   "mono": false,
+   "primary": "#4b4c99",
+   "secondary": "#a1a1d1",
+   "logo_claro": false
+  },
+  "slug_scrape": "rehabiliti",
+  "nombre_comercial": "Rehabiliti",
+  "config_key": "06047cbe920a21d8239ee7c7"
+ },
+ {
+  "slug": "reformax",
+  "empresa": "ReformaX",
+  "ciudad": "San Sebastián de los Reyes",
+  "email": "info@reformax.es",
+  "url": "https://reformax.es/",
+  "logo": {
+   "file": "reformax.png",
+   "bytes": 8701,
+   "from": "https://reformax.es/wp-content/uploads/2020/11/LOGO-REFORMAX2.png"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "slug_scrape": "reformax",
+  "nombre_comercial": "ReformaX",
+  "config_key": "a83305f46ca40a3ef0203ac9"
+ },
+ {
+  "slug": "spacioh",
+  "empresa": "Spacioh",
+  "ciudad": "Fuenlabrada",
+  "email": "info@spacioh.com",
+  "url": "https://spacioh.com/",
+  "logo": {
+   "file": "spacioh.svg",
+   "bytes": 2120,
+   "from": "https://spacioh.com/wp-content/uploads/2026/08/logo-dark.svg"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": false,
+   "primary": "#e4092f",
+   "secondary": "#161616"
+  },
+  "slug_scrape": "spacioh",
+  "nombre_comercial": "Spacioh",
+  "config_key": "58a90b74f914cb7c841b8a1f"
+ },
+ {
+  "slug": "reformas-europa",
+  "empresa": "Reformas Europa Torrejón de Ardoz",
+  "ciudad": "Torrejón de Ardoz",
+  "email": "reformas@reformaseuropa.es",
+  "url": "https://www.reformaseuropa.es/",
+  "logo": {
+   "file": "reformas-europa.png",
+   "bytes": 154223,
+   "from": "https://www.reformaseuropa.es/wp-content/uploads/2026/01/EMPRESA-DE-REFORMAS-EN-TORREJON-DE-ARDOZ.png"
+  },
+  "n_cands": 3,
+  "color": {
+   "mono": false,
+   "primary": "#003298",
+   "secondary": "#fdcf04",
+   "logo_claro": false
+  },
+  "slug_scrape": "reformas-europa-torrejon-de",
+  "nombre_comercial": "Reformas Europa",
+  "config_key": "80353a6197f6849ed53a424d"
+ },
+ {
+  "slug": "decojust",
+  "empresa": "Reformas Integrales DecoJust",
+  "ciudad": "Móstoles",
+  "email": "info@decojust.es",
+  "url": "https://decojust.es/",
+  "logo": {
+   "file": "decojust.png",
+   "bytes": 1082,
+   "from": "https://decojust.es/wp-content/uploads/LOGO-DECO.png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": false,
+   "primary": "#b8211e",
+   "secondary": "#e97d7b",
+   "logo_claro": false
+  },
+  "slug_scrape": "reformas-integrales-decojust",
+  "nombre_comercial": "Reformas Integrales DecoJust",
+  "config_key": "3985b64632636c6640497333"
+ },
+ {
+  "slug": "juropa",
+  "empresa": "Juropa Reformas",
+  "ciudad": "Fuenlabrada",
+  "email": "contacto@juropareformas.es",
+  "url": "https://www.juropareformas.es/",
+  "logo": {
+   "file": "juropa.png",
+   "bytes": 83832,
+   "from": "https://le-de.cdn-website.com/9288f2e2726f4bef9b8af2400171d392/dms3rep/multi/opt/Logo-Juropa-web-274w.png"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": false,
+   "primary": "#fd8221",
+   "secondary": "#056899",
+   "logo_claro": false
+  },
+  "slug_scrape": "juropa-reformas",
+  "nombre_comercial": "Juropa Reformas",
+  "config_key": "149e4e7af1d9208d73d8f0bf"
+ },
+ {
+  "slug": "fusion-reformas",
+  "empresa": "Fusión Reformas Obras con Diseño S.L",
+  "ciudad": "Móstoles",
+  "email": "info@fusionreformas.com",
+  "url": "https://fusionreformas.com/",
+  "logo": {
+   "file": "fusion-reformas.png",
+   "bytes": 13326,
+   "from": "https://fusionreformas.com/wp-content/uploads/2024/10/logo-web-isotipo.png"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": false,
+   "primary": "#1f074e",
+   "secondary": "#e1b71d",
+   "logo_claro": false
+  },
+  "slug_scrape": "fusion-reformas-obras-con",
+  "nombre_comercial": "Fusión Reformas",
+  "config_key": "6a443de94278dde260b12db0"
+ },
+ {
+  "slug": "gesamarcos",
+  "empresa": "GESAMARCOS",
+  "ciudad": "Rivas-Vaciamadrid",
+  "email": "info@gesamarcos.es",
+  "url": "https://www.gesamarcos.es/",
+  "logo": {
+   "file": "gesamarcos.jpg",
+   "bytes": 7396,
+   "from": "https://www.gesamarcos.es/-_-/res/6ae0a2c4-610b-43f8-a30f-2858db83028d/images/files/6ae0a2c4-610b-43f8-a30f-2858db83028d/577ad17a-4ce6-46d7-8839-57cc31deb643/228-189/24ddc643b51f3dae0beee7fe21e2cde216be97d3"
+  },
+  "n_cands": 3,
+  "color": {
+   "mono": false,
+   "primary": "#e8434f",
+   "secondary": "#1f9ed9"
+  },
+  "slug_scrape": "gesamarcos",
+  "nombre_comercial": "Gesamarcos",
+  "config_key": "1872714f260802f73157aba4"
+ },
+ {
+  "slug": "areareforma",
+  "empresa": "AreaReforma",
+  "ciudad": "Leganés",
+  "email": "hectorpelliteri@gmail.com",
+  "url": "https://areareforma.com/",
+  "logo": {
+   "file": "areareforma.jpg",
+   "bytes": 6671,
+   "from": "http://areareforma.com/wp-content/uploads/2024/06/image0-e1717763449614.jpeg"
+  },
+  "n_cands": 1,
+  "color": {
+   "mono": false,
+   "primary": "#fae223",
+   "secondary": "#fcf19b",
+   "logo_claro": false
+  },
+  "slug_scrape": "areareforma",
+  "nombre_comercial": "AreaReforma",
+  "config_key": "85ca1b8a5fb62fab4d0085fa"
+ },
+ {
+  "slug": "reformas-sucon",
+  "empresa": "Reformas Sucon",
+  "ciudad": "Parla",
+  "email": "suconreformas@gmail.com",
+  "url": "https://reformassucon.com/",
+  "logo": {
+   "file": "reformas-sucon.png",
+   "bytes": 2754,
+   "from": "https://reformassucon.com/media/logo.png"
+  },
+  "n_cands": 1,
+  "color": {
+   "mono": false,
+   "primary": "#006333",
+   "secondary": "#2e9e63",
+   "logo_claro": false
+  },
+  "slug_scrape": "reformas-sucon",
+  "nombre_comercial": "Reformas Sucon",
+  "config_key": "e2ec11f55c9da3069827b450"
+ },
+ {
+  "slug": "midan-home",
+  "empresa": "Midan Home S.L.",
+  "ciudad": "Getafe",
+  "email": "midanhome@gmail.com",
+  "url": "https://reformasmidanhome.com/",
+  "logo": {
+   "file": "midan-home.png",
+   "bytes": 5126,
+   "from": "https://reformasmidanhome.com/wp-content/uploads/thegem-logos/logo_f398a5260b71c6776634b4b226ae6d3b_1x.png"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#c8922a"
+  },
+  "slug_scrape": "midan-home-s-l",
+  "nombre_comercial": "Midan Home",
+  "config_key": "de0100ffb74d5236453a198b"
+ },
+ {
+  "slug": "hometailor",
+  "empresa": "HomeTailor | Reformas Integrales en Madrid",
+  "ciudad": "San Sebastián de los Reyes",
+  "email": "info@hometailor.es",
+  "url": "https://hometailor.es/",
+  "logo": {
+   "file": "hometailor.png",
+   "bytes": 2363,
+   "from": "https://hometailor.es/wp-content/uploads/2021/09/logo.png"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": false,
+   "primary": "#1a3156",
+   "secondary": "#3b6fc3",
+   "logo_claro": false
+  },
+  "slug_scrape": "hometailor",
+  "nombre_comercial": "HomeTailor",
+  "config_key": "b5bd86422ef5c4c48544222f"
+ },
+ {
+  "slug": "integral-dgm",
+  "empresa": "INTEGRAL DGM",
+  "ciudad": "Móstoles",
+  "email": "info@reformainterior.es",
+  "url": "https://reformainterior.es/",
+  "logo": {
+   "file": "integral-dgm.png",
+   "bytes": 3657,
+   "from": "https://reformainterior.es/wp-content/uploads/2017/09/logo-reforma-interior.png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": false,
+   "primary": "#e02020",
+   "secondary": "#1a1a1a"
+  },
+  "slug_scrape": "integral-dgm",
+  "nombre_comercial": "Integral DGM",
+  "config_key": "715c90259442f9f02dd330d5"
+ },
+ {
+  "slug": "waris-reformas",
+  "empresa": "WARIS REFORMAS",
+  "ciudad": "Rivas-Vaciamadrid",
+  "email": "comercial@waris.es",
+  "url": "https://warisreformas.com/",
+  "logo": null,
+  "n_cands": 2,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "nota_marca": "su web no publica logo utilizable: wordmark en tinta",
+  "slug_scrape": "waris-reformas",
+  "nombre_comercial": "Waris Reformas",
+  "config_key": "549945f998ac3d3718f9b23c"
+ },
+ {
+  "slug": "construpolis",
+  "empresa": "Construpolis",
+  "ciudad": "Alcalá de Henares",
+  "email": "contacto@construpolis.net",
+  "url": "https://construpolis.net/",
+  "logo": {
+   "file": "construpolis.png",
+   "bytes": 59368,
+   "from": "https://www.construpolis.net/wp-content/uploads/2020/04/LOGO-AZUL-transparente-construpolis.png"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": false,
+   "primary": "#03376b",
+   "secondary": "#067ef5",
+   "logo_claro": false
+  },
+  "slug_scrape": "construpolis",
+  "nombre_comercial": "Construpolis",
+  "config_key": "c55f2d12033c0b420fbbdba7"
+ },
+ {
+  "slug": "narvoa",
+  "empresa": "NARVOA CONSTRUCCIONES S.L.",
+  "ciudad": "Alcobendas",
+  "email": "info@narvoa.com",
+  "url": "https://narvoa.com/",
+  "logo": {
+   "file": "narvoa.png",
+   "bytes": 76953,
+   "from": "https://narvoa.com/wp-content/uploads/2024/11/Logo_Narvoa_BLANCO-1.png"
+  },
+  "n_cands": 4,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b",
+   "logo_claro": true
+  },
+  "slug_scrape": "narvoa-construcciones-s-l",
+  "nombre_comercial": "Narvoa Construcciones",
+  "config_key": "44720b100f448febc793baf1"
+ },
+ {
+  "slug": "reformas-torrejon",
+  "empresa": "Reformas Torrejón de Ardoz │ Farkas Ciprian",
+  "ciudad": "Torrejón de Ardoz",
+  "email": "farkascsabaciprian@gmail.com",
+  "url": "https://reformastorrejondeardoz.com/",
+  "logo": null,
+  "n_cands": 2,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "nota_marca": "su web no publica logo utilizable: wordmark en tinta",
+  "slug_scrape": "reformas-torrejon-de-ardoz",
+  "nombre_comercial": "Reformas Torrejón de Ardoz",
+  "config_key": "fd5e779546aeb3dc8b94b30a"
+ },
+ {
+  "slug": "jukave",
+  "empresa": "CONSTRUCCIONES Y REFORMAS JUKAVE, SL",
+  "ciudad": "Coslada",
+  "email": "construccionesyreformasjukave@gmail.com",
+  "url": "https://cys-construccionesyreformasjukave.com/",
+  "logo": {
+   "file": "jukave.png",
+   "bytes": 522803,
+   "from": "https://cys-construccionesyreformasjukave.com/wp-content/uploads/2023/10/Logotipo.png"
+  },
+  "n_cands": 3,
+  "color": {
+   "mono": false,
+   "primary": "#1b4f9c",
+   "secondary": "#d0202a"
+  },
+  "slug_scrape": "construcciones-y-reformas-jukave",
+  "nombre_comercial": "Jukave Construcciones y Reformas",
+  "config_key": "ee921826df397fd554f2f92c"
+ },
+ {
+  "slug": "cocinas-plaza",
+  "empresa": "Cocinas y Reformas Incaser",
+  "ciudad": "Rivas-Vaciamadrid",
+  "email": "incaserslu@gmail.com",
+  "url": "https://cocinasyreformasplaza.com/",
+  "logo": {
+   "file": "cocinas-plaza.png",
+   "bytes": 156333,
+   "from": "https://cocinasyreformasplaza.com/fotos/logo.png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": false,
+   "primary": "#d8232a",
+   "secondary": "#1b9ad6"
+  },
+  "slug_scrape": "cocinas-y-reformas-incaser",
+  "nombre_comercial": "Cocinas y Reformas Plaza",
+  "config_key": "21fdd76d8f8704a460c67b83"
+ },
+ {
+  "slug": "caldisban",
+  "empresa": "Caldisban",
+  "ciudad": "Alcobendas",
+  "email": "alcobendas@caldisban.com",
+  "url": "http://www.caldisban.com/",
+  "logo": null,
+  "n_cands": 0,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "nota_marca": "su web no publica logo utilizable: wordmark en tinta",
+  "slug_scrape": "caldisban",
+  "nombre_comercial": "Caldisban",
+  "config_key": "a681af3cb26b0b9a7046ec41"
+ },
+ {
+  "slug": "pro-reforma",
+  "empresa": "Pro Reforma",
+  "ciudad": "Rivas-Vaciamadrid",
+  "email": "daniel@proreforma.es",
+  "url": "https://www.proreforma.es/",
+  "logo": {
+   "file": "pro-reforma.png",
+   "bytes": 125364,
+   "from": "https://le-de.cdn-website.com/beaaf108ecf341caa892db8928c0bb0c/dms3rep/multi/opt/ProReforma_1200x630-1920w.png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": false,
+   "primary": "#c1121f",
+   "secondary": "#23232e"
+  },
+  "slug_scrape": "pro-reforma",
+  "nombre_comercial": "Pro Reforma",
+  "config_key": "42a267e4a2698d2d7b5cccd2"
+ },
+ {
+  "slug": "garcia-romero",
+  "empresa": "Grupo García Romero e Hijos",
+  "ciudad": "Rivas-Vaciamadrid",
+  "email": "reformasgarciaromero@gmail.com",
+  "url": "https://www.reformasgarciaromero.es/",
+  "logo": {
+   "file": "garcia-romero.png",
+   "bytes": 16307,
+   "from": "https://le-de.cdn-website.com/4c9f861bff824c8a87ccba13fa088517/dms3rep/multi/opt/Logo-Grupo-Romero-web-1920w.png"
+  },
+  "n_cands": 3,
+  "color": {
+   "mono": false,
+   "primary": "#e30414",
+   "secondary": "#fc7982",
+   "logo_claro": false
+  },
+  "slug_scrape": "grupo-garcia-romero-e",
+  "nombre_comercial": "Grupo García Romero e Hijos",
+  "config_key": "64acd093d5f36e5b5713a98e"
+ },
+ {
+  "slug": "180-grados",
+  "empresa": "180 Grados Obras y Proyectos",
+  "ciudad": "Alcobendas",
+  "email": "info@180grados.es",
+  "url": "https://180grados.es/",
+  "logo": {
+   "file": "180-grados.png",
+   "bytes": 4997,
+   "from": "https://180grados.es/wp-content/uploads/thegem/logos/logo_26f2fcd3cfed692f7d4b7043e8818d6e_1x.png"
+  },
+  "n_cands": 3,
+  "color": {
+   "mono": false,
+   "primary": "#00ae85",
+   "secondary": "#3dfed1",
+   "logo_claro": false
+  },
+  "slug_scrape": "180-grados-obras-y",
+  "nombre_comercial": "180 Grados Obras y Proyectos",
+  "config_key": "ac7731cc94f10c24599b82da"
+ },
+ {
+  "slug": "a-reformas",
+  "empresa": "A-reformas",
+  "ciudad": "Alcobendas",
+  "email": "info@areformas.es",
+  "url": "http://www.areformas.es/",
+  "logo": {
+   "file": "a-reformas.png",
+   "bytes": 15958,
+   "from": "http://www.areformas.es/images/logo.png"
+  },
+  "n_cands": 1,
+  "color": {
+   "mono": false,
+   "primary": "#1ea7e1",
+   "secondary": "#111111"
+  },
+  "slug_scrape": "a-reformas",
+  "nombre_comercial": "A-Reformas",
+  "config_key": "e8754f1f986c15bec9232fe9"
+ },
+ {
+  "slug": "clc-reformas",
+  "empresa": "Clc Reformas",
+  "ciudad": "Arganda del Rey",
+  "email": "c.l.c.reformas@hotmail.com",
+  "url": "https://clcreformas.com/",
+  "logo": {
+   "file": "clc-reformas.png",
+   "bytes": 8403,
+   "from": "https://clcreformas.com/wp-content/uploads/2025/05/cropped-cropped-NEGRO-ATRAS-1-scaled-2-2.png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "slug_scrape": "clc-reformas",
+  "nombre_comercial": "CLC Reformas",
+  "config_key": "6451269c9fa3e0f2af79c4d2"
+ },
+ {
+  "slug": "reformas-valentin",
+  "empresa": "ReformasValentin",
+  "ciudad": "Coslada",
+  "email": "537info@reformasvalentin.es",
+  "url": "https://www.reformasvalentin.es/",
+  "logo": {
+   "file": "reformas-valentin.png",
+   "bytes": 8293,
+   "from": "https://reformasvalentin.es/.cm4all/uproc.php/0/15d5605ef15b4936a5eb5d1f4c68aec2-free%20(3).png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": false,
+   "primary": "#08d2a0",
+   "secondary": "#6ff9d7",
+   "logo_claro": false
+  },
+  "slug_scrape": "reformasvalentin",
+  "nombre_comercial": "Reformas Valentín",
+  "config_key": "b8bd2a9455165bd0ef89da75"
+ },
+ {
+  "slug": "reformas-pio",
+  "empresa": "Reformas Integrales Pio",
+  "ciudad": "Mejorada del Campo",
+  "email": "reformasintegralespio@gmail.com",
+  "url": "https://www.reformasintegralespio.es/",
+  "logo": null,
+  "n_cands": 0,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "nota_marca": "su web no publica logo utilizable: wordmark en tinta",
+  "slug_scrape": "reformas-integrales-pio",
+  "nombre_comercial": "Reformas Integrales Pío",
+  "config_key": "ebdb24920d960dfa3ee334e4"
+ },
+ {
+  "slug": "reformas-velez",
+  "empresa": "Reformas Vélez",
+  "ciudad": "Fuenlabrada",
+  "email": "reformasvelez17@gmail.com",
+  "url": "https://reformasvelez.es/",
+  "logo": {
+   "file": "reformas-velez.png",
+   "bytes": 14024,
+   "from": "https://reformasvelez.es/wp-content/uploads/2022/03/Screenshot_225.png"
+  },
+  "n_cands": 1,
+  "color": {
+   "mono": false,
+   "primary": "#124ca6",
+   "secondary": "#5993ed",
+   "logo_claro": false
+  },
+  "slug_scrape": "reformas-velez",
+  "nombre_comercial": "Reformas Vélez",
+  "config_key": "1e7ac4f320763b4e1566b433"
+ },
+ {
+  "slug": "auge-reformas",
+  "empresa": "Auge Reformas Madrid | Empresa de Reformas Integrales",
+  "ciudad": "Getafe",
+  "email": "info@augereformasmadrid.com",
+  "url": "https://augereformasmadrid.com/",
+  "logo": {
+   "file": "auge-reformas.png",
+   "bytes": 4518,
+   "from": "https://augereformasmadrid.com/wp-content/uploads/2023/06/logo-auge.png"
+  },
+  "n_cands": 1,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "slug_scrape": "auge-reformas-madrid",
+  "nombre_comercial": "Auge Reformas Madrid",
+  "config_key": "421232284c0130906830b569"
+ },
+ {
+  "slug": "juan-salcedo",
+  "empresa": "Reformas Juan Salcedo",
+  "ciudad": "Alcalá de Henares",
+  "email": "reformas@reformasjuansalcedo.com",
+  "url": "https://reformasjuansalcedo.com/",
+  "logo": null,
+  "n_cands": 3,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  },
+  "nota_marca": "su web no publica logo utilizable: wordmark en tinta",
+  "slug_scrape": "reformas-juan-salcedo",
+  "nombre_comercial": "Reformas Juan Salcedo",
+  "config_key": "4ab8f5cf1ed04303454bc3cb"
+ },
+ {
+  "slug": "hegasa",
+  "empresa": "Construcciones y Reformas Integrales en Madrid - Hegasa",
+  "ciudad": "Fuenlabrada",
+  "email": "info@construccioneshegasa.com",
+  "url": "https://reformasintegralesmadridhegasa.com/",
+  "logo": {
+   "file": "hegasa.png",
+   "bytes": 8840,
+   "from": "https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_180,h_180/https://reformasintegralesmadridhegasa.com/wp-content/uploads/2021/01/construcciones-hegasa-favicon.png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": false,
+   "primary": "#5c2028",
+   "secondary": "#c04a5a",
+   "logo_claro": false
+  },
+  "slug_scrape": "construcciones-y-reformas-integrales",
+  "nombre_comercial": "Hegasa Construcciones y Reformas",
+  "config_key": "1e5e10fe4630b1b63fbfd235"
+ },
+ {
+  "slug": "mhd-reformas",
+  "empresa": "MHD REFORMAS INTEGRALES",
+  "ciudad": "Valdemoro",
+  "email": "info@mhdreformasintegrales.com",
+  "url": "https://mhdreformasintegrales.com/",
+  "logo": {
+   "file": "mhd-reformas.png",
+   "bytes": 52934,
+   "from": "https://mhdreformasintegrales.com/wp-content/uploads/2026/05/logo-web-nuevo.png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": false,
+   "primary": "#00b7c9",
+   "secondary": "#aa752a",
+   "logo_claro": false
+  },
+  "slug_scrape": "mhd-reformas-integrales",
+  "nombre_comercial": "MHD Reformas Integrales",
+  "config_key": "6fb27d4aac13df91725ddef5"
+ },
+ {
+  "slug": "reformas-daniel",
+  "empresa": "Decoración y reformas Daniel SL",
+  "ciudad": "Leganés",
+  "email": "decoracionesyreformasdaniel@gmail.com",
+  "url": "https://reformasdaniel.net/",
+  "logo": {
+   "file": "reformas-daniel.png",
+   "bytes": 82433,
+   "from": "https://reformasdaniel.net/images/logo.png"
+  },
+  "n_cands": 2,
+  "color": {
+   "mono": false,
+   "primary": "#e01b24",
+   "secondary": "#23232e"
+  },
+  "slug_scrape": "decoracion-y-reformas-daniel",
+  "nombre_comercial": "Decoración y Reformas Daniel",
+  "config_key": "fd3d940561f9dd737f77c8ca"
+ },
+ {
+  "slug": "mlc",
+  "empresa": "MLC Trabajos Integrales",
+  "ciudad": "Móstoles",
+  "email": "infomlctrabajosintegrales@gmail.com",
+  "url": "https://mlctrabajosintegrales.com/",
+  "logo": {
+   "file": "mlc.jpg",
+   "bytes": 22947,
+   "from": "https://mlctrabajosintegrales.com/wp-content/uploads/2019/02/logo-recortado.jpg"
+  },
+  "n_cands": 1,
+  "color": {
+   "mono": false,
+   "primary": "#e8a800",
+   "secondary": "#23232e"
+  },
+  "slug_scrape": "mlc-trabajos-integrales",
+  "nombre_comercial": "MLC Trabajos Integrales",
+  "config_key": "a3aa5a72fe2831706f2571d5"
+ }
+]
