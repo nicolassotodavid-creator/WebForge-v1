@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { messageEngagement, type LeadEvent } from "@/lib/activity";
 import { messageLabel, messageProduct, type Product } from "@/lib/product";
 import { cn } from "@/lib/utils";
+import { LoteFunnel } from "@/components/LoteFunnel";
 
 const PRODUCT_TABS: { key: Product | "all"; label: string }[] = [
   { key: "all", label: "Todos" },
@@ -161,6 +162,8 @@ export default function Emails() {
         })}
       </div>
 
+      {product !== "simulador" && <LoteFunnel />}
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {([
           ["Enviados", String(kpis.enviados)],
@@ -298,8 +301,8 @@ export default function Emails() {
       <p className="text-[11px] text-muted-foreground">
         La apertura se detecta con un píxel (puede no registrarse si el cliente bloquea imágenes) y
         los clics con los enlaces de seguimiento (desde el 13-sep-2026). No cuentan los escáneres, las
-        vistas previas ni las aperturas a menos de 1 min del envío. «Respondió» aún no se captura
-        automáticamente.
+        vistas previas, las aperturas a menos de 1 min del envío ni tus propios clics. «Respondió» se
+        marca a mano con el botón de la ficha del lead.
       </p>
     </div>
   );

@@ -108,6 +108,8 @@ export function describeEvent(e: LeadEvent, messages: ActivityMessage[]): Activi
       const t = { web: "Ver la web", whatsapp_dudas: "WhatsApp (dudas)", email: "el email" }[str(p.target) ?? ""] ?? "un enlace";
       return { ...base, kind: "intent", label: `Pulsó ${t} en la propuesta`, detail: operator ? "tú (este dispositivo es del panel)" : null, automatic: operator };
     }
+    case "checkout_started":
+      return { ...base, kind: "intent", label: "Abrió el pago con tarjeta", detail: null, automatic: false };
     case "booking_paid":
       return { ...base, kind: "paid", label: "Pagó la reserva", detail: null, automatic: false };
     case "luvia_handoff":

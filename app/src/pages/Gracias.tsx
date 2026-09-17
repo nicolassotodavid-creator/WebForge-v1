@@ -1,40 +1,53 @@
 // /gracias — Página PÚBLICA de confirmación tras el pago con Stripe.
 // Stripe redirige aquí con ?session_id=cs_xxx tras checkout.session.completed.
+// Mismo estilo que /book (book.css: lv-scope, paper/ink/brick, Instrument Serif + DM Sans).
+import { useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
+import { CONTACT_EMAIL, whatsappLink } from "@/lib/business";
+import "./book.css";
 
 export default function Gracias() {
+  useEffect(() => {
+    document.title = "Pago recibido · Nico Soto";
+  }, []);
+
+  const wa = whatsappLink("Hola Nico, acabo de pagar mi web. ¿Cómo seguimos?");
+
   return (
-    <div className="min-h-screen bg-zinc-50 grid place-items-center px-4">
-      <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm max-w-sm w-full p-8 text-center space-y-5">
+    <div className="lv-scope grid min-h-screen place-items-center bg-paper px-4 py-10 text-ink">
+      <div className="w-full max-w-md rounded-sm bg-paper p-8 text-center shadow-2xl shadow-ink/5 ring-1 ring-ink/10 sm:p-10">
         <div className="flex justify-center">
-          <CheckCircle2 className="h-14 w-14 text-emerald-500" />
+          <CheckCircle2 className="h-14 w-14 text-brick" strokeWidth={1.5} />
         </div>
 
-        <div className="space-y-2">
-          <h1 className="text-xl font-bold text-zinc-900">¡Pago recibido!</h1>
-          <p className="text-zinc-500 text-sm leading-relaxed">
-            Muchas gracias. Me pongo en contacto contigo en las próximas horas
-            para publicar la web bajo tu dominio y explicarte los siguientes pasos.
-          </p>
-        </div>
+        <h1 className="mt-5 font-serif text-4xl leading-tight">¡Pago recibido!</h1>
+        <p className="mt-3 text-[15px] leading-relaxed opacity-75">
+          Muchas gracias. Me pongo en contacto contigo en las próximas horas
+          para publicar la web bajo tu dominio y explicarte los siguientes pasos.
+        </p>
 
-        <div className="bg-zinc-50 rounded-xl px-4 py-3 text-left space-y-1.5">
-          <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Qué pasa ahora</p>
-          <ul className="text-sm text-zinc-600 space-y-1">
-            <li>1. Te escribo por email con los siguientes pasos.</li>
+        <div className="mt-7 rounded-sm border border-ink/5 bg-ink/[0.03] px-5 py-4 text-left">
+          <p className="mb-2 text-[10px] font-medium uppercase tracking-widest text-brick">Qué pasa ahora</p>
+          <ol className="space-y-1.5 text-sm opacity-80">
+            <li>1. Te escribo por WhatsApp o email con los siguientes pasos.</li>
             <li>2. Elegimos el dominio (o usamos el tuyo).</li>
-            <li>3. La web está publicada en 24 horas.</li>
-          </ul>
+            <li>3. En 48-72 horas la web está publicada.</li>
+          </ol>
         </div>
 
-        <div className="pt-1">
-          <a
-            href="mailto:nicolassotodavid@gmail.com"
-            className="text-xs text-zinc-400 underline underline-offset-2 hover:text-zinc-700"
-          >
-            ¿Alguna duda? nicolassotodavid@gmail.com
+        {wa && (
+          <a href={wa} target="_blank" rel="noopener noreferrer"
+            className="mt-6 flex w-full items-center justify-center rounded-sm bg-[#25D366] py-3.5 text-sm font-medium text-white shadow-lg shadow-[#25D366]/20 transition-transform hover:-translate-y-0.5">
+            Escríbeme por WhatsApp
           </a>
-        </div>
+        )}
+
+        <p className="mt-4 text-xs opacity-55">
+          ¿Prefieres email?{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2 hover:opacity-100">
+            {CONTACT_EMAIL}
+          </a>
+        </p>
       </div>
     </div>
   );

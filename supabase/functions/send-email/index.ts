@@ -31,6 +31,7 @@ Deno.serve(async (req: Request) => {
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   const FROM_EMAIL = Deno.env.get("FROM_EMAIL");
+  const ADMIN_USER_ID = Deno.env.get("ADMIN_USER_ID");
   if (!SUPABASE_URL || !SERVICE_KEY) {
     return jsonResponse(
       { error: "Faltan SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY en el entorno." },
@@ -95,7 +96,7 @@ Deno.serve(async (req: Request) => {
       400,
     );
   }
-  if (msg.status === "sent") {
+  if (msg.status === "sent" || msg.status === "sending" || msg.status === "replied") {
     return jsonResponse({ error: "Este mensaje ya se había enviado." }, 409);
   }
   if (!msg.subject || !msg.body) {
@@ -124,14 +125,36 @@ Deno.serve(async (req: Request) => {
   }
 
   // --- Web del lead: captura (escaparate) + live_url (botón "Ver la web entera") ---
-  const { data: site } = await supabase
+  // Leads de WebForge: gate de QA también aquí (no solo al generar el borrador) → la web tiene que
+  // seguir aprobada; si se rechazó después, no se envía. Luvia está exento (no vende web).
+  const isWebforgeLead = !ADMIN_USER_ID || lead.owner === ADMIN_USER_ID;
+  let siteQuery = supabase
     .from("sites")
-    .select("live_url, preview_image_url")
+    .select("live_url, preview_image_url, status")
     .eq("lead_id", msg.lead_id)
-    .not("live_url", "is", null)
+    .not("live_url", "is", null);
+  if (isWebforgeLead) siteQuery = siteQuery.eq("status", "approved");
+  const { data: site } = await siteQuery
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+  if (isWebforgeLead && !site) {
+    return jsonResponse({ error: "La web de este lead no está aprobada; no se envía." }, 409);
+  }
+
+  // --- Reclamar el mensaje (atómico) antes de enviar: doble clic, dos pestañas o un reintento
+  // tras timeout no mandan dos emails. Solo uno consigue pasar de su estado a 'sending'.
+  const { data: claimed } = await supabase
+    .from("outreach_messages")
+    .update({ status: "sending" })
+    .eq("id", messageId)
+    .eq("status", msg.status)
+    .select("id");
+  if (!claimed?.length) {
+    return jsonResponse({ error: "Este mensaje ya se está enviando." }, 409);
+  }
+  const releaseClaim = () =>
+    supabase.from("outreach_messages").update({ status: msg.status }).eq("id", messageId).eq("status", "sending");
 
   // --- Construir HTML del email (plantilla compartida _shared/emailTemplate.ts) ---
   // Pixel de seguimiento de apertura (1×1, llamada pública a track-event GET).
@@ -180,6 +203,8 @@ Deno.serve(async (req: Request) => {
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json",
+        // Resend deduplica 24 h por esta clave: segunda red de seguridad contra el doble envío.
+        "Idempotency-Key": `outreach-${messageId}`,
       },
       body: JSON.stringify({
         from: `Nico <${FROM_EMAIL}>`,
@@ -201,6 +226,7 @@ Deno.serve(async (req: Request) => {
       message?: string;
     };
     if (!res.ok) {
+      await releaseClaim();
       return jsonResponse(
         { error: `Resend devolvió ${res.status}: ${data?.message ?? "error"}` },
         502,
@@ -208,6 +234,7 @@ Deno.serve(async (req: Request) => {
     }
     resendId = data?.id ?? null;
   } catch (e) {
+    await releaseClaim();
     return jsonResponse(
       {
         error: `No se pudo enviar el email: ${e instanceof Error ? e.message : "error"}`,

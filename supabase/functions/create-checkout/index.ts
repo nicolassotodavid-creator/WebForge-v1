@@ -162,7 +162,7 @@ Deno.serve(async (req: Request) => {
   // --- Evento de analítica ---
   await supabase.from("events").insert({
     lead_id,
-    type: "booking_started",
+    type: "checkout_started", // distinto de booking_started (= botón WhatsApp de /book)
     payload: { booking_id: booking.id, stripe_session_id: (session as { id: string }).id },
   });
 

@@ -34,6 +34,11 @@ export default function Layout() {
   const { session } = useSession();
   const [dark, setDark] = useDarkMode();
 
+  // index.html trae un título neutro para /book; en el panel se ve el suyo.
+  useEffect(() => {
+    document.title = "WebForge · Panel";
+  }, []);
+
   async function signOut() {
     await supabase.auth.signOut();
     navigate("/login", { replace: true });

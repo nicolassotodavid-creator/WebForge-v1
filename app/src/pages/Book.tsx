@@ -6,10 +6,11 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { Palette, Search, ClipboardList, Star, Zap, Smartphone, ChevronDown, Loader2, Lock, ShieldCheck } from "lucide-react";
+import { Palette, Search, ClipboardList, Star, Zap, Smartphone, ChevronDown, Loader2, Lock, ShieldCheck, RotateCw } from "lucide-react";
 import { CONTACT_EMAIL, whatsappLink } from "@/lib/business";
 import { Reveal } from "@/components/Reveal";
 import { isOperatorDevice } from "@/hooks/useSession";
+import { categoryNoun, cleanBusinessName, domainHintFrom } from "@/lib/bookCopy";
 import "./book.css";
 
 const NICO_NAME = "Nico";
@@ -40,19 +41,15 @@ const INCLUDED = [
   { title: "Carga ultra-rápida", body: "Web ligera que abre al instante en cualquier dispositivo." },
   { title: "Adaptado a móviles", body: "Se ve y funciona perfecto en cualquier pantalla." },
 ];
-const FAQ = [
+// `onlyWithWebsite`: la pregunta solo tiene sentido para negocios que ya tienen web.
+const FAQ: Array<{ q: string; a: string; onlyWithWebsite?: boolean }> = [
   { q: "¿Y si no me gusta la web?", a: "Tienes 7 días de garantía total. Si no te convence, te devuelvo el dinero sin preguntas." },
   { q: "¿Necesito saber de tecnología?", a: "Nada. Yo me encargo del dominio, el hosting y todo lo técnico. Tú solo me das el visto bueno." },
-  { q: "¿Es caro comparado con hacerla yo?", a: "Una agencia te cobra 1.500€ o más. Conmigo pagas 397€ + IVA una sola vez y la web es tuya para siempre." },
-  { q: "¿Y si ya tengo web?", a: "La reemplazamos. Esta está optimizada para móvil, velocidad y Google — lo que probablemente la tuya no hace." },
+  { q: "¿Es caro comparado con una agencia?", a: "Una agencia te cobra 1.500€ o más. Conmigo pagas 397€ + IVA una sola vez y la web es tuya para siempre." },
+  { q: "¿Y si ya tengo web?", onlyWithWebsite: true, a: "Perfecto: la nueva puede sustituirla cuando tú quieras y yo me encargo del cambio. Está pensada para móvil, velocidad y Google, para que quien ya te busca te encuentre y te contacte todavía más fácil." },
   { q: "¿Hay cuotas mensuales?", a: "Ninguna. Es un pago único y la web es tuya. El hosting del primer año va incluido." },
   { q: "¿Cuánto tarda en estar lista?", a: "La estructura ya está construida. En cuanto me confirmes, la adapto a tu negocio y está online en 48-72 horas." },
 ];
-
-function domainHintFrom(name: string): string {
-  const slug = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "").slice(0, 20);
-  return `${slug || "tunegocio"}.es`;
-}
 
 const Stars = ({ size = "text-lg" }: { size?: string }) => (
   <div className={`flex gap-0.5 text-brick leading-none ${size}`}>
@@ -87,14 +84,16 @@ export default function Book() {
   const { leadId } = useParams<{ leadId: string }>();
   const [info, setInfo] = useState<BookingInfo | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  // not_found = el lead no existe / enlace roto; network = fallo temporal (se puede reintentar).
+  const [loadError, setLoadError] = useState<"not_found" | "network" | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
   const [waSent, setWaSent] = useState(false);
 
   useEffect(() => {
-    if (!leadId) { setLoadError("Enlace no válido."); setLoading(false); return; }
+    if (!leadId) { setLoadError("not_found"); setLoading(false); return; }
     if (leadId === "preview") {
       setInfo({
         business_name: "Talleres YuriCar", category: "taller", city: "Valencia",
@@ -105,6 +104,8 @@ export default function Book() {
       setLoading(false);
       return;
     }
+    setLoading(true);
+    setLoadError(null);
     supabase.functions.invoke("get-booking-info", { body: { lead_id: leadId } })
       .then(({ data, error }) => {
         if (error) throw error;
@@ -112,13 +113,20 @@ export default function Book() {
         setInfo(data as BookingInfo);
         if (leadId) trackBookEvent(leadId, "demo_viewed");
       })
-      .catch((e: Error) => {
+      .catch((e: Error & { context?: { status?: number } }) => {
         // El prospecto no tiene que ver "Edge Function returned a non-2xx status code".
         console.error("get-booking-info:", e.message);
-        setLoadError("Este enlace no es válido o la propuesta ya no está disponible.");
+        // Solo un 400/404 de la función significa "no existe"; lo demás (sin red, 5xx, relay) es temporal.
+        const status = e.name === "FunctionsHttpError" ? e.context?.status : undefined;
+        setLoadError(status === 404 || status === 400 ? "not_found" : "network");
       })
       .finally(() => setLoading(false));
-  }, [leadId]);
+  }, [leadId, reloadKey]);
+
+  const businessName = info ? cleanBusinessName(info.business_name) : "";
+  useEffect(() => {
+    if (businessName) document.title = `Tu nueva web · ${businessName}`;
+  }, [businessName]);
 
   // ── estados ──
   if (loading) return (
@@ -126,31 +134,54 @@ export default function Book() {
       <Loader2 className="h-6 w-6 animate-spin text-brick" />
     </div>
   );
+  if (loadError === "network") {
+    const waAyuda = whatsappLink(`Hola ${NICO_NAME}, estoy intentando abrir la propuesta de mi web y no me carga.`);
+    return (
+      <div className="lv-scope grid min-h-screen place-items-center bg-paper px-4 text-center">
+        <div className="max-w-sm">
+          <p className="font-serif text-2xl text-ink">No se ha podido cargar la propuesta</p>
+          <p className="mt-2 text-sm text-ink/60">Parece un problema de conexión. Prueba otra vez en unos segundos.</p>
+          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:justify-center">
+            <button type="button" onClick={() => setReloadKey((k) => k + 1)}
+              className="flex items-center justify-center gap-2 rounded-sm bg-ink px-5 py-3 text-sm font-medium text-paper">
+              <RotateCw className="size-4" /> Reintentar
+            </button>
+            {waAyuda && (
+              <a href={waAyuda} target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-sm bg-[#25D366] px-5 py-3 text-sm font-medium text-white">
+                <WhatsAppIcon size={18} /> Escríbeme por WhatsApp
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (loadError || !info) return (
     <div className="lv-scope grid min-h-screen place-items-center bg-paper px-4 text-center">
       <div>
         <p className="font-serif text-2xl text-ink">Página no encontrada</p>
-        <p className="mt-2 text-sm text-ink/50">{loadError ?? "No se pudo cargar la propuesta."}</p>
+        <p className="mt-2 text-sm text-ink/50">Este enlace no es válido o la propuesta ya no está disponible.</p>
       </div>
     </div>
   );
 
   // ── datos derivados ──
-  const businessName = info.business_name;
   const city = info.city ?? "tu ciudad";
-  const category = (info.category ?? "negocio").toLowerCase();
+  const category = categoryNoun(info.category); // "taller", "empresa de reformas"… (nunca la categoría cruda de Maps)
   const previewUrl = info.live_url ?? "#";
   const screenshotUrl = info.preview_image_url;
   // Nota REAL de Google o nada: antes caía a "4.9" inventado si el lead no tenía nota, y decía
   // "los clientes hablan bien de ti" también a negocios con 3,8.
-  const showRating = info.rating != null && info.rating >= 4.3;
+  const showRating = info.rating != null && info.rating >= 4.3 && (info.review_count ?? 0) >= 10;
   const rating = info.rating != null ? info.rating.toLocaleString("es-ES", { maximumFractionDigits: 1 }) : "";
   const domainHint = domainHintFrom(businessName);
   const greeting = info.contact_name ? `Hola ${info.contact_name}, ` : "Hola, ";
-  // 9 de las 17 webs aprobadas son de negocios SIN web: a esos no se les dice que su web "no les hace justicia".
+  // Nunca decir que su web actual es mala (regla de templates.md): se plantea como oportunidad.
   const intro = info.has_website === false
     ? "estuve mirando negocios locales con buena reputación en Google que todavía no tienen web."
-    : "estuve mirando negocios locales con buena reputación en Google pero con una web que no les hace justicia.";
+    : "estuve mirando negocios locales con buena reputación en Google que pueden sacarle todavía más partido a internet.";
+  const faq = FAQ.filter((f) => !f.onlyWithWebsite || info.has_website === true);
   const waDefault = whatsappLink(`Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quería preguntarte una cosa.`) ?? "#";
 
   const isPreview = !leadId || leadId === "preview";
@@ -410,7 +441,7 @@ export default function Book() {
 
             <Reveal delay={120} className="mt-2 bg-paper ring-1 ring-ink/10 rounded-sm p-5 shadow-2xl shadow-ink/5 sm:mt-4 sm:p-7 lg:p-10">
               <div className="grid grid-cols-3 gap-2 mb-7 pb-6 border-b border-ink/5">
-                {[["Garantía", "7 días"], ["Pago", "único"], ["Respuesta", "<1h"]].map(([k, v]) => (
+                {[["Garantía", "7 días"], ["Pago", "único"], ["Respuesta", "el mismo día"]].map(([k, v]) => (
                   <div key={k} className="text-center">
                     <p className="text-[9px] font-medium uppercase tracking-widest opacity-40">{k}</p>
                     <p className="text-xs font-medium mt-1">{v}</p>
@@ -426,7 +457,7 @@ export default function Book() {
               </button>
               {waSent && (
                 <p className="mt-2.5 text-center text-[13px] leading-snug text-ink/70">
-                  Te espero en WhatsApp 👋 Te respondo en menos de una hora.
+                  Te espero en WhatsApp 👋 Te respondo el mismo día.
                 </p>
               )}
 
@@ -444,7 +475,7 @@ export default function Book() {
               {/* Confianza + salida por email */}
               <div className="mt-6 pt-5 border-t border-ink/5 text-center">
                 <p className="inline-flex items-center gap-1.5 text-[11px] opacity-55">
-                  <ShieldCheck className="size-3.5 text-brick" /> Respondo en menos de 1h · pago seguro con Stripe
+                  <ShieldCheck className="size-3.5 text-brick" /> Te respondo el mismo día · pago seguro con Stripe
                 </p>
                 <p className="mt-2 text-[11px] opacity-45">
                   ¿Sin WhatsApp? Escríbeme a{" "}
@@ -476,7 +507,7 @@ export default function Book() {
               <h2 className="font-serif text-[2rem] leading-tight text-balance sm:text-4xl lg:text-5xl">Antes de decidirte.</h2>
             </Reveal>
             <div>
-              {FAQ.map((item, i) => (
+              {faq.map((item, i) => (
                 <Reveal key={item.q} delay={i * 60}>
                   <FaqItem q={item.q} a={item.a} />
                 </Reveal>
