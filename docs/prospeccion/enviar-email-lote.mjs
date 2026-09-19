@@ -7,6 +7,10 @@
 // Cada envío se apunta en outreach_messages con email_number 101 (email 1) / 102 (seguimiento):
 // así el panel lo etiqueta como "Simulador" (app/src/lib/product.ts) y los crons de webs no lo tocan.
 // NO cambia leads.status: el pipeline de webs no se entera.
+// Seguimiento (18-sep): la fila se crea ANTES del envío (draft, sin sent_at) para tener su id y meterlo en
+//  · el píxel de apertura (track-event → outreach_messages.opened_at), en una parte HTML que es el mismo texto;
+//  · el enlace a la demo, que va por www.nico-soto.es/r/<lead>/demo?m=&s=<slug> (track-click → events.link_clicked).
+// Tras enviar se marca sent + sent_at. Si Resend falla, se borra el borrador.
 import fs from "node:fs";
 import path from "node:path";
 
@@ -65,13 +69,28 @@ const LEADS = parseCsv(fs.readFileSync(path.join(DIR, LOTES[LOTE][0]), "utf8"), 
   .map((r) => {
     const c = demoPorEmail.get(ALIAS[r.email.trim().toLowerCase()] || r.email.trim().toLowerCase());
     if (!c?.demo_url) throw new Error(`Sin demo para ${r.empresa} (${r.email})`);
-    const link = c.demo_url;
+    if (!/^[0-9a-f-]{36}$/i.test(c.lead_id || "")) throw new Error(`Sin lead_id para ${r.empresa}`);
     return {
-      n: Number(c.n), lead_id: c.lead_id, empresa: r.empresa, to: r.email.trim(), slug: c.slug, cluster: r.cluster, link,
+      n: Number(c.n), lead_id: c.lead_id, empresa: r.empresa, to: r.email.trim(), slug: c.slug, cluster: r.cluster,
       asunto: SEGUIMIENTO ? r.followup_asunto : r.asunto,
-      text: (SEGUIMIENTO ? r.followup_cuerpo : r.cuerpo).replaceAll("{link_demo}", link),
+      plantilla: SEGUIMIENTO ? r.followup_cuerpo : r.cuerpo,
     };
   });
+
+// Enlace con seguimiento a la demo (mismo dominio que el remitente). El destino lo fija track-click.
+const linkDemo = (l, messageId) =>
+  `${env.APP_URL.replace(/\/$/, "")}/r/${l.lead_id}/demo?m=${messageId}&c=email&s=${encodeURIComponent(l.slug)}`;
+const textoDe = (l, messageId) => l.plantilla.replaceAll("{link_demo}", linkDemo(l, messageId));
+for (const l of LEADS) l.text = textoDe(l, "00000000-0000-0000-0000-000000000000");
+
+// HTML = el mismo texto plano, sin diseño (que siga pareciendo un correo escrito a mano) + píxel 1×1.
+const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function htmlDe(text, l, messageId) {
+  const cuerpo = esc(text).replace(/https?:\/\/[^\s<]+/g, (u) => `<a href="${u}">${u}</a>`).replace(/\n/g, "<br>\n");
+  const pixel = `${env.SUPABASE_URL}/functions/v1/track-event?lead_id=${l.lead_id}&type=email_opened&message_id=${messageId}`;
+  return `<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#222">${cuerpo}</div>` +
+    `<img src="${pixel}" width="1" height="1" alt="" style="display:block;border:0;width:1px;height:1px">`;
+}
 
 for (const l of LEADS) if (/\{[a-z_]+\}/.test(l.text + l.asunto)) throw new Error(`Placeholder sin rellenar en ${l.empresa}`);
 
@@ -79,7 +98,32 @@ const LOG = path.join(DIR, `home-estimator-lote${LOTE}-${SEGUIMIENTO ? "seguimie
 const previos = fs.existsSync(LOG) ? JSON.parse(fs.readFileSync(LOG, "utf8")) : [];
 const yaEnviados = new Set(previos.filter((r) => r.http === 200).map((r) => r.n));
 
-// Apunta el envío en el panel. Idempotente por el índice único (lead_id, email_number).
+const SB = {
+  apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+  "Content-Type": "application/json",
+};
+const REST = `${env.SUPABASE_URL}/rest/v1/outreach_messages`;
+
+// Borrador previo al envío: devuelve su id. Si ya hay fila para (lead, email_number): enviada → null (saltar),
+// borrador de un intento fallido → se reutiliza.
+async function crearBorrador(l) {
+  const q = await fetch(`${REST}?select=id,status&lead_id=eq.${l.lead_id}&email_number=eq.${EMAIL_NUMBER}`, { headers: SB });
+  const [previa] = await q.json();
+  if (previa) return previa.status === "sent" ? null : previa.id;
+  const res = await fetch(REST, {
+    method: "POST", headers: { ...SB, Prefer: "return=representation" },
+    body: JSON.stringify({
+      lead_id: l.lead_id, channel: "email", email_number: EMAIL_NUMBER, subject: l.asunto, body: l.plantilla,
+      status: "draft", generated_by_model: "manual:simulador",
+    }),
+  });
+  if (!res.ok) throw new Error(`borrador HTTP ${res.status} ${await res.text()}`);
+  return (await res.json())[0].id;
+}
+const patchMensaje = (id, campos) =>
+  fetch(`${REST}?id=eq.${id}`, { method: "PATCH", headers: SB, body: JSON.stringify(campos) });
+
+// Solo para --registrar (envíos antiguos, hechos sin seguimiento). Idempotente por (lead_id, email_number).
 async function registrarEnPanel(l, sentAt) {
   const res = await fetch(`${env.SUPABASE_URL}/rest/v1/outreach_messages?on_conflict=lead_id,email_number`, {
     method: "POST",
@@ -110,16 +154,21 @@ const registro = [...previos];
 for (const l of LEADS) {
   if (yaEnviados.has(l.n)) { console.log(`${l.n} ${l.empresa} · ya enviado, salto`); continue; }
   if (!ENVIAR) { console.log(`\n=== ${l.n} [${l.cluster}] ${l.empresa} → ${l.to}\nAsunto: ${l.asunto}\n\n${l.text}`); continue; }
+  const messageId = await crearBorrador(l);
+  if (!messageId) { console.log(`${l.n} ${l.empresa} · ya consta como enviado en el panel, salto`); continue; }
+  const text = textoDe(l, messageId);
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: "Nico <hola@nico-soto.es>", to: [l.to], reply_to: "hola@nico-soto.es", subject: l.asunto, text: l.text }),
+    body: JSON.stringify({ from: "Nico <hola@nico-soto.es>", to: [l.to], reply_to: "hola@nico-soto.es", subject: l.asunto, text, html: htmlDe(text, l, messageId) }),
   });
   const body = await res.json().catch(() => ({}));
-  const r = { n: l.n, empresa: l.empresa, slug: l.slug, cluster: l.cluster, to: l.to, asunto: l.asunto, http: res.status, resend_id: body.id || null, error: body.message || null, at: new Date().toISOString() };
+  const r = { n: l.n, empresa: l.empresa, slug: l.slug, cluster: l.cluster, to: l.to, asunto: l.asunto, http: res.status, resend_id: body.id || null, message_id: messageId, error: body.message || null, at: new Date().toISOString() };
   registro.push(r);
   fs.writeFileSync(LOG, JSON.stringify(registro, null, 2));
-  const panel = res.ok ? await registrarEnPanel(l, r.at) : "";
+  const panel = res.ok
+    ? ((await patchMensaje(messageId, { status: "sent", sent_at: r.at, body: text })).ok ? "apuntado en el panel" : "OJO: enviado pero sin marcar en el panel")
+    : (await fetch(`${REST}?id=eq.${messageId}`, { method: "DELETE", headers: SB }), "borrador borrado");
   console.log(`${r.n} [${r.cluster}] ${r.empresa} → ${r.to} · HTTP ${r.http} ${r.resend_id || r.error} · ${panel}`);
   await new Promise((ok) => setTimeout(ok, 1500));
 }

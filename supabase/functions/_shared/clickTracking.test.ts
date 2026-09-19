@@ -5,6 +5,7 @@ import {
   isLikelyBot,
   isTooSoonAfterSend,
   parseClickPath,
+  demoUrl,
   trackEmailLinks,
 } from "./clickTracking.ts";
 
@@ -38,6 +39,10 @@ assertEq(parseClickPath(`/r/${LEAD}/book`), { leadId: LEAD, target: "book" }, "r
 assertEq(parseClickPath(`/track-click/${LEAD}/wa/`), { leadId: LEAD, target: "wa" }, "ruta de la función con barra final");
 assertEq(parseClickPath(`/r/${LEAD.toUpperCase()}/WEB`), { leadId: LEAD, target: "web" }, "normaliza mayúsculas");
 assertEq(parseClickPath(`/r/${LEAD}/evil`), null, "destino desconocido → null");
+assertEq(parseClickPath(`/r/${LEAD}/demo`), { leadId: LEAD, target: "demo" }, "destino demo del simulador");
+assertEq(demoUrl("cecever"), "https://presupuestos.nico-soto.es/demo/cecever", "demo con slug válido");
+assertEq(demoUrl("x/../../evil.com"), null, "slug con barras → null");
+assertEq(demoUrl(""), null, "sin slug → null");
 assertEq(parseClickPath("/r/no-es-uuid/web"), null, "lead no válido → null");
 
 // ── isLikelyBot ──────────────────────────────────────────────────────────────

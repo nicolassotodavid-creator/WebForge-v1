@@ -1,10 +1,11 @@
 // track-click — Redirector con seguimiento para los enlaces que recibe el prospecto.
-// GET /track-click/<leadId>/<web|book|wa>?m=<message_id>&c=<email|whatsapp>
+// GET /track-click/<leadId>/<web|book|wa|demo>?m=<message_id>&c=<email|whatsapp>[&s=<slug demo>]
 // En los emails y en el WhatsApp manual va como https://www.nico-soto.es/r/<leadId>/<destino>
 // (app/vercel.json lo reescribe aquí), así el prospecto ve el dominio de la marca.
 //
 //  1) Resuelve el destino EN EL SERVIDOR a partir del lead: web → última sites.live_url,
-//     book → BOOKING_BASE/<lead>, wa → wa.me/WHATSAPP_NUMBER. Nunca redirige a una URL que venga
+//     book → BOOKING_BASE/<lead>, wa → wa.me/WHATSAPP_NUMBER, demo → presupuestos.nico-soto.es/demo/<s>
+//     ([SIMULADOR], host fijo). Nunca redirige a una URL que venga
 //     en el propio enlace (sin redirección abierta).
 //  2) Apunta `link_clicked` en events: destino, canal, mensaje y si parece automático (vista previa
 //     de WhatsApp, escáner del correo, HEAD o clic a <60 s del envío).
@@ -14,7 +15,7 @@
 // PÚBLICO (verify_jwt=false): lo abre el prospecto sin sesión. Si algo falla, redirige igualmente.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { bookingLink } from "../_shared/emailTemplate.ts";
-import { isLikelyBot, isTooSoonAfterSend, parseClickPath } from "../_shared/clickTracking.ts";
+import { demoUrl, isLikelyBot, isTooSoonAfterSend, parseClickPath } from "../_shared/clickTracking.ts";
 
 const DEFAULT_FALLBACK = "https://www.nico-soto.es";
 
@@ -66,6 +67,8 @@ Deno.serve(async (req: Request) => {
       destination = (siteRes.data as { live_url?: string } | null)?.live_url ?? bookUrl;
     } else if (target === "book") {
       destination = bookUrl;
+    } else if (target === "demo") {
+      destination = demoUrl(url.searchParams.get("s"));
     } else {
       const n = (Deno.env.get("WHATSAPP_NUMBER") ?? "").replace(/\D/g, "");
       destination = n.length >= 8 ? `https://wa.me/${n}` : null;
@@ -91,7 +94,8 @@ Deno.serve(async (req: Request) => {
       },
     });
 
-    if (!automatic) {
+    // El simulador no toca leads.status: el pipeline de webs no debe enterarse.
+    if (!automatic && target !== "demo") {
       await supabase
         .from("leads")
         .update({ status: "viewed", updated_at: new Date().toISOString() })
@@ -100,7 +104,7 @@ Deno.serve(async (req: Request) => {
     }
   } catch (e) {
     console.error("track-click:", e instanceof Error ? e.message : e);
-    if (!destination) destination = target === "book" ? bookUrl : null;
+    if (!destination) destination = target === "book" ? bookUrl : target === "demo" ? demoUrl(url.searchParams.get("s")) : null;
   }
 
   return redirect(destination ?? fallback);

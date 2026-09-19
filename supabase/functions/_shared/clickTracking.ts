@@ -5,7 +5,15 @@
 // nunca lleva la URL final, así que no hay redirección abierta. Puro y sin dependencias: lo
 // importan las Edge Functions (Deno) y el orquestador (Node).
 
-export type ClickTarget = "web" | "book" | "wa";
+export type ClickTarget = "web" | "book" | "wa" | "demo";
+
+// [SIMULADOR] Demo del Home Estimator: el enlace lleva el slug (?s=), el host es FIJO, así que
+// tampoco hay redirección abierta. Devuelve null si el slug no es válido.
+export const DEMO_BASE = "https://presupuestos.nico-soto.es/demo";
+export function demoUrl(slug: string | null | undefined): string | null {
+  const s = (slug ?? "").trim().toLowerCase();
+  return /^[a-z0-9][a-z0-9-]{0,79}$/.test(s) ? `${DEMO_BASE}/${s}` : null;
+}
 
 // Base de los enlaces de seguimiento. Con APP_URL (dominio de la marca) → <APP_URL>/r, que es lo
 // que ve el prospecto y va alineado con el dominio remitente. Sin APP_URL → la función directa.
@@ -22,17 +30,18 @@ export function clickUrl(
   base: string,
   leadId: string,
   target: ClickTarget,
-  opts: { messageId?: string | null; channel?: string | null } = {},
+  opts: { messageId?: string | null; channel?: string | null; slug?: string | null } = {},
 ): string {
   const q = new URLSearchParams();
   if (opts.messageId) q.set("m", opts.messageId);
   if (opts.channel) q.set("c", opts.channel);
+  if (opts.slug) q.set("s", opts.slug);
   const qs = q.toString();
   return `${base.replace(/\/$/, "")}/${leadId}/${target}${qs ? `?${qs}` : ""}`;
 }
 
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
-const CLICK_PATH = new RegExp(`/(${UUID})/(web|book|wa)/?$`, "i");
+const CLICK_PATH = new RegExp(`/(${UUID})/(web|book|wa|demo)/?$`, "i");
 
 // Acepta tanto /r/<lead>/<destino> como /track-click/<lead>/<destino> (la ruta que llega a la función).
 export function parseClickPath(pathname: string): { leadId: string; target: ClickTarget } | null {
