@@ -3,8 +3,9 @@
 // Uso: node docs/prospeccion/enviar-email-lote.mjs --lote 3                          → simulación
 //      node docs/prospeccion/enviar-email-lote.mjs --lote 3 --enviar                 → email 1
 //      node docs/prospeccion/enviar-email-lote.mjs --lote 3 --seguimiento --enviar   → email 2 (seguimiento)
+//      node docs/prospeccion/enviar-email-lote.mjs --lote madrid3 --email3 --enviar   → email 3 (solo lotes con email3_* en el CSV)
 //      node docs/prospeccion/enviar-email-lote.mjs --lote 3 [--seguimiento] --registrar → solo apunta en el panel lo ya enviado (log)
-// Cada envío se apunta en outreach_messages con email_number 101 (email 1) / 102 (seguimiento):
+// Cada envío se apunta en outreach_messages con email_number 101 (email 1) / 102 (seguimiento) / 103 (email 3):
 // así el panel lo etiqueta como "Simulador" (app/src/lib/product.ts) y los crons de webs no lo tocan.
 // NO cambia leads.status: el pipeline de webs no se entera.
 // Seguimiento (18-sep): la fila se crea ANTES del envío (draft, sin sent_at) para tener su id y meterlo en
@@ -19,6 +20,7 @@ const DIR = path.dirname(new URL(import.meta.url).pathname);
 const ROOT = path.resolve(DIR, "../..");
 const ENVIAR = process.argv.includes("--enviar");
 const SEGUIMIENTO = process.argv.includes("--seguimiento");
+const EMAIL3 = process.argv.includes("--email3");
 const REGISTRAR = process.argv.includes("--registrar");
 const LOTE = process.argv[process.argv.indexOf("--lote") + 1];
 // lote → [CSV de clusters, cola con demo_url]
@@ -38,7 +40,8 @@ const LOTES = {
 if (!process.argv.includes("--lote") || !LOTES[LOTE]) { console.error(`Falta --lote ${Object.keys(LOTES).join(" | ")}`); process.exit(1); }
 // Emails corregidos respecto a la cola: email del CSV de clusters → email que figura en la cola.
 const ALIAS = { "administracion@bonoproyectos.com": "info@bonoporyectos.com" };
-const EMAIL_NUMBER = SEGUIMIENTO ? 102 : 101;
+const EMAIL_NUMBER = EMAIL3 ? 103 : SEGUIMIENTO ? 102 : 101;
+const FASE = EMAIL3 ? "email3" : SEGUIMIENTO ? "seguimiento" : "email1";
 const env = Object.fromEntries(fs.readFileSync(path.join(ROOT, ".env"), "utf8").split("\n")
   .filter((l) => /^[A-Z_]+=/.test(l)).map((l) => [l.slice(0, l.indexOf("=")), l.slice(l.indexOf("=") + 1).trim()]));
 
@@ -77,8 +80,8 @@ const LEADS = parseCsv(fs.readFileSync(path.join(DIR, LOTES[LOTE][0]), "utf8"), 
     if (!/^[0-9a-f-]{36}$/i.test(c.lead_id || "")) throw new Error(`Sin lead_id para ${r.empresa}`);
     return {
       n: Number(c.n), lead_id: c.lead_id, empresa: r.empresa, to: r.email.trim(), slug: c.slug, cluster: r.cluster,
-      asunto: SEGUIMIENTO ? r.followup_asunto : r.asunto,
-      plantilla: SEGUIMIENTO ? r.followup_cuerpo : r.cuerpo,
+      asunto: EMAIL3 ? r.email3_asunto : SEGUIMIENTO ? r.followup_asunto : r.asunto,
+      plantilla: EMAIL3 ? r.email3_cuerpo : SEGUIMIENTO ? r.followup_cuerpo : r.cuerpo,
     };
   });
 
@@ -87,7 +90,7 @@ const LEADS = parseCsv(fs.readFileSync(path.join(DIR, LOTES[LOTE][0]), "utf8"), 
 const linkDemo = (l, messageId) =>
   `${env.APP_URL.replace(/\/$/, "")}/r/${l.lead_id}/demo?m=${messageId}&c=email&s=${encodeURIComponent(l.slug)}`;
 const demoLimpia = (l) => `https://presupuestos.nico-soto.es/demo/${l.slug}`;
-for (const l of LEADS) l.text = l.plantilla.replaceAll("{link_demo}", demoLimpia(l));
+for (const l of LEADS) l.text = (l.plantilla || "").replaceAll("{link_demo}", demoLimpia(l));
 
 // HTML = el mismo texto plano, sin diseño (que siga pareciendo un correo escrito a mano) + píxel 1×1.
 const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -102,8 +105,9 @@ function htmlDe(text, l, messageId) {
 }
 
 for (const l of LEADS) if (/\{[a-z_]+\}/.test(l.text + l.asunto)) throw new Error(`Placeholder sin rellenar en ${l.empresa}`);
+for (const l of LEADS) if (!l.asunto || !l.plantilla) throw new Error(`Sin asunto o cuerpo (${FASE}) para ${l.empresa}`);
 
-const LOG = path.join(DIR, `home-estimator-lote${LOTE}-${SEGUIMIENTO ? "seguimiento" : "email1"}-envios.json`);
+const LOG = path.join(DIR, `home-estimator-lote${LOTE}-${FASE}-envios.json`);
 const previos = fs.existsSync(LOG) ? JSON.parse(fs.readFileSync(LOG, "utf8")) : [];
 const yaEnviados = new Set(previos.filter((r) => r.http === 200).map((r) => r.n));
 
@@ -166,7 +170,7 @@ const bloqueo = await fetch(`${env.SUPABASE_URL}/rest/v1/leads?select=id&do_not_
 if (!bloqueo.ok) throw new Error(`No se pudo leer do_not_contact (HTTP ${bloqueo.status}): no envío a ciegas`);
 const noContactar = new Set((await bloqueo.json()).map((r) => r.id));
 
-console.log(`${LEADS.length - noContactar.size} emails (${noContactar.size} con no contactar) · ${SEGUIMIENTO ? "seguimiento" : "email 1"} · ${ENVIAR ? "ENVÍO REAL" : "simulación"}`);
+console.log(`${LEADS.length - noContactar.size} emails (${noContactar.size} con no contactar) · ${FASE} · ${ENVIAR ? "ENVÍO REAL" : "simulación"}`);
 const registro = [...previos];
 for (const l of LEADS) {
   if (noContactar.has(l.lead_id)) { console.log(`${l.n} ${l.empresa} · no contactar (rebote/queja/baja), salto`); continue; }

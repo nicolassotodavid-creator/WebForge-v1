@@ -1,841 +1,1201 @@
-empresa,ciudad,email,slug,variante,cluster,asunto,cuerpo,followup_asunto,followup_cuerpo,enviar,aviso
-Construcciones J.D.M.,Alcobendas,construccionesj.d.m@hotmail.com,construcciones-jdm,A-fijo,A-fijo,he probado tu formulario,"Hola,
+empresa,ciudad,email,slug,variante,cluster,asunto,cuerpo,followup_asunto,followup_cuerpo,email3_asunto,email3_cuerpo,enviar,aviso
+"Construcciones J.D.M.","Alcobendas","construccionesj.d.m@hotmail.com","construcciones-jdm","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Vuestra página de contacto se llama 'Pide ya tu presupuesto', pero el formulario no pregunta metros, tipo de reforma ni plazo. Cada petición llega como un mensaje en blanco y alguien tiene que escribir para entender qué quiere el cliente.
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+He preparado un simulador para la web de Construcciones J.D.M.: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Construcciones J.D.M.? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Quality Reform,Fuenlabrada,info@qualityreform.com,quality-reform,B-medida,B-medida,presupuesto con solo el código postal,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-Vuestro formulario pide nombre, teléfono y código postal, pero no metros, tipo de reforma ni presupuesto. Eso significa que cada contacto requiere una llamada antes de saber si merece una visita.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: presupuesto con solo el código postal,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Quality Reform? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-IRC Service,Torrejón de Ardoz,info@ircservice.es,irc-service,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-Vuestra web promete 'transparencia y confianza', pero el único botón de contacto lleva directo a WhatsApp. Quien llega sin saber lo que puede costar su reforma os hace perder tiempo a los dos antes de pisar la obra.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Construcciones J.D.M. sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Quality Reform","Fuenlabrada","info@qualityreform.com","quality-reform","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en IRC Service? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Quality Reform: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Sigueplac SGP Home,Alcorcón,sigueplac@sigueplac.com,sigueplac,B-medida,B-medida,"""completamente personalizado"" con un campo de texto","Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-En vuestra web prometéis un presupuesto 'completamente personalizado', pero el formulario solo tiene un campo de texto libre. Antes de preparar nada, alguien tiene que llamar para preguntar los metros, qué estancias y cuánto quiere invertir el cliente.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es","Re: ""completamente personalizado"" con un campo de texto","Hola de nuevo,
-
-¿Quién lleva los presupuestos en Sigueplac SGP Home? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Reformas Vegam,Alcobendas,roniegio9@hotmail.com,reformas-vegam,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-Vuestra web promete 'Claridad total desde el primer momento', pero el formulario solo pide nombre, email y un mensaje libre. El cliente no sabe qué contar, y vosotros no sabéis nada de la obra hasta llamarle.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Quality Reform sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"IRC Service","Torrejón de Ardoz","info@ircservice.es","irc-service","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Reformas Vegam? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de IRC Service: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Refordomus Obras y Servicios,Móstoles,info@refordomus.es,refordomus,B-medida,B-medida,"""presupuesto online"" sin saber el piso","Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-Vuestra web promete 'Pide presupuesto online', pero el formulario solo pide nombre y teléfono. Así, cada contacto exige una llamada para saber qué reforma es, cuántos m² tiene y qué presupuesto maneja.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es","Re: ""presupuesto online"" sin saber el piso","Hola de nuevo,
-
-¿Quién lleva los presupuestos en Refordomus Obras y Servicios? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Rehabiliti,San Sebastián de los Reyes,reformas@rehabiliti.com,rehabiliti,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-En vuestra web prometéis 'presupuesto cerrado desde el primer día', pero el formulario no pregunta ni los metros ni qué se quiere reformar. Cada lead llega en blanco y vosotros ponéis una videollamada de 30 minutos solo para ver si el proyecto os encaja.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de IRC Service sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Sigueplac SGP Home","Alcorcón","sigueplac@sigueplac.com","sigueplac","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Rehabiliti? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Sigueplac SGP Home: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-ReformaX,San Sebastián de los Reyes,info@reformax.es,reformax,B-medida,B-medida,vuestro 'sin compromiso' cuesta llamadas,"Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-Prometéis 'presupuesto gratuito y sin compromiso', pero el formulario solo pide nombre, email y un mensaje libre. Cada lead que llega necesita una llamada para saber si es una cocina o un piso entero.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: vuestro 'sin compromiso' cuesta llamadas,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en ReformaX? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Spacioh,Fuenlabrada,info@spacioh.com,spacioh,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-Vuestro formulario promete 'presupuesto gratis' y responder el mismo día, pero no pregunta m² ni inversión. Eso significa una llamada por lead solo para tener datos mínimos antes de poder decir cualquier cifra.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Sigueplac SGP Home sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Reformas Vegam","Alcobendas","roniegio9@hotmail.com","reformas-vegam","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Spacioh? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Reformas Vegam: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y terrazas):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Reformas Europa,Torrejón de Ardoz,reformas@reformaseuropa.es,reformas-europa,B-medida,B-medida,el mejor precio sin saber los m²,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-Vuestro formulario de presupuesto solo pide Nombre, Email, Teléfono y Mensaje. Así, cada lead requiere una llamada para saber si la obra son 3.000 € o 50.000 €.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: el mejor precio sin saber los m²,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Reformas Europa? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Reformas Integrales DecoJust,Móstoles,info@decojust.es,decojust,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-Vuestro formulario solo pide nombre, email y teléfono. Cada consulta que llega obliga a llamar antes de saber si quiere reformar un baño o un piso entero, cuándo empieza y con qué presupuesto cuenta.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Reformas Vegam sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Refordomus Obras y Servicios","Móstoles","info@refordomus.es","refordomus","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Reformas Integrales DecoJust? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Refordomus Obras y Servicios: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Juropa Reformas,Fuenlabrada,contacto@juropareformas.es,juropa,B-medida,B-medida,elegir materiales sin saber los m²,"Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-Vuestro formulario solo pide nombre, teléfono y mensaje, así que cada consulta llega sin saber si es una cocina, una reforma integral o un local. Antes de decidir si vale la pena visitar, alguien tiene que llamar para preguntar lo básico.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: elegir materiales sin saber los m²,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Juropa Reformas? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Fusión Reformas,Móstoles,info@fusionreformas.com,fusion-reformas,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-Vuestra página de contacto se llama 'Solicita tu presupuesto', pero el formulario solo pide nombre, email, teléfono y un mensaje libre. Cada lead que llega así os obliga a llamar para saber qué quieren reformar, cuántos metros tienen y qué presupuesto manejan.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Refordomus Obras y Servicios sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Rehabiliti","San Sebastián de los Reyes","reformas@rehabiliti.com","rehabiliti","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Fusión Reformas? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Rehabiliti: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Gesamarcos,Rivas-Vaciamadrid,info@gesamarcos.es,gesamarcos,B-medida,B-medida,ese 'presupuesto orientativo' sin saber los m²,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-Vuestro formulario solo pide nombre y un mensaje libre, así que cada contacto llega sin m², sin tipo de reforma, sin nada. Para dar ese presupuesto orientativo que prometéis en la web, necesitáis una visita antes de saber si merece la pena.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: ese 'presupuesto orientativo' sin saber los m²,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Gesamarcos? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-AreaReforma,Leganés,hectorpelliteri@gmail.com,areareforma,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-Vuestro botón 'Solicitar presupuesto' lleva a una página con solo el teléfono y el email. Quien pulsa llega sin haber dado ni los m² ni el tipo de reforma, así que ese primer filtro lo hacéis vosotros en cada llamada.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Rehabiliti sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"ReformaX","San Sebastián de los Reyes","info@reformax.es","reformax","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en AreaReforma? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de ReformaX: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Reformas Sucon,Parla,suconreformas@gmail.com,reformas-sucon,B-medida,B-medida,visita a parla sin saber los m²,"Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-Vuestra web ofrece 'presupuesto gratuito y adaptado a tus necesidades', pero antes de la visita no recogéis ni los metros ni el tipo de reforma. Eso significa ir a cada casa sin saber si es un baño de 4.000 € o una integral de 40.000 €.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: visita a parla sin saber los m²,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Reformas Sucon? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Midan Home,Getafe,midanhome@gmail.com,midan-home,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-Vuestra web promete 'PRESUPUESTO 100% GRATIS', pero el formulario solo pide nombre, teléfono y un mensaje libre. El cliente llega sin decir qué reforma quiere ni cuántos metros tiene, y alguien tiene que llamar para averiguarlo.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de ReformaX sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Spacioh","Fuenlabrada","info@spacioh.com","spacioh","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Midan Home? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Spacioh: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (pisos, cocinas y baños):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-HomeTailor,San Sebastián de los Reyes,info@hometailor.es,hometailor,B-medida,B-medida,vuestra propuesta detallada sin los m²,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-Vuestro formulario promete una 'propuesta detallada' pero solo pide nombre, teléfono y un comentario libre. Sin m², tipo de reforma ni presupuesto, cada lead obliga a una llamada antes de poder preparar nada.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: vuestra propuesta detallada sin los m²,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en HomeTailor? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Integral DGM,Móstoles,info@reformainterior.es,integral-dgm,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-Vuestro botón dice 'Consulta presupuestos', pero el formulario solo pide nombre, email y teléfono. Cualquier contacto que llega obliga a una llamada o visita solo para saber qué se quiere reformar y con qué presupuesto.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Spacioh sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Reformas Europa","Torrejón de Ardoz","reformas@reformaseuropa.es","reformas-europa","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Integral DGM? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Reformas Europa: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Waris Reformas,Rivas-Vaciamadrid,comercial@waris.es,waris-reformas,B-medida,B-medida,presupuesto gratis sin saber los m²,"Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-Vuestro botón dice 'SOLICITA PRESUPUESTO GRATIS', pero el formulario solo pide nombre, teléfono y un mensaje en blanco. Eso significa que cada contacto nuevo requiere una llamada para saber qué quiere reformar, cuántos metros tiene y qué presupuesto maneja.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: presupuesto gratis sin saber los m²,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Waris Reformas? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Construpolis,Alcalá de Henares,contacto@construpolis.net,construpolis,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-Vuestra home promete '48h presupuesto' y 'presupuesto cerrado · sin sorpresas', pero el formulario no pregunta m², estancia ni calidades. Sin esos datos, el plazo de 48h depende de una llamada previa que vosotros tenéis que hacer.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Reformas Europa sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Reformas Integrales DecoJust","Móstoles","info@decojust.es","decojust","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Construpolis? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Reformas Integrales DecoJust: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Narvoa Construcciones,Alcobendas,info@narvoa.com,narvoa,B-medida,B-medida,¿plazos garantizados sin saber los metros?,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-En vuestra página 'Pide tu presupuesto' pedís que el cliente 'describa el tipo de reforma que necesitas', sin preguntar metros, plazo ni presupuesto. Antes de visitar la obra, alguien tiene que llamar para enterarse de lo básico.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: ¿plazos garantizados sin saber los metros?,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Narvoa Construcciones? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Reformas Torrejón de Ardoz,Torrejón de Ardoz,farkascsabaciprian@gmail.com,reformas-torrejon,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-Vuestro formulario pide nombre, email y una consulta libre, nada más. Eso significa que cada petición de presupuesto llega sin saber qué quiere reformar el cliente, cuánto quiere gastar ni cuándo.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Reformas Integrales DecoJust sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Juropa Reformas","Fuenlabrada","contacto@juropareformas.es","juropa","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Reformas Torrejón de Ardoz? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Juropa Reformas: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y albañilería):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Jukave Construcciones y Reformas,Coslada,construccionesyreformasjukave@gmail.com,jukave,B-medida,B-medida,"""presupuesto sin compromiso"" sin saber qué reforma","Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-Vuestro formulario solo pide nombre, teléfono y un mensaje libre, sin preguntar qué reforma es ni cuántos metros tiene. Así, cada contacto obliga a una llamada o visita solo para saber si merece la pena.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es","Re: ""presupuesto sin compromiso"" sin saber qué reforma","Hola de nuevo,
-
-¿Quién lleva los presupuestos en Jukave Construcciones y Reformas? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Cocinas y Reformas Plaza,Rivas-Vaciamadrid,incaserslu@gmail.com,cocinas-plaza,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-En vuestra home hay un botón 'Solicite Presupuesto', pero el formulario solo pide nombre, teléfono y un comentario libre. Así, cada contacto llega sin datos de la obra y alguien tiene que llamar para saber qué quieren y de cuánto disponen.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Juropa Reformas sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Fusión Reformas","Móstoles","info@fusionreformas.com","fusion-reformas","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Cocinas y Reformas Plaza? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Fusión Reformas: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (baños, cocinas y viviendas):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Caldisban,Alcobendas,alcobendas@caldisban.com,caldisban,B-medida,B-medida,'solicite presupuesto' y un teléfono,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-En vuestra web aparece 'Solicite presupuesto' dos veces, pero el siguiente paso es llamar o mandar un email en blanco. Eso significa que antes de cada visita hay que llamar para preguntar metros, estancias y qué calidades buscan.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: 'solicite presupuesto' y un teléfono,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Caldisban? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Pro Reforma,Rivas-Vaciamadrid,daniel@proreforma.es,pro-reforma,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-Vuestro botón dice 'PIDE PRESUPUESTO' pero el formulario solo pide nombre y un mensaje libre. Eso significa que cada solicitud requiere una llamada para saber de qué obra se trata antes de poder valorar si merece visita.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Fusión Reformas sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Gesamarcos","Rivas-Vaciamadrid","info@gesamarcos.es","gesamarcos","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Pro Reforma? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Gesamarcos: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Grupo García Romero e Hijos,Rivas-Vaciamadrid,reformasgarciaromero@gmail.com,garcia-romero,B-medida,B-medida,reforma integral en rivas sin metros,"Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-Vuestro formulario pide nombre, teléfono y mensaje, pero no qué reforma quieren hacer ni cuántos metros tiene la vivienda. Cada lead nuevo exige una llamada solo para saber si merece una visita.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: reforma integral en rivas sin metros,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Grupo García Romero e Hijos? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-180 Grados Obras y Proyectos,Alcobendas,info@180grados.es,180-grados,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-En vuestra web invitáis a contactar para pedir presupuesto, pero el formulario solo recoge nombre, email y un mensaje libre. Cada consulta nueva probablemente requiere una llamada antes de saber siquiera de qué reforma se trata.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Gesamarcos sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"AreaReforma","Leganés","hectorpelliteri@gmail.com","areareforma","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en 180 Grados Obras y Proyectos? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de AreaReforma: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-A-Reformas,Alcobendas,info@areformas.es,a-reformas,B-medida,B-medida,presupuestos sin compromiso… ¿y sin preguntas?,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-En vuestra web prometéis 'presupuestos sin compromiso', pero el cliente solo puede llamar o escribir a info@areformas.es en blanco, sin indicar metros, tipo de reforma ni presupuesto. Eso significa que cada contacto acaba en una llamada o visita solo para saber si merece la pena.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: presupuestos sin compromiso… ¿y sin preguntas?,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en A-Reformas? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-CLC Reformas,Arganda del Rey,c.l.c.reformas@hotmail.com,clc-reformas,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-En vuestra web el botón dice 'SOLICITA TU PRESUPUESTO GRATIS', pero el formulario solo pide nombre, email y teléfono. Llega un lead y no sabéis si es una cocina de 8 m² o una reforma integral de 120 m².
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de AreaReforma sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Reformas Sucon","Parla","suconreformas@gmail.com","reformas-sucon","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en CLC Reformas? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Reformas Sucon: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Reformas Valentín,Coslada,info@reformasvalentin.es,reformas-valentin,B-medida,B-medida,ese presupuesto gratuito en coslada,"Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-En vuestra página de contacto invitáis a 'solicitarnos un presupuesto gratuito y sin compromiso', pero el formulario no pregunta ni el tipo de reforma ni los metros. Así cada lead llega vacío y hay que llamar solo para saber de qué va la obra.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: ese presupuesto gratuito en coslada,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Reformas Valentín? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,cita corregida a la forma literal de su /CONTACTO/ y comprobada el 17-sep
-Reformas Integrales Pío,Mejorada del Campo,reformasintegralespio@gmail.com,reformas-pio,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-Vuestra web promete 'presupuesto detallado y sin compromiso', pero el formulario solo pide nombre, email y un mensaje libre. Cada lead llega sin saber si es un baño o un piso completo, ni los metros, así que toca llamar antes de poder preparar nada.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Reformas Sucon sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Midan Home","Getafe","midanhome@gmail.com","midan-home","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Reformas Integrales Pío? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Midan Home: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Reformas Vélez,Fuenlabrada,reformasvelez17@gmail.com,reformas-velez,B-medida,B-medida,presupuesto a medida sin saber los m²,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-Vuestra web dice 'Te ofrecemos un presupuesto hecho a medida de forma gratuita', pero el formulario solo pide nombre, teléfono y un mensaje libre. El cliente no sabe qué escribir y vosotros recibís el contacto sin saber los m² ni qué quieren reformar.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: presupuesto a medida sin saber los m²,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Reformas Vélez? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Auge Reformas Madrid,Getafe,info@augereformasmadrid.com,auge-reformas,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-En vuestra web prometéis un 'presupuesto detallado adaptado a sus necesidades', pero el formulario solo pide nombre, teléfono y un mensaje libre. El lead llega sin metros, sin estancias ni plazo, y hay que llamar antes de saber si vale la pena agendar la visita.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Midan Home sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"HomeTailor","San Sebastián de los Reyes","info@hometailor.es","hometailor","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Auge Reformas Madrid? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de HomeTailor: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-Reformas Juan Salcedo,Alcalá de Henares,reformas@reformasjuansalcedo.com,juan-salcedo,B-medida,B-medida,ese campo de mensaje libre en alcalá,"Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-Vuestro formulario pide tipo de servicio y un mensaje libre, pero sin m², calidades ni presupuesto orientativo, cada lead que llega hay que llamarlo para saber si la obra es viable.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: ese campo de mensaje libre en alcalá,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en Reformas Juan Salcedo? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Hegasa Construcciones y Reformas,Fuenlabrada,info@construccioneshegasa.com,hegasa,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: Presupuestos que no te contestan","Hola,
 
-En vuestra web prometéis 'presupuesto cerrado por escrito', pero el formulario solo pide nombre, email y teléfono. Cada visita la organizáis sin saber los m², la estancia ni el tipo de reforma.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de HomeTailor sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Integral DGM","Móstoles","info@reformainterior.es","integral-dgm","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Hegasa Construcciones y Reformas? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Integral DGM: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (baños, cocinas y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-MHD Reformas Integrales,Valdemoro,info@mhdreformasintegrales.com,mhd-reformas,B-medida,B-medida,presupuesto personalizado sin saber los metros,"Hola,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
 
-En vuestra home prometéis 'un presupuesto personalizado sin compromiso', pero el formulario solo pide nombre, teléfono y un mensaje libre. El cliente llega sin deciros ni los metros ni qué quiere reformar.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: presupuesto personalizado sin saber los metros,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en MHD Reformas Integrales? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
 
-Nico Soto
-nico-soto.es",TRUE,
-Decoración y Reformas Daniel,Leganés,decoracionesyreformasdaniel@gmail.com,reformas-daniel,A-fijo,A-fijo,he probado tu formulario,"Hola,
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
 
-Vuestro formulario pide nombre, teléfono y un comentario libre, nada más. Eso significa llamar a cada contacto para saber qué quieren reformar, cuántos metros tienen y qué dinero manejan.
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
+La demo de Integral DGM sigue aquí: {link_demo}
 
-Así se ve: {link_demo}
+¿Lo dejo aquí o te interesa verlo 10 minutos?
 
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
+Nico","TRUE",""
+"Waris Reformas","Rivas-Vaciamadrid","comercial@waris.es","waris-reformas","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
 
-Nico Soto
-nico-soto.es",Re: he probado tu formulario,"Hola de nuevo,
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
 
-¿Quién lleva los presupuestos en Decoración y Reformas Daniel? Si no eres tú, ¿me dices a quién le paso la demo?
+He preparado un simulador para la web de Waris Reformas: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
 
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
-MLC Trabajos Integrales,Móstoles,infomlctrabajosintegrales@gmail.com,mlc,B-medida,B-medida,sin compromiso... pero sin saber qué reformáis,"Hola,
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
 
-Vuestra web invita a 'pedir presupuesto sin compromiso', pero el formulario solo recoge nombre, email y teléfono. Llegáis a cada llamada sin saber si es una cocina pequeña o una reforma integral.
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
 
-Estoy montando una herramienta para empresas de reformas: el cliente contesta en tu web metros, estancias, calidades y cuánto quiere invertir, y te llega una estimación antes de la visita.
-
-Así se ve: {link_demo}
-
-¿Te encaja? Si no te interesa, dímelo y no vuelvo a escribir.
-
-Nico Soto
-nico-soto.es",Re: sin compromiso... pero sin saber qué reformáis,"Hola de nuevo,
-
-¿Quién lleva los presupuestos en MLC Trabajos Integrales? Si no eres tú, ¿me dices a quién le paso la demo?
-
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
 {link_demo}
 
-Si no os interesa, lo dejo aquí.
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Waris Reformas sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Construpolis","Alcalá de Henares","contacto@construpolis.net","construpolis","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Construpolis: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (baños, cocinas y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
 
 Nico Soto
-nico-soto.es",TRUE,
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Construpolis sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Narvoa Construcciones","Alcobendas","info@narvoa.com","narvoa","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Narvoa Construcciones: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de pisos y chalets):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Narvoa Construcciones sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Reformas Torrejón de Ardoz","Torrejón de Ardoz","farkascsabaciprian@gmail.com","reformas-torrejon","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Reformas Torrejón de Ardoz: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Reformas Torrejón de Ardoz sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Jukave Construcciones y Reformas","Coslada","construccionesyreformasjukave@gmail.com","jukave","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Jukave Construcciones y Reformas: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (baños, cocinas y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Jukave Construcciones y Reformas sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Cocinas y Reformas Plaza","Rivas-Vaciamadrid","incaserslu@gmail.com","cocinas-plaza","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Cocinas y Reformas Plaza: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Cocinas y Reformas Plaza sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Caldisban","Alcobendas","alcobendas@caldisban.com","caldisban","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Caldisban: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (cocinas y baños):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Caldisban sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Pro Reforma","Rivas-Vaciamadrid","daniel@proreforma.es","pro-reforma","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Pro Reforma: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Pro Reforma sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Grupo García Romero e Hijos","Rivas-Vaciamadrid","reformasgarciaromero@gmail.com","garcia-romero","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Grupo García Romero e Hijos: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Grupo García Romero e Hijos sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"180 Grados Obras y Proyectos","Alcobendas","info@180grados.es","180-grados","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de 180 Grados Obras y Proyectos: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de 180 Grados Obras y Proyectos sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"A-Reformas","Alcobendas","info@areformas.es","a-reformas","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de A-Reformas: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de A-Reformas sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"CLC Reformas","Arganda del Rey","c.l.c.reformas@hotmail.com","clc-reformas","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de CLC Reformas: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (baños, cocinas y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de CLC Reformas sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Reformas Valentín","Coslada","info@reformasvalentin.es","reformas-valentin","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Reformas Valentín: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Reformas Valentín sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE","cita corregida a la forma literal de su /CONTACTO/ y comprobada el 17-sep"
+"Reformas Integrales Pío","Mejorada del Campo","reformasintegralespio@gmail.com","reformas-pio","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Reformas Integrales Pío: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (baños, cocinas y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Reformas Integrales Pío sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Reformas Vélez","Fuenlabrada","reformasvelez17@gmail.com","reformas-velez","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Reformas Vélez: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (baños, cocinas y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Reformas Vélez sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Auge Reformas Madrid","Getafe","info@augereformasmadrid.com","auge-reformas","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Auge Reformas Madrid: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Auge Reformas Madrid sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Reformas Juan Salcedo","Alcalá de Henares","reformas@reformasjuansalcedo.com","juan-salcedo","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Reformas Juan Salcedo: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Reformas Juan Salcedo sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Hegasa Construcciones y Reformas","Fuenlabrada","info@construccioneshegasa.com","hegasa","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Hegasa Construcciones y Reformas: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Hegasa Construcciones y Reformas sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"MHD Reformas Integrales","Valdemoro","info@mhdreformasintegrales.com","mhd-reformas","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de MHD Reformas Integrales: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (reformas integrales de viviendas):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de MHD Reformas Integrales sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"Decoración y Reformas Daniel","Leganés","decoracionesyreformasdaniel@gmail.com","reformas-daniel","A-leads","A-leads","¿Pagas por leads que reciben 4?","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de Decoración y Reformas Daniel: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: ¿Pagas por leads que reciben 4?","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: ¿Pagas por leads que reciben 4?","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de Decoración y Reformas Daniel sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
+"MLC Trabajos Integrales","Móstoles","infomlctrabajosintegrales@gmail.com","mlc","B-contesta","B-contesta","Presupuestos que no te contestan","Hola,
+
+¿Cuántas visitas y presupuestos haces a clientes que luego no contestan, o que solo querían comparar precio? Y si el contacto viene de Habitissimo o Cronoshare, encima lo has pagado y lo tienen otras tres empresas.
+
+He preparado un simulador para la web de MLC Trabajos Integrales: el cliente elige tipo de obra, metros y calidades, ve un precio orientativo y te escribe ya sabiendo cuánto cuesta. Ese contacto es solo tuyo.
+
+Ya está montado con tu nombre y tus servicios (cocinas, baños y reformas integrales):
+{link_demo}
+
+¿Hoy te llegan más clientes por tu web o por plataformas?
+
+Nico Soto
+nico-soto.es","Re: Presupuestos que no te contestan","Hola de nuevo,
+
+Un contacto de plataforma cuesta 15 € o más y le llega a la vez a otras tres empresas: o llamas el primero o lo pierdes.
+
+Los que entran por el simulador de tu web ya han visto un precio y no los comparte nadie:
+{link_demo}
+
+¿Pagas hoy por contactos en alguna plataforma?
+
+Nico","Re: Presupuestos que no te contestan","Hola,
+
+Último correo. Cada visita a alguien que solo quería ""hacerse una idea"" es una mañana perdida. Con el simulador, quien no encaja con el precio ya no te llama.
+
+La demo de MLC Trabajos Integrales sigue aquí: {link_demo}
+
+¿Lo dejo aquí o te interesa verlo 10 minutos?
+
+Nico","TRUE",""
