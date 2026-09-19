@@ -36,6 +36,8 @@ const LOTES = {
   // es la variante del A/B de asunto (A-fijo / B-medida). El cuerpo es el mismo para las dos.
   madrid2: ["outreach_reformas_madrid2.csv", "home-estimator-outreach-madrid2.csv"],
   madrid3: ["outreach_reformas_madrid3.csv", "home-estimator-outreach-madrid3.csv"],
+  // Madrid 4 (19-sep): 30 de Madrid norte-oeste, scrape y auditoría nuevos (auditar-reformas.mjs), copy de dolor.
+  madrid4: ["outreach_reformas_madrid4.csv", "home-estimator-outreach-madrid4.csv"],
 };
 if (!process.argv.includes("--lote") || !LOTES[LOTE]) { console.error(`Falta --lote ${Object.keys(LOTES).join(" | ")}`); process.exit(1); }
 // Emails corregidos respecto a la cola: email del CSV de clusters → email que figura en la cola.

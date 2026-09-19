@@ -1,0 +1,616 @@
+[
+ {
+  "slug": "arq-reformas",
+  "lead_id": "5fd789f9-cb54-4c03-9af8-fe890c1b4b0f",
+  "empresa": "Arq & Reformas | Reformas Integrales Madrid",
+  "nombre_comercial": "Arq & Reformas",
+  "ciudad": "Galapagar",
+  "email": "info@tusreformas.com",
+  "verificacion": "OK",
+  "url": "http://www.tusreformas.com/",
+  "clase": "A",
+  "score": 9,
+  "servicios": "reformas integrales, baños y diseño de espacios",
+  "logo": {
+   "file": "arq-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#4f2a13",
+   "secondary": "#4f2a13"
+  }
+ },
+ {
+  "slug": "infoconstrureform",
+  "lead_id": "7e70b521-6665-4ffe-a2b8-24e2339d277f",
+  "empresa": "Infoconstrureform - Las Rozas de Madrid",
+  "nombre_comercial": "Infoconstrureform",
+  "ciudad": "Las Rozas de Madrid",
+  "email": "info@infoconstrureform.com",
+  "verificacion": "OK",
+  "url": "https://www.infoconstrureform.com/",
+  "clase": "A",
+  "score": 9,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "construcciones-arana",
+  "lead_id": "1401bdb4-5c0f-4dcc-86ba-a2cc8b076b69",
+  "empresa": "Reformas y construcciones: Construcciones Arana S.L.",
+  "nombre_comercial": "Construcciones Arana",
+  "ciudad": "Collado Villalba",
+  "email": "info@construccionesarana.es",
+  "verificacion": "OK",
+  "url": "https://www.construccionesarana.es/",
+  "clase": "A",
+  "score": 9,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "construcciones-arana.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "alejo-reformas",
+  "lead_id": "a460adce-d338-4c12-80d5-77fe7e0c3888",
+  "empresa": "ALEJO construction & design",
+  "nombre_comercial": "Alejo Construction & Design",
+  "ciudad": "Boadilla del Monte",
+  "email": "info@tureformaenmadrid.es",
+  "verificacion": "OK",
+  "url": "http://tureformaenmadrid.es/",
+  "clase": "A",
+  "score": 9,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "alejo-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#6f5390",
+   "secondary": "#6f5390"
+  }
+ },
+ {
+  "slug": "exclusivas-joma",
+  "lead_id": "92d5945f-2431-404f-be31-6950101d284c",
+  "empresa": "EXCLUSIVAS JOMA",
+  "nombre_comercial": "Exclusivas Joma",
+  "ciudad": "Tres Cantos",
+  "email": "exclusivasjoma@gmail.com",
+  "verificacion": "OK",
+  "url": "http://www.exclusivasjoma.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "acantarero",
+  "lead_id": "141c6ca5-59be-4bda-83fc-59fc441f6e39",
+  "empresa": "Acantarero Construcciones y Reformas",
+  "nombre_comercial": "Acantarero",
+  "ciudad": "Villaviciosa de Odón",
+  "email": "info@acantareroconstrucciones.com",
+  "verificacion": "OK",
+  "url": "http://www.acantareroconstrucciones.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas, rehabilitaciones y obra nueva",
+  "logo": {
+   "file": "acantarero.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "emona-reformas",
+  "lead_id": "2df90125-4aca-4f83-b2ce-9d129733bf7a",
+  "empresa": "Emona - Reformas integrales",
+  "nombre_comercial": "Emona Reformas",
+  "ciudad": "Collado Villalba",
+  "email": "info@reformasemona.com",
+  "verificacion": "OK",
+  "url": "http://www.reformasemona.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, baños y cocinas",
+  "logo": {
+   "file": "emona-reformas.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformas-ideas",
+  "lead_id": "1bb40b25-fded-4e61-a279-1333dd01506c",
+  "empresa": "Reformas Ideas",
+  "nombre_comercial": "Reformas Ideas",
+  "ciudad": "Las Rozas de Madrid",
+  "email": "pinturasytarimasideas@gmail.com",
+  "verificacion": "OK",
+  "url": "http://www.reformasideas.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales y llave en mano",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "faner-reformas",
+  "lead_id": "887705c5-69ad-4b66-80f0-eb2c9b2e8201",
+  "empresa": "FANER REFORMAS",
+  "nombre_comercial": "Faner Reformas",
+  "ciudad": "Las Rozas de Madrid",
+  "email": "faner@faner.es",
+  "verificacion": "OK",
+  "url": "http://www.faner.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "faner-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#896b1c",
+   "secondary": "#9e7b20"
+  }
+ },
+ {
+  "slug": "area-reformas",
+  "lead_id": "4823f5b1-4c03-4470-a190-02695325d84f",
+  "empresa": "Área Reformas y Decoración, S.L.",
+  "nombre_comercial": "Área Reformas",
+  "ciudad": "Las Rozas de Madrid",
+  "email": "info@areareformas.com",
+  "verificacion": "OK",
+  "url": "https://www.areareformas.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y locales",
+  "logo": {
+   "file": "area-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#692036",
+   "secondary": "#692036"
+  }
+ },
+ {
+  "slug": "de-la-llave",
+  "lead_id": "bcc9e250-9651-4bfb-af59-c6914eb4dd4d",
+  "empresa": "De la llave",
+  "nombre_comercial": "De la Llave",
+  "ciudad": "Collado Villalba",
+  "email": "info@delallave.net",
+  "verificacion": "OK",
+  "url": "https://www.delallave.net/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, albañilería y fontanería",
+  "logo": {
+   "file": "de-la-llave.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#5f798b",
+   "secondary": "#88adc7"
+  }
+ },
+ {
+  "slug": "simetrika",
+  "lead_id": "d0a55fc2-17e2-4c62-8ccf-97513cce1548",
+  "empresa": "Simetrika Reformas Integrales",
+  "nombre_comercial": "Simetrika",
+  "ciudad": "Majadahonda",
+  "email": "web@simetrika.es",
+  "verificacion": "OK",
+  "url": "https://simetrika.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, proyecto y obra",
+  "logo": {
+   "file": "simetrika.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "renueva-3c",
+  "lead_id": "88b4faaa-6a2c-40d7-9bbf-0c1a890006e5",
+  "empresa": "Renueva 3C",
+  "nombre_comercial": "Renueva 3C",
+  "ciudad": "Tres Cantos",
+  "email": "info@renueva3c.es",
+  "verificacion": "OK",
+  "url": "http://www.renueva3c.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "renueva-3c.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#e3000e",
+   "secondary": "#e3000e"
+  }
+ },
+ {
+  "slug": "kozma",
+  "lead_id": "a389d62a-0ccc-4613-897c-d193a05f6085",
+  "empresa": "Kozma Reformas e Interiorismo",
+  "nombre_comercial": "Kozma",
+  "ciudad": "Tres Cantos",
+  "email": "info@kozma.es",
+  "verificacion": "OK",
+  "url": "https://kozma.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas de baños, cocinas e integrales",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformas-jrecio",
+  "lead_id": "9962ef9c-b471-43ea-a4e6-642c25bd563d",
+  "empresa": "Reformas Javier Recio",
+  "nombre_comercial": "Reformas Javier Recio",
+  "ciudad": "Galapagar",
+  "email": "reformas.jrecio@gmail.com",
+  "verificacion": "OK",
+  "url": "http://www.reformas-jrecio.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas de baños, cocinas e integrales",
+  "logo": {
+   "file": "reformas-jrecio.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#c04943",
+   "secondary": "#df554d"
+  }
+ },
+ {
+  "slug": "seira-reformas",
+  "lead_id": "d00e56ab-18a5-42f2-a54e-3c02825819cc",
+  "empresa": "A REFORMAS SEIRA",
+  "nombre_comercial": "Seira Reformas",
+  "ciudad": "Colmenar Viejo",
+  "email": "seira@seirasl.es",
+  "verificacion": "OK",
+  "url": "https://seirasl.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "seira-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#d33a26",
+   "secondary": "#e33e29"
+  }
+ },
+ {
+  "slug": "hometrader",
+  "lead_id": "b463806c-9fa2-42e9-850c-0711c271391e",
+  "empresa": "HomeTrader Inversiones S L",
+  "nombre_comercial": "HomeTrader Reformas",
+  "ciudad": "Majadahonda",
+  "email": "info@reformashometrader.com",
+  "verificacion": "OK",
+  "url": "http://www.reformashometrader.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, albañilería y pintura",
+  "logo": {
+   "file": "hometrader.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#517488",
+   "secondary": "#6d9bb6"
+  }
+ },
+ {
+  "slug": "reformas-lenzo",
+  "lead_id": "10183611-6dbe-4453-85eb-e5154595080c",
+  "empresa": "Reformas Lenzo",
+  "nombre_comercial": "Reformas Lenzo",
+  "ciudad": "Majadahonda",
+  "email": "info@reformaslenzo.es",
+  "verificacion": "OK",
+  "url": "https://www.reformaslenzo.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, pintura y fontanería",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformalista",
+  "lead_id": "07469710-1594-44a3-8e5c-cc1a77c15180",
+  "empresa": "Reformalista Reformas integrales en Madrid",
+  "nombre_comercial": "Reformalista",
+  "ciudad": "Villaviciosa de Odón",
+  "email": "info@reformalista.es",
+  "verificacion": "OK",
+  "url": "https://reformalista.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales y proyectos de interiores",
+  "logo": {
+   "file": "reformalista.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "renovatotal",
+  "lead_id": "8aaca61b-0e50-47a3-9846-a1d1169ed837",
+  "empresa": "Renovatotal SL",
+  "nombre_comercial": "Renovatotal",
+  "ciudad": "Torrelodones",
+  "email": "info@renovatotal.com.es",
+  "verificacion": "OK",
+  "url": "http://www.renovatotal.com.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, parciales y pintura",
+  "logo": {
+   "file": "renovatotal.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#b35f00",
+   "secondary": "#f2c418"
+  }
+ },
+ {
+  "slug": "tecfincas",
+  "lead_id": "3a3f07ad-ec83-4e3a-90b1-1569478406f6",
+  "empresa": "Tecfincas - Reformas integrales en Boadilla del Monte",
+  "nombre_comercial": "Tecfincas",
+  "ciudad": "Boadilla del Monte",
+  "email": "tecfincas@gmail.com",
+  "verificacion": "OK",
+  "url": "https://tecfincas.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "tecfincas.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "ayc-proyectos",
+  "lead_id": "d962a88a-f6f6-4170-b10a-68e5716b31ee",
+  "empresa": "AyC Proyectos - Reformas Majadahonda",
+  "nombre_comercial": "AyC Proyectos",
+  "ciudad": "Majadahonda",
+  "email": "contacto@aycproyectos.info",
+  "verificacion": "OK",
+  "url": "http://www.aycproyectos.info/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "ayc-proyectos.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#0044bd",
+   "secondary": "#0044bd"
+  }
+ },
+ {
+  "slug": "reformas-jl-marlo",
+  "lead_id": "6a4da179-f633-4410-990d-55be232ad1f1",
+  "empresa": "Reformas JL MARLO HRC S.L.",
+  "nombre_comercial": "Reformas JL Marlo",
+  "ciudad": "Torrelodones",
+  "email": "info@reformasjlmarlo.es",
+  "verificacion": "OK",
+  "url": "https://reformasjlmarlo.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, reformas de baños y cocinas",
+  "logo": {
+   "file": "reformas-jl-marlo.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#df0a1c",
+   "secondary": "#df0a1c"
+  }
+ },
+ {
+  "slug": "antter-interiores",
+  "lead_id": "b9659dc1-4d2a-4d1e-b94c-451af4cb90d6",
+  "empresa": "ANTTER INTERIORES",
+  "nombre_comercial": "Antter Interiores",
+  "ciudad": "Tres Cantos",
+  "email": "info@antterinteriores.com",
+  "verificacion": "OK",
+  "url": "http://antterinteriores.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, diseño de interiores y carpintería",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "keshia",
+  "lead_id": "4593ded8-714d-4a86-a2ef-bdbc5eb0f7c3",
+  "empresa": "Cocinas Tres Cantos | KESHIA",
+  "nombre_comercial": "Keshia Interiorismo",
+  "ciudad": "Tres Cantos",
+  "email": "info@keshiainteriorismo.es",
+  "verificacion": "OK",
+  "url": "https://keshiainteriorismo.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y diseño de interiores",
+  "logo": {
+   "file": "keshia.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "cisoyer",
+  "lead_id": "fe6bb0a2-2132-491d-9b67-0c2574bb8f2c",
+  "empresa": "CISOYER",
+  "nombre_comercial": "Cisoyer",
+  "ciudad": "Boadilla del Monte",
+  "email": "info@cisoyer.es",
+  "verificacion": "catchall",
+  "url": "https://cisoyer.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales y rehabilitación",
+  "logo": {
+   "file": "cisoyer.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#005eb0",
+   "secondary": "#005eb0"
+  }
+ },
+ {
+  "slug": "a198-design",
+  "lead_id": "812f15fb-9749-4e8a-80d9-10e7e3c22f17",
+  "empresa": "A198 Design & Projects – Reformas Integrales Tres Cantos",
+  "nombre_comercial": "A198 Design",
+  "ciudad": "Tres Cantos",
+  "email": "contacto@a198design.com",
+  "verificacion": "catchall",
+  "url": "http://www.a198design.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformas-cgr",
+  "lead_id": "13febfda-880c-4453-9f31-b69a0ddfc74f",
+  "empresa": "Reformas CGR",
+  "nombre_comercial": "Reformas CGR",
+  "ciudad": "Tres Cantos",
+  "email": "comercial@reformascgr.es",
+  "verificacion": "catchall",
+  "url": "http://www.reformascgr.es/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas de cocinas, baños y viviendas",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "unitec-reformas",
+  "lead_id": "1da2d7ad-c6a5-447e-aead-f2e87adf13c3",
+  "empresa": "Unitec Reformas",
+  "nombre_comercial": "Unitec Reformas",
+  "ciudad": "Pozuelo de Alarcón",
+  "email": "angelbueno@unitec-reformas.net",
+  "verificacion": "catchall",
+  "url": "http://www.unitec-reformas.net/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "unitec-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#0b2a4f",
+   "secondary": "#e8731c"
+  }
+ },
+ {
+  "slug": "caoba-majadahonda",
+  "lead_id": "2dfee82a-992d-4d7a-a79a-b003be160981",
+  "empresa": "Caoba Majadahonda",
+  "nombre_comercial": "Caoba Majadahonda",
+  "ciudad": "Majadahonda",
+  "email": "info@caobamajadahonda.com",
+  "verificacion": "noverif",
+  "url": "http://www.caobamajadahonda.com/",
+  "clase": "A",
+  "score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "logo": {
+   "file": "caoba-majadahonda.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ }
+]

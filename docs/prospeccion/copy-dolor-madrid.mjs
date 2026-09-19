@@ -81,7 +81,7 @@ function parseCsv(txt) {
 }
 const esc = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
 
-for (const lote of ["madrid2", "madrid3"]) {
+for (const lote of ["madrid2", "madrid3", "madrid4"]) {
   const CSV = path.join(DIR, `outreach_reformas_${lote}.csv`);
   const { cab, filas } = parseCsv(fs.readFileSync(CSV, "utf8"));
   for (const k of ["email3_asunto", "email3_cuerpo"]) if (!cab.includes(k)) cab.splice(cab.indexOf("enviar"), 0, k);

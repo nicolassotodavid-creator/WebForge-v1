@@ -1,0 +1,3269 @@
+[
+ {
+  "lead_id": "0369f41c-9c8f-4946-b07e-c9a203d75fc8",
+  "nombre": "SAAVEDRA INTERIORISMO",
+  "ciudad": "Majadahonda",
+  "url": "http://www.saavedrainteriorismo.com/",
+  "rating": 4.5,
+  "resenas": 16,
+  "email": null,
+  "telefono": "+34 616 01 00 00",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 0,
+  "servicios": "",
+  "motivo_encaje": "web caída",
+  "caida": true,
+  "audited_at": "2026-09-19T17:36:54.972Z"
+ },
+ {
+  "lead_id": "10183611-6dbe-4453-85eb-e5154595080c",
+  "nombre": "Reformas Lenzo",
+  "ciudad": "Majadahonda",
+  "url": "https://www.reformaslenzo.es/",
+  "rating": 4.8,
+  "resenas": 22,
+  "email": null,
+  "email_web": "info@reformaslenzo.es",
+  "emails_web": [
+   "info@reformaslenzo.es"
+  ],
+  "telefono": "+34 620 84 70 72",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, pintura y fontanería",
+  "motivo_encaje": "Reformista residencial con formulario inexistente y solo contacto por teléfono, encaje perfecto para el simulador.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.reformaslenzo.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:36:57.358Z"
+ },
+ {
+  "lead_id": "73042dd2-ace8-487d-a912-289aa8b4cdbb",
+  "nombre": "REFORMAS MAJADAHONDA",
+  "ciudad": "Majadahonda",
+  "url": "http://reformasmajadahondasl.com/",
+  "rating": 5,
+  "resenas": 15,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 671 17 45 36",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales de viviendas",
+  "motivo_encaje": "Formulario genérico sin cualificación y web con contenido mínimo: encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:_app_id",
+   "text:",
+   "textarea:Message"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformasmajadahondasl.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:36:57.533Z"
+ },
+ {
+  "lead_id": "bd358781-37a6-440e-a5f1-a5611377c2ae",
+  "nombre": "Atrio Reformas Integrales",
+  "ciudad": "Majadahonda",
+  "url": "http://atrioreformasmajadahonda.com/",
+  "rating": 4.6,
+  "resenas": 54,
+  "email": null,
+  "email_web": "atrio.reformasintegrales@gmail.com\\",
+  "emails_web": [
+   "atrio.reformasintegrales@gmail.com\\",
+   "atrio.reformasintegrales@gmail.com"
+  ],
+  "telefono": "+34 916 38 91 78",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "reformas integrales y construcciones",
+  "motivo_encaje": "Web con contenido mínimo por navegador desactualizado; reformista residencial claro pero sin formulario ni WhatsApp, solo captcha activo.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://atrioreformasmajadahonda.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:36:58.908Z"
+ },
+ {
+  "lead_id": "d962a88a-f6f6-4170-b10a-68e5716b31ee",
+  "nombre": "AyC Proyectos - Reformas Majadahonda",
+  "ciudad": "Majadahonda",
+  "url": "http://www.aycproyectos.info/",
+  "rating": 5,
+  "resenas": 16,
+  "email": null,
+  "email_web": "contacto@aycproyectos.info",
+  "emails_web": [
+   "alvaroarribas@dicsa.info",
+   "contacto@aycproyectos.info"
+  ],
+  "telefono": "+34 669 87 03 22",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial puro con formulario de contacto genérico y WhatsApp, sin calculadora ni preguntas de cualificación previas.",
+  "campos_formulario": [
+   "text:dmform-0",
+   "email:dmform-1",
+   "tel:dmform-2",
+   "textarea:dmform-3"
+  ],
+  "whatsapp": true,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.aycproyectos.info/",
+   "https://www.aycproyectos.info/servicios/presupuesto-reforma-majadahonda",
+   "https://www.aycproyectos.info/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:03.465Z"
+ },
+ {
+  "lead_id": "d0a55fc2-17e2-4c62-8ccf-97513cce1548",
+  "nombre": "Simetrika Reformas Integrales",
+  "ciudad": "Majadahonda",
+  "url": "https://simetrika.es/",
+  "rating": 3.9,
+  "resenas": 50,
+  "email": null,
+  "email_web": "web@simetrika.es",
+  "emails_web": [
+   "web@simetrika.es"
+  ],
+  "telefono": "+34 916 39 00 40",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, diseño de proyecto y ejecución de obra",
+  "motivo_encaje": "Reformista integral residencial en Madrid con formulario genérico de contacto y sin calculadora de precios.",
+  "campos_formulario": [
+   "text:form_fields[name] Nombre",
+   "email:form_fields[email] Correo electrónico",
+   "tel:form_fields[field_3f3f9b5] Teléfono",
+   "textarea:form_fields[message] Mensaje",
+   "tel:form_fields[field_e14c983] Teléfono"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://simetrika.es/",
+   "https://simetrika.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:03.986Z"
+ },
+ {
+  "lead_id": "6a081e63-cea5-448f-933b-5be536c1a10d",
+  "nombre": "Aqui tu Reforma",
+  "ciudad": "Majadahonda",
+  "url": "https://www.aquitureforma.com/nuestras-concept-stores/madrid-majadahonda/",
+  "rating": 4.3,
+  "resenas": 28,
+  "email": null,
+  "email_web": "info@aquitureforma.com",
+  "emails_web": [
+   "info@aquitureforma.com",
+   "pannellum@2.5.6.css",
+   "store.majadahonda@es.aquitureforma.com",
+   "somos@aquitureforma.com",
+   "pannellum@2.5.6.js"
+  ],
+  "telefono": "+34 684 73 91 67",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 2.5,
+  "servicios": "reforma integral, cocinas y baños",
+  "motivo_encaje": "Franquicia con red de tiendas y calculadora/presupuesto propio integrado en su web corporativa.",
+  "campos_formulario": [
+   "text:form_fields[nombre]",
+   "text:form_fields[asunto]",
+   "select:form_fields[lada]",
+   "text:form_fields[telefono]",
+   "email:form_fields[atencion_email]",
+   "textarea:form_fields[field_db867a3]",
+   "email:form_fields[prensa_email]",
+   "email:form_fields[licencias_email]",
+   "email:form_fields[proveedores_email]"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [
+   "calendly"
+  ],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.aquitureforma.com/nuestras-tiendas/madrid-majadahonda/",
+   "https://www.aquitureforma.com/presupuesto/",
+   "https://www.aquitureforma.com/contacto/",
+   "https://www.aquitureforma.com/presupuesto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:06.746Z"
+ },
+ {
+  "lead_id": "2dfee82a-992d-4d7a-a79a-b003be160981",
+  "nombre": "Caoba Majadahonda",
+  "ciudad": "Majadahonda",
+  "url": "http://www.caobamajadahonda.com/",
+  "rating": 4.1,
+  "resenas": 50,
+  "email": null,
+  "email_web": "info@caobamajadahonda.com",
+  "emails_web": [
+   "info@caobamajadahonda.com"
+  ],
+  "telefono": "+34 916 34 59 48",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial puro con 35 años de experiencia, formulario genérico sin cualificación de obra ni m², encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:your-name",
+   "email:your-email",
+   "tel:tel-60",
+   "text:your-subject",
+   "textarea:your-message",
+   "textarea:_wpcf7_ak_hp_textarea"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://caobamajadahonda.com/",
+   "https://caobamajadahonda.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.6",
+   "https://caobamajadahonda.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:07.427Z"
+ },
+ {
+  "lead_id": "e60e0ca9-1f0b-4f12-b563-c578f2fbdbb2",
+  "nombre": "Alcover Soluciones Reformas e Interiorismo. Reformas en Las Rozas. Reformas Majadahonda.",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "http://www.alcoversoluciones.es/",
+  "rating": 5,
+  "resenas": 14,
+  "email": null,
+  "telefono": "+34 633 27 33 80",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 0,
+  "servicios": "",
+  "motivo_encaje": "web caída",
+  "caida": true,
+  "audited_at": "2026-09-19T17:37:07.889Z"
+ },
+ {
+  "lead_id": "4fb92777-bb17-436e-8e7b-034831ede016",
+  "nombre": "DAVANNI Estudio de cocina e interiorismo.",
+  "ciudad": "Majadahonda",
+  "url": "https://davanni.es/",
+  "rating": 4.3,
+  "resenas": 125,
+  "email": null,
+  "email_web": "davanni@davanni.es",
+  "emails_web": [
+   "hola@miempresa.es\\",
+   "davanni@davanni.es\\",
+   "davanni@davanni.es",
+   "hola@miempresa.es",
+   "alejandro@davanni.es"
+  ],
+  "telefono": "+34 916 39 52 62",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6,
+  "servicios": "cocinas de diseño, reformas de cocinas e interiorismo",
+  "motivo_encaje": "Especialista en cocinas de diseño y lujo con buenas reseñas, pero el nicho de lujo/diseño puede no encajar con el precio orientativo genérico y la web apenas carga contenido útil",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://davanni.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:10.650Z"
+ },
+ {
+  "lead_id": "7e70b521-6665-4ffe-a2b8-24e2339d277f",
+  "nombre": "Infoconstrureform - Las Rozas de Madrid",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "https://www.infoconstrureform.com/",
+  "rating": 5,
+  "resenas": 61,
+  "email": null,
+  "email_web": "info@infoconstrureform.com",
+  "emails_web": [
+   "info@infoconstrureform.com"
+  ],
+  "telefono": "+34 643 13 32 08",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 9,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico y WhatsApp, sin calculadora de precio ni configurador; encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "input:empresa",
+   "text:nombre",
+   "tel:telefono",
+   "select:servicio",
+   "textarea:mensaje"
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.infoconstrureform.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:10.983Z"
+ },
+ {
+  "lead_id": "b463806c-9fa2-42e9-850c-0711c271391e",
+  "nombre": "HomeTrader Inversiones S L",
+  "ciudad": "Majadahonda",
+  "url": "http://www.reformashometrader.com/",
+  "rating": 4.3,
+  "resenas": 24,
+  "email": null,
+  "email_web": "info@reformashometrader.com",
+  "emails_web": [
+   "info@reformashometrader.com"
+  ],
+  "telefono": "+34 916 34 57 39",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, albañilería y pintura",
+  "motivo_encaje": "Reformista residencial con más de 20 años de experiencia que solo ofrece teléfono y un formulario vacío para solicitar presupuesto, encaje perfecto para Home Estimator.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": true,
+  "paginas": [
+   "https://www.reformashometrader.com/",
+   "https://www.reformashometrader.com/contacto",
+   "https://www.reformashometrader.com/solicite-presupuesto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:11.522Z"
+ },
+ {
+  "lead_id": "0740cf73-f003-4ff0-a9c7-ec70e97e4c39",
+  "nombre": "Molino Homes",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "https://www.molinohomes.com/",
+  "rating": 5,
+  "resenas": 36,
+  "email": null,
+  "email_web": "info@molinohomes.com",
+  "emails_web": [
+   "info@molinohomes.com"
+  ],
+  "telefono": "+34 611 32 11 82",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 2,
+  "servicios": "compraventa, alquiler, reformas y gestión de propiedades",
+  "motivo_encaje": "Es principalmente una agencia inmobiliaria que ofrece reformas como servicio secundario, no una empresa reformista residencial pura.",
+  "campos_formulario": [
+   "text:",
+   "textarea:",
+   "email:"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.molinohomes.com/",
+   "https://www.molinohomes.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:16.122Z"
+ },
+ {
+  "lead_id": "13c87202-fc21-476c-9d89-df55ce43ec1c",
+  "nombre": "LK interiorismo",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "http://www.lkinteriorismo.com/",
+  "rating": 5,
+  "resenas": 13,
+  "email": null,
+  "email_web": "info@lkinteriorismo.com",
+  "emails_web": [
+   "info@lkinteriorismo",
+   "info@lkinteriorismo.com"
+  ],
+  "telefono": "+34 690 96 99 69",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "reformas integrales, interiorismo y decoración",
+  "motivo_encaje": "Interiorista residencial con formulario genérico y WhatsApp, buen encaje, pero el foco es diseño/decoración más que ejecución de obra, lo que puede limitar la utilidad del simulador de precio.",
+  "campos_formulario": [
+   "text:your-name Nombre",
+   "text:your-lastname Apellido",
+   "tel:your-phone Telefono",
+   "email:your-email E-mail",
+   "textarea:your-message Mensaje"
+  ],
+  "whatsapp": true,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "http://www.lkinteriorismo.com/",
+   "http://www.lkinteriorismo.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=5.7.5.1",
+   "https://www.lkinteriorismo.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:17.097Z"
+ },
+ {
+  "lead_id": "4823f5b1-4c03-4470-a190-02695325d84f",
+  "nombre": "Área Reformas y Decoración, S.L.",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "https://www.areareformas.com/",
+  "rating": 4.9,
+  "resenas": 59,
+  "email": null,
+  "email_web": "info@areareformas.com",
+  "emails_web": [
+   "info@areareformas.com"
+  ],
+  "telefono": "+34 916 26 63 81",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y locales",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico (nombre, teléfono, email y mensaje) sin preguntar tipo ni metros, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:form_fields[name]",
+   "tel:form_fields[field_1]",
+   "email:form_fields[email]",
+   "select:form_fields[message]",
+   "textarea:form_fields[message]"
+  ],
+  "whatsapp": true,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://areareformas.com/",
+   "https://areareformas.com/wp-content/cache/min/1/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=1789137158",
+   "https://areareformas.com/wp-content/themes/astra/assets/css/minified/compatibility/contact-form-7-main.min.css?ver=4.13.8",
+   "https://areareformas.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:18.146Z"
+ },
+ {
+  "lead_id": "e65795c0-a319-416a-a2ab-ac97224206b6",
+  "nombre": "Armahome proyectos y obras",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "https://armahomeproyectosyobras.com/",
+  "rating": 4.6,
+  "resenas": 22,
+  "email": null,
+  "email_web": "info@armahomeproyectosyobras.com",
+  "emails_web": [
+   "info@armahomeproyectosyobras.com"
+  ],
+  "telefono": "+34 639 14 51 57",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8,
+  "servicios": "reformas, interiorismo y certificación passivhaus",
+  "motivo_encaje": "Reformista residencial con formulario genérico de contacto y sin calculadora de precios, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:sunombre Nombre*",
+   "email:sucorreo Email*",
+   "tel:sutel Teléfono*",
+   "textarea:textarea-512 Mensaje*",
+   "text:captcha-123"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://armahomeproyectosyobras.com/",
+   "https://armahomeproyectosyobras.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:19.055Z"
+ },
+ {
+  "lead_id": "ae975360-993d-4d6b-ab9e-7072ac2aedfb",
+  "nombre": "ACIP Arquitectura y Construcción Reformas y obra nueva",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "http://www.proyectosacip.com/",
+  "rating": 4.8,
+  "resenas": 32,
+  "email": null,
+  "email_web": "info@proyectosacip.com",
+  "emails_web": [
+   "info@proyectosacip.com"
+  ],
+  "telefono": "+34 614 49 46 01",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 2.5,
+  "servicios": "viviendas unifamiliares, reformas integrales y interiorismo",
+  "motivo_encaje": "El formulario de contacto ya pregunta tipo de proyecto, rango de presupuesto y necesidad, por lo que el lead llega bastante cualificado sin necesitar un simulador adicional.",
+  "campos_formulario": [
+   "text:Escribe tu mensaje…",
+   "text:",
+   "text:Calle, número, localidad…",
+   "email:",
+   "tel:",
+   "textarea:"
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://proyectosacip.com/",
+   "https://proyectosacip.com/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:24.620Z"
+ },
+ {
+  "lead_id": "cd6be759-5113-4a89-b036-fcbd3f99ed90",
+  "nombre": "Redecora Tu Casa - Reformas integrales en Madrid",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "https://www.redecoratucasa.com/?utm_source=GMB&utm_medium=organic",
+  "rating": 4.3,
+  "resenas": 153,
+  "email": null,
+  "email_web": "contacto@redecoratucasa.com",
+  "emails_web": [
+   "contacto@redecoratucasa.com"
+  ],
+  "telefono": "+34 915 93 74 42",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "reformas integrales, reformas de cocinas y baños",
+  "motivo_encaje": "Ya muestra precios orientativos por paquetes (básica/óptima) y el formulario ya filtra tipo y uso de reforma, lo que reduce la necesidad del simulador, aunque no llega a ser una calculadora interactiva.",
+  "campos_formulario": [
+   "text:form_fields[name_contacto] Nombre*",
+   "text:form_fields[lastname_contacto] Apellidos*",
+   "email:form_fields[email_contacto] Email*",
+   "text:form_fields[phone_contacto] Teléfono*",
+   "select:form_fields[servicio_contacto]",
+   "select:form_fields[horario_contacto]",
+   "text:form_fields[location_contacto] Localización*",
+   "date:form_fields[fecha_contacto] Fecha solicitada de entrega",
+   "select:form_fields[uso_contacto]",
+   "select:form_fields[tipo_contacto]"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [
+   "hubspot"
+  ],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.redecoratucasa.com/?utm_source=GMB&utm_medium=organic"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:26.421Z"
+ },
+ {
+  "lead_id": "887705c5-69ad-4b66-80f0-eb2c9b2e8201",
+  "nombre": "FANER REFORMAS",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "http://www.faner.es/",
+  "rating": 4.9,
+  "resenas": 60,
+  "email": null,
+  "email_web": "faner@faner.es",
+  "emails_web": [
+   "faner@faner.es"
+  ],
+  "telefono": "+34 675 52 95 34",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, reformas de cocinas y baños",
+  "motivo_encaje": "Reformista residencial puro con casi 20 años de experiencia, formulario genérico sin preguntas de cualificación y sin calculadora de precios.",
+  "campos_formulario": [
+   "text:form_fields[name] Nombre",
+   "email:form_fields[email] Email",
+   "textarea:form_fields[message] Mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://faner.es/",
+   "https://faner.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:28.631Z"
+ },
+ {
+  "lead_id": "30c86a1e-3484-464b-b4f0-29f2a6495cec",
+  "nombre": "Rez-Estudio: Arquitectos y Construcción",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "http://www.rez-estudio.com/",
+  "rating": 5,
+  "resenas": 57,
+  "email": null,
+  "email_web": "rez@rez-estudio.com",
+  "emails_web": [
+   "rez@rez-estudio.com"
+  ],
+  "telefono": "+34 650 66 53 86",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas integrales, obra nueva e interiorismo",
+  "motivo_encaje": "El formulario ya pregunta tipo de trabajo, funcionalidad, m² y uso final, lo que reduce la ventaja del simulador, aunque el encaje residencial es claro.",
+  "campos_formulario": [
+   "text:form_fields[name]",
+   "email:form_fields[email]",
+   "tel:form_fields[field_086c31e]",
+   "textarea:form_fields[message]",
+   "text:form_fields[field_522625d]",
+   "select:form_fields[field_139638e]",
+   "select:form_fields[field_9f4a7b4]",
+   "number:form_fields[field_14aec4a]",
+   "select:form_fields[field_3d833a5]",
+   "text:form_fields[field_f701cb9]",
+   "select:form_fields[field_f9bdf1c]",
+   "text:form_fields[field_1ffc94c]"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://rez-estudio.com/",
+   "https://rez-estudio.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:30.469Z"
+ },
+ {
+  "lead_id": "1bb40b25-fded-4e61-a279-1333dd01506c",
+  "nombre": "Reformas Ideas",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "http://www.reformasideas.com/",
+  "rating": 4.7,
+  "resenas": 74,
+  "email": null,
+  "email_web": "pinturasytarimasideas@gmail.com",
+  "emails_web": [
+   "pinturasytarimasideas@gmail.com",
+   "email@gmail.com"
+  ],
+  "telefono": "+34 642 86 90 89",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales exteriores, interiores y llave en mano",
+  "motivo_encaje": "Formulario genérico sin cualificación de obra ni metros, reformista residencial con buena reputación y encaje perfecto para el simulador.",
+  "campos_formulario": [
+   "contact:nombre-79 Maria Perez",
+   "contact:correo-electronico-41 email@gmail.com",
+   "contact:telefono-movil-1 666-66-66-66",
+   "textarea:mensaje-6"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.reformasideas.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:34.161Z"
+ },
+ {
+  "lead_id": "9d108e49-3662-49e3-b7d8-608867c8f60d",
+  "nombre": "Profesionales de Reformas Integrales | VIP Reformas",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "https://www.vipreformas.es/",
+  "rating": 4.1,
+  "resenas": 134,
+  "email": null,
+  "email_web": "info@vipreformas.es",
+  "emails_web": [
+   "info@vipreformas.es"
+  ],
+  "telefono": "+34 900 902 908",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 2,
+  "servicios": "reformas integrales, baños, cocinas y pintura",
+  "motivo_encaje": "Es un marketplace/buscador de empresas de reformas, no una empresa reformista directa; conecta clientes con múltiples profesionales y no ejecuta obras propias.",
+  "campos_formulario": [
+   "text:Escribe la reforma que necesitas",
+   "text:nombre Nombre",
+   "text:telefono Tel&eacute;fono",
+   "email:email Correo electr&oacute;nico",
+   "select:actividad",
+   "text:codigopostal C&oacute;digo Postal",
+   "select:provincia",
+   "select:localidad",
+   "textarea:descripcionReforma Si quieres describe lo que neces",
+   "select:actividadPopUp",
+   "text:codigopostalPopUp Código Postal",
+   "select:provinciaPopUp",
+   "select:localidadPopUp",
+   "textarea:descripcionReformaPopUp",
+   "text:nombrePopUp Nombre",
+   "email:emailPopUp Correo electrónico",
+   "text:telefonoPopUp Teléfono",
+   "text:proEmail",
+   "password:proPasswd",
+   "text:recEmail",
+   "text:consNombre Nombre*",
+   "text:consApellidos Apellidos*",
+   "text:consEmail Email*",
+   "text:consTelefono Teléfono*",
+   "textarea:consConsulta Consulta*"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": true,
+  "paginas": [
+   "https://www.vipreformas.es/",
+   "https://www.vipreformas.es/contactar/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:34.169Z"
+ },
+ {
+  "lead_id": "c723c8c5-1a6e-4c38-a9b2-436123784e4f",
+  "nombre": "Honrados | Reformas en Pozuelo",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "https://www.honra2.com/",
+  "rating": 4.7,
+  "resenas": 22,
+  "email": null,
+  "email_web": "info@honra2.com",
+  "emails_web": [
+   "nombre@correo.com",
+   "info@honra2.com"
+  ],
+  "telefono": "+34 914 33 26 27",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial con buen encaje, pero el formulario ya incluye campos de superficie y presupuesto orientativo que solapan parcialmente la propuesta de valor del simulador.",
+  "campos_formulario": [
+   "text:your-name Nombre y apellidos",
+   "select:localidad",
+   "email:your-email nombre@correo.com",
+   "tel:your-phone Ej.: 600 000 000",
+   "range:superficie-aproximada",
+   "range:presupuesto-orientativo",
+   "textarea:your-message Indica el estado de la vivienda, los t",
+   "textarea:_wpcf7_ak_hp_textarea"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.honra2.com/",
+   "https://www.honra2.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://www.honra2.com/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/contact/contact.css?ver=8.1",
+   "https://www.honra2.com/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:34.727Z"
+ },
+ {
+  "lead_id": "f8784bc6-2443-4942-acb7-ec83f29b7213",
+  "nombre": "Reformas Flutur · Reformas integrales en Las Rozas",
+  "ciudad": "Las Rozas de Madrid",
+  "url": "https://reformasflutur.com/",
+  "rating": 3.9,
+  "resenas": 14,
+  "email": null,
+  "email_web": "administracion@dayvo.com",
+  "emails_web": [
+   "administracion@dayvo.com"
+  ],
+  "telefono": "+34 678 26 87 77",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 0,
+  "servicios": "reformas integrales de viviendas",
+  "motivo_encaje": "La web está caída y no muestra contenido propio de la empresa.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://inactivo.dshosting.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:35.487Z"
+ },
+ {
+  "lead_id": "8eab75dc-ecdc-478c-9848-f0aa0a84fe9f",
+  "nombre": "Reformas Monbas",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "http://reformasmonbas.es/",
+  "rating": 5,
+  "resenas": 40,
+  "email": null,
+  "email_web": "info@reformasmonbas.es",
+  "emails_web": [
+   "info@reformasmonbas.es"
+  ],
+  "telefono": "+34 695 49 62 70",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 9,
+  "servicios": "reformas integrales, baños y cocinas",
+  "motivo_encaje": "Reformista residencial puro con WhatsApp y sin formulario ni calculadora; solo ofrece teléfono y email para pedir presupuesto.",
+  "campos_formulario": [],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformasmonbas.es/",
+   "https://reformasmonbas.es/pedir-presupuesto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:39.696Z"
+ },
+ {
+  "lead_id": "c33e1c08-8976-4783-9960-42667a333e16",
+  "nombre": "Toolman",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "http://www.toolman.es/",
+  "rating": 4.5,
+  "resenas": 31,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 911 43 03 50",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 2,
+  "servicios": "reformas integrales de viviendas",
+  "motivo_encaje": "La web tiene un sistema de cotización propio (btQuoteBooking) embebido, lo que hace redundante añadir Home Estimator.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.toolman.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:39.807Z"
+ },
+ {
+  "lead_id": "1da2d7ad-c6a5-447e-aead-f2e87adf13c3",
+  "nombre": "Unitec Reformas",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "http://www.unitec-reformas.net/",
+  "rating": 4.7,
+  "resenas": 24,
+  "email": null,
+  "email_web": "angelbueno@unitec-reformas.net",
+  "emails_web": [
+   "a&#110;&#103;&#101;lbu&#101;no&#64;uni&#116;&#101;c&#45;r&#101;&#102;&#111;&#114;mas.&#110;et",
+   "ang&#101;&#108;b&#117;&#101;n&#111;&#64;&#117;n&#105;&#116;&#101;&#99;-&#114;efo&#114;&#109;&#97;s.&#110;e&#116;",
+   "angelbueno@unitec-reformas.net",
+   "john@company.com"
+  ],
+  "telefono": "+34 653 91 89 77",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, reforma de cocinas y reforma de baños",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin preguntar metros ni tipo de obra, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:first_name Tu nombre aquí... ",
+   "text:last_name Tus apellidos... ",
+   "tel:phone_number",
+   "email:email_address john@company.com *",
+   "textarea:message I need help with the next problem...  *"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.unitec-reformas.net/",
+   "https://www.unitec-reformas.net/presupuesto-reforma-madrid/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:40.179Z"
+ },
+ {
+  "lead_id": "598657ba-91c5-49ba-aaf4-a17c15f6e1b8",
+  "nombre": "Producasa - Construcción y reformas",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "http://producasa.es/",
+  "rating": 4.5,
+  "resenas": 22,
+  "email": null,
+  "email_web": "info@producasa.es",
+  "emails_web": [
+   "info@producasa.es"
+  ],
+  "telefono": "+34 911 84 59 35",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas integrales, rehabilitación energética y reformas de chalets",
+  "motivo_encaje": "Reformista residencial con buen encaje, pero exige proyecto propio de arquitecto en cada reforma, lo que implica un proceso de cualificación más controlado y podría chocar con un presupuesto orientativo automatizado",
+  "campos_formulario": [
+   "text:your-name Nombre",
+   "email:your-email Email",
+   "tel:telephone Teléfono",
+   "textarea:your-message Detalles de la obra",
+   "text:your-name Nombre y apellidos",
+   "tel:telephone Teléfonos",
+   "text:your-subject Asunto",
+   "textarea:your-message Mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://producasa.es/",
+   "https://producasa.es/contacto/",
+   "https://producasa.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:40.687Z"
+ },
+ {
+  "lead_id": "db024a8b-8009-4b49-a963-82b045895b8a",
+  "nombre": "Fixhogar",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "https://www.fixhogar.com/",
+  "rating": 4.7,
+  "resenas": 28,
+  "email": null,
+  "email_web": "info@fixhogar.com",
+  "emails_web": [
+   "info@fixhogar.com"
+  ],
+  "telefono": "+34 644 83 38 90",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, parciales y mantenimiento del hogar",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin preguntar tipo de obra ni metros, encaje perfecto para Home Estimator",
+  "campos_formulario": [
+   "text:your-name Nombre",
+   "text:your-codigo Código Postal",
+   "email:your-email Email",
+   "text:your-phone Teléfono",
+   "textarea:your-message Coméntanos sobre el servicio que neces"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.fixhogar.com/",
+   "https://www.fixhogar.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.6",
+   "https://www.fixhogar.com/contacto/",
+   "https://www.fixhogar.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:44.653Z"
+ },
+ {
+  "lead_id": "eac86c9f-ab5d-4a99-8ba9-e30df8e0d7c8",
+  "nombre": "cerodisa",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "http://www.reformascerodisa.com/contacto.aspx?ID=5798",
+  "rating": 4.6,
+  "resenas": 20,
+  "email": null,
+  "email_web": "info@cerodisa.com",
+  "emails_web": [
+   "info@cerodisa.com"
+  ],
+  "telefono": "+34 699 29 90 11",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas de baños, alicatado de cocinas y pintores",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificación previa, encaje perfecto para capturar contactos cualificados.",
+  "campos_formulario": [
+   "text:ctl00$ContentPlaceHolder1$txtNombre",
+   "text:ctl00$ContentPlaceHolder1$txtEmail",
+   "text:ctl00$ContentPlaceHolder1$txtTelefono",
+   "textarea:ctl00$ContentPlaceHolder1$txtComentarios"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformascerodisa.com/contacto.aspx?ID=5798",
+   "https://reformascerodisa.com/contacto.aspx?ID=5798"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:45.053Z"
+ },
+ {
+  "lead_id": "6e31f4d9-614a-4b8d-aece-20843a70e1e5",
+  "nombre": "Iz Decoración",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "http://izdecoracion.com/",
+  "rating": 5,
+  "resenas": 24,
+  "email": null,
+  "email_web": "icetalucia@gmail.com",
+  "emails_web": [
+   "icetalucia@gmail.com"
+  ],
+  "telefono": "+34 670 39 14 23",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "decoración de interiores, reformas integrales y paisajismo",
+  "motivo_encaje": "Reformista residencial con formulario genérico válido, pero la web mezcla decoración, paisajismo y estilismo editorial, lo que difumina el foco en reforma pura.",
+  "campos_formulario": [
+   "text:field3[]",
+   "text:field6[]",
+   "text:field5[]",
+   "text:field10[]",
+   "text:field11[]",
+   "text:field12[]",
+   "text:field13[]",
+   "text:field7",
+   "text:field4",
+   "select:field22",
+   "text:",
+   "file:files",
+   "text:stripe-coupon Enter Coupon Code",
+   "text:website",
+   "text:name Nombre *",
+   "text:email E-mail *",
+   "text:telephone Teléfono",
+   "textarea:message Mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.izdecoracion.com/",
+   "https://www.izdecoracion.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://www.izdecoracion.com/wp-content/uploads/smile_fonts/icomoon-free-social-contact-16x16/icomoon-free-social-contact-16x16.css?ver=7.1"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:45.476Z"
+ },
+ {
+  "lead_id": "d00b00ce-dfdb-4190-a640-e4fe0f4697cb",
+  "nombre": "WannaHome",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "https://www.wannahome.es/",
+  "rating": 4.6,
+  "resenas": 396,
+  "email": null,
+  "email_web": "hola@wannahome.es",
+  "emails_web": [
+   "hola@wannahome.es"
+  ],
+  "telefono": "+34 681 05 22 22",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas integrales, mejoras del hogar y carpintería",
+  "motivo_encaje": "El formulario ya pregunta el tipo de servicio (urgencias, mejoras, carpintería, reforma integral), lo que cualifica parcialmente al lead, pero no recoge metros ni calidad; además mezcla reparaciones urgentes y manitas con reforma, lo que diluye el encaje perfecto.",
+  "campos_formulario": [
+   "text:form_fields[name]",
+   "tel:form_fields[field_a767421]",
+   "email:form_fields[email]",
+   "text:form_fields[message]"
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.wannahome.es/",
+   "https://www.wannahome.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:55.160Z"
+ },
+ {
+  "lead_id": "a460adce-d338-4c12-80d5-77fe7e0c3888",
+  "nombre": "ALEJO construction & design",
+  "ciudad": "Boadilla del Monte",
+  "url": "http://tureformaenmadrid.es/",
+  "rating": 5,
+  "resenas": 15,
+  "email": null,
+  "email_web": "info@tureformaenmadrid.es",
+  "emails_web": [
+   "info@tureformaenmadrid.es"
+  ],
+  "telefono": "+34 657 83 65 37",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 9,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial puro con solo WhatsApp y llamada para presupuesto, sin formulario ni calculadora, encaje perfecto para Home Estimator",
+  "campos_formulario": [],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://tureformaenmadrid.es/",
+   "https://tureformaenmadrid.es/contacto.html"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:58.913Z"
+ },
+ {
+  "lead_id": "3a3f07ad-ec83-4e3a-90b1-1569478406f6",
+  "nombre": "Tecfincas - Reformas integrales en Boadilla del Monte",
+  "ciudad": "Boadilla del Monte",
+  "url": "https://tecfincas.com/",
+  "rating": 4.3,
+  "resenas": 17,
+  "email": null,
+  "email_web": "tecfincas@gmail.com",
+  "emails_web": [
+   "tecfincas@gmail.com",
+   "tecfincassl@gmail.com",
+   "tucorreo@mail.com"
+  ],
+  "telefono": "+34 630 12 25 35",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas, baños y escaleras",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico de contacto y sin calculadora de precios, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "input:s Buscar",
+   "text:b1774bb4 TuNombre",
+   "email:b97328e1 tucorreo@mail.com",
+   "textarea:af643d45 Escribe aquí su consulta"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://tecfincas.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:37:59.051Z"
+ },
+ {
+  "lead_id": "bb49e2e8-6f49-403d-bade-8b2d50262eaf",
+  "nombre": "DIECISEIS24",
+  "ciudad": "Boadilla del Monte",
+  "url": "https://www.dieciseis24.com/boadilla-del-monte/reformas/",
+  "rating": 4.7,
+  "resenas": 35,
+  "email": null,
+  "email_web": "info@dieciseis24.com",
+  "emails_web": [
+   "info@dieciseis24.com",
+   "info@wedostudio3d.com",
+   "aitorwilzig@gmail.com"
+  ],
+  "telefono": "+34 914 64 15 54",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 2,
+  "servicios": "reformas integrales, arquitectura y mantenimiento de comunidades",
+  "motivo_encaje": "Ya dispone de su propia calculadora de presupuesto de reforma en la web.",
+  "campos_formulario": [
+   "text:first_name First Name *",
+   "text:last_name Last Name *",
+   "email:email Email *",
+   "text:contact_number Contact Number *",
+   "select:quote_for",
+   "select:estimate_quote",
+   "textarea:message Message *",
+   "text:Name",
+   "email:Email",
+   "text:Phone",
+   "text:Address",
+   "textarea:Message",
+   "text:your-name",
+   "email:your-email",
+   "tel:tel-703",
+   "text:your-subject",
+   "textarea:your-message"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.dieciseis24.com/boadilla-del-monte/reformas/",
+   "https://www.dieciseis24.com/wp-content/cache/min/1/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=1788511879",
+   "https://www.dieciseis24.com/calcular-presupuesto-reforma-madrid/",
+   "https://www.dieciseis24.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:00.413Z"
+ },
+ {
+  "lead_id": "ac042676-01f7-4e28-a3e9-d28ca55b4b36",
+  "nombre": "MADRILEÑA DE PINTURAS Y REFORMAS",
+  "ciudad": "Pozuelo de Alarcón",
+  "url": "https://mdepinturasyreformas.com/",
+  "rating": 4.2,
+  "resenas": 50,
+  "email": null,
+  "email_web": "mdepinturas@yahoo.es",
+  "emails_web": [
+   "mdepinturas@yahoo.es"
+  ],
+  "telefono": "+34 913 52 46 55",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "pinturas, reformas integrales y decoración",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificación previa; encaje perfecto para captar leads cualificados.",
+  "campos_formulario": [
+   "text:your-name",
+   "email:your-email",
+   "text:your-subject",
+   "textarea:your-message"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://mdepinturasyreformas.com/",
+   "https://mdepinturasyreformas.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://mdepinturasyreformas.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:00.874Z"
+ },
+ {
+  "lead_id": "fe6bb0a2-2132-491d-9b67-0c2574bb8f2c",
+  "nombre": "CISOYER",
+  "ciudad": "Boadilla del Monte",
+  "url": "https://cisoyer.es/",
+  "rating": 4.8,
+  "resenas": 96,
+  "email": null,
+  "email_web": "info@cisoyer.es",
+  "emails_web": [
+   "info@cisoyer.es"
+  ],
+  "telefono": "+34 619 21 13 08",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, construcción y rehabilitación",
+  "motivo_encaje": "Reformista integral con formulario genérico sin precualificación, sin calculadora ni configurador de precio.",
+  "campos_formulario": [
+   "text:name Nombre *",
+   "text:email E-mail *",
+   "text:telephone Teléfono",
+   "textarea:message Mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://cisoyer.es/",
+   "https://cisoyer.es/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://cisoyer.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:04.283Z"
+ },
+ {
+  "lead_id": "2ddfad38-4ee0-4ac0-81a3-1f6af4023a62",
+  "nombre": "adosA2 Arquitectura y Reformas",
+  "ciudad": "Boadilla del Monte",
+  "url": "http://www.adosa2.es/",
+  "rating": 5,
+  "resenas": 24,
+  "email": null,
+  "email_web": "adosa2proyectos@gmail.com",
+  "emails_web": [
+   "adosa2proyectos@gmail.com"
+  ],
+  "telefono": "+34 654 30 17 55",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6,
+  "servicios": "reformas integrales, tabiquería seca y proyectos de arquitectura",
+  "motivo_encaje": "Reformista residencial con formulario genérico y teléfono, pero mezcla obra nueva, arquitectura y licencias, lo que añade complejidad fuera del perfil puro de reformas.",
+  "campos_formulario": [
+   "text:",
+   "textarea:"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.adosa2.es/",
+   "https://www.adosa2.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:05.732Z"
+ },
+ {
+  "lead_id": "ac955edc-526e-4b42-a620-c75eee911c1b",
+  "nombre": "CIVISSA Reformas y proyectos de interiores",
+  "ciudad": "Boadilla del Monte",
+  "url": "https://www.civissa.es/",
+  "rating": 4.7,
+  "resenas": 15,
+  "email": null,
+  "email_web": "info@civissa.es",
+  "emails_web": [
+   "info@civissa.es"
+  ],
+  "telefono": "+34 622 44 76 22",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, reformas parciales y proyectos de interiorismo",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificar; encaje perfecto para capturar leads con precio orientativo.",
+  "campos_formulario": [
+   "text:your-name Nombre",
+   "tel:your-tel Teléfono",
+   "email:your-email Email",
+   "text:your-message Tu mensaje (opcional)",
+   "text:apbct__email_id__wp_contact_form_7",
+   "text:apbct__email_id__elementor_form"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://civissa.es/",
+   "https://civissa.es/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://civissa.es/wp-content/themes/astra/assets/css/minified/compatibility/contact-form-7-main.min.css?ver=4.13.12"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:06.378Z"
+ },
+ {
+  "lead_id": "a98f0f85-e855-4dd4-a1cd-1e03d4c35a00",
+  "nombre": "GRUPO PROCELCO",
+  "ciudad": "Boadilla del Monte",
+  "url": "https://gestcelco.com/",
+  "rating": 4.7,
+  "resenas": 30,
+  "email": null,
+  "email_web": "info@gestcelco.com",
+  "emails_web": [
+   "info@gestcelco.com"
+  ],
+  "telefono": "+34 916 32 23 33",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "reformas, construcción de casas y locales comerciales",
+  "motivo_encaje": "Hace reformas residenciales pero mezcla obra nueva, naves industriales y promociones; formulario genérico sin cualificación de obra.",
+  "campos_formulario": [
+   "text:form_fields[name] Nombre",
+   "text:form_fields[field_61f59ef] Apellidos",
+   "tel:form_fields[field_3a7717c] Teléfono",
+   "email:form_fields[email] Email",
+   "text:form_fields[field_eae40d9] Asunto",
+   "textarea:form_fields[message] Mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.gestcelco.com/",
+   "https://www.gestcelco.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:09.191Z"
+ },
+ {
+  "lead_id": "80048559-0321-4be5-87cf-87c806e8690b",
+  "nombre": "DR CARPINTERIA Y DISEÑO",
+  "ciudad": "Villaviciosa de Odón",
+  "url": "https://drcarpinteria.com/",
+  "rating": 5,
+  "resenas": 16,
+  "email": null,
+  "email_web": "antonio.diaz@drcarpinteria.com",
+  "emails_web": [
+   "antonio.diaz@drcarpinteria.com"
+  ],
+  "telefono": "+34 659 89 33 24",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "muebles a medida, cocinas a medida y puertas y tarimas",
+  "motivo_encaje": "Carpintero especializado en muebles, cocinas y revestimientos a medida; buen encaje pero no es reformista integral residencial clásico",
+  "campos_formulario": [
+   "text:_app_id",
+   "text:",
+   "textarea:Mensaje ",
+   "file:"
+  ],
+  "whatsapp": true,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://drcarpinteria.com/",
+   "https://drcarpinteria.com/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:13.591Z"
+ },
+ {
+  "lead_id": "4e387157-7157-4fb1-94ba-4fa008ea9e92",
+  "nombre": "ESCALA Reformas Integrales & Arquitectura S.L.",
+  "ciudad": "Villaviciosa de Odón",
+  "url": "http://www.reformasescala.com/",
+  "rating": 4.7,
+  "resenas": 15,
+  "email": null,
+  "email_web": "inforeformasescala.com",
+  "emails_web": [
+   "inforeformasescala.com",
+   "info@reformasescala.com"
+  ],
+  "telefono": "+34 655 10 79 04",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas, baños y carpintería",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin cualificación de obra ni metros.",
+  "campos_formulario": [
+   "text:wpforms[fields][0][first]",
+   "text:wpforms[fields][0][last]",
+   "email:wpforms[fields][1]",
+   "textarea:wpforms[fields][2]",
+   "text:wpforms[hp]"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformasescala.com/",
+   "https://reformasescala.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:14.043Z"
+ },
+ {
+  "lead_id": "141c6ca5-59be-4bda-83fc-59fc441f6e39",
+  "nombre": "Acantarero Construcciones y Reformas",
+  "ciudad": "Villaviciosa de Odón",
+  "url": "http://www.acantareroconstrucciones.com/",
+  "rating": 4.8,
+  "resenas": 107,
+  "email": null,
+  "email_web": "info@acantareroconstrucciones.com",
+  "emails_web": [
+   "info@acantareroconstrucciones.com"
+  ],
+  "telefono": "+34 689 75 78 65",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "obra nueva, reformas y rehabilitaciones, mármoles y granitos",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificación previa, encaje perfecto para capturar leads con presupuesto orientativo.",
+  "campos_formulario": [
+   "text:et_pb_contact_name_0 Nombre",
+   "text:et_pb_contact_email_0 Dirección de correo electrónico",
+   "textarea:et_pb_contact_message_0 Mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "http://www.acantareroconstrucciones.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:14.570Z"
+ },
+ {
+  "lead_id": "07469710-1594-44a3-8e5c-cc1a77c15180",
+  "nombre": "Reformalista Reformas integrales en Madrid",
+  "ciudad": "Villaviciosa de Odón",
+  "url": "https://reformalista.es/",
+  "rating": 4.9,
+  "resenas": 22,
+  "email": null,
+  "email_web": "info@reformalista.es",
+  "emails_web": [
+   "info@reformalista.es"
+  ],
+  "telefono": "+34 669 52 99 25",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales y proyectos de interiores",
+  "motivo_encaje": "Reformista residencial puro en Madrid con formulario de contacto genérico y sin calculadora de precios, encaje perfecto para Home Estimator",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformalista.es/",
+   "https://reformalista.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:15.356Z"
+ },
+ {
+  "lead_id": "d022c810-1117-4411-ac20-b04b0e182c47",
+  "nombre": "RUBIC CONSTRUCTORA",
+  "ciudad": "Villaviciosa de Odón",
+  "url": "https://rubicconstructora.es/",
+  "rating": 4.4,
+  "resenas": 14,
+  "email": null,
+  "email_web": "info@rubicconstructora.es",
+  "emails_web": [
+   "theratio_interior@mail.com",
+   "info@rubicconstructora.es"
+  ],
+  "telefono": "+34 624 12 37 69",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas de viviendas, obra nueva y locales",
+  "motivo_encaje": "Reformista con formulario genérico de contacto, pero mezcla obra nueva y locales comerciales, lo que reduce el encaje perfecto con el producto.",
+  "campos_formulario": [
+   "text:your-name",
+   "email:your-email",
+   "text:your-subject",
+   "textarea:your-message"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://rubicconstructora.es/",
+   "https://rubicconstructora.es/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=5.7.7",
+   "https://rubicconstructora.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:19.146Z"
+ },
+ {
+  "lead_id": "bb63eae1-a2c9-4845-ab82-b34ec255d6d3",
+  "nombre": "Materiales De Construccion El Señorío",
+  "ciudad": "Villaviciosa de Odón",
+  "url": "http://www.materialesdeconstruccionelsenorio.com/",
+  "rating": 4.2,
+  "resenas": 16,
+  "email": null,
+  "email_web": "elsenorio@icloud.com",
+  "emails_web": [
+   "elsenorio@icloud.com"
+  ],
+  "telefono": "+34 626 40 14 61",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 1.5,
+  "servicios": "materiales de construcción, ferretería y bricolaje, carpintería y cerrajería",
+  "motivo_encaje": "Es una tienda de venta de materiales de construcción, no una empresa reformista que ejecute obras residenciales.",
+  "campos_formulario": [
+   "text:dmform-0 Nombre*",
+   "email:dmform-1 Email*",
+   "textarea:dmform-3 Mensaje*"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.materialesdeconstruccionelsenorio.com/",
+   "https://www.materialesdeconstruccionelsenorio.com/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:19.160Z"
+ },
+ {
+  "lead_id": "2df90125-4aca-4f83-b2ce-9d129733bf7a",
+  "nombre": "Emona - Reformas integrales",
+  "ciudad": "Collado Villalba",
+  "url": "http://www.reformasemona.com/",
+  "rating": 4.8,
+  "resenas": 93,
+  "email": null,
+  "email_web": "info@reformasemona.com",
+  "emails_web": [
+   "info@reformasemona.com"
+  ],
+  "telefono": "+34 666 58 49 92",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, baños y cocinas",
+  "motivo_encaje": "Reformista residencial con formulario genérico de contacto y WhatsApp, sin calculadora ni cualificación previa del cliente.",
+  "campos_formulario": [
+   "text:text-462 Nombre y Apellidos* :",
+   "email:email-309 Email* :",
+   "tel:tel-409 Teléfono* (sin espacios ni guiones):",
+   "textarea:textarea-479 Mensaje:"
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformasemona.com/",
+   "https://reformasemona.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:19.487Z"
+ },
+ {
+  "lead_id": "eafe82d0-8a62-4a55-b0f7-b73c7a855f32",
+  "nombre": "Soluciones De 10",
+  "ciudad": "Villaviciosa de Odón",
+  "url": "https://www.solucionesde10.com/",
+  "rating": 4.7,
+  "resenas": 13,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 663 27 62 91",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, reparaciones del hogar y aislamientos",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin preguntar tipo de obra ni metros, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:et_pb_contact_nombre_0 Nombre",
+   "text:et_pb_contact_email_0 Email",
+   "textarea:et_pb_contact_mensaje_0 Mensaje",
+   "text:et_pb_contact_captcha_0"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.solucionesde10.com/",
+   "https://www.solucionesde10.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:24.555Z"
+ },
+ {
+  "lead_id": "5b05aa11-9fab-495a-adda-c518c1491940",
+  "nombre": "VG Proyectos y Reformas | Reformas en General",
+  "ciudad": "Collado Villalba",
+  "url": "http://joseguillermosalirrosasjaime.com/",
+  "rating": 4.6,
+  "resenas": 20,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 642 03 71 45",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 1,
+  "servicios": "reformas integrales de viviendas",
+  "motivo_encaje": "Web en construcción sin contenido ni formulario de contacto.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://joseguillermosalirrosasjaime.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:28.527Z"
+ },
+ {
+  "lead_id": "29317e84-8214-4399-9fe7-afedf65c7023",
+  "nombre": "Reformas En Collado Villalba",
+  "ciudad": "La Estación",
+  "url": "http://www.reformasencolladovillalba.net/",
+  "rating": 4.9,
+  "resenas": 63,
+  "email": null,
+  "email_web": "info@reformtechvillalba.es",
+  "emails_web": [
+   "info@reformtechvillalba.es"
+  ],
+  "telefono": "+34 678 19 71 76",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas integrales, baños y cocinas, exteriores y piscinas",
+  "motivo_encaje": "Formulario con selector de tipo de reforma que ya pre-cualifica algo, pero sin metros ni calidades; buen encaje aunque la captación inicial ya filtra mínimamente.",
+  "campos_formulario": [
+   "text:empresa",
+   "text:nombre ¿Cómo te llamas?",
+   "tel:telefono Para llamarte y resolverlo rápido",
+   "email:email tu@email.com",
+   "select:tipo",
+   "textarea:mensaje Ej.: quiero reformar el baño de un piso en "
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformtechvillalba.es/",
+   "https://reformtechvillalba.es/contacto.html"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:31.024Z"
+ },
+ {
+  "lead_id": "f788d67a-2aa0-4aab-9608-7bbe05708d63",
+  "nombre": "Galaxy Construcciones y Reformas S.L.",
+  "ciudad": "Collado Villalba",
+  "url": "http://www.grupogalaxy.es/",
+  "rating": 5,
+  "resenas": 42,
+  "email": null,
+  "email_web": "constru_charli@yahoo.es",
+  "emails_web": [
+   "constru_charli@yahoo.es"
+  ],
+  "telefono": "+34 622 59 58 94",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas generales, construcción de obra nueva y rehabilitación de viviendas",
+  "motivo_encaje": "Reformista residencial con buen volumen de trabajo pero mezcla obra nueva y construcción de chalets, lo que añade complejidad fuera del perfil puro de reforma",
+  "campos_formulario": [
+   "text:your-name",
+   "email:your-email",
+   "tel:tel-202",
+   "text:your-subject",
+   "textarea:your-message"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://grupogalaxy.es/",
+   "https://grupogalaxy.es/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1",
+   "https://grupogalaxy.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:34.498Z"
+ },
+ {
+  "lead_id": "bcc9e250-9651-4bfb-af59-c6914eb4dd4d",
+  "nombre": "De la llave",
+  "ciudad": "Collado Villalba",
+  "url": "https://www.delallave.net/",
+  "rating": 4.9,
+  "resenas": 55,
+  "email": null,
+  "email_web": "info@delallave.net",
+  "emails_web": [
+   "info@delallave.net"
+  ],
+  "telefono": "+34 918 55 93 60",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, albañilería y fontanería",
+  "motivo_encaje": "Reformista residencial puro con amplio catálogo de servicios pero sin formulario ni WhatsApp, solo teléfono, encaje perfecto para capturar leads cualificados.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.delallave.net/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:34.697Z"
+ },
+ {
+  "lead_id": "9390ca26-8627-4eda-baf4-90e42cec19f9",
+  "nombre": "Tabanera Interiorismo S.L",
+  "ciudad": "Collado Villalba",
+  "url": "https://tabanerainteriorismo.com/",
+  "rating": 4.9,
+  "resenas": 27,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 655 68 24 23",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 1,
+  "servicios": "reformas integrales de viviendas",
+  "motivo_encaje": "Web caída o en mantenimiento, sin contenido accesible ni formulario de contacto.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://tabanerainteriorismo.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:37.074Z"
+ },
+ {
+  "lead_id": "46891174-3588-41ba-85fc-474c4f50ec5b",
+  "nombre": "Reformas PRORENOVA MADRID",
+  "ciudad": "Collado Villalba",
+  "url": "https://prorenova.es/",
+  "rating": 4.8,
+  "resenas": 32,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 642 95 57 86",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6,
+  "servicios": "reformas integrales en collado villalba y sierra de madrid",
+  "motivo_encaje": "Solo aparece el título de la web sin contenido ni formulario, lo que limita la cualificación pero el perfil reformista es claro.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.prorenova.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:37.951Z"
+ },
+ {
+  "lead_id": "1401bdb4-5c0f-4dcc-86ba-a2cc8b076b69",
+  "nombre": "Reformas y construcciones: Construcciones Arana S.L.",
+  "ciudad": "Collado Villalba",
+  "url": "https://www.construccionesarana.es/",
+  "rating": 4.7,
+  "resenas": 34,
+  "email": null,
+  "email_web": "info@construccionesarana.es",
+  "emails_web": [
+   "info@construccionesarana.es"
+  ],
+  "telefono": "+34 648 16 92 10",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 9,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin cualificación previa; encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:form_fields[name] Nombre",
+   "text:form_fields[field_3a60088] Apellidos",
+   "email:form_fields[email] Email",
+   "tel:form_fields[field_410b20d] Telefono",
+   "textarea:form_fields[message] Mensaje",
+   "text:form_fields[field_38fbbca] Aquí su número de móvil",
+   "textarea:form_fields[message] ¿Qué necesita ?"
+  ],
+  "whatsapp": true,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.construccionesarana.es/",
+   "https://www.construccionesarana.es/contacto/",
+   "https://www.construccionesarana.es/presupuesto-albanileria-en-madrid/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:38.709Z"
+ },
+ {
+  "lead_id": "9901b05e-2c56-41e0-b418-ebf1eb0a3f51",
+  "nombre": "Reformas Rocafonda",
+  "ciudad": "Collado Villalba",
+  "url": "https://www.rocafonda.com/",
+  "rating": 4.5,
+  "resenas": 17,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 627 74 94 44",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6,
+  "servicios": "reformas de baños, cocinas y salones",
+  "motivo_encaje": "Reformista residencial con servicios claros pero mezcla reforma integral con manitas/bricolaje y sin formulario de contacto estructurado",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://rocafonda.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:39.434Z"
+ },
+ {
+  "lead_id": "de6993ab-3b37-4e3d-bec6-2482d8c44c21",
+  "nombre": "Stani Reformas S. L.",
+  "ciudad": "Collado Villalba",
+  "url": "http://www.stanireformas.com/",
+  "rating": 3.9,
+  "resenas": 26,
+  "email": null,
+  "telefono": "+34 677 65 72 61",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 0,
+  "servicios": "",
+  "motivo_encaje": "web caída",
+  "caida": true,
+  "audited_at": "2026-09-19T17:38:40.193Z"
+ },
+ {
+  "lead_id": "72bf0097-8347-4836-af2b-bebf0dc5d261",
+  "nombre": "Easy Hogar Reformas y Construcciones S.L.",
+  "ciudad": "Torrelodones",
+  "url": "https://www.easyhogar.es/",
+  "rating": 4.5,
+  "resenas": 41,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 652 95 47 91",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial sin calculadora ni formulario cualificado; HubSpot embebido indica interés en captación de leads, encaje perfecto para Home Estimator.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [
+   "hubspot"
+  ],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.easyhogar.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:44.033Z"
+ },
+ {
+  "lead_id": "3ff2fabe-d05d-4e0b-9426-74ab4030b794",
+  "nombre": "CM Invest&Business",
+  "ciudad": "Collado Villalba",
+  "url": "http://www.empresapladurmadridcminvest.com/",
+  "rating": 4.7,
+  "resenas": 15,
+  "email": null,
+  "email_web": "cminvestandbusiness@gmail.com",
+  "emails_web": [
+   "cminvestandbusiness@gmail.com",
+   "floreacatalimarin@gmail.com"
+  ],
+  "telefono": "+34 643 52 23 53",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "tabiques de pladur, techos de pladur y aislamientos",
+  "motivo_encaje": "Especialista en pladur con reformas como servicio secundario; el formulario ya pide metros cuadrados, lo que complica ligeramente el encaje perfecto.",
+  "campos_formulario": [
+   "text:form_fields[name] Nombre*",
+   "email:form_fields[email] Email",
+   "tel:form_fields[field_367446f] Teléfono*",
+   "number:form_fields[field_4b40358] Metros cuadrados del proye",
+   "textarea:form_fields[message] Escribe aquí tus dudas o ideas"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.empresapladurmadridcminvest.com/",
+   "https://www.empresapladurmadridcminvest.com/contacto-empresas-de-pladur-en-madrid/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:44.651Z"
+ },
+ {
+  "lead_id": "74c20d01-a38b-40bf-9803-91ca46b61d51",
+  "nombre": "Reformas Sierra Madrid",
+  "ciudad": "Collado Villalba",
+  "url": "https://reformasierramadrid.es/",
+  "rating": 5,
+  "resenas": 18,
+  "email": null,
+  "email_web": "info@reformasierramadrid.es",
+  "emails_web": [
+   "info@reformasierramadrid.es"
+  ],
+  "telefono": "+34 629 25 48 64",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "El formulario de presupuesto ya pregunta tipo de inmueble, metros cuadrados y tipo de reforma, lo que reduce la ventaja diferencial del simulador, aunque sigue siendo un reformista residencial con encaje claro.",
+  "campos_formulario": [
+   "text:wpforms[fields][0] Nombre",
+   "email:wpforms[fields][1] Correo electrónico",
+   "tel:wpforms[fields][3] Teléfono / Whatsapp",
+   "select:wpforms[fields][6]",
+   "textarea:wpforms[fields][2] Importante: Indica la dirección ",
+   "text:wpforms[fields][0]",
+   "email:wpforms[fields][1]",
+   "text:wpforms[fields][3]",
+   "tel:wpforms[fields][5]",
+   "text:wpforms[fields][4]",
+   "select:wpforms[fields][9]",
+   "select:wpforms[fields][10]",
+   "text:wpforms[fields][25][address1] Calle / Avenida / Vía",
+   "text:wpforms[fields][25][address2] Nro / Portal",
+   "text:wpforms[fields][25][city] Ciudad",
+   "text:wpforms[fields][25][state] Provincia",
+   "text:wpforms[fields][26]",
+   "text:wpforms[fields][15]",
+   "select:wpforms[fields][20]",
+   "text:wpforms_251_14",
+   "text:wpforms_251_19",
+   "text:wpforms[fields][21][date]",
+   "text:wpforms[fields][21][time]",
+   "textarea:wpforms[fields][2]"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformasierramadrid.es/",
+   "https://reformasierramadrid.es/presupuestos/",
+   "https://reformasierramadrid.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:46.384Z"
+ },
+ {
+  "lead_id": "81ded0ea-c8ae-44b3-82f7-a81f6ba0328d",
+  "nombre": "Cube Arquitectura",
+  "ciudad": "Torrelodones",
+  "url": "http://cubearquitectura.com/",
+  "rating": 4.4,
+  "resenas": 20,
+  "email": null,
+  "telefono": "+34 918 59 41 08",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 0,
+  "servicios": "",
+  "motivo_encaje": "web caída",
+  "caida": true,
+  "audited_at": "2026-09-19T17:38:46.801Z"
+ },
+ {
+  "lead_id": "6a4da179-f633-4410-990d-55be232ad1f1",
+  "nombre": "Reformas JL MARLO HRC S.L.",
+  "ciudad": "Torrelodones",
+  "url": "https://reformasjlmarlo.es/",
+  "rating": 4.8,
+  "resenas": 16,
+  "email": null,
+  "email_web": "info@reformasjlmarlo.es",
+  "emails_web": [
+   "info@reformasjlmarlo.es",
+   "tinfo@reformasjlmarlo.es"
+  ],
+  "telefono": "+34 657 14 24 21",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, reformas de baños y cocinas",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin cualificación, ideal para añadir simulador de presupuesto orientativo.",
+  "campos_formulario": [
+   "text:form_fields[name] Nombre",
+   "email:form_fields[email] Correo electrónico",
+   "tel:form_fields[field_34009c4] Teléfono",
+   "textarea:form_fields[message] Mensaje",
+   "text:form_fields[field_25d63c5]"
+  ],
+  "whatsapp": true,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformasjlmarlo.es/",
+   "https://reformasjlmarlo.es/contacto/",
+   "https://reformasjlmarlo.es/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:50.208Z"
+ },
+ {
+  "lead_id": "8aaca61b-0e50-47a3-9846-a1d1169ed837",
+  "nombre": "Renovatotal SL",
+  "ciudad": "Torrelodones",
+  "url": "http://www.renovatotal.com.es/",
+  "rating": 4.6,
+  "resenas": 19,
+  "email": null,
+  "email_web": "info@renovatotal.com.es",
+  "emails_web": [
+   "info@renovatotal.com.es",
+   "hola@ejemplo.com"
+  ],
+  "telefono": "+34 637 76 28 01",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, reformas parciales y pintura",
+  "motivo_encaje": "Reformista residencial con formulario genérico de email y mensaje sin preguntar tipo de obra ni metros, encaje perfecto para el simulador.",
+  "campos_formulario": [
+   "email:page-zones__main-widgets__6664b1b3963a3-widgets__6664b",
+   "textarea:page-zones__main-widgets__6664b1b3963a3-widgets__66"
+  ],
+  "whatsapp": true,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://renovatotal.com.es/",
+   "https://renovatotal.com.es/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:50.584Z"
+ },
+ {
+  "lead_id": "86711b04-b609-44b5-8709-83871a24e0fe",
+  "nombre": "Designio Interior",
+  "ciudad": "Torrelodones",
+  "url": "http://designiointerior.com/",
+  "rating": 5,
+  "resenas": 62,
+  "email": null,
+  "email_web": "info@designiointerior.com",
+  "emails_web": [
+   "info@designiointerior.com"
+  ],
+  "telefono": "+34 671 22 77 75",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 9,
+  "servicios": "reformas integrales, proyectos de distribución y acompañamiento",
+  "motivo_encaje": "Reformista residencial pura con formulario genérico de contacto y hasta un botón 'Calcular Reforma' sin calculadora real, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:wpforms[fields][3]",
+   "text:wpforms[fields][1] Nombre",
+   "text:wpforms[fields][2] Telefono",
+   "text:wpforms[fields][0]",
+   "email:wpforms[fields][1]",
+   "textarea:wpforms[fields][2]",
+   "text:wpforms[hp]"
+  ],
+  "whatsapp": true,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://designiointerior.com/",
+   "https://designiointerior.com/contacto/",
+   "https://designiointerior.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:53.584Z"
+ },
+ {
+  "lead_id": "9962ef9c-b471-43ea-a4e6-642c25bd563d",
+  "nombre": "Reformas Javier Recio",
+  "ciudad": "Galapagar",
+  "url": "http://www.reformas-jrecio.com/",
+  "rating": 5,
+  "resenas": 32,
+  "email": null,
+  "email_web": "reformas.jrecio@gmail.com",
+  "emails_web": [
+   "reformas.jrecio@gmail.com"
+  ],
+  "telefono": "+34 671 39 01 24",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas de baños, cocinas e integrales",
+  "motivo_encaje": "Reformista residencial puro con 20 años de experiencia, formulario de contacto genérico sin cualificación y sin WhatsApp ni calculadora.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "http://www.reformas-jrecio.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:56.860Z"
+ },
+ {
+  "lead_id": "6b67b665-4630-4bcb-a951-538852f66b03",
+  "nombre": "AJ REFORMAS 2016 SL",
+  "ciudad": "Galapagar",
+  "url": "https://www.ajreformas.net/",
+  "rating": 4.9,
+  "resenas": 56,
+  "email": null,
+  "email_web": "ajreformasaj@yahoo.es",
+  "emails_web": [
+   "ajreformasaj@yahoo.es"
+  ],
+  "telefono": "+34 677 22 22 42",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, fontanería y obra nueva",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificación previa; encaje perfecto para capturar contactos cualificados.",
+  "campos_formulario": [
+   "text:dmform-0",
+   "email:dmform-1",
+   "tel:dmform-2",
+   "textarea:dmform-3"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.ajreformas.net/",
+   "https://www.ajreformas.net/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:57.763Z"
+ },
+ {
+  "lead_id": "cb8e00b4-d564-4c87-a53a-d9e6fc5bedff",
+  "nombre": "Reformas Integrales Innova Construct-Empresa de Reformas en Galapagar",
+  "ciudad": "Galapagar",
+  "url": "https://reformas-integrales-innovaconstruct.com/",
+  "rating": 4.8,
+  "resenas": 22,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 637 94 51 98",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, baños y cocinas",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificación de obra ni metros, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:s Introduce tu búsqueda",
+   "text:Nombre Nombre",
+   "text:Email Email",
+   "text:Asunto Asunto",
+   "tel:tel-546 Teléfono",
+   "textarea:Mensaje Mensaje",
+   "select:menu-248"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformas-integrales-innovaconstruct.com/",
+   "https://reformas-integrales-innovaconstruct.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=5.7.7",
+   "https://reformas-integrales-innovaconstruct.com/contacto/",
+   "https://reformas-integrales-innovaconstruct.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:38:58.332Z"
+ },
+ {
+  "lead_id": "992e09e4-1fcd-4bc7-bec3-797773d33719",
+  "nombre": "Saneamientos Lozano Morales SL",
+  "ciudad": "Torrelodones",
+  "url": "http://www.lozanoreformasypiscinas.com/",
+  "rating": 3.1,
+  "resenas": 32,
+  "email": null,
+  "email_web": "lozanomorales1@yahoo.es",
+  "emails_web": [
+   "lozanomorales1@yahoo.es"
+  ],
+  "telefono": "+34 918 59 02 87",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6,
+  "servicios": "reformas de cocinas y baños, construcción de piscinas y aerotermia",
+  "motivo_encaje": "Reformista residencial con buen encaje pero mezcla piscinas e instalaciones técnicas que alejan del perfil puro de reforma de vivienda",
+  "campos_formulario": [
+   "text:dmform-0",
+   "email:dmform-1",
+   "tel:dmform-2",
+   "textarea:dmform-3"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.lozanoreformasypiscinas.com/",
+   "https://www.lozanoreformasypiscinas.com/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:00.100Z"
+ },
+ {
+  "lead_id": "96f5934f-45a6-4dcd-ac1f-4931e97c2db2",
+  "nombre": "REFORMAS CHRISTIAN QQ S.L.",
+  "ciudad": "Galapagar",
+  "url": "https://reformaschristian.com/",
+  "rating": 4.9,
+  "resenas": 46,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 698 38 71 01",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "reformas integrales de viviendas",
+  "motivo_encaje": "Web de reformista con buenas reseñas pero sin formulario ni WhatsApp y contenido textual casi inexistente, lo que dificulta confirmar servicios y encaje exacto",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformaschristian.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:03.573Z"
+ },
+ {
+  "lead_id": "47102f8c-c610-4979-831c-20e23ef33ffb",
+  "nombre": "Proyectos Almicasa",
+  "ciudad": "Galapagar",
+  "url": "http://www.almicasa.com/",
+  "rating": 4.3,
+  "resenas": 11,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 918 59 75 75",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "construcción de obra nueva, reformas integrales y promoción inmobiliaria",
+  "motivo_encaje": "Reformista con reformas integrales pero mezcla prominentemente obra nueva y promoción inmobiliaria, lo que reduce el encaje puro",
+  "campos_formulario": [
+   "text:form_fields[name] Tu nombre",
+   "tel:form_fields[field_3afab57] Tu teléfono",
+   "email:form_fields[email] E-mail",
+   "textarea:form_fields[message] Escríbenos tu requerimiento",
+   "text:form_fields[field_e8ab3f4]"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.almicasa.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:04.134Z"
+ },
+ {
+  "lead_id": "184d6de4-6df6-455b-8c54-cd3b24ce1280",
+  "nombre": "Mihovi Reformas y Construcciones",
+  "ciudad": "Galapagar",
+  "url": "https://mihovi.com/",
+  "rating": 5,
+  "resenas": 16,
+  "email": null,
+  "email_web": "info@mihovi.com",
+  "emails_web": [
+   "info@mihovi.com"
+  ],
+  "telefono": "+34 609 16 26 92",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6,
+  "servicios": "construcción de viviendas, reforma de interiores y rehabilitación de edificios",
+  "motivo_encaje": "Reformista residencial con encaje alto, pero mezcla obra nueva, refuerzo de estructuras y rehabilitación de fachadas/cubiertas que van más allá del residencial típico; formulario genérico sin ninguna cualificación previa.",
+  "campos_formulario": [
+   "text:your-name Nombre",
+   "email:your-email Email",
+   "tel:your-tel Teléfono",
+   "textarea:your-message Tu mensaje (opcional)",
+   "text:apbct__email_id__wp_contact_form_7",
+   "text:apbct__email_id__elementor_form"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://mihovi.com/",
+   "https://mihovi.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://mihovi.com/wp-content/themes/astra/assets/css/minified/compatibility/contact-form-7-main.min.css?ver=4.13.12"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:07.278Z"
+ },
+ {
+  "lead_id": "5fd789f9-cb54-4c03-9af8-fe890c1b4b0f",
+  "nombre": "Arq & Reformas | Reformas Integrales Madrid",
+  "ciudad": "Parquelagos",
+  "url": "http://www.tusreformas.com/",
+  "rating": 4.9,
+  "resenas": 80,
+  "email": null,
+  "email_web": "info@tusreformas.com",
+  "emails_web": [
+   "info@tusreformas.com",
+   "correo@ejemplo.com"
+  ],
+  "telefono": "+34 666 60 09 23",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 9,
+  "servicios": "reformas integrales, baños y diseño de espacios",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin precualificación y sin calculadora de precio.",
+  "campos_formulario": [
+   "text:nombre",
+   "text:apellido",
+   "tel:telefono",
+   "email:email",
+   "text:poblacion",
+   "textarea:mensaje",
+   "text:nombre Su nombre completo",
+   "email:email correo@ejemplo.com",
+   "text:apellido Apellido",
+   "tel:telefono Teléfono",
+   "text:poblacion Ciudad o población",
+   "textarea:mensaje Cuéntanos tus ideas..."
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://tusreformas.com/",
+   "https://tusreformas.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:10.427Z"
+ },
+ {
+  "lead_id": "3c76292c-f62d-4e69-8cff-ec6076c4c89b",
+  "nombre": "decoreforma3c",
+  "ciudad": "Tres Cantos",
+  "url": "https://www.decoreforma3c.es/",
+  "rating": 4.7,
+  "resenas": 15,
+  "email": null,
+  "email_web": "info@decoreforma3c.es",
+  "emails_web": [
+   "info@decoreforma3c.es",
+   "atlaspinar@gmail.com"
+  ],
+  "telefono": "+34 686 81 15 83",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial con formulario genérico de solo nombre y mensaje, sin calculadora ni cualificación previa del lead.",
+  "campos_formulario": [
+   "text:",
+   "textarea:"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.decoreforma3c.es/",
+   "https://www.decoreforma3c.es/contactanos"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:14.672Z"
+ },
+ {
+  "lead_id": "812f15fb-9749-4e8a-80d9-10e7e3c22f17",
+  "nombre": "A198 Design & Projects – Reformas Integrales Tres Cantos",
+  "ciudad": "Tres Cantos",
+  "url": "http://www.a198design.com/",
+  "rating": 4.9,
+  "resenas": 55,
+  "email": null,
+  "email_web": "contacto@a198design.com",
+  "emails_web": [
+   "contacto@a198design.com"
+  ],
+  "telefono": "+34 628 24 94 51",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, reformas de cocinas y reformas de baño",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin cualificación previa; encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:nombre",
+   "text:apellidos",
+   "email:email",
+   "tel:telefono",
+   "textarea:mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://a198design.com/",
+   "https://a198design.com/contacto/",
+   "https://a198design.com/presupuesto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:15.320Z"
+ },
+ {
+  "lead_id": "ba487bdb-e44a-47d7-afd0-69878c90bdb3",
+  "nombre": "CONSTRUCCIONES INTEGRALES TRES CANTOS",
+  "ciudad": "Madrid",
+  "url": "https://www.construccionestrescantos.com/",
+  "rating": 4.2,
+  "resenas": 19,
+  "email": null,
+  "email_web": "info@construccionestrescantos.com",
+  "emails_web": [
+   "info@construccionestrescantos.com"
+  ],
+  "telefono": "+34 627 62 58 21",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reforma integral, rehabilitación integral y construcción de viviendas",
+  "motivo_encaje": "Reformista residencial puro con tres servicios claros, solo ofrece teléfono como contacto y un buscador genérico, sin formulario cualificador ni calculadora.",
+  "campos_formulario": [
+   "text:s Type what you&#039;re looking for"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://construccionestrescantos.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:16.633Z"
+ },
+ {
+  "lead_id": "92d5945f-2431-404f-be31-6950101d284c",
+  "nombre": "EXCLUSIVAS JOMA",
+  "ciudad": "Tres Cantos",
+  "url": "http://www.exclusivasjoma.es/",
+  "rating": 4.8,
+  "resenas": 118,
+  "email": null,
+  "email_web": "exclusivasjoma@gmail.com",
+  "emails_web": [
+   "exclusivasjoma@gmail.com"
+  ],
+  "telefono": "+34 918 06 07 80",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin cualificación de obra ni metros, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:et_pb_contact_name_0 Nombre",
+   "text:et_pb_contact_telefono_0 Telefono de contacto",
+   "text:et_pb_contact_email_0 Dirección de correo electrónico",
+   "textarea:et_pb_contact_message_0 Mensaje"
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://exclusivasjoma.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:17.694Z"
+ },
+ {
+  "lead_id": "4593ded8-714d-4a86-a2ef-bdbc5eb0f7c3",
+  "nombre": "Cocinas Tres Cantos | KESHIA",
+  "ciudad": "Tres Cantos",
+  "url": "https://keshiainteriorismo.es/",
+  "rating": 4.1,
+  "resenas": 13,
+  "email": null,
+  "email_web": "info@keshiainteriorismo.es",
+  "emails_web": [
+   "info@keshiainteriorismo.es",
+   "admisep@gmail.com"
+  ],
+  "telefono": "+34 633 51 52 09",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y diseño de interiores",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificación previa, especializada en cocinas y reformas integrales en Madrid.",
+  "campos_formulario": [
+   "text:your-name Nombre*",
+   "email:your-email Email *",
+   "tel:tel-474 Telefono*",
+   "textarea:your-message Mensaje..."
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://keshiainteriorismo.es/",
+   "https://keshiainteriorismo.es/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.3",
+   "https://keshiainteriorismo.es/contacto/",
+   "https://keshiainteriorismo.es/solicita-tu-proyecto-online/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:22.593Z"
+ },
+ {
+  "lead_id": "cbcb440f-b4f4-4bdc-b364-327660479347",
+  "nombre": "Mi Decoradora Vip Style Studio",
+  "ciudad": "Tres Cantos",
+  "url": "https://midecoradoravip.es/",
+  "rating": 5,
+  "resenas": 38,
+  "email": null,
+  "email_web": "mdv@midecoradoravip.es",
+  "emails_web": [
+   "mdv@midecoradoravip.es"
+  ],
+  "telefono": "+34 678 27 13 82",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 5.5,
+  "servicios": "diseño e interiorismo, reformas y decoración, proyectos de muebles",
+  "motivo_encaje": "Estudio de interiorismo que también hace reformas residenciales, pero el foco principal es decoración/diseño de interiores más que reforma constructiva pura, lo que reduce el encaje perfecto.",
+  "campos_formulario": [
+   "text:form_fields[name] Nombre",
+   "email:form_fields[miemail] Correo electrónico",
+   "tel:form_fields[field_ce01045] Teléfono",
+   "textarea:form_fields[message] Mensaje"
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://midecoradoravip.es/",
+   "https://midecoradoravip.es/contactar/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:22.829Z"
+ },
+ {
+  "lead_id": "88b4faaa-6a2c-40d7-9bbf-0c1a890006e5",
+  "nombre": "Renueva 3C",
+  "ciudad": "Tres Cantos",
+  "url": "http://www.renueva3c.es/",
+  "rating": 4.4,
+  "resenas": 49,
+  "email": null,
+  "email_web": "info@renueva3c.es",
+  "emails_web": [
+   "info@renueva3c.es"
+  ],
+  "telefono": "+34 911 69 29 38",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificación de obra ni metros, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:form_fields[name] Nombre",
+   "email:form_fields[email] Email",
+   "tel:form_fields[telefono] Teléfono",
+   "text:form_fields[asunto] Asunto",
+   "textarea:form_fields[message] Mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://renueva3c.es/",
+   "https://renueva3c.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:23.294Z"
+ },
+ {
+  "lead_id": "13febfda-880c-4453-9f31-b69a0ddfc74f",
+  "nombre": "Reformas CGR",
+  "ciudad": "Tres Cantos",
+  "url": "http://www.reformascgr.es/",
+  "rating": 4.6,
+  "resenas": 55,
+  "email": null,
+  "email_web": "comercial@reformascgr.es",
+  "emails_web": [
+   "reformas_cgr@hotmail.com",
+   "comercial@reformascgr.es"
+  ],
+  "telefono": "+34 918 03 24 45",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas de cocinas, baños y viviendas",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico sin preguntas de cualificación, perfecto para añadir un simulador de presupuesto orientativo.",
+  "campos_formulario": [
+   "text:nombre",
+   "text:telefono",
+   "email:email",
+   "textarea:mensaje"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.reformascgr.es/",
+   "https://www.reformascgr.es/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://www.reformascgr.es/contacto/",
+   "https://www.reformascgr.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:25.382Z"
+ },
+ {
+  "lead_id": "37b96bc5-5d35-4d70-b104-a71c37b01d0c",
+  "nombre": "Reformas Panygon",
+  "ciudad": "Tres Cantos",
+  "url": "http://www.reformaspanygon.com/",
+  "rating": 3.7,
+  "resenas": 15,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 912 29 85 57",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 0,
+  "servicios": "reformas integrales de viviendas",
+  "motivo_encaje": "La web está caída y muestra una página de parking de dominio sin contenido real.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "http://www.reformaspanygon.com/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:27.884Z"
+ },
+ {
+  "lead_id": "a389d62a-0ccc-4613-897c-d193a05f6085",
+  "nombre": "Kozma Reformas e Interiorismo",
+  "ciudad": "Tres Cantos",
+  "url": "https://kozma.es/",
+  "rating": 4.3,
+  "resenas": 43,
+  "email": null,
+  "email_web": "info@kozma.es",
+  "emails_web": [
+   "info@kozma.es",
+   "info@kozma.es\\"
+  ],
+  "telefono": "+34 636 27 93 37",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas de baños, cocinas e integrales",
+  "motivo_encaje": "Reformista residencial especializado en baños y cocinas con formulario de contacto genérico, sin calculadora ni cualificación previa del lead.",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://kozma.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:28.694Z"
+ },
+ {
+  "lead_id": "cd46eac0-b45e-4a8d-a5c2-71c3c9e0bcec",
+  "nombre": "Brico&Más Mantenimiento SL",
+  "ciudad": "Tres Cantos",
+  "url": "http://www.bricomas.net/",
+  "rating": 4.7,
+  "resenas": 24,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 613 71 99 70",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, manitas a domicilio y bricolaje",
+  "motivo_encaje": "Reformista residencial con formulario genérico de texto libre y sin ningún tipo de calculadora ni precualificación, encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:dmform-0",
+   "email:dmform-1",
+   "tel:dmform-2",
+   "textarea:dmform-3"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.bricomas.net/",
+   "https://www.bricomas.net/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:30.157Z"
+ },
+ {
+  "lead_id": "b9659dc1-4d2a-4d1e-b94c-451af4cb90d6",
+  "nombre": "ANTTER INTERIORES",
+  "ciudad": "Tres Cantos",
+  "url": "http://antterinteriores.com/",
+  "rating": 4.2,
+  "resenas": 16,
+  "email": null,
+  "email_web": "info@antterinteriores.com",
+  "emails_web": [
+   "info@antterinteriores.com"
+  ],
+  "telefono": "+34 910 34 63 69",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, diseño de interiores y carpintería",
+  "motivo_encaje": "Reformista residencial completo con formulario genérico sin preguntas de cualificación, cubre cocinas, baños, viviendas y locales.",
+  "campos_formulario": [
+   "text:nombre",
+   "text:Apellidos",
+   "email:email",
+   "tel:Telefono Teléfono*",
+   "text:asunto",
+   "textarea:mensaje ¿Qué trabajo necesitas?"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.antterinteriores.com/",
+   "https://www.antterinteriores.com/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:32.058Z"
+ },
+ {
+  "lead_id": "b64ae896-9ade-45d9-bcf8-6b4ae53bf129",
+  "nombre": "Reparaciones y Reformas Ismael Oliva",
+  "ciudad": "Colmenar Viejo",
+  "url": "https://www.paginasamarillas.es/f/colmenar-viejo/reparaciones-y-reformas-ismael-oliva_197972128_000000002.html",
+  "rating": 4.8,
+  "resenas": 82,
+  "email": null,
+  "telefono": "+34 619 48 89 06",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 0,
+  "servicios": "",
+  "motivo_encaje": "web caída",
+  "caida": true,
+  "audited_at": "2026-09-19T17:39:33.709Z"
+ },
+ {
+  "lead_id": "9e21b4c2-c8e0-4527-b76d-c02e558e464e",
+  "nombre": "Reformas dg Colmenar Viejo",
+  "ciudad": "Colmenar Viejo",
+  "url": "http://reformasdg.es/",
+  "rating": 4.6,
+  "resenas": 58,
+  "email": null,
+  "email_web": "reformasdg2019@gmail.com",
+  "emails_web": [
+   "reformasdg2019@gmail.com",
+   "dg@reformasdg.com",
+   "soporte@webador.es"
+  ],
+  "telefono": "+34 636 58 05 43",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas integrales, construcción y mantenimiento de comunidades",
+  "motivo_encaje": "Reformista residencial con buen encaje, pero mezcla obra nueva, obra pública y comunidades, y el formulario es genérico sin campos de cualificación",
+  "campos_formulario": [
+   "text:q Buscar...",
+   "text:dynamic-form-2368734-8490771",
+   "email:dynamic-form-2368734-8490772",
+   "textarea:dynamic-form-2368734-8490773",
+   "text:captcha"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.reformasdg.es/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:36.803Z"
+ },
+ {
+  "lead_id": "d00e56ab-18a5-42f2-a54e-3c02825819cc",
+  "nombre": "A REFORMAS SEIRA",
+  "ciudad": "Colmenar Viejo",
+  "url": "https://seirasl.es/",
+  "rating": 4.3,
+  "resenas": 25,
+  "email": null,
+  "email_web": "seira@seirasl.es",
+  "emails_web": [
+   "seira@seirasl.es"
+  ],
+  "telefono": "+34 918 46 78 57",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas y baños",
+  "motivo_encaje": "Reformista residencial con formulario genérico sin cualificar y amplia oferta de servicios de reforma.",
+  "campos_formulario": [
+   "text:form_fields[name]",
+   "tel:form_fields[field_71275a2]",
+   "email:form_fields[email]",
+   "text:form_fields[field_bc3b9a9]",
+   "textarea:form_fields[message]"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://seirasl.es/",
+   "https://seirasl.es/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:37.089Z"
+ },
+ {
+  "lead_id": "e2f2ac9d-a477-4d66-a0e6-ed7dfa7adedf",
+  "nombre": "Reformas y Rehabilitaciones Andrés Corral",
+  "ciudad": "Colmenar Viejo",
+  "url": "https://reformasyrehabilitacionesmadrid.es/",
+  "rating": 4.8,
+  "resenas": 45,
+  "email": null,
+  "email_web": "presupuestos@reformasyrehabilitacionesmadrid.es",
+  "emails_web": [
+   "presupuestos@reformasyrehabilitacionesmadrid.es",
+   "clientes@reformasyrehabilitacionesmadrid.es"
+  ],
+  "telefono": "+34 633 05 54 94",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6.5,
+  "servicios": "reformas integrales, rehabilitación de fachadas y climatización",
+  "motivo_encaje": "Reformista residencial con amplia gama de servicios pero sin formulario ni WhatsApp, solo llamada telefónica, y mezcla obra residencial con locales y fachadas",
+  "campos_formulario": [],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://reformasyrehabilitacionesmadrid.es/",
+   "https://reformasyrehabilitacionesmadrid.es/wp-content/themes/enfold/enfold/config-templatebuilder/avia-shortcodes/contact/contact.css?ver=5.6.8",
+   "https://reformasyrehabilitacionesmadrid.es/wp-content/plugins/contact-form-7-honeypot/legacy-honeypot/includes/css/honeypot-frontend.css?ver=3.7.1",
+   "https://reformasyrehabilitacionesmadrid.es/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:38.213Z"
+ },
+ {
+  "lead_id": "5260c818-b089-4955-9ed6-411f269fa0d1",
+  "nombre": "Reformas Madi servicios y proyectos",
+  "ciudad": "Algete",
+  "url": "http://www.madireformasmadrid.com/",
+  "rating": 5,
+  "resenas": 12,
+  "email": null,
+  "telefono": "+34 642 15 53 59",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 0,
+  "servicios": "",
+  "motivo_encaje": "web caída",
+  "caida": true,
+  "audited_at": "2026-09-19T17:39:38.524Z"
+ },
+ {
+  "lead_id": "35a21748-206c-45b1-bf9c-ae28edee7a09",
+  "nombre": "EDCM Proyectos y Obras S.L.",
+  "ciudad": "Colmenar Viejo",
+  "url": "http://edcmpyo.com/",
+  "rating": 4.4,
+  "resenas": 13,
+  "email": null,
+  "email_web": "info@edcmpyo.com",
+  "emails_web": [
+   "info@edcmpyo.com"
+  ],
+  "telefono": "+34 919 20 49 19",
+  "lote": "madrid-4",
+  "clase": "B",
+  "home_estimator_score": 6,
+  "servicios": "reformas integrales, rehabilitación y reforma de locales",
+  "motivo_encaje": "Reformista con amplio catálogo residencial pero también abarca hospitales, colegios y obra civil, lo que diluye el encaje perfecto con el segmento residencial puro",
+  "campos_formulario": [
+   "text:your-name Nombre",
+   "text:your-name2 Apellido",
+   "email:your-email Email",
+   "tel:tel-336 Teléfono",
+   "textarea:your-message Escribe lo qué necesites"
+  ],
+  "whatsapp": false,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://edcmpyo.com/",
+   "https://edcmpyo.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.0.3",
+   "https://edcmpyo.com/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:45.140Z"
+ },
+ {
+  "lead_id": "38a608ad-f90a-404a-b7d8-625cd9b11148",
+  "nombre": "Zeta 2 Reformas y Proyectos S.L.",
+  "ciudad": "Algete",
+  "url": "https://zeta2reformas.com/",
+  "rating": 4.9,
+  "resenas": 28,
+  "email": null,
+  "email_web": "info@zeta2reformas.com",
+  "emails_web": [
+   "info@zeta2reformas.com",
+   "zeta2.reformas@gmail.com"
+  ],
+  "telefono": "+34 603 28 50 50",
+  "lote": "madrid-4",
+  "clase": "A",
+  "home_estimator_score": 8.5,
+  "servicios": "reformas integrales, cocinas, baños y trabajos exteriores",
+  "motivo_encaje": "Reformista residencial puro con formulario genérico que solo pregunta tipo de reforma y plazo, sin calculadora ni configurador de precio; encaje perfecto para Home Estimator.",
+  "campos_formulario": [
+   "text:form_fields[field_8a131c1] Nombre y apellidos",
+   "number:form_fields[field_3db65c9] Teléfono",
+   "email:form_fields[field_3ad93f1] Email",
+   "select:form_fields[field_fd07543]",
+   "select:form_fields[field_cbd1d6c]",
+   "number:form_fields[field_907f412] Presupuesto",
+   "textarea:form_fields[field_5339de1] Observaciones/comentario"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://zeta2reformas.com/",
+   "https://zeta2reformas.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:45.684Z"
+ },
+ {
+  "lead_id": "726bfcd6-f1b1-43c1-b5b0-02e84e665f8a",
+  "nombre": "Parque Mueble Algete",
+  "ciudad": "Algete",
+  "url": "https://www.parquemueble.com/",
+  "rating": 4.6,
+  "resenas": 72,
+  "email": null,
+  "email_web": "info@parquemueble.com",
+  "emails_web": [
+   "info@parquemueble.com"
+  ],
+  "telefono": "+34 916 29 08 10",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 1.5,
+  "servicios": "muebles de cocina, armarios a medida y muebles de salón",
+  "motivo_encaje": "Es una tienda de muebles, no una empresa de reformas residenciales",
+  "campos_formulario": [
+   "text:s Search...",
+   "text:s",
+   "text:FNAME Tu nombre (obligatorio)",
+   "email:EMAIL Tu dirección de email (obligatorio)",
+   "text:_mc4wp_honeypot",
+   "email:your-email Correo electrónico*",
+   "tel:telefono Teléfono",
+   "text:your-name Nombre y apellidos*",
+   "textarea:Mensaje ¿En qué podemos ayudarte?*)"
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://parquemueble.com/",
+   "https://parquemueble.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://parquemueble.com/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:45.994Z"
+ },
+ {
+  "lead_id": "bfbe599c-b030-4534-8b74-bfcf1a2a0385",
+  "nombre": "Piscinas a Medida",
+  "ciudad": "Navalcarnero",
+  "url": "http://www.piscinasamedida.com/",
+  "rating": 4,
+  "resenas": 16,
+  "email": null,
+  "email_web": null,
+  "emails_web": [],
+  "telefono": "+34 680 66 79 79",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 2,
+  "servicios": "construcción de piscinas y mantenimiento",
+  "motivo_encaje": "Es una empresa especializada exclusivamente en piscinas, no en reformas residenciales integrales, y ya dispone de un formulario de presupuesto con selección de medidas y opciones específicas de piscina.",
+  "campos_formulario": [
+   "select:metrosancho",
+   "select:metroslargo",
+   "select:profundidad_minimo",
+   "select:profundidad_maximo",
+   "select:revestimiento_interior",
+   "select:coronacion",
+   "select:depuracion",
+   "select:duchas",
+   "select:lona_invierno",
+   "text:nombre",
+   "text:telefono",
+   "text:poblacion",
+   "text:email",
+   "text:control",
+   "email:telefono",
+   "email:email",
+   "email:control",
+   "textarea:comentarios"
+  ],
+  "whatsapp": true,
+  "captcha": false,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.piscinasamedida.com/",
+   "https://www.piscinasamedida.com/presupuesto",
+   "https://www.piscinasamedida.com/contacto"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:50.752Z"
+ },
+ {
+  "lead_id": "2640b187-8aa5-4647-9fe4-dd3fa6673845",
+  "nombre": "Reformas Davilla",
+  "ciudad": "Navalcarnero",
+  "url": "https://www.serviciosenverde.com/item/reformas-davilla/",
+  "rating": 2.4,
+  "resenas": 14,
+  "email": null,
+  "email_web": "info@serviciosenverde.com",
+  "emails_web": [
+   "info@serviciosenverde.com&quot;&gt;info@serviciosenverde.com&lt;\\/a&gt;",
+   "info@serviciosenverde.com"
+  ],
+  "telefono": "+34 625 63 35 81",
+  "lote": "madrid-4",
+  "clase": "C",
+  "home_estimator_score": 1.5,
+  "servicios": "reformas de baños, reformas integrales y reformas de viviendas",
+  "motivo_encaje": "La web es un directorio de terceros (serviciosenverde.com), no la web propia de la empresa; el formulario pertenece al directorio y no a Reformas Davilla.",
+  "campos_formulario": [
+   "text:s Buscar palabra clave",
+   "select:category Categoría",
+   "select:location Ubicación",
+   "range:rad",
+   "select:cat",
+   "text:your-name",
+   "email:your-email",
+   "tel:tel-766",
+   "text:text-187",
+   "textarea:your-message"
+  ],
+  "whatsapp": false,
+  "captcha": true,
+  "embebidos": [],
+  "estimacion_automatica": false,
+  "paginas": [
+   "https://www.serviciosenverde.com/item/reformas-davilla/",
+   "https://www.serviciosenverde.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+   "https://www.serviciosenverde.com/servicios-en-verde/contacto/",
+   "https://www.serviciosenverde.com/servicios-en-verde/contacto/"
+  ],
+  "caida": false,
+  "audited_at": "2026-09-19T17:39:52.058Z"
+ }
+]
