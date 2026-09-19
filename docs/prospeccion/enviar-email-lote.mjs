@@ -9,7 +9,8 @@
 // NO cambia leads.status: el pipeline de webs no se entera.
 // Seguimiento (18-sep): la fila se crea ANTES del envío (draft, sin sent_at) para tener su id y meterlo en
 //  · el píxel de apertura (track-event → outreach_messages.opened_at), en una parte HTML que es el mismo texto;
-//  · el enlace a la demo, que va por www.nico-soto.es/r/<lead>/demo?m=&s=<slug> (track-click → events.link_clicked).
+//  · el enlace a la demo: se LEE presupuestos.nico-soto.es/demo/<slug>, pero en HTML apunta a
+//    www.nico-soto.es/r/<lead>/demo?m=&s=<slug> (track-click → events.link_clicked).
 // Tras enviar se marca sent + sent_at. Si Resend falla, se borra el borrador.
 import fs from "node:fs";
 import path from "node:path";
@@ -77,16 +78,20 @@ const LEADS = parseCsv(fs.readFileSync(path.join(DIR, LOTES[LOTE][0]), "utf8"), 
     };
   });
 
-// Enlace con seguimiento a la demo (mismo dominio que el remitente). El destino lo fija track-click.
+// El texto lleva la URL limpia de la demo (es lo que se lee). En la parte HTML el enlace muestra esa misma
+// URL pero apunta al de seguimiento (mismo dominio que el remitente); el destino lo fija track-click.
 const linkDemo = (l, messageId) =>
   `${env.APP_URL.replace(/\/$/, "")}/r/${l.lead_id}/demo?m=${messageId}&c=email&s=${encodeURIComponent(l.slug)}`;
-const textoDe = (l, messageId) => l.plantilla.replaceAll("{link_demo}", linkDemo(l, messageId));
-for (const l of LEADS) l.text = textoDe(l, "00000000-0000-0000-0000-000000000000");
+const demoLimpia = (l) => `https://presupuestos.nico-soto.es/demo/${l.slug}`;
+for (const l of LEADS) l.text = l.plantilla.replaceAll("{link_demo}", demoLimpia(l));
 
 // HTML = el mismo texto plano, sin diseño (que siga pareciendo un correo escrito a mano) + píxel 1×1.
 const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 function htmlDe(text, l, messageId) {
-  const cuerpo = esc(text).replace(/https?:\/\/[^\s<]+/g, (u) => `<a href="${u}">${u}</a>`).replace(/\n/g, "<br>\n");
+  const limpia = demoLimpia(l);
+  const cuerpo = esc(text)
+    .replace(/https?:\/\/[^\s<]+/g, (u) => `<a href="${u === limpia ? linkDemo(l, messageId) : u}">${u}</a>`)
+    .replace(/\n/g, "<br>\n");
   const pixel = `${env.SUPABASE_URL}/functions/v1/track-event?lead_id=${l.lead_id}&type=email_opened&message_id=${messageId}`;
   return `<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.5;color:#222">${cuerpo}</div>` +
     `<img src="${pixel}" width="1" height="1" alt="" style="display:block;border:0;width:1px;height:1px">`;
@@ -156,7 +161,7 @@ for (const l of LEADS) {
   if (!ENVIAR) { console.log(`\n=== ${l.n} [${l.cluster}] ${l.empresa} → ${l.to}\nAsunto: ${l.asunto}\n\n${l.text}`); continue; }
   const messageId = await crearBorrador(l);
   if (!messageId) { console.log(`${l.n} ${l.empresa} · ya consta como enviado en el panel, salto`); continue; }
-  const text = textoDe(l, messageId);
+  const text = l.text;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
