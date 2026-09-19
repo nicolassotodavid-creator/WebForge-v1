@@ -23,6 +23,9 @@ const REGISTRAR = process.argv.includes("--registrar");
 const LOTE = process.argv[process.argv.indexOf("--lote") + 1];
 // lote → [CSV de clusters, cola con demo_url]
 const LOTES = {
+  // El lote 1 tiene su propio script (enviar-email-lote1.mjs) para el email 1, que salió sin píxel ni
+  // enlace medido. Su seguimiento va por aquí para que sí se mida. Mismo formato de CSV y cola.
+  1: ["outreach_reformas_lote1.csv", "home-estimator-outreach-15.csv"],
   2: ["outreach_reformas_lote2.csv", "home-estimator-outreach-16-30.csv"],
   3: ["outreach_reformas_lote3.csv", "home-estimator-outreach-31-45.csv"],
   4: ["outreach_reformas_lote4.csv", "home-estimator-outreach-46-60.csv"],
@@ -154,9 +157,18 @@ if (REGISTRAR) {
   process.exit(0);
 }
 
-console.log(`${LEADS.length} emails · ${SEGUIMIENTO ? "seguimiento" : "email 1"} · ${ENVIAR ? "ENVÍO REAL" : "simulación"}`);
+// Rebotes, quejas de spam y bajas: resend-webhook y la baja one-click marcan leads.do_not_contact.
+// Los envíos de webs lo respetan; este script no lo hacía y el seguimiento habría vuelto a escribir
+// a 5 de los 65 del 16-17 sep (MyJ, Mesform, VGA, Genesis, Salvicar).
+const ids = LEADS.map((l) => l.lead_id).join(",");
+const bloqueo = await fetch(`${env.SUPABASE_URL}/rest/v1/leads?select=id&do_not_contact=eq.true&id=in.(${ids})`, { headers: SB });
+if (!bloqueo.ok) throw new Error(`No se pudo leer do_not_contact (HTTP ${bloqueo.status}): no envío a ciegas`);
+const noContactar = new Set((await bloqueo.json()).map((r) => r.id));
+
+console.log(`${LEADS.length - noContactar.size} emails (${noContactar.size} con no contactar) · ${SEGUIMIENTO ? "seguimiento" : "email 1"} · ${ENVIAR ? "ENVÍO REAL" : "simulación"}`);
 const registro = [...previos];
 for (const l of LEADS) {
+  if (noContactar.has(l.lead_id)) { console.log(`${l.n} ${l.empresa} · no contactar (rebote/queja/baja), salto`); continue; }
   if (yaEnviados.has(l.n)) { console.log(`${l.n} ${l.empresa} · ya enviado, salto`); continue; }
   if (!ENVIAR) { console.log(`\n=== ${l.n} [${l.cluster}] ${l.empresa} → ${l.to}\nAsunto: ${l.asunto}\n\n${l.text}`); continue; }
   const messageId = await crearBorrador(l);
