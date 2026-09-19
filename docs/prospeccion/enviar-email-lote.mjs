@@ -33,6 +33,7 @@ const LOTES = {
   // Madrid 2 (17-sep): 40 del pool ya auditado. Aquí `cluster` NO es un ángulo de copy:
   // es la variante del A/B de asunto (A-fijo / B-medida). El cuerpo es el mismo para las dos.
   madrid2: ["outreach_reformas_madrid2.csv", "home-estimator-outreach-madrid2.csv"],
+  madrid3: ["outreach_reformas_madrid3.csv", "home-estimator-outreach-madrid3.csv"],
 };
 if (!process.argv.includes("--lote") || !LOTES[LOTE]) { console.error(`Falta --lote ${Object.keys(LOTES).join(" | ")}`); process.exit(1); }
 // Emails corregidos respecto a la cola: email del CSV de clusters → email que figura en la cola.

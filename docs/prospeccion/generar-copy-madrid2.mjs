@@ -11,7 +11,8 @@
 // resto de la plantilla es fija. Toda cita entrecomillada se verifica contra el texto de
 // la auditoría: si el modelo se inventa una, la fila sale marcada y no se envía.
 //
-// Uso: node docs/prospeccion/generar-copy-madrid2.mjs [--limit N]
+// Uso: node docs/prospeccion/generar-copy-madrid2.mjs [--lote madrid3] [--limit N]
+//      (sin --lote hace Madrid 2; madrid3 = las 20 del 19-sep, numeradas desde el 116)
 //      node docs/prospeccion/generar-copy-madrid2.mjs --solo slug1,slug2   (rehace solo esas filas)
 import fs from "node:fs";
 import path from "node:path";
@@ -26,8 +27,11 @@ const SOLO = process.argv.includes("--solo")
   ? new Set(process.argv[process.argv.indexOf("--solo") + 1].split(",").map((s) => s.trim()))
   : null;
 
-const M = JSON.parse(fs.readFileSync(path.join(DIR, "madrid2-marca.json"), "utf8"));
-const POOL = JSON.parse(fs.readFileSync(path.join(DIR, "madrid2-pool.json"), "utf8"));
+const LOTE = process.argv.includes("--lote") ? process.argv[process.argv.indexOf("--lote") + 1] : "madrid2";
+const PRIMER_N = { madrid2: 76, madrid3: 116 }[LOTE];
+if (!PRIMER_N) throw new Error(`lote desconocido: ${LOTE}`);
+const M = JSON.parse(fs.readFileSync(path.join(DIR, `${LOTE}-marca.json`), "utf8"));
+const POOL = JSON.parse(fs.readFileSync(path.join(DIR, `${LOTE}-pool.json`), "utf8"));
 const porScrape = new Map(POOL.map((p) => [p.nombre, p]));
 
 const SYSTEM = `Escribes el segundo párrafo de un email frío a una empresa de reformas española, y un asunto.
@@ -113,7 +117,7 @@ nico-soto.es`;
 
 // A/B: alternando por score (ya vienen ordenadas) para que las dos variantes lleven fichas iguales.
 const ASUNTO_A = "he probado tu formulario";
-const CSV = path.join(DIR, "outreach_reformas_madrid2.csv");
+const CSV = path.join(DIR, `outreach_reformas_${LOTE}.csv`);
 
 // Con --solo, las demás filas se conservan tal cual estaban.
 function leePrevias() {
@@ -158,17 +162,17 @@ console.log("");
 
 const esc = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
 const cab = ["empresa", "ciudad", "email", "slug", "variante", "cluster", "asunto", "cuerpo", "followup_asunto", "followup_cuerpo", "enviar", "aviso"];
-fs.writeFileSync(path.join(DIR, "outreach_reformas_madrid2.csv"),
+fs.writeFileSync(CSV,
   [cab.join(","), ...filas.map((f) => cab.map((k) => esc(f[k])).join(","))].join("\n"));
 
 // Cola con el enlace de cada demo, en el formato que espera enviar-email-lote.mjs
 const cabCola = ["n", "empresa", "score", "url_contacto", "mensaje", "demo_url", "slug", "lead_id", "email", "web"];
 const cola = M.map((r, n) => {
   const a = porScrape.get(r.empresa) || {};
-  return [n + 76, r.nombre_comercial, a.home_estimator_score ?? "", a.url_presupuesto || r.url, "",
+  return [n + PRIMER_N, r.nombre_comercial, a.home_estimator_score ?? "", a.url_presupuesto || r.url, "",
     `https://presupuestos.nico-soto.es/demo/${r.slug}`, r.slug, r.lead_id ?? a.lead_id ?? "", r.email, r.url];
 });
-fs.writeFileSync(path.join(DIR, "home-estimator-outreach-madrid2.csv"),
+fs.writeFileSync(path.join(DIR, `home-estimator-outreach-${LOTE}.csv`),
   [cabCola.join(";"), ...cola.map((f) => f.map(esc).join(";"))].join("\n"));
 
 const ok = filas.filter((f) => f.enviar === "TRUE").length;

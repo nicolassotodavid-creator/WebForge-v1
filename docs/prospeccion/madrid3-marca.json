@@ -1,0 +1,316 @@
+[
+ {
+  "slug": "villarreal-decor",
+  "empresa": "Reformas en Fuenlabrada -Villarreal Decormadrid SL",
+  "nombre_comercial": "Villarreal Decor",
+  "ciudad": "Fuenlabrada",
+  "email": "info@decormadrid.es",
+  "url": "https://www.decormadrid.es/",
+  "logo": {
+   "file": "villarreal-decor.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#b35f00",
+   "secondary": "#603030"
+  }
+ },
+ {
+  "slug": "reformas-tvm",
+  "empresa": "Reformas TVM Madrid",
+  "nombre_comercial": "Reformas TVM",
+  "ciudad": "Parla",
+  "email": "trofinvilaroel@gmail.com",
+  "url": "http://reformastvm.es/",
+  "logo": {
+   "file": "reformas-tvm.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#c8321a",
+   "secondary": "#3c3c3c"
+  }
+ },
+ {
+  "slug": "protrux",
+  "empresa": "Protrux Reformas",
+  "nombre_comercial": "Protrux Reformas",
+  "ciudad": "Alcobendas",
+  "email": "contacto@protrux.es",
+  "url": "https://www.protrux.es/",
+  "logo": {
+   "file": "protrux.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#0b2a3c",
+   "secondary": "#3d6178"
+  }
+ },
+ {
+  "slug": "ramms-reform",
+  "empresa": "Reformas integrales, construcción y pintura RAMMS Reform",
+  "nombre_comercial": "Ramms Reform",
+  "ciudad": "Valdemoro",
+  "email": "info@rammsreform.es",
+  "url": "https://www.rammsreform.es/",
+  "logo": {
+   "file": "ramms-reform.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#8f7414",
+   "secondary": "#d8a818"
+  }
+ },
+ {
+  "slug": "akiando",
+  "empresa": "Akiando Reforma",
+  "nombre_comercial": "Akiando Reforma",
+  "ciudad": "Alcorcón",
+  "email": "info@akiandoreforma.com",
+  "url": "https://www.akiandoreforma.com/",
+  "logo": {
+   "file": "akiando.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "jm-construccion",
+  "empresa": "J&M Servicios Integrales de Construcción",
+  "nombre_comercial": "J&M Construcción",
+  "ciudad": "Rivas-Vaciamadrid",
+  "email": "info@jmconstruccion.es",
+  "url": "http://www.jmconstruccion.es/",
+  "logo": {
+   "file": "jm-construccion.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#c8161b",
+   "secondary": "#111111"
+  }
+ },
+ {
+  "slug": "reformas-cabacor",
+  "empresa": "REFORMAS CABACOR",
+  "nombre_comercial": "Reformas Cabacor",
+  "ciudad": "Móstoles",
+  "email": "ocaballero@reformascabacor.es",
+  "url": "http://www.reformascabacor.es/",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformas-galo",
+  "empresa": "Reformas Galo",
+  "nombre_comercial": "Reformas Galo",
+  "ciudad": "Parla",
+  "email": "reformasgalo@hotmail.com",
+  "url": "https://reformasgalo.es/",
+  "logo": {
+   "file": "reformas-galo.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#7a5212",
+   "secondary": "#c09048"
+  }
+ },
+ {
+  "slug": "zasert",
+  "empresa": "ZASERT Trabajos Integrales",
+  "nombre_comercial": "Zasert",
+  "ciudad": "Alcorcón",
+  "email": "info@zasert.es",
+  "url": "http://www.zasert.es/",
+  "logo": {
+   "file": "zasert.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#8f1a1f",
+   "secondary": "#3a3a3a"
+  }
+ },
+ {
+  "slug": "reform-you",
+  "empresa": "Reform You | Empresa de Reformas Integrales en Madrid",
+  "nombre_comercial": "Reform You",
+  "ciudad": "Rivas-Vaciamadrid",
+  "email": "info@reformyou.es",
+  "url": "https://reformyou.es/",
+  "logo": {
+   "file": "reform-you.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#5a2a08",
+   "secondary": "#a8621e"
+  }
+ },
+ {
+  "slug": "asimetria",
+  "empresa": "Asimetría Reformas Integrales",
+  "nombre_comercial": "Asimetría Reformas",
+  "ciudad": "Torrejón de Ardoz",
+  "email": "info@asimetria.es",
+  "url": "https://asimetria.es/",
+  "logo": {
+   "file": "asimetria.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#187860",
+   "secondary": "#2d2d2d"
+  }
+ },
+ {
+  "slug": "reformas-atlanta",
+  "empresa": "Construcciones Y Reformas Atlanta",
+  "nombre_comercial": "Reformas Atlanta",
+  "ciudad": "Getafe",
+  "email": "contactoatlanta@gmail.com",
+  "url": "https://reformaspisosmadrid.es/",
+  "logo": {
+   "file": "reformas-atlanta.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#1a4a95",
+   "secondary": "#d8a830"
+  }
+ },
+ {
+  "slug": "reformas-verli",
+  "empresa": "Reformas Verli",
+  "nombre_comercial": "Reformas Verli",
+  "ciudad": "Mejorada del Campo",
+  "email": "reformasverli@hotmail.com",
+  "url": "https://cys-reformasverli.com/",
+  "logo": {
+   "file": "reformas-verli.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#2f5f78",
+   "secondary": "#f07830"
+  }
+ },
+ {
+  "slug": "reformas-marai",
+  "empresa": "Reformas Marai",
+  "nombre_comercial": "Reformas Marai",
+  "ciudad": "Móstoles",
+  "email": "info@reformasmarai.com",
+  "url": "http://www.reformasmarai.com/",
+  "logo": {
+   "file": "reformas-marai.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "prialum",
+  "empresa": "PRIALUM reformas integrales",
+  "nombre_comercial": "Prialum Reformas",
+  "ciudad": "Torrejón de Ardoz",
+  "email": "prisancb@gmail.com",
+  "url": "https://reformasprialum.es/",
+  "logo": {
+   "file": "prialum.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#d10000",
+   "secondary": "#1e1e1e"
+  }
+ },
+ {
+  "slug": "duchaestilo",
+  "empresa": "Duchaestilo",
+  "nombre_comercial": "Duchaestilo",
+  "ciudad": "Alcorcón",
+  "email": "info@duchaestilo.com",
+  "url": "https://duchaestilo.com/",
+  "logo": {
+   "file": "duchaestilo.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#0079a3",
+   "secondary": "#00a8d8"
+  }
+ },
+ {
+  "slug": "novainteria",
+  "empresa": "Novaintéria, reformas e interiorismo",
+  "nombre_comercial": "Novaintéria",
+  "ciudad": "San Fernando de Henares",
+  "email": "info@novainteria.es",
+  "url": "http://www.novainteria.es/",
+  "logo": {
+   "file": "novainteria.svg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#9f1228",
+   "secondary": "#141313"
+  }
+ },
+ {
+  "slug": "excot",
+  "empresa": "Muebles y Reformas Excot Fuenlabrada",
+  "nombre_comercial": "Reformas Excot",
+  "ciudad": "Fuenlabrada",
+  "email": "info@reformasexcot.com",
+  "url": "https://reformasexcot.com/",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "dci-reformas",
+  "empresa": "DCI Reformas Madrid (Diseño, Construcción e Interiorismo)",
+  "nombre_comercial": "DCI Reformas Madrid",
+  "ciudad": "Madrid",
+  "email": "info@dcireformasmadrid.es",
+  "url": "http://dcireformasmadrid.es/",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "arte-en-bano",
+  "empresa": "Arte en baño",
+  "nombre_comercial": "Arte en Baño",
+  "ciudad": "Coslada",
+  "email": "info@arteenbano.es",
+  "url": "http://www.arteenbano.es/",
+  "logo": {
+   "file": "arte-en-bano.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#b52a2a",
+   "secondary": "#7a1f1f"
+  }
+ }
+]

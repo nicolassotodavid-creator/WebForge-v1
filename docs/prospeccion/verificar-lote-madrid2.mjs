@@ -1,10 +1,11 @@
 // [SIMULADOR] Comprueba el lote Madrid 2 ANTES de que Nico lance el envío.
 // Hace las mismas comprobaciones que enviar-email-lote.mjs, pero no habla con Resend ni
-// con la base: solo lee los dos CSV y dice qué saldría. Uso: node docs/prospeccion/verificar-lote-madrid2.mjs [--ver N]
+// con la base: solo lee los dos CSV y dice qué saldría. Uso: node docs/prospeccion/verificar-lote-madrid2.mjs [--lote madrid3] [--ver N]
 import fs from "node:fs";
 import path from "node:path";
 
 const DIR = path.dirname(new URL(import.meta.url).pathname);
+const LOTE = process.argv.includes("--lote") ? process.argv[process.argv.indexOf("--lote") + 1] : "madrid2";
 const VER = process.argv.includes("--ver") ? Number(process.argv[process.argv.indexOf("--ver") + 1]) : 1;
 
 function parse(txt, sep) {
@@ -23,8 +24,8 @@ function parse(txt, sep) {
   return resto.map((f) => Object.fromEntries(cab.map((k, j) => [k, f[j] ?? ""])));
 }
 
-const cola = parse(fs.readFileSync(path.join(DIR, "home-estimator-outreach-madrid2.csv"), "utf8"), ";");
-const leads = parse(fs.readFileSync(path.join(DIR, "outreach_reformas_madrid2.csv"), "utf8"), ",");
+const cola = parse(fs.readFileSync(path.join(DIR, `home-estimator-outreach-${LOTE}.csv`), "utf8"), ";");
+const leads = parse(fs.readFileSync(path.join(DIR, `outreach_reformas_${LOTE}.csv`), "utf8"), ",");
 const demoPorEmail = new Map(cola.map((r) => [r.email.trim().toLowerCase(), r]));
 
 const problemas = [];
