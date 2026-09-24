@@ -171,11 +171,20 @@ const ids = LEADS.map((l) => l.lead_id).join(",");
 const bloqueo = await fetch(`${env.SUPABASE_URL}/rest/v1/leads?select=id&do_not_contact=eq.true&id=in.(${ids})`, { headers: SB });
 if (!bloqueo.ok) throw new Error(`No se pudo leer do_not_contact (HTTP ${bloqueo.status}): no envío a ciegas`);
 const noContactar = new Set((await bloqueo.json()).map((r) => r.id));
+// Quien ya contestó (botón "Respondió" de la ficha o webhook del buzón → mark-replied) no recibe más
+// emails del lote: el seguimiento dice "último mensaje, no escribo más" y llegaría a quien preguntó precio.
+const [msgsResp, evResp] = await Promise.all([
+  fetch(`${REST}?select=lead_id&status=eq.replied&lead_id=in.(${ids})`, { headers: SB }),
+  fetch(`${env.SUPABASE_URL}/rest/v1/events?select=lead_id&type=eq.replied&lead_id=in.(${ids})`, { headers: SB }),
+]);
+if (!msgsResp.ok || !evResp.ok) throw new Error("No se pudo leer quién ha contestado: no envío a ciegas");
+const contestaron = new Set([...(await msgsResp.json()), ...(await evResp.json())].map((r) => r.lead_id));
 
-console.log(`${LEADS.length - noContactar.size} emails (${noContactar.size} con no contactar) · ${FASE} · ${ENVIAR ? "ENVÍO REAL" : "simulación"}`);
+console.log(`${LEADS.length - noContactar.size} emails (${noContactar.size} con no contactar, ${contestaron.size} ya contestaron) · ${FASE} · ${ENVIAR ? "ENVÍO REAL" : "simulación"}`);
 const registro = [...previos];
 for (const l of LEADS) {
   if (noContactar.has(l.lead_id)) { console.log(`${l.n} ${l.empresa} · no contactar (rebote/queja/baja), salto`); continue; }
+  if (contestaron.has(l.lead_id)) { console.log(`${l.n} ${l.empresa} · ya contestó, salto`); continue; }
   if (yaEnviados.has(l.n)) { console.log(`${l.n} ${l.empresa} · ya enviado, salto`); continue; }
   if (!ENVIAR) { console.log(`\n=== ${l.n} [${l.cluster}] ${l.empresa} → ${l.to}\nAsunto: ${l.asunto}\n\n${l.text}`); continue; }
   const messageId = await crearBorrador(l);
