@@ -5,6 +5,7 @@
 //      node docs/prospeccion/enviar-email-lote.mjs --lote 3 --seguimiento --enviar   → email 2 (seguimiento)
 //      node docs/prospeccion/enviar-email-lote.mjs --lote madrid3 --email3 --enviar   → email 3 (solo lotes con email3_* en el CSV)
 //      node docs/prospeccion/enviar-email-lote.mjs --lote 3 [--seguimiento] --registrar → solo apunta en el panel lo ya enviado (log)
+// Seguimiento / email 3: quien no abrió los anteriores recibe el asunto de asuntos-nuevos.json en vez del "Re:".
 // Cada envío se apunta en outreach_messages con email_number 101 (email 1) / 102 (seguimiento) / 103 (email 3):
 // así el panel lo etiqueta como "Simulador" (app/src/lib/product.ts) y los crons de webs no lo tocan.
 // NO cambia leads.status: el pipeline de webs no se entera.
@@ -180,7 +181,31 @@ const [msgsResp, evResp] = await Promise.all([
 if (!msgsResp.ok || !evResp.ok) throw new Error("No se pudo leer quién ha contestado: no envío a ciegas");
 const contestaron = new Set([...(await msgsResp.json()), ...(await evResp.json())].map((r) => r.lead_id));
 
-console.log(`${LEADS.length - noContactar.size} emails (${noContactar.size} con no contactar, ${contestaron.size} ya contestaron) · ${FASE} · ${ENVIAR ? "ENVÍO REAL" : "simulación"}`);
+// Asunto nuevo para quien no abrió (asuntos-nuevos.json, por fase y cluster): un "Re:" a un email que no ha visto
+// no le dice nada. Abrió = opened_at de algún email del simulador (el píxel ya descarta escáneres), clic en la
+// demo, o su slug en abrieron_sin_pixel (lotes enviados antes del píxel, por la analítica de las demos).
+const NUEVOS_F = path.join(DIR, "asuntos-nuevos.json");
+const NUEVOS = fs.existsSync(NUEVOS_F) ? JSON.parse(fs.readFileSync(NUEVOS_F, "utf8")) : {};
+const nuevos = NUEVOS[FASE] || {};
+let conAsuntoNuevo = 0;
+if (Object.keys(nuevos).length) {
+  const [abiertos, clics] = await Promise.all([
+    fetch(`${REST}?select=lead_id&email_number=gte.101&opened_at=not.is.null&lead_id=in.(${ids})`, { headers: SB }),
+    fetch(`${env.SUPABASE_URL}/rest/v1/events?select=lead_id&type=eq.link_clicked&lead_id=in.(${ids})`, { headers: SB }),
+  ]);
+  if (!abiertos.ok || !clics.ok) throw new Error("No se pudo leer quién abrió: no envío a ciegas");
+  const abrio = new Set([...(await abiertos.json()), ...(await clics.json())].map((r) => r.lead_id));
+  const sinPixel = new Set(NUEVOS.abrieron_sin_pixel || []);
+  for (const l of LEADS) {
+    const nuevo = nuevos[l.cluster];
+    if (!nuevo || abrio.has(l.lead_id) || sinPixel.has(l.slug)) continue;
+    l.asunto = nuevo.replaceAll("{empresa}", (NUEVOS.nombres || {})[l.empresa] || l.empresa);
+    if (/\{[a-z_]+\}/.test(l.asunto)) throw new Error(`Placeholder sin rellenar en el asunto nuevo de ${l.empresa}`);
+    conAsuntoNuevo++;
+  }
+}
+
+console.log(`${LEADS.length - noContactar.size} emails (${noContactar.size} con no contactar, ${contestaron.size} ya contestaron, ${conAsuntoNuevo} con asunto nuevo por no abrir) · ${FASE} · ${ENVIAR ? "ENVÍO REAL" : "simulación"}`);
 const registro = [...previos];
 for (const l of LEADS) {
   if (noContactar.has(l.lead_id)) { console.log(`${l.n} ${l.empresa} · no contactar (rebote/queja/baja), salto`); continue; }

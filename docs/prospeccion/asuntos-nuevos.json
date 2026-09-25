@@ -1,0 +1,31 @@
+{
+  "_nota": "[SIMULADOR] Asunto nuevo para quien NO abrió los emails anteriores (lo usa enviar-email-lote.mjs). Quien abrió recibe «Re: <asunto>» y le cae en el mismo hilo; quien no, un asunto que no dependa de un email que no ha visto. Clave = fase y luego cluster/variante del CSV; {empresa} se rellena. Abrió = opened_at humano (el píxel ya descarta escáneres <60 s), un clic en la demo, o su slug en abrieron_sin_pixel.",
+  "seguimiento": {
+    "Dolor": "pruébalo como si fueras tu cliente",
+    "Curiosidad": "¿llamas tú o vas a verlo?",
+    "Gancho": "¿quién lleva los presupuestos en {empresa}?",
+    "A-leads": "Un contacto de 15 € que tienen otros tres",
+    "B-contesta": "Un contacto de 15 € que tienen otros tres"
+  },
+  "_nombres": "Nombre corto para {empresa} en el asunto cuando el del CSV queda raro en un asunto (Cuinex, extraMURS y Reformas en Oliva son los que ya usa su cuerpo).",
+  "nombres": {
+    "Reformas integrales Cuinex": "Cuinex",
+    "extraMURS Arquitectura": "extraMURS",
+    "DLUXE Solutions · Reformas en Oliva": "Reformas en Oliva",
+    "tAs obrAs y reformAs": "Tas Obras y Reformas",
+    "Reformas & Mantenimiento - Grupo G": "Grupo G",
+    "OBRAS VIP": "Obras VIP"
+  },
+  "_abrieron_sin_pixel": "Lotes 1-4 y Madrid 1 salieron el 16-17 sep sin píxel: solo sabemos que abrieron los que entraron en su demo (analítica de reform-wizard 16-25 sep + visitas vistas el 17-sep).",
+  "abrieron_sin_pixel": [
+    "efenval",
+    "reformas-orcu",
+    "bono-proyectos",
+    "reformas-ferreira",
+    "ecerotres",
+    "escriva-sanjuan",
+    "reformas-areal",
+    "remacen",
+    "grupo-leon-reformas"
+  ]
+}
