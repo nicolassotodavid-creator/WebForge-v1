@@ -16,7 +16,7 @@
     "Reformas & Mantenimiento - Grupo G": "Grupo G",
     "OBRAS VIP": "Obras VIP"
   },
-  "_abrieron_sin_pixel": "Lotes 1-4 y Madrid 1 salieron el 16-17 sep sin píxel: solo sabemos que abrieron los que entraron en su demo (analítica de reform-wizard 16-25 sep + visitas vistas el 17-sep).",
+  "_abrieron_sin_pixel": "Lotes 1-4 y Madrid 1 salieron el 16-17 sep sin píxel: solo sabemos que abrieron los que entraron en su demo (analítica de reform-wizard 16-25 sep, visitas vistas el 17-sep y tabla leads de reform-wizard: Mestre Reformas completó su demo el 21-sep).",
   "abrieron_sin_pixel": [
     "efenval",
     "reformas-orcu",
@@ -26,6 +26,7 @@
     "escriva-sanjuan",
     "reformas-areal",
     "remacen",
-    "grupo-leon-reformas"
+    "grupo-leon-reformas",
+    "mestre-reformas"
   ]
 }
