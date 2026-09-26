@@ -1,6 +1,6 @@
 # Home Estimator — Madrid 7: 24 empresas del pool ya auditado
 
-**Preparado:** 2026-09-26 · **Lanzamiento:** jueves 1-oct-2026 (lo lanza Nico) · **Sin enviar.**
+**Preparado:** 2026-09-26 · **Lanzamiento:** martes 29-sep-2026 (lo lanza Nico) · **Sin enviar.**
 
 Madrid 5, 6 y 7 salen del mismo pool: las empresas de `events` (`type = 'home_estimator_audit'`, lotes `madrid-1` y `madrid-4`)
 con clase A o B que siguen en `status = 'new'`, con email, sin ningún envío previo y sin `do_not_contact`. No hizo falta scrape ni auditoría nueva.
@@ -67,7 +67,7 @@ node docs/prospeccion/enviar-email-lote.mjs --lote madrid7 --seguimiento --envia
 node docs/prospeccion/enviar-email-lote.mjs --lote madrid7 --email3 --enviar        # email 3, sin fecha
 ```
 
-Calendario: Madrid 5 martes 29-sep · Madrid 6 miércoles 30-sep · Madrid 7 jueves 1-oct.
+Calendario: los tres lotes (Madrid 5, 6 y 7) salen el martes 29-sep por la mañana, a la vez que los formularios de Cowork (decidido el 26-sep, para que el A/B de canal compare el mismo día).
 
 ## Dónde están los datos
 

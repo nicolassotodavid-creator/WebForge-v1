@@ -66,7 +66,7 @@ node docs/prospeccion/enviar-email-lote.mjs --lote madrid5 --seguimiento --envia
 node docs/prospeccion/enviar-email-lote.mjs --lote madrid5 --email3 --enviar        # email 3, sin fecha
 ```
 
-Calendario: Madrid 5 martes 29-sep · Madrid 6 miércoles 30-sep · Madrid 7 jueves 1-oct.
+Calendario: los tres lotes (Madrid 5, 6 y 7) salen el martes 29-sep por la mañana, a la vez que los formularios de Cowork (decidido el 26-sep, para que el A/B de canal compare el mismo día).
 
 ## Dónde están los datos
 
