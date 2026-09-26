@@ -1,6 +1,6 @@
 # Encargo para Cowork: enviar el formulario de contacto de 142 empresas de reformas
 
-Eres el asistente de Nico Soto (nico-soto.es). Nico ha preparado para cada una de estas empresas de reformas de Madrid
+Eres el asistente de Nico Soto (nico-soto.es). Nico ha preparado para cada una de estas empresas de reformas de Madrid y Valencia
 una demo de un simulador de presupuestos con su marca. Tu trabajo: entrar en la web de cada empresa y mandarle el mensaje
 por **su formulario de contacto**. El texto de cada empresa ya está escrito y no se toca.
 
