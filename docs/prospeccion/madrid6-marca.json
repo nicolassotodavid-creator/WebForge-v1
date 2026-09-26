@@ -1,0 +1,322 @@
+[
+ {
+  "slug": "madrilena-pinturas-reformas",
+  "lead_id": "ac042676-01f7-4e28-a3e9-d28ca55b4b36",
+  "empresa": "Madrileña de Pinturas y Reformas",
+  "ciudad": "Pozuelo de Alarcón",
+  "logo": {
+   "file": "madrilena-pinturas-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#b5363c",
+   "secondary": "#b5363c"
+  }
+ },
+ {
+  "slug": "zeta-2-reformas",
+  "lead_id": "38a608ad-f90a-404a-b7d8-625cd9b11148",
+  "empresa": "Zeta 2 Reformas",
+  "ciudad": "Algete",
+  "logo": {
+   "file": "zeta-2-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#9f6912",
+   "secondary": "#f5a21c"
+  }
+ },
+ {
+  "slug": "construcciones-integrales-tres-cantos",
+  "lead_id": "ba487bdb-e44a-47d7-afd0-69878c90bdb3",
+  "empresa": "Construcciones Integrales Tres Cantos",
+  "ciudad": "Madrid",
+  "logo": {
+   "file": "construcciones-integrales-tres-cantos.jpg"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "decoreforma3c",
+  "lead_id": "3c76292c-f62d-4e69-8cff-ec6076c4c89b",
+  "empresa": "Decoreforma3c",
+  "ciudad": "Tres Cantos",
+  "logo": {
+   "file": "decoreforma3c.jpg"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "vivienda-sana",
+  "lead_id": "e2d7db7c-0928-4885-b6db-e288df8b8010",
+  "empresa": "Vivienda Sana",
+  "ciudad": "San Sebastián de los Reyes",
+  "logo": {
+   "file": "vivienda-sana.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#667b3c",
+   "secondary": "#9ebd5c"
+  }
+ },
+ {
+  "slug": "escarpa-reparaciones",
+  "lead_id": "f0004901-f974-4fae-b40e-9aa050ec299a",
+  "empresa": "Escarpa Reparaciones",
+  "ciudad": "Arganda del Rey",
+  "logo": {
+   "file": "escarpa-reparaciones.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#36488d",
+   "secondary": "#36488d"
+  }
+ },
+ {
+  "slug": "reformas-factory",
+  "lead_id": "3014a431-4f99-4a2e-aebc-b5536f508c96",
+  "empresa": "Reformas Factory",
+  "ciudad": "Parla",
+  "logo": {
+   "file": "reformas-factory.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#ab5f22",
+   "secondary": "#f88a31"
+  }
+ },
+ {
+  "slug": "studio77",
+  "lead_id": "6755bcac-e268-4932-84a0-ae79b21b0fac",
+  "empresa": "Studio77",
+  "ciudad": "Alcalá de Henares",
+  "logo": {
+   "file": "studio77.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "decoraciones-valdavia",
+  "lead_id": "eadef797-1adb-46ba-8807-692601ffd70c",
+  "empresa": "Decoraciones Valdavia",
+  "ciudad": "San Sebastián de los Reyes",
+  "logo": {
+   "file": "decoraciones-valdavia.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#7f4564",
+   "secondary": "#7f4564"
+  }
+ },
+ {
+  "slug": "ofara",
+  "lead_id": "844b22d7-2da2-4210-aff0-dd7f548ac230",
+  "empresa": "Ofara",
+  "ciudad": "Leganés",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "duchanova",
+  "lead_id": "3f5278c2-19f8-462d-8f97-72aaa7ef0249",
+  "empresa": "Duchanova",
+  "ciudad": "Rivas-Vaciamadrid",
+  "logo": {
+   "file": "duchanova.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#1b7aaa",
+   "secondary": "#1b7aaa"
+  }
+ },
+ {
+  "slug": "reformas-collado-villalba",
+  "lead_id": "29317e84-8214-4399-9fe7-afedf65c7023",
+  "empresa": "Reformas en Collado Villalba",
+  "ciudad": "Collado Villalba",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "andres-corral-reformas",
+  "lead_id": "e2f2ac9d-a477-4d66-a0e6-ed7dfa7adedf",
+  "empresa": "Reformas y Rehabilitaciones Andrés Corral",
+  "ciudad": "Colmenar Viejo",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "multiservicios-morosan",
+  "lead_id": "a5f3028b-7222-4b8b-b743-d106370d7761",
+  "empresa": "Multiservicios Morosan",
+  "ciudad": "Arganda del Rey",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformas-go",
+  "lead_id": "beadce42-5a98-4e31-b46d-1161e11fa208",
+  "empresa": "Reformas Go",
+  "ciudad": "Torrejón de Ardoz",
+  "logo": {
+   "file": "reformas-go.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#5d810d",
+   "secondary": "#77a511"
+  }
+ },
+ {
+  "slug": "tce-reformas",
+  "lead_id": "5ece63b8-30b2-413b-b6b3-f8eff4f6948c",
+  "empresa": "TCE Reformas",
+  "ciudad": "Pinto",
+  "logo": {
+   "file": "tce-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#3561be",
+   "secondary": "#3561be"
+  }
+ },
+ {
+  "slug": "alicia-mesa",
+  "lead_id": "c0b3f56b-5548-405c-b5dd-3b30d595aa89",
+  "empresa": "Alicia Mesa",
+  "ciudad": "Alcobendas",
+  "logo": {
+   "file": "alicia-mesa.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "producasa",
+  "lead_id": "598657ba-91c5-49ba-aaf4-a17c15f6e1b8",
+  "empresa": "Producasa",
+  "ciudad": "Pozuelo de Alarcón",
+  "logo": {
+   "file": "producasa.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#956b2b",
+   "secondary": "#e6a542"
+  }
+ },
+ {
+  "slug": "refor-obras",
+  "lead_id": "45b5ea7a-12c1-4803-8bff-a1408b36c877",
+  "empresa": "Refor Obras y Reformas",
+  "ciudad": "Alcorcón",
+  "logo": {
+   "file": "refor-obras.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#2f7da6",
+   "secondary": "#3996c8"
+  }
+ },
+ {
+  "slug": "rubic-constructora",
+  "lead_id": "d022c810-1117-4411-ac20-b04b0e182c47",
+  "empresa": "Rubic Constructora",
+  "ciudad": "Villaviciosa de Odón",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "ecoreforma360",
+  "lead_id": "ece8af68-2e65-40eb-a173-f75924133f58",
+  "empresa": "EcoReforma360",
+  "ciudad": "Arganda del Rey",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "mihovi",
+  "lead_id": "184d6de4-6df6-455b-8c54-cd3b24ce1280",
+  "empresa": "Mihovi",
+  "ciudad": "Galapagar",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "mb-reformas",
+  "lead_id": "28335dac-9c09-473f-ac5c-eff550429230",
+  "empresa": "MB Reformas",
+  "ciudad": "San Sebastián de los Reyes",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "grupo-procelco",
+  "lead_id": "a98f0f85-e855-4dd4-a1cd-1e03d4c35a00",
+  "empresa": "Grupo Procelco",
+  "ciudad": "Boadilla del Monte",
+  "logo": {
+   "file": "grupo-procelco.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#2a7d83",
+   "secondary": "#39aab2"
+  }
+ }
+]

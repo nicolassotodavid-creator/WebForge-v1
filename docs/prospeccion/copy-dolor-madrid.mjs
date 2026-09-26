@@ -10,7 +10,7 @@
 // {servicios} sale de madrid-servicios.json (extraído de la auditoría de su web y revisado).
 // Verificación de buzones del 19-sep (SMTP RCPT): Reformas TVM no existe → enviar=FALSE.
 //
-// Uso: node docs/prospeccion/copy-dolor-madrid.mjs   (reescribe los dos CSV)
+// Uso: node docs/prospeccion/copy-dolor-madrid.mjs [madrid5 madrid6 madrid7]   (reescribe los CSV indicados; sin args, madrid2-4)
 import fs from "node:fs";
 import path from "node:path";
 
@@ -81,7 +81,8 @@ function parseCsv(txt) {
 }
 const esc = (v) => `"${String(v ?? "").replaceAll('"', '""')}"`;
 
-for (const lote of ["madrid2", "madrid3", "madrid4"]) {
+// Sin argumentos reescribe madrid2-4; con argumentos solo los lotes indicados: node copy-dolor-madrid.mjs madrid5 madrid6 madrid7
+for (const lote of process.argv.length > 2 ? process.argv.slice(2) : ["madrid2", "madrid3", "madrid4"]) {
   const CSV = path.join(DIR, `outreach_reformas_${lote}.csv`);
   const { cab, filas } = parseCsv(fs.readFileSync(CSV, "utf8"));
   for (const k of ["email3_asunto", "email3_cuerpo"]) if (!cab.includes(k)) cab.splice(cab.indexOf("enviar"), 0, k);

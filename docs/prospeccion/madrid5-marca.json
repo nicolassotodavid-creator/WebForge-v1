@@ -1,0 +1,304 @@
+[
+ {
+  "slug": "aj-reformas",
+  "lead_id": "6b67b665-4630-4bcb-a951-538852f66b03",
+  "empresa": "AJ Reformas",
+  "ciudad": "Galapagar",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "brico-mas",
+  "lead_id": "cd46eac0-b45e-4a8d-a5c2-71c3c9e0bcec",
+  "empresa": "Brico&Más",
+  "ciudad": "Tres Cantos",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "cerodisa",
+  "lead_id": "eac86c9f-ab5d-4a99-8ba9-e30df8e0d7c8",
+  "empresa": "Cerodisa",
+  "ciudad": "Pozuelo de Alarcón",
+  "logo": {
+   "file": "cerodisa.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#1f7a4d",
+   "secondary": "#30b070"
+  }
+ },
+ {
+  "slug": "armahome",
+  "lead_id": "e65795c0-a319-416a-a2ab-ac97224206b6",
+  "empresa": "Armahome",
+  "ciudad": "Las Rozas de Madrid",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "olcasa",
+  "lead_id": "6d23b3b8-7421-4ddb-a8a3-2d2d244fc977",
+  "empresa": "Olcasa Obras y Construcciones",
+  "ciudad": "San Sebastián de los Reyes",
+  "logo": {
+   "file": "olcasa.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#3d7070",
+   "secondary": "#509090"
+  }
+ },
+ {
+  "slug": "reformar-renovacion",
+  "lead_id": "565193db-7bf0-4b37-88c8-3ffc0b3bcb21",
+  "empresa": "Reformar Renovación",
+  "ciudad": "Fuenlabrada",
+  "logo": {
+   "file": "reformar-renovacion.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#22853c",
+   "secondary": "#248e40"
+  }
+ },
+ {
+  "slug": "reformas-mavisan",
+  "lead_id": "4ce48056-7b9a-4ce6-8de6-68d1c21241aa",
+  "empresa": "Reformas Mavisan",
+  "ciudad": "Arganda del Rey",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "transformaya",
+  "lead_id": "2554c66e-e13c-4000-af65-1419f34c68b9",
+  "empresa": "Transformaya",
+  "ciudad": "Arganda del Rey",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "budia-obras",
+  "lead_id": "156f309a-f885-4615-aa8d-9bca6e1e054a",
+  "empresa": "Budia Obras",
+  "ciudad": "Coslada",
+  "logo": {
+   "file": "budia-obras.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#752121",
+   "secondary": "#752121"
+  }
+ },
+ {
+  "slug": "asc-reformas",
+  "lead_id": "f29744d8-0e17-4f12-9da8-5cbbd2122a87",
+  "empresa": "ASC Construcciones y Reformas",
+  "ciudad": "Torrejón de Ardoz",
+  "logo": {
+   "file": "asc-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#b55026",
+   "secondary": "#b55026"
+  }
+ },
+ {
+  "slug": "wannahome",
+  "lead_id": "d00b00ce-dfdb-4190-a640-e4fe0f4697cb",
+  "empresa": "WannaHome",
+  "ciudad": "Pozuelo de Alarcón",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformas-dg",
+  "lead_id": "9e21b4c2-c8e0-4527-b76d-c02e558e464e",
+  "empresa": "Reformas DG",
+  "ciudad": "Colmenar Viejo",
+  "logo": {
+   "file": "reformas-dg.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#ae5a17",
+   "secondary": "#ae5a17"
+  }
+ },
+ {
+  "slug": "rez-estudio",
+  "lead_id": "30c86a1e-3484-464b-b4f0-29f2a6495cec",
+  "empresa": "Rez-Estudio",
+  "ciudad": "Las Rozas de Madrid",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "cecilia-caro",
+  "lead_id": "20ee0d27-769d-4975-b0ac-8e8ed7a33cb3",
+  "empresa": "Cecilia Caro",
+  "ciudad": "Alcobendas",
+  "logo": {
+   "file": "cecilia-caro.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#00597a",
+   "secondary": "#00597a"
+  }
+ },
+ {
+  "slug": "reformas-integrales-alejandro",
+  "lead_id": "36258891-37dd-4b6e-8a9d-aa597cb0a098",
+  "empresa": "Reformas Integrales Alejandro",
+  "ciudad": "Alcorcón",
+  "logo": {
+   "file": "reformas-integrales-alejandro.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#9b6b00",
+   "secondary": "#feaf00"
+  }
+ },
+ {
+  "slug": "crisreformas",
+  "lead_id": "c225f0ad-7ba3-47f0-ba9f-c7f43465ebad",
+  "empresa": "Crisreformas",
+  "ciudad": "Alcorcón",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "nomasbanera",
+  "lead_id": "030ae212-3849-4049-9d71-95dfc7bc1781",
+  "empresa": "NoMasBanera",
+  "ciudad": "Alcalá de Henares",
+  "logo": {
+   "file": "nomasbanera.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#4c77ad",
+   "secondary": "#517fb8"
+  }
+ },
+ {
+  "slug": "nemesis-reformas",
+  "lead_id": "a32c2d29-eab5-49f4-8b01-43fc709116b2",
+  "empresa": "Némesis Reformas",
+  "ciudad": "Leganés",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "grupo-edma",
+  "lead_id": "65a7cf88-8435-4a54-ac4a-b0052e209595",
+  "empresa": "Grupo Edma",
+  "ciudad": "Arganda del Rey",
+  "logo": {
+   "file": "grupo-edma.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#cd2813",
+   "secondary": "#cd2813"
+  }
+ },
+ {
+  "slug": "baus21",
+  "lead_id": "4cd4047f-8e00-42c5-bf19-8a7f102656ee",
+  "empresa": "BAUS21",
+  "ciudad": "Fuenlabrada",
+  "logo": {
+   "file": "baus21.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "construccion-decoracion-rehabilitacion",
+  "lead_id": "eaded490-8091-40f5-8aa3-455f1e6b6429",
+  "empresa": "Construcción, Decoración y Rehabilitación",
+  "ciudad": "Alcalá de Henares",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "edcm-proyectos",
+  "lead_id": "35a21748-206c-45b1-bf9c-ae28edee7a09",
+  "empresa": "EDCM Proyectos y Obras",
+  "ciudad": "Colmenar Viejo",
+  "logo": {
+   "file": "edcm-proyectos.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "amira-construcciones",
+  "lead_id": "3ea3b65a-2cb5-4a0a-bc63-cd5475ad7b92",
+  "empresa": "Amira Construcciones",
+  "ciudad": "Madrid",
+  "logo": {
+   "file": "amira-construcciones.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#013399",
+   "secondary": "#013399"
+  }
+ }
+]

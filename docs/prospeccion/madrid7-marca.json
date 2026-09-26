@@ -1,0 +1,328 @@
+[
+ {
+  "slug": "easy-hogar",
+  "lead_id": "72bf0097-8347-4836-af2b-bebf0dc5d261",
+  "empresa": "Easy Hogar",
+  "ciudad": "Torrelodones",
+  "logo": {
+   "file": "easy-hogar.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#707703",
+   "secondary": "#c3cf06"
+  }
+ },
+ {
+  "slug": "fixhogar",
+  "lead_id": "db024a8b-8009-4b49-a963-82b045895b8a",
+  "empresa": "Fixhogar",
+  "ciudad": "Pozuelo de Alarcón",
+  "logo": {
+   "file": "fixhogar.svg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#0c2a4d",
+   "secondary": "#0c2a4d"
+  }
+ },
+ {
+  "slug": "civissa",
+  "lead_id": "ac955edc-526e-4b42-a620-c75eee911c1b",
+  "empresa": "Civissa",
+  "ciudad": "Boadilla del Monte",
+  "logo": {
+   "file": "civissa.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#1148aa",
+   "secondary": "#1148aa"
+  }
+ },
+ {
+  "slug": "escala-reformas",
+  "lead_id": "4e387157-7157-4fb1-94ba-4fa008ea9e92",
+  "empresa": "Escala Reformas",
+  "ciudad": "Villaviciosa de Odón",
+  "logo": {
+   "file": "escala-reformas.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformas-doviflor",
+  "lead_id": "631e2595-df2d-4c85-a422-9f266d3418b1",
+  "empresa": "Reformas Doviflor",
+  "ciudad": "Alcorcón",
+  "logo": {
+   "file": "reformas-doviflor.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#0c6f31",
+   "secondary": "#0c6f31"
+  }
+ },
+ {
+  "slug": "reformas-arko",
+  "lead_id": "c6919156-38a4-49d0-8a68-bb54e662637d",
+  "empresa": "Reformas Arko",
+  "ciudad": "Coslada",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "atz-reformas",
+  "lead_id": "3bc30f69-ac4c-41dc-b56a-84aa4e510ee1",
+  "empresa": "ATZ Reformas",
+  "ciudad": "San Fernando de Henares",
+  "logo": {
+   "file": "atz-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#d3283e",
+   "secondary": "#d3283e"
+  }
+ },
+ {
+  "slug": "romat-reformas",
+  "lead_id": "d4834302-f307-4d96-8bee-aeb657415948",
+  "empresa": "Romat Reformas Integrales",
+  "ciudad": "Fuenlabrada",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "sgh-interiorismo",
+  "lead_id": "d023e6fd-6593-480f-952f-3e890f9f3cc1",
+  "empresa": "SGH Interiorismo",
+  "ciudad": "Torrejón de Ardoz",
+  "logo": {
+   "file": "sgh-interiorismo.png"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "reformas-gualda",
+  "lead_id": "371eb794-d8bc-4066-a533-abc1c6a60f59",
+  "empresa": "Reformas Gualda",
+  "ciudad": "Alcalá de Henares",
+  "logo": {
+   "file": "reformas-gualda.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#e10400",
+   "secondary": "#ff0400"
+  }
+ },
+ {
+  "slug": "reformas-bg",
+  "lead_id": "ff021508-aef8-48f4-ac42-4f603fe613fb",
+  "empresa": "Reformas BG",
+  "ciudad": "Getafe",
+  "logo": {
+   "file": "reformas-bg.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#912527",
+   "secondary": "#912527"
+  }
+ },
+ {
+  "slug": "jj-garcia-reformas",
+  "lead_id": "f113d734-5364-498f-b444-0316bdbc97a8",
+  "empresa": "JJ García Reformas",
+  "ciudad": "Móstoles",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "grupo-galaxy",
+  "lead_id": "f788d67a-2aa0-4aab-9608-7bbe05708d63",
+  "empresa": "Grupo Galaxy",
+  "ciudad": "Collado Villalba",
+  "logo": {
+   "file": "grupo-galaxy.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#161834",
+   "secondary": "#161834"
+  }
+ },
+ {
+  "slug": "reforalya",
+  "lead_id": "49ba880c-2900-4b8c-9d17-0c2793394360",
+  "empresa": "Reforalya",
+  "ciudad": "Móstoles",
+  "logo": {
+   "file": "reforalya.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#9b6600",
+   "secondary": "#ffa700"
+  }
+ },
+ {
+  "slug": "dcc-proyectos",
+  "lead_id": "84ddbe2f-9558-446a-a656-b70669e53bcd",
+  "empresa": "DCC Proyectos e Interiorismo",
+  "ciudad": "Alcobendas",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "neagoe-reformas",
+  "lead_id": "a5e1b2d6-5489-49bd-827b-b4d546de88dc",
+  "empresa": "Neagoe Reformas",
+  "ciudad": "Boadilla del Monte",
+  "logo": {
+   "file": "neagoe-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#9c6d24",
+   "secondary": "#d59431"
+  }
+ },
+ {
+  "slug": "asesora-reformas",
+  "lead_id": "e4d846d9-351e-4176-9477-84001d9b7c35",
+  "empresa": "Asesora Reformas",
+  "ciudad": "Alcorcón",
+  "logo": {
+   "file": "asesora-reformas.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#5c367a",
+   "secondary": "#5c367a"
+  }
+ },
+ {
+  "slug": "honrados",
+  "lead_id": "c723c8c5-1a6e-4c38-a9b2-436123784e4f",
+  "empresa": "Honrados",
+  "ciudad": "Pozuelo de Alarcón",
+  "logo": {
+   "file": "honrados.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#67492e",
+   "secondary": "#67492e"
+  }
+ },
+ {
+  "slug": "reformas-sierra-madrid",
+  "lead_id": "74c20d01-a38b-40bf-9803-91ca46b61d51",
+  "empresa": "Reformas Sierra Madrid",
+  "ciudad": "Collado Villalba",
+  "logo": {
+   "file": "reformas-sierra-madrid.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#d03618",
+   "secondary": "#eb3d1b"
+  }
+ },
+ {
+  "slug": "onereformas",
+  "lead_id": "ede4b56d-2d43-49fa-8dc7-eeeceb987f47",
+  "empresa": "OneReformas",
+  "ciudad": "Móstoles",
+  "logo": {
+   "file": "onereformas.jpg"
+  },
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "lozano-morales",
+  "lead_id": "992e09e4-1fcd-4bc7-bec3-797773d33719",
+  "empresa": "Saneamientos Lozano Morales",
+  "ciudad": "Torrelodones",
+  "logo": {
+   "file": "lozano-morales.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#25366a",
+   "secondary": "#25366a"
+  }
+ },
+ {
+  "slug": "adosa2",
+  "lead_id": "2ddfad38-4ee0-4ac0-81a3-1f6af4023a62",
+  "empresa": "adosA2",
+  "ciudad": "Boadilla del Monte",
+  "logo": null,
+  "color": {
+   "mono": true,
+   "primary": "#23232e",
+   "secondary": "#5c5c6b"
+  }
+ },
+ {
+  "slug": "redecora-tu-casa",
+  "lead_id": "cd6be759-5113-4a89-b036-fcbd3f99ed90",
+  "empresa": "Redecora Tu Casa",
+  "ciudad": "Las Rozas de Madrid",
+  "logo": {
+   "file": "redecora-tu-casa.png"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#976c2b",
+   "secondary": "#e9a743"
+  }
+ },
+ {
+  "slug": "atrio-reformas",
+  "lead_id": "bd358781-37a6-440e-a5f1-a5611377c2ae",
+  "empresa": "Atrio Reformas",
+  "ciudad": "Majadahonda",
+  "logo": {
+   "file": "atrio-reformas.jpg"
+  },
+  "color": {
+   "mono": false,
+   "primary": "#7d7503",
+   "secondary": "#f7e706"
+  }
+ }
+]

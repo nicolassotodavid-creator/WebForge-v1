@@ -39,6 +39,10 @@ const LOTES = {
   madrid3: ["outreach_reformas_madrid3.csv", "home-estimator-outreach-madrid3.csv"],
   // Madrid 4 (19-sep): 30 de Madrid norte-oeste, scrape y auditoría nuevos (auditar-reformas.mjs), copy de dolor.
   madrid4: ["outreach_reformas_madrid4.csv", "home-estimator-outreach-madrid4.csv"],
+  // Madrid 5, 6 y 7 (26-sep): del pool ya auditado (madrid-1 y madrid-4 sin contactar), repartido en espiral por score. n 166-236.
+  madrid5: ["outreach_reformas_madrid5.csv", "home-estimator-outreach-madrid5.csv"],
+  madrid6: ["outreach_reformas_madrid6.csv", "home-estimator-outreach-madrid6.csv"],
+  madrid7: ["outreach_reformas_madrid7.csv", "home-estimator-outreach-madrid7.csv"],
 };
 if (!process.argv.includes("--lote") || !LOTES[LOTE]) { console.error(`Falta --lote ${Object.keys(LOTES).join(" | ")}`); process.exit(1); }
 // Emails corregidos respecto a la cola: email del CSV de clusters → email que figura en la cola.
