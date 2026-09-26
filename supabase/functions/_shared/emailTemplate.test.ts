@@ -170,7 +170,7 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertExcludes(html, "Ver la propuesta", "luvia: sin /book");
   assertExcludes(html, "Si ya la quieres", "luvia: sin enlace de compra");
   assertExcludes(html, "Aviso legal", "luvia: sin aviso legal si no se configura");
-  assertIncludes(html, "Luvia IA (luvia-ia.es)", "luvia: pie con la identidad de Luvia");
+  assertIncludes(html, "David Nicolás Soto · Luvia IA (<a ", "luvia: pie con la identidad de Luvia (luvia-ia.es enlazado en gris)");
   const direct = renderEmail({ bodyText: body, brand: "luvia" });
   assertIncludes(direct, `href="${wa.replace(/&/g, "&amp;")}"`, "luvia: sin contador → WhatsApp directo con el texto");
 }

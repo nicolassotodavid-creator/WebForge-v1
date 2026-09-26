@@ -59,7 +59,7 @@ function luviaSignature(): string {
     `<td style="border-left:3px solid ${LUVIA_SAGE};padding:2px 0 2px 12px;">` +
     `<p style="margin:0;font-size:15px;line-height:1.4;font-weight:600;color:${LUVIA_INK};">Nico</p>` +
     `<p style="margin:0 0 4px;font-size:14px;line-height:1.4;color:#5f6368;"><span style="font-family:${serif};font-size:15px;color:${LUVIA_INK};">Luvia</span> &middot; recepcionista con IA para cl&iacute;nicas</p>` +
-    `<p style="margin:0;font-size:13px;line-height:1.4;color:#5f6368;"><a href="${LUVIA_WEB_URL}" style="color:${LUVIA_SAGE};text-decoration:none;font-weight:600;">luvia-ia.es</a> &middot; +34 632 21 74 00</p>` +
+    `<p style="margin:0;font-size:13px;line-height:1.4;color:#5f6368;"><a href="${LUVIA_WEB_URL}" style="color:${LUVIA_SAGE};text-decoration:none;font-weight:600;">luvia-ia.es</a> &middot; <a href="tel:+34632217400" style="color:#5f6368;text-decoration:none;">+34 632 21 74 00</a></p>` +
     `</td></tr></table>`;
 }
 
@@ -216,6 +216,12 @@ export interface RenderEmailOptions {
   brand?: EmailBrand;
 }
 
+// [LUVIA] Gmail convierte "luvia-ia.es" suelto en un enlace azul chillón: lo enlazamos nosotros en
+// el gris del pie (mismo href que la web → mismo contador lweb).
+function luviaFootIdentity(identity: string): string {
+  return identity.replace(/\bluvia-ia\.es\b/, `<a href="${LUVIA_WEB_URL}" style="color:#9aa0a6;text-decoration:underline;">luvia-ia.es</a>`);
+}
+
 // [LUVIA] HTML completo: alineado a la izquierda y sin padding lateral propio (Gmail/Apple Mail ya
 // ponen el suyo), así el texto arranca a la altura del remitente como un correo normal.
 function luviaEmailHtml(o: {
@@ -252,7 +258,7 @@ function luviaEmailHtml(o: {
             <td align="left" style="color:${LUVIA_INK};font-family:-apple-system,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;">
               ${bodyToHtml(o.bodyText, "luvia")}
               <p style="margin:28px 0 0;padding-top:12px;border-top:1px solid #ececec;${foot}">Te escribo a t&iacute;tulo profesional; tu contacto est&aacute; en tu ficha p&uacute;blica. Si no quieres m&aacute;s correos, responde <strong>BAJA</strong> y borro tus datos.</p>
-              <p style="margin:4px 0 0;${foot}">${o.senderIdentity}${extras.length ? ` &middot; ${extras.join(" &middot; ")}` : ""}</p>
+              <p style="margin:4px 0 0;${foot}">${luviaFootIdentity(o.senderIdentity)}${extras.length ? ` &middot; ${extras.join(" &middot; ")}` : ""}</p>
               ${o.pixel}
             </td>
           </tr>
