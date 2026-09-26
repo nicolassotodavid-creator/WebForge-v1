@@ -29,6 +29,16 @@ export function bodyToHtml(text: string): string {
         if (waMatch) {
           return `<a href="${waMatch[1]}" style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;padding:13px 28px;border-radius:999px;font-size:15px;font-weight:700;line-height:1;box-shadow:0 4px 12px rgba(37,211,102,0.30);">Escríbeme por WhatsApp &nbsp;→</a>`;
         }
+        // [LUVIA] CTA principal: el WhatsApp del asistente de ventas, con el primer mensaje escrito.
+        const luviaWa = line.trim().match(/^Escr[ií]bele por WhatsApp:\s*(https:\/\/wa\.me\/\d+\?text=\S+)$/i);
+        if (luviaWa) {
+          return `<a href="${luviaWa[1].replace(/&/g, "&amp;")}" style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;padding:14px 30px;border-radius:999px;font-size:15px;font-weight:700;line-height:1;box-shadow:0 4px 12px rgba(37,211,102,0.30);">Escribir a Luvia por WhatsApp &nbsp;→</a>`;
+        }
+        // [LUVIA] CTA secundaria: hablar con ella por voz en la web.
+        const luviaVoz = line.trim().match(/^H[aá]blale por voz:\s*(https:\/\/luvia-ia\.es\S*)$/i);
+        if (luviaVoz) {
+          return `<a href="${luviaVoz[1]}" style="color:#1a1a1a;font-size:15px;font-weight:600;text-decoration:none;border-bottom:1px solid #1a1a1a;padding-bottom:1px;">o háblale por voz en luvia-ia.es →</a>`;
+        }
         const urlMatch = line.trim().match(/^(https?:\/\/[^\s]+)$/);
         if (urlMatch) {
           return `<a href="${urlMatch[1]}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:11px 22px;border-radius:8px;font-size:15px;font-weight:600;">Ver la web →</a>`;
@@ -129,12 +139,15 @@ export interface RenderEmailOptions {
   // Seguimiento de clics (ver clickTracking.ts): si viene, los enlaces a la web, a /book y al
   // WhatsApp del pie salen por <base>/<leadId>/<destino>. null/undefined (o base null) → enlaces directos.
   clickTracking?: { base: string | null; leadId: string; messageId?: string | null } | null;
+  // [LUVIA] Aviso legal de la marca que firma. Si viene, sustituye al derivado de bookingUrl
+  // (los emails de Luvia no llevan /book).
+  legalUrl?: string | null;
 }
 
 // Devuelve el HTML completo del email. NO añade firma (el cuerpo ya la trae) ni
 // botón de WhatsApp. Con captura → escaparate (captura enmarcada + 2 CTAs); sin
 // captura → texto plano + (enlace de compra opcional). Siempre: opt-out + píxel.
-export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY, unsubscribeUrl, clickTracking }: RenderEmailOptions): string {
+export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY, unsubscribeUrl, clickTracking, legalUrl: legalUrlOpt }: RenderEmailOptions): string {
   const pixel = trackingPixelUrl
     ? `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`
     : "";
@@ -142,9 +155,9 @@ export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingU
   // Enlace de baja clicable en el pie (opcional). El botón nativo "Cancelar suscripción" del
   // cliente de correo sale de la cabecera List-Unsubscribe; esto es su equivalente visible.
   // Aviso legal (NIF y domicilio, LSSI art. 10) en la web de la marca: mismo dominio que /book.
-  let legalUrl: string | null = null;
+  let legalUrl: string | null = legalUrlOpt ?? null;
   try {
-    if (bookingUrl) legalUrl = `${new URL(bookingUrl).origin}/aviso-legal`;
+    if (!legalUrl && bookingUrl) legalUrl = `${new URL(bookingUrl).origin}/aviso-legal`;
   } catch { /* bookingUrl inválida → sin enlace */ }
   const unsub = unsubscribeUrl
     ? `<p style="margin:6px 0 0;color:#9ca3af;font-size:13px;line-height:1.5;"><a href="${unsubscribeUrl}" style="color:#9ca3af;text-decoration:underline;">Darte de baja con un clic</a></p>`

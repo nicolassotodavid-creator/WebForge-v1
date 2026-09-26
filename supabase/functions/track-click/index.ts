@@ -1,12 +1,13 @@
 // track-click — Redirector con seguimiento para los enlaces que recibe el prospecto.
-// GET /track-click/<leadId>/<web|book|wa|demo>?m=<message_id>&c=<email|whatsapp>[&s=<slug demo>]
+// GET /track-click/<leadId>/<web|book|wa|demo|home|lwa|lweb>?m=<message_id>&c=<email|whatsapp>[&s=<slug demo>]
 // En los emails y en el WhatsApp manual va como https://www.nico-soto.es/r/<leadId>/<destino>
 // (app/vercel.json lo reescribe aquí), así el prospecto ve el dominio de la marca.
 //
 //  1) Resuelve el destino EN EL SERVIDOR a partir del lead: web → última sites.live_url,
 //     book → BOOKING_BASE/<lead>, wa → wa.me/WHATSAPP_NUMBER, demo → presupuestos.nico-soto.es/demo/<s>
-//     ([SIMULADOR], host fijo), home → APP_URL (portada de la marca). Nunca redirige a una URL que venga
-//     en el propio enlace (sin redirección abierta).
+//     ([SIMULADOR], host fijo), home → APP_URL (portada de la marca), [LUVIA] lwa → WhatsApp de ventas
+//     de Luvia con el texto que llevaba el email (sacado del cuerpo guardado, validado contra el número
+//     fijo), lweb → luvia-ia.es. Nunca redirige a una URL que venga en el propio enlace.
 //  2) Apunta `link_clicked` en events: destino, canal, mensaje y si parece automático (vista previa
 //     de WhatsApp, escáner del correo, HEAD o clic a <60 s del envío).
 //  3) Un clic de una persona cuenta como "ha visto la web": lead contacted → viewed, igual que
@@ -15,7 +16,15 @@
 // PÚBLICO (verify_jwt=false): lo abre el prospecto sin sesión. Si algo falla, redirige igualmente.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { bookingLink } from "../_shared/emailTemplate.ts";
-import { demoUrl, isLikelyBot, isTooSoonAfterSend, parseClickPath } from "../_shared/clickTracking.ts";
+import {
+  demoUrl,
+  isLikelyBot,
+  isLuviaWhatsappUrl,
+  isTooSoonAfterSend,
+  LUVIA_WEB,
+  luviaWhatsappUrl,
+  parseClickPath,
+} from "../_shared/clickTracking.ts";
 
 const DEFAULT_FALLBACK = "https://www.nico-soto.es";
 
@@ -59,7 +68,7 @@ Deno.serve(async (req: Request) => {
           .maybeSingle()
         : Promise.resolve({ data: null }),
       messageId
-        ? supabase.from("outreach_messages").select("sent_at").eq("id", messageId).maybeSingle()
+        ? supabase.from("outreach_messages").select("sent_at, body").eq("id", messageId).maybeSingle()
         : Promise.resolve({ data: null }),
     ]);
 
@@ -71,6 +80,13 @@ Deno.serve(async (req: Request) => {
       destination = demoUrl(url.searchParams.get("s"));
     } else if (target === "home") {
       destination = fallback;
+    } else if (target === "lweb") {
+      destination = LUVIA_WEB;
+    } else if (target === "lwa") {
+      // El mismo enlace (con el nombre de la clínica ya escrito) que llevaba el email.
+      const body = (msgRes.data as { body?: string } | null)?.body ?? "";
+      const fromBody = body.match(/https:\/\/wa\.me\/\d+\?text=\S+/)?.[0];
+      destination = isLuviaWhatsappUrl(fromBody) ? fromBody! : luviaWhatsappUrl(null);
     } else {
       const n = (Deno.env.get("WHATSAPP_NUMBER") ?? "").replace(/\D/g, "");
       destination = n.length >= 8 ? `https://wa.me/${n}` : null;
@@ -106,7 +122,17 @@ Deno.serve(async (req: Request) => {
     }
   } catch (e) {
     console.error("track-click:", e instanceof Error ? e.message : e);
-    if (!destination) destination = target === "book" ? bookUrl : target === "demo" ? demoUrl(url.searchParams.get("s")) : null;
+    if (!destination) {
+      destination = target === "book"
+        ? bookUrl
+        : target === "demo"
+        ? demoUrl(url.searchParams.get("s"))
+        : target === "lwa"
+        ? luviaWhatsappUrl(null)
+        : target === "lweb"
+        ? LUVIA_WEB
+        : null;
+    }
   }
 
   return redirect(destination ?? fallback);

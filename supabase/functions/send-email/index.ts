@@ -9,6 +9,10 @@ import { renderEmail, bookingLink } from "../_shared/emailTemplate.ts";
 import { clickBase } from "../_shared/clickTracking.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
+import { isLuviaLead } from "../_shared/luvia.ts";
+
+// Pie legal de los emails de Luvia (LSSI art. 10). Sobrescribible con LUVIA_SENDER_IDENTITY.
+const DEFAULT_LUVIA_SENDER_IDENTITY = "David Nicolás Soto · Luvia IA (luvia-ia.es)";
 import { signUnsubscribe, unsubscribeUrl } from "../_shared/unsubscribe.ts";
 import {
   DEFAULT_REPLY_TO_LUVIA,
@@ -126,18 +130,23 @@ Deno.serve(async (req: Request) => {
 
   // --- Web del lead: captura (escaparate) + live_url (botón "Ver la web entera") ---
   // Leads de WebForge: gate de QA también aquí (no solo al generar el borrador) → la web tiene que
-  // seguir aprobada; si se rechazó después, no se envía. Luvia está exento (no vende web).
-  const isWebforgeLead = !ADMIN_USER_ID || lead.owner === ADMIN_USER_ID;
-  let siteQuery = supabase
-    .from("sites")
-    .select("live_url, preview_image_url, status")
-    .eq("lead_id", msg.lead_id)
-    .not("live_url", "is", null);
-  if (isWebforgeLead) siteQuery = siteQuery.eq("status", "approved");
-  const { data: site } = await siteQuery
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // seguir aprobada; si se rechazó después, no se envía.
+  // Leads de Luvia: NI web NI /book. Muchas clínicas tienen una web vieja (rechazada) del bug de
+  // aislamiento de julio; si se buscara aquí, el email de Luvia saldría con su captura y el botón
+  // de comprar la web.
+  const luvia = isLuviaLead(lead.owner, ADMIN_USER_ID);
+  const isWebforgeLead = !luvia;
+  const { data: site } = luvia
+    ? { data: null }
+    : await supabase
+      .from("sites")
+      .select("live_url, preview_image_url, status")
+      .eq("lead_id", msg.lead_id)
+      .not("live_url", "is", null)
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
   if (isWebforgeLead && !site) {
     return jsonResponse({ error: "La web de este lead no está aprobada; no se envía." }, 409);
   }
@@ -182,8 +191,12 @@ Deno.serve(async (req: Request) => {
     subject: msg.subject,
     previewImageUrl: site?.preview_image_url ?? null,
     webUrl: site?.live_url ?? null,
-    bookingUrl: bookingLink(Deno.env.get("BOOKING_BASE"), msg.lead_id),
-    senderIdentity: Deno.env.get("SENDER_LEGAL_IDENTITY"),
+    bookingUrl: luvia ? null : bookingLink(Deno.env.get("BOOKING_BASE"), msg.lead_id),
+    senderIdentity: luvia
+      ? (Deno.env.get("LUVIA_SENDER_IDENTITY") ?? DEFAULT_LUVIA_SENDER_IDENTITY)
+      : Deno.env.get("SENDER_LEGAL_IDENTITY"),
+    // Aviso legal de luvia-ia.es: solo si se configura (hoy su página aún tiene los huecos de plantilla).
+    legalUrl: luvia ? (Deno.env.get("LUVIA_LEGAL_URL") ?? null) : null,
     unsubscribeUrl: unsubUrl,
     // Clics en la web, la propuesta y el WhatsApp → www.nico-soto.es/r/… (función track-click).
     clickTracking: { base: clickBase(Deno.env.get("APP_URL"), SUPABASE_URL), leadId: msg.lead_id, messageId },
@@ -207,7 +220,8 @@ Deno.serve(async (req: Request) => {
         "Idempotency-Key": `outreach-${messageId}`,
       },
       body: JSON.stringify({
-        from: `Nico <${FROM_EMAIL}>`,
+        // Luvia sale de FROM_EMAIL_LUVIA (p. ej. hola@luvia-ia.es) cuando su dominio esté verificado en Resend.
+        from: luvia ? `Nico de Luvia <${Deno.env.get("FROM_EMAIL_LUVIA") ?? FROM_EMAIL}>` : `Nico <${FROM_EMAIL}>`,
         to: [lead.email],
         subject: msg.subject,
         html: htmlBody,

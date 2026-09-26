@@ -141,5 +141,30 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertIncludes(direct, `href="https://clinica-ana.web.app"`, "clics: sin base → enlaces directos");
 }
 
+// ── [LUVIA] email: botón de WhatsApp de ventas + voz, sin escaparate ni /book ──────────
+{
+  const { luviaWhatsappUrl } = await import("./clickTracking.ts");
+  const wa = luviaWhatsappUrl("Clínica Belice");
+  const body = `Hola,\nTexto.\n\nEscríbele por WhatsApp: ${wa}\n\nHáblale por voz: https://luvia-ia.es\n\nNico\nLuvia — atención al cliente con IA`;
+  const lead = "9334c48a-0000-4000-8000-000000000000";
+  const html = renderEmail({
+    bodyText: body,
+    bookingUrl: null,
+    senderIdentity: "David Nicolás Soto · Luvia IA (luvia-ia.es)",
+    clickTracking: { base: "https://www.nico-soto.es/r", leadId: lead, messageId: "m1" },
+  });
+  assertIncludes(html, "Escribir a Luvia por WhatsApp", "luvia: botón verde de WhatsApp");
+  assertIncludes(html, "o háblale por voz en luvia-ia.es", "luvia: enlace de voz");
+  assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lwa?m=m1&amp;c=email"`, "luvia: WhatsApp pasa por el contador");
+  assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lweb?m=m1&amp;c=email"`, "luvia: voz pasa por el contador");
+  assertExcludes(html, "wa.me/34632217400", "luvia: no queda el enlace directo al WhatsApp");
+  assertExcludes(html, "Ver la propuesta", "luvia: sin /book");
+  assertExcludes(html, "Si ya la quieres", "luvia: sin enlace de compra");
+  assertExcludes(html, "Aviso legal", "luvia: sin aviso legal si no se configura");
+  assertIncludes(html, "Luvia IA (luvia-ia.es)", "luvia: pie con la identidad de Luvia");
+  const direct = renderEmail({ bodyText: body });
+  assertIncludes(direct, `href="${wa.replace(/&/g, "&amp;")}"`, "luvia: sin contador → WhatsApp directo con el texto");
+}
+
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures) process.exit(1);

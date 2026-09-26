@@ -6,7 +6,28 @@
 // importan las Edge Functions (Deno) y el orquestador (Node).
 
 // home = portada de la marca (APP_URL), con webs reales hechas: para el email sin web construida.
-export type ClickTarget = "web" | "book" | "wa" | "demo" | "home";
+// [LUVIA] lwa = WhatsApp del asistente de ventas de Luvia (texto ya escrito con la clínica),
+// lweb = luvia-ia.es (hablar con Luvia por voz). Host y número FIJOS → sin redirección abierta.
+export type ClickTarget = "web" | "book" | "wa" | "demo" | "home" | "lwa" | "lweb";
+
+export const LUVIA_WEB = "https://luvia-ia.es";
+export const LUVIA_SALES_WHATSAPP = "34632217400";
+
+// Enlace al WhatsApp de ventas de Luvia con el primer mensaje ya escrito, para que el asistente
+// sepa de qué clínica viene y que llega desde el email.
+export function luviaWhatsappUrl(clinicName: string | null | undefined): string {
+  const name = String(clinicName ?? "").replace(/\s+/g, " ").trim();
+  const text = name
+    ? `Hola, soy de ${name}. Me ha llegado vuestro email y quiero probar Luvia.`
+    : "Hola, me ha llegado vuestro email y quiero probar Luvia.";
+  return `https://wa.me/${LUVIA_SALES_WHATSAPP}?text=${encodeURIComponent(text)}`;
+}
+
+// Solo acepta enlaces a ESE número (con o sin texto): lo usa track-click al recuperar el enlace
+// del cuerpo del mensaje, para no redirigir nunca a otro sitio.
+export function isLuviaWhatsappUrl(u: string | null | undefined): boolean {
+  return new RegExp(`^https://wa\\.me/${LUVIA_SALES_WHATSAPP}(\\?text=[^\\s"<>]*)?$`).test(u ?? "");
+}
 
 // [SIMULADOR] Demo del Home Estimator: el enlace lleva el slug (?s=), el host es FIJO, así que
 // tampoco hay redirección abierta. Devuelve null si el slug no es válido.
@@ -42,7 +63,7 @@ export function clickUrl(
 }
 
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
-const CLICK_PATH = new RegExp(`/(${UUID})/(web|book|wa|demo|home)/?$`, "i");
+const CLICK_PATH = new RegExp(`/(${UUID})/(web|book|wa|demo|home|lwa|lweb)/?$`, "i");
 
 // Acepta tanto /r/<lead>/<destino> como /track-click/<lead>/<destino> (la ruta que llega a la función).
 export function parseClickPath(pathname: string): { leadId: string; target: ClickTarget } | null {
@@ -101,9 +122,14 @@ export function trackEmailLinks(
 ): string {
   const opts = { messageId: o.messageId, channel: o.channel ?? "email" };
   const wa = html.match(/href="(https:\/\/wa\.me\/\d+)"/)?.[1];
+  // [LUVIA] Botón del WhatsApp de ventas (con ?text=, que en el HTML va con &amp;) y enlace a la web.
+  const lwa = html.match(new RegExp(`href="(https://wa\\.me/${LUVIA_SALES_WHATSAPP}\\?text=[^"]*)"`))?.[1];
+  const lweb = html.match(new RegExp(`href="(${LUVIA_WEB.replace(/\./g, "\\.")}/?[^"]*)"`))?.[1];
   return trackHrefs(html, [
     [o.webUrl, clickUrl(o.base, o.leadId, "web", opts)],
     [o.bookUrl, clickUrl(o.base, o.leadId, "book", opts)],
     [wa, clickUrl(o.base, o.leadId, "wa", opts)],
+    [lwa, clickUrl(o.base, o.leadId, "lwa", opts)],
+    [lweb, clickUrl(o.base, o.leadId, "lweb", opts)],
   ]);
 }

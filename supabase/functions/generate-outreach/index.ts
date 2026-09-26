@@ -6,7 +6,14 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { OUTREACH_PROMPT, LUVIA_OUTREACH_PROMPT } from "../_shared/prompts.ts";
-import { isLuviaLead, buildLuviaOutreachPayload, buildLuviaFinalBody } from "../_shared/luvia.ts";
+import {
+  isLuviaLead,
+  buildLuviaOutreachPayload,
+  buildLuviaFinalBody,
+  luviaQuoteIssues,
+  luviaShortName,
+} from "../_shared/luvia.ts";
+import { LUVIA_WEB, luviaWhatsappUrl } from "../_shared/clickTracking.ts";
 import { bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import { canAccessLead, type Operator } from "../_shared/leadAccess.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
@@ -144,8 +151,8 @@ Deno.serve(async (req: Request) => {
 
   const ADMIN_USER_ID = Deno.env.get("ADMIN_USER_ID");
   // QUÉ PRODUCTO se ofrece depende SOLO del DUEÑO del lead, nunca del rol de quien dispara:
-  // un lead de Luvia (owner != admin) SIEMPRE recibe el pitch de Luvia (agente de chat, sin
-  // web, sin reseñas, sin /book), lo genere el operador de Luvia, el admin o el orquestador;
+  // un lead de Luvia (owner != admin) SIEMPRE recibe el pitch de Luvia (recepcionista IA, sin
+  // web ni /book), lo genere el operador de Luvia, el admin o el orquestador;
   // y un lead de WebForge SIEMPRE recibe el pitch de web. Así no se mezclan los dos productos.
   // (Antes se colaba `!isAdminEmail(operator.email)` aquí, y el admin viendo un lead Luvia
   //  acababa generándole el pitch de web — bug de "producto según el que mira".)
@@ -287,7 +294,8 @@ Deno.serve(async (req: Request) => {
   // ─────────────────────────────────────────────────────────────────────────────
   // EMAIL 1: IA personalizada (Claude Haiku)
   //  - Web (OUTREACH_PROMPT): vende la web de muestra; el sistema añade CTA → /book.
-  //  - Luvia (LUVIA_OUTREACH_PROMPT): ofrece el agente de chat; SIN link (CTA = responder).
+  //  - Luvia (LUVIA_OUTREACH_PROMPT): gancho con sus reseñas; CTA = probar Luvia por WhatsApp
+  //    (el sistema añade el botón con el nombre de la clínica, el enlace de voz y la firma).
   // ─────────────────────────────────────────────────────────────────────────────
   const systemPrompt = luvia ? LUVIA_OUTREACH_PROMPT : OUTREACH_PROMPT;
   // Web: citas SOLO de fragmentos literales de reseñas reales (raw_json.reviews). Los
@@ -369,6 +377,27 @@ Deno.serve(async (req: Request) => {
   if (first instanceof Response) return first;
   let { draft, text } = first;
 
+  // Luvia: toda cita entre comillas tiene que estar literal en sus reseñas → UNA corrección.
+  if (luvia && typeof draft.body === "string") {
+    const samples = (payload as ReturnType<typeof buildLuviaOutreachPayload>).reviews.samples;
+    const issues = luviaQuoteIssues(draft.body, samples);
+    if (issues.length) {
+      const retry = await askClaude([
+        ...messages,
+        { role: "assistant", content: text },
+        {
+          role: "user",
+          content:
+            `Corrige el body. Problemas: ${issues.join("; ")}. Las comillas solo para fragmentos copiados ` +
+            `LITERALES de reviews.samples[].text; si no, parafrasea sin comillas. Devuelve solo el JSON.`,
+        },
+      ]);
+      if (!(retry instanceof Response) && typeof retry.draft.body === "string" && retry.draft.body.trim()) {
+        if (luviaQuoteIssues(retry.draft.body, samples).length < issues.length) ({ draft, text } = retry);
+      }
+    }
+  }
+
   // Web por email: si la intro rompe reglas que no se arreglan a máquina (longitud, "vosotros",
   // cifras inventadas, citas no literales) → UNA corrección. Si la 2ª sale peor o falla, se queda la 1ª.
   if (!luvia && channel === "email" && typeof draft.body === "string") {
@@ -400,12 +429,15 @@ Deno.serve(async (req: Request) => {
   // Web: asunto fijo del sistema. El cuerpo lo ensambla el SISTEMA (no la IA) en el orden del diseño
   // canónico: saludo → intro → línea-URL (captura + CTAs en renderEmail) → firma "Nico". Las comillas
   // que no sean cita literal de review_quotes se quitan. El pie de WhatsApp va después, bajo la firma.
-  // Luvia: asunto lo propone la IA (con respaldo fijo) y NO se añade ningún link.
+  // Luvia: asunto lo propone la IA (con respaldo fijo); botón de WhatsApp + voz + firma, del sistema.
   const finalSubject = luvia
     ? (typeof draft.subject === "string" && draft.subject.trim() ? draft.subject.trim() : getLuviaSubject())
     : subject;
   const finalBody = luvia
-    ? buildLuviaFinalBody(bodyText, lead.luvia_demo_url)
+    ? buildLuviaFinalBody(bodyText, {
+      whatsappUrl: luviaWhatsappUrl(luviaShortName(draft.short_name, lead.name)),
+      webUrl: LUVIA_WEB,
+    })
     : (channel === "email"
       ? assembleEmail1Body({
         intro: bodyText,
