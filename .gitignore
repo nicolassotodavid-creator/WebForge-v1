@@ -11,3 +11,7 @@ orquestador/.tmp-*
 # Scripts de prueba/scratch: pueden leer .env; no se versionan para no arrastrar
 # secretos por accidente. Para versionar uno legítimo: git add -f scripts/<archivo>
 scripts/
+
+# poll-replies
+orquestador/.poll-replies-state.json
+orquestador/poll-replies.log
