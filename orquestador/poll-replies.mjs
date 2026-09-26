@@ -51,7 +51,7 @@ for (const m of msgs) {
   const r = await fetch(`${e.SUPABASE_URL}/functions/v1/mark-replied?token=${encodeURIComponent(e.INBOUND_REPLY_SECRET)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fromAddress: from, subject: m.subject ?? "" }),
+    body: JSON.stringify({ fromAddress: from, subject: m.subject ?? "", snippet: m.summary ?? "" }),
   });
   if (!r.ok) { console.error(`mark-replied ${r.status} para ${id}; se reintenta en la próxima pasada`); continue; }
   const j = await r.json();

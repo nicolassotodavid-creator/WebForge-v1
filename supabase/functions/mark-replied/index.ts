@@ -76,9 +76,10 @@ Deno.serve(async (req: Request) => {
       return json({ ok: true, matched: false, sender });
     }
     const subject = subjectOf(body);
+    const snippet = typeof body.snippet === "string" ? body.snippet.replace(/\s+/g, " ").trim().slice(0, 400) || null : null;
     const out = [];
     for (const lead of leads) {
-      const n = await markLead(supabase, lead.id, { channel: "email", from: sender, subject, auto: true });
+      const n = await markLead(supabase, lead.id, { channel: "email", from: sender, subject, snippet, auto: true });
       out.push({ lead: lead.name, messages: n });
     }
     console.log(`mark-replied: ${sender} → ${out.map((o) => o.lead).join(", ")}`);

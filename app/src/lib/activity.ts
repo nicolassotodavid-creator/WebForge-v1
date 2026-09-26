@@ -99,7 +99,7 @@ export function describeEvent(e: LeadEvent, messages: ActivityMessage[]): Activi
       };
     }
     case "replied":
-      return { ...base, kind: "intent", label: "Respondió", detail: str(p.channel), automatic: false };
+      return { ...base, kind: "intent", label: "Respondió", detail: [str(p.subject), str(p.snippet)].filter(Boolean).join(" — ") || str(p.channel), automatic: false };
     case "demo_viewed":
       return { ...base, kind: "visit", label: "Abrió la propuesta (/book)", detail: operator ? "tú, con sesión del panel" : null, automatic: operator };
     case "booking_started":
