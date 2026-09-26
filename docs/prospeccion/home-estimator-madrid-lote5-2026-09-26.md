@@ -73,3 +73,10 @@ Calendario: Madrid 5 martes 29-sep · Madrid 6 miércoles 30-sep · Madrid 7 jue
 - Pool: `madrid5-pool.json` · marca: `madrid5-marca.json` · copy: `outreach_reformas_madrid5.csv` · cola con enlaces: `home-estimator-outreach-madrid5.csv`.
 - Logos: `app/public/demo/logos/` (servidos desde `www.nico-soto.es/demo/logos/`).
 - Selección completa (los 3 lotes, antes del reparto): `seleccion-madrid567.json`; reparto: `preparar-lotes-madrid567.mjs`.
+
+## A/B de canal (26-sep): formulario vs email
+
+La mitad del lote va por el **formulario de su web** (lo envía Cowork) y la otra mitad por email. Mismo asunto y mismo texto; solo cambia el canal.
+Reparto: `repartir-canal-madrid567.mjs`, por parejas de score y al azar con semilla fija. Las de formulario tienen `enviar=FALSE` en `outreach_reformas_madrid5.csv`, así que `enviar-email-lote.mjs` las salta.
+Lista y encargo para Cowork: `cowork-formularios/` (`ENCARGO.md`, `formularios-madrid567.csv`, `resultados.csv`). Las que tengan CAPTCHA las envía Nico a mano.
+Se compara por sesiones en la demo (tabla `leads` de reform-wizard, por slug).
