@@ -1,0 +1,134 @@
+[
+  {
+    "empresa": "A. Moreno Reparaciones y Obras",
+    "lead_id": "5139ba1a-d3d3-4a2b-b3c8-144be62471e6",
+    "to": "infoamoreno@gmail.com",
+    "asunto": "Los dos correos de vuestra web",
+    "http": 200,
+    "resend_id": "01a0dde9-408a-72cc-8cbb-8e7c9ddf97d6",
+    "message_id": "c9ab85e7-0786-493d-afba-21d3e31f52c1",
+    "error": null,
+    "at": "2026-09-26T13:30:46.354Z"
+  },
+  {
+    "empresa": "CM Invest&Business",
+    "lead_id": "3ff2fabe-d05d-4e0b-9426-74ab4030b794",
+    "to": "cminvestandbusiness@gmail.com",
+    "asunto": "Vuestras 15 reseñas no salen en la web",
+    "http": 200,
+    "resend_id": "01a0dde9-48e6-72df-952c-532ac85223c2",
+    "message_id": "07244d35-029a-4871-ba5b-1acf5f9025db",
+    "error": null,
+    "at": "2026-09-26T13:30:48.562Z"
+  },
+  {
+    "empresa": "Cocinas Tavira",
+    "lead_id": "35efd40a-4612-4ef9-a347-296db24adebc",
+    "to": "info@cocinastavira.com",
+    "asunto": "La web de Cocinas Tavira en el móvil",
+    "http": 200,
+    "resend_id": "01a0dde9-512b-71a0-ba56-4bd72e139f7a",
+    "message_id": "189d606d-4e1c-477a-9f54-2625e63d9354",
+    "error": null,
+    "at": "2026-09-26T13:30:50.601Z"
+  },
+  {
+    "empresa": "Cuevas Grima",
+    "lead_id": "0def2a31-3587-41f5-a0b9-9887c3391aa1",
+    "to": "info@jesuscuevasgrima.es",
+    "asunto": "Vuestra web sale como «No seguro»",
+    "http": 200,
+    "resend_id": "01a0dde9-5954-70f9-89c1-103b9bb27d5e",
+    "message_id": "2d27a104-af8f-4601-aa70-5129c426ff90",
+    "error": null,
+    "at": "2026-09-26T13:30:52.698Z"
+  },
+  {
+    "empresa": "DAVANNI",
+    "lead_id": "4fb92777-bb17-436e-8e7b-034831ede016",
+    "to": "davanni@davanni.es",
+    "asunto": "125 reseñas y la web no lo dice",
+    "http": 200,
+    "resend_id": "01a0dde9-616f-767a-8c94-95846721ef5a",
+    "message_id": "b83d0c2a-6996-4b38-aba3-5f59b6004660",
+    "error": null,
+    "at": "2026-09-26T13:30:54.798Z"
+  },
+  {
+    "empresa": "DR Carpintería y Diseño",
+    "lead_id": "80048559-0321-4be5-87cf-87c806e8690b",
+    "to": "antonio.diaz@drcarpinteria.com",
+    "asunto": "La web de DR Carpintería",
+    "http": 200,
+    "resend_id": "01a0dde9-6ab5-7296-89ff-c755c8137f63",
+    "message_id": "e12803e5-3ad1-4e41-8ede-a8be2d0a708c",
+    "error": null,
+    "at": "2026-09-26T13:30:57.364Z"
+  },
+  {
+    "empresa": "Garma Milenium",
+    "lead_id": "5f4c0571-add8-43ef-9478-70f8fb20af72",
+    "to": "garma.moral@gmail.com",
+    "asunto": "Un texto en inglés en vuestra web",
+    "http": 200,
+    "resend_id": "01a0dde9-73e3-740d-b284-aafb40573bb5",
+    "message_id": "7908c712-b261-4d06-8fa3-a74674199200",
+    "error": null,
+    "at": "2026-09-26T13:30:59.498Z"
+  },
+  {
+    "empresa": "LK Interiorismo",
+    "lead_id": "13c87202-fc21-476c-9d89-df55ce43ec1c",
+    "to": "info@lkinteriorismo.com",
+    "asunto": "Vuestra web sale como «No seguro»",
+    "http": 200,
+    "resend_id": "01a0dde9-7c24-72da-a11c-7dc01a62bc37",
+    "message_id": "2f8b294c-1bd2-45f0-90ff-896ed9b7caa1",
+    "error": null,
+    "at": "2026-09-26T13:31:01.642Z"
+  },
+  {
+    "empresa": "Mi Decoradora VIP",
+    "lead_id": "cbcb440f-b4f4-4bdc-b364-327660479347",
+    "to": "mdv@midecoradoravip.es",
+    "asunto": "Tus 38 reseñas de 5 estrellas",
+    "http": 200,
+    "resend_id": "01a0dde9-8480-71ab-a21a-b7509f9d5d72",
+    "message_id": "c996c89d-c529-473a-9f6a-76d088523071",
+    "error": null,
+    "at": "2026-09-26T13:31:03.774Z"
+  },
+  {
+    "empresa": "OGR",
+    "lead_id": "dab0bb82-b287-40f1-a7ae-d401083fef04",
+    "to": "administracion@obrasgruporojas.com",
+    "asunto": "La web de OGR tarda en cargar",
+    "http": 200,
+    "resend_id": "01a0dde9-8ccf-723e-b2e4-63b9a7ccc56f",
+    "message_id": "fd4f13d8-492d-4839-be46-260b9aa9b801",
+    "error": null,
+    "at": "2026-09-26T13:31:05.877Z"
+  },
+  {
+    "empresa": "Sialser",
+    "lead_id": "e31b2f4b-200b-4dff-99d9-7c37b80074b2",
+    "to": "info@sialser.es",
+    "asunto": "La web de Sialser",
+    "http": 200,
+    "resend_id": "01a0dde9-94ee-747d-806a-be7f352ec627",
+    "message_id": "0deb6750-03d9-427c-8031-9f412936815d",
+    "error": null,
+    "at": "2026-09-26T13:31:07.957Z"
+  },
+  {
+    "empresa": "Grupo Strotec",
+    "lead_id": "cfe81061-ee19-4c7f-89a1-b11485730eb9",
+    "to": "info@strotec.es",
+    "asunto": "La web de Strotec tarda en cargar",
+    "http": 200,
+    "resend_id": "01a0dde9-9d41-779c-824e-a77f6e689495",
+    "message_id": "a82104be-191a-41d0-a4bf-54961858a1cc",
+    "error": null,
+    "at": "2026-09-26T13:31:10.087Z"
+  }
+]
