@@ -80,7 +80,8 @@ function trackBookEvent(
     .catch(() => {});
 }
 
-export default function Book() {
+// `home`: la raíz pública del dominio (sin lead): misma página con textos neutros, sin métricas.
+export default function Book({ home = false }: { home?: boolean } = {}) {
   const { leadId } = useParams<{ leadId: string }>();
   const [info, setInfo] = useState<BookingInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -91,6 +92,14 @@ export default function Book() {
   const [waSent, setWaSent] = useState(false);
 
   useEffect(() => {
+    if (home) {
+      setInfo({
+        business_name: "tu negocio", category: null, city: null, live_url: null,
+        preview_image_url: null, rating: null, review_count: null, contact_name: null, has_website: null,
+      });
+      setLoading(false);
+      return;
+    }
     if (!leadId) { setLoadError("not_found"); setLoading(false); return; }
     if (leadId === "preview") {
       setInfo({
@@ -119,12 +128,13 @@ export default function Book() {
         setLoadError(status === 404 || status === 400 ? "not_found" : "network");
       })
       .finally(() => setLoading(false));
-  }, [leadId, reloadKey]);
+  }, [leadId, reloadKey, home]);
 
   const businessName = info ? cleanBusinessName(info.business_name) : "";
   useEffect(() => {
-    if (businessName) document.title = `Tu nueva web · ${businessName}`;
-  }, [businessName]);
+    if (home) document.title = "Nico · Webs para negocios";
+    else if (businessName) document.title = `Tu nueva web · ${businessName}`;
+  }, [businessName, home]);
 
   // ── estados ──
   if (loading) return (
@@ -180,11 +190,14 @@ export default function Book() {
     ? "estuve mirando negocios locales con buena reputación en Google que todavía no tienen web."
     : "estuve mirando negocios locales con buena reputación en Google que pueden sacarle todavía más partido a internet.";
   const faq = FAQ.filter((f) => !f.onlyWithWebsite || info.has_website === true);
-  const waDefault = whatsappLink(`Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quería preguntarte una cosa.`) ?? "#";
+  const waDefault = whatsappLink(home
+    ? `Hola ${NICO_NAME}, he visto tu web y quería preguntarte una cosa.`
+    : `Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quería preguntarte una cosa.`) ?? "#";
 
-  const isPreview = !leadId || leadId === "preview";
-  const waReserva = whatsappLink(
-    `Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quiero reservarla. ¿Cómo seguimos?`,
+  const isPreview = home || !leadId || leadId === "preview";
+  const waReserva = whatsappLink(home
+    ? `Hola ${NICO_NAME}, he visto tu web y me interesa una para mi negocio. ¿Cómo seguimos?`
+    : `Hola ${NICO_NAME}, soy de ${businessName}. Vi la web que me preparaste y quiero reservarla. ¿Cómo seguimos?`,
   ) ?? "#";
 
   // CTA de respaldo: WhatsApp. Registra la intención (booking_started) para que quede en el
