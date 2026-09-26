@@ -56,6 +56,7 @@ const FAQ: Array<{ q: string; a: string; onlyWithWebsite?: boolean }> = [
 const SHOWCASE = [
   { name: "Farmacia AntonDeSoto", meta: "Farmacia · León", url: "https://web-farmacia-antondesoto-9334c4.lovable.app", img: "/showcase/farmacia.jpg" },
   { name: "Adina Fica Studio", meta: "Masaje a domicilio", url: "https://adina-fica-studio.lovable.app", img: "/showcase/adina.jpg" },
+  { name: "Growth AI", meta: "SaaS · Growth Wave", url: "https://growth-wave.es", img: "/showcase/growth-wave.jpg" },
 ];
 
 const Stars = ({ size = "text-lg" }: { size?: string }) => (
