@@ -6,6 +6,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { renderEmail, bookingLink, withWhatsappFooter } from "../_shared/emailTemplate.ts";
 import { clickBase } from "../_shared/clickTracking.ts";
 import { isOptedOut } from "../_shared/contactability.ts";
+import { isLuviaLead } from "../_shared/luvia.ts";
 import { signUnsubscribe, unsubscribeUrl } from "../_shared/unsubscribe.ts";
 import {
   DEFAULT_REPLY_TO_LUVIA,
@@ -183,6 +184,8 @@ Deno.serve(async (req: Request) => {
 
   for (const lead of staleLeads ?? []) {
     if (!lead.email) continue;
+    // Solo leads de WEBS: un lead Luvia puede tener una web vieja (rechazada) y su Email 1 es otro pitch.
+    if (isLuviaLead(lead.owner, Deno.env.get("ADMIN_USER_ID"))) continue;
     const { data: msgs } = await supabase
       .from("outreach_messages").select("email_number, status, sent_at")
       .eq("lead_id", lead.id);
@@ -192,7 +195,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: site } = await supabase
       .from("sites").select("live_url, preview_image_url")
-      .eq("lead_id", lead.id).not("live_url", "is", null)
+      .eq("lead_id", lead.id).eq("status", "approved").not("live_url", "is", null)
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (!site?.live_url) continue;
 
@@ -217,6 +220,7 @@ Deno.serve(async (req: Request) => {
       .from("leads").select("id, name, email, contact_name, has_website, owner, do_not_contact, status")
       .eq("id", msg.lead_id).maybeSingle();
     if (!lead?.email) continue;
+    if (isLuviaLead(lead.owner, Deno.env.get("ADMIN_USER_ID"))) continue;
     if (isOptedOut(lead)) continue; // BAJA: no mandar el Email 3 aunque exista el Email 2.
     if (!FOLLOWUP_STATUSES.includes(lead.status)) continue; // ya reservó / ganado / perdido
     const { data: replied } = await supabase
@@ -226,7 +230,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: site } = await supabase
       .from("sites").select("live_url, preview_image_url")
-      .eq("lead_id", lead.id).not("live_url", "is", null)
+      .eq("lead_id", lead.id).eq("status", "approved").not("live_url", "is", null)
       .order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (!site?.live_url) continue;
 
