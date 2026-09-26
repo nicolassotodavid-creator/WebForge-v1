@@ -12,11 +12,52 @@ import { trackEmailLinks } from "./clickTracking.ts";
 // si se quiere añadir NIF/domicilio y cubrir el Art. 10 al 100 %.
 const DEFAULT_SENDER_IDENTITY = "David Nicolás Soto · diseño web (autónomo)";
 
+// Marca que firma el email. "luvia" = diseño propio de correo personal (ver luviaBodyToHtml).
+export type EmailBrand = "webforge" | "luvia";
+
+// [LUVIA] Tinta de marca de luvia-ia.es (--ink). El botón va en tinta, no en verde WhatsApp:
+// en un correo "escrito a mano" un botón fosforito con sombra grita newsletter.
+const LUVIA_INK = "#1b1b1b";
+const LUVIA_TEXT = `margin:0 0 14px;color:${LUVIA_INK};font-size:15px;line-height:1.55;`;
+
+// [LUVIA] Cuerpo con pinta de correo personal: texto a 15 px como el de Gmail, botón sobrio en
+// tinta, la voz como enlace normal debajo y la 2ª línea de la firma en gris.
+function luviaBodyToHtml(text: string): string {
+  const linkify = (s: string) =>
+    s.replace(/(https?:\/\/[^\s<]+)/g, `<a href="$1" style="color:${LUVIA_INK};text-decoration:underline;">$1</a>`);
+  return text
+    .split(/\n{2,}/)
+    .map((para) => {
+      const lines = para.split("\n").map((l) => l.trim()).filter(Boolean);
+      const one = lines.length === 1 ? lines[0] : "";
+      // CTA principal: el WhatsApp del asistente de ventas, con el primer mensaje escrito.
+      const wa = one.match(/^Escr[ií]bele por WhatsApp:\s*(https:\/\/wa\.me\/\d+\?text=\S+)$/i);
+      if (wa) {
+        return `<table cellpadding="0" cellspacing="0" role="presentation" style="margin:22px 0 10px;"><tr>` +
+          `<td bgcolor="${LUVIA_INK}" style="background:${LUVIA_INK};border-radius:8px;">` +
+          `<a href="${wa[1].replace(/&/g, "&amp;")}" style="display:inline-block;padding:12px 22px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;line-height:1.2;">Escribir a Luvia por WhatsApp &rarr;</a>` +
+          `</td></tr></table>`;
+      }
+      // CTA secundaria: hablar con ella por voz en la web.
+      const voz = one.match(/^H[aá]blale por voz:\s*(https:\/\/luvia-ia\.es\S*)$/i);
+      if (voz) {
+        return `<p style="margin:0 0 26px;color:#5f6368;font-size:14px;line-height:1.5;">o, si lo prefieres, <a href="${voz[1]}" style="color:${LUVIA_INK};text-decoration:underline;">háblale por voz en luvia-ia.es</a></p>`;
+      }
+      // Firma "Nico / Luvia — …": la 2ª línea en gris y más pequeña.
+      if (lines.length === 2 && /^nico$/i.test(lines[0])) {
+        return `<p style="${LUVIA_TEXT}">${lines[0]}<br><span style="color:#5f6368;font-size:14px;">${lines[1]}</span></p>`;
+      }
+      return `<p style="${LUVIA_TEXT}">${lines.map(linkify).join("<br>")}</p>`;
+    })
+    .join("");
+}
+
 // Convierte el cuerpo en texto plano a HTML:
 //  - párrafos separados por línea en blanco
 //  - una línea que es SOLO una URL → botón slim "Ver la web →"
 //  - el resto → texto normal (incluida la firma, que ya viene en el cuerpo)
-export function bodyToHtml(text: string): string {
+export function bodyToHtml(text: string, brand: EmailBrand = "webforge"): string {
+  if (brand === "luvia") return luviaBodyToHtml(text);
   return text
     .split(/\n{2,}/)
     .map((para) => {
@@ -28,16 +69,6 @@ export function bodyToHtml(text: string): string {
         const waMatch = line.trim().match(/^WhatsApp:\s*(https:\/\/wa\.me\/\d+)$/i);
         if (waMatch) {
           return `<a href="${waMatch[1]}" style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;padding:13px 28px;border-radius:999px;font-size:15px;font-weight:700;line-height:1;box-shadow:0 4px 12px rgba(37,211,102,0.30);">Escríbeme por WhatsApp &nbsp;→</a>`;
-        }
-        // [LUVIA] CTA principal: el WhatsApp del asistente de ventas, con el primer mensaje escrito.
-        const luviaWa = line.trim().match(/^Escr[ií]bele por WhatsApp:\s*(https:\/\/wa\.me\/\d+\?text=\S+)$/i);
-        if (luviaWa) {
-          return `<a href="${luviaWa[1].replace(/&/g, "&amp;")}" style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;padding:14px 30px;border-radius:999px;font-size:15px;font-weight:700;line-height:1;box-shadow:0 4px 12px rgba(37,211,102,0.30);">Escribir a Luvia por WhatsApp &nbsp;→</a>`;
-        }
-        // [LUVIA] CTA secundaria: hablar con ella por voz en la web.
-        const luviaVoz = line.trim().match(/^H[aá]blale por voz:\s*(https:\/\/luvia-ia\.es\S*)$/i);
-        if (luviaVoz) {
-          return `<a href="${luviaVoz[1]}" style="color:#1a1a1a;font-size:15px;font-weight:600;text-decoration:none;border-bottom:1px solid #1a1a1a;padding-bottom:1px;">o háblale por voz en luvia-ia.es →</a>`;
         }
         const urlMatch = line.trim().match(/^(https?:\/\/[^\s]+)$/);
         if (urlMatch) {
@@ -142,15 +173,64 @@ export interface RenderEmailOptions {
   // [LUVIA] Aviso legal de la marca que firma. Si viene, sustituye al derivado de bookingUrl
   // (los emails de Luvia no llevan /book).
   legalUrl?: string | null;
+  // [LUVIA] "luvia" → layout de correo personal: alineado a la izquierda (sin la columna centrada
+  // que en Gmail deja un hueco enorme), texto a 15 px y pie legal compacto. Sin escaparate.
+  brand?: EmailBrand;
+}
+
+// [LUVIA] HTML completo: alineado a la izquierda y sin padding lateral propio (Gmail/Apple Mail ya
+// ponen el suyo), así el texto arranca a la altura del remitente como un correo normal.
+function luviaEmailHtml(o: {
+  bodyText: string; subject: string; senderIdentity: string; legalUrl: string | null;
+  unsubscribeUrl?: string | null; pixel: string;
+}): string {
+  const foot = "color:#9aa0a6;font-size:12px;line-height:1.5;";
+  const extras = [
+    o.legalUrl ? `<a href="${o.legalUrl}" style="color:#9aa0a6;text-decoration:underline;">Aviso legal</a>` : "",
+    o.unsubscribeUrl ? `<a href="${o.unsubscribeUrl}" style="color:#9aa0a6;text-decoration:underline;">Darte de baja</a>` : "",
+  ].filter(Boolean);
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>${o.subject}</title>
+</head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;">
+    <tr>
+      <td align="left" style="padding:4px 0 8px;">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;">
+          <tr>
+            <td align="left" style="color:${LUVIA_INK};font-family:-apple-system,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;">
+              ${bodyToHtml(o.bodyText, "luvia")}
+              <p style="margin:28px 0 0;padding-top:12px;border-top:1px solid #ececec;${foot}">Te escribo a t&iacute;tulo profesional; tu contacto est&aacute; en tu ficha p&uacute;blica. Si no quieres m&aacute;s correos, responde <strong>BAJA</strong> y borro tus datos.</p>
+              <p style="margin:4px 0 0;${foot}">${o.senderIdentity}${extras.length ? ` &middot; ${extras.join(" &middot; ")}` : ""}</p>
+              ${o.pixel}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 }
 
 // Devuelve el HTML completo del email. NO añade firma (el cuerpo ya la trae) ni
 // botón de WhatsApp. Con captura → escaparate (captura enmarcada + 2 CTAs); sin
 // captura → texto plano + (enlace de compra opcional). Siempre: opt-out + píxel.
-export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY, unsubscribeUrl, clickTracking, legalUrl: legalUrlOpt }: RenderEmailOptions): string {
+export function renderEmail({ bodyText, trackingPixelUrl, subject = "", bookingUrl, previewImageUrl, webUrl, senderIdentity = DEFAULT_SENDER_IDENTITY, unsubscribeUrl, clickTracking, legalUrl: legalUrlOpt, brand = "webforge" }: RenderEmailOptions): string {
   const pixel = trackingPixelUrl
     ? `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`
     : "";
+  if (brand === "luvia") {
+    const html = luviaEmailHtml({ bodyText, subject, senderIdentity, legalUrl: legalUrlOpt ?? null, unsubscribeUrl, pixel });
+    return clickTracking?.base
+      ? trackEmailLinks(html, { ...clickTracking, base: clickTracking.base, webUrl: null, bookUrl: null })
+      : html;
+  }
 
   // Enlace de baja clicable en el pie (opcional). El botón nativo "Cancelar suscripción" del
   // cliente de correo sale de la cabecera List-Unsubscribe; esto es su equivalente visible.

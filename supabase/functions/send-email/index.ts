@@ -197,6 +197,7 @@ Deno.serve(async (req: Request) => {
       : Deno.env.get("SENDER_LEGAL_IDENTITY"),
     // Aviso legal de luvia-ia.es: solo si se configura (hoy su página aún tiene los huecos de plantilla).
     legalUrl: luvia ? (Deno.env.get("LUVIA_LEGAL_URL") ?? null) : null,
+    brand: luvia ? "luvia" : "webforge",
     unsubscribeUrl: unsubUrl,
     // Clics en la web, la propuesta y el WhatsApp → www.nico-soto.es/r/… (función track-click).
     clickTracking: { base: clickBase(Deno.env.get("APP_URL"), SUPABASE_URL), leadId: msg.lead_id, messageId },

@@ -152,9 +152,13 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
     bookingUrl: null,
     senderIdentity: "David Nicolás Soto · Luvia IA (luvia-ia.es)",
     clickTracking: { base: "https://www.nico-soto.es/r", leadId: lead, messageId: "m1" },
+    brand: "luvia",
   });
-  assertIncludes(html, "Escribir a Luvia por WhatsApp", "luvia: botón verde de WhatsApp");
-  assertIncludes(html, "o háblale por voz en luvia-ia.es", "luvia: enlace de voz");
+  assertIncludes(html, "Escribir a Luvia por WhatsApp", "luvia: botón de WhatsApp");
+  assertExcludes(html, "#25D366", "luvia: botón en tinta de marca, no verde fosforito");
+  assertExcludes(html, 'align="center"', "luvia: alineado a la izquierda, sin columna centrada");
+  assertIncludes(html, "Nico<br><span", "luvia: 2ª línea de la firma en gris");
+  assertIncludes(html, "háblale por voz en luvia-ia.es", "luvia: enlace de voz");
   assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lwa?m=m1&amp;c=email"`, "luvia: WhatsApp pasa por el contador");
   assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lweb?m=m1&amp;c=email"`, "luvia: voz pasa por el contador");
   assertExcludes(html, "wa.me/34632217400", "luvia: no queda el enlace directo al WhatsApp");
@@ -162,7 +166,7 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertExcludes(html, "Si ya la quieres", "luvia: sin enlace de compra");
   assertExcludes(html, "Aviso legal", "luvia: sin aviso legal si no se configura");
   assertIncludes(html, "Luvia IA (luvia-ia.es)", "luvia: pie con la identidad de Luvia");
-  const direct = renderEmail({ bodyText: body });
+  const direct = renderEmail({ bodyText: body, brand: "luvia" });
   assertIncludes(direct, `href="${wa.replace(/&/g, "&amp;")}"`, "luvia: sin contador → WhatsApp directo con el texto");
 }
 
