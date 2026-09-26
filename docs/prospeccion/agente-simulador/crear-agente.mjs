@@ -55,6 +55,10 @@ const config = {
       interesado: { type: "boolean", description: "true si quiere que Nico se lo monte; false si dijo que no le interesa." },
       objecion: { type: "string", description: "Lo que no le encaja o lo que le frena, con sus palabras. Vacío si no lo dijo." },
     },
+    // Aviso por email de cada conversación (conectar-aviso.mjs): webhook propio, no el de Luvia de la cuenta.
+    ...(estado.post_call_webhook_id ? { workspace_overrides: { webhooks: {
+      post_call_webhook_id: estado.post_call_webhook_id, events: ["transcript"], transcript_format: "json", send_audio: false,
+    } } } : {}),
     evaluation: {
       criteria: [{
         id: "datos_para_montarlo", name: "Datos para montarlo", type: "prompt",
