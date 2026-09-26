@@ -439,6 +439,7 @@ Deno.serve(async (req: Request) => {
     ? buildLuviaFinalBody(bodyText, {
       whatsappUrl: luviaWhatsappUrl(luviaShortName(draft.short_name, lead.name)),
       webUrl: LUVIA_WEB,
+      shortName: luviaShortName(draft.short_name, lead.name),
     })
     : (channel === "email"
       ? assembleEmail1Body({

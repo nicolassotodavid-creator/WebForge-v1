@@ -102,22 +102,36 @@ export function buildLuviaOutreachPayload(lead: {
 // Firma fija de los emails de Luvia (la pone el sistema, no la IA).
 export const LUVIA_SIGNATURE = "Nico\nLuvia — atención al cliente con IA";
 
-// Body final del Email 1 de Luvia. La IA escribe solo los párrafos; el sistema añade, cada uno en
-// su párrafo, la CTA principal a luvia-ia.es (botón), el WhatsApp de ventas como alternativa (con
-// el nombre de la clínica ya escrito) y la firma. Si la IA firmó igualmente, se quita su firma.
+// Saludo del Email 1 de Luvia: al equipo de la clínica ("Hola, equipo de Benaes:"). Con nombre de
+// médico va con artículo: "equipo del Doctor Lluch", "equipo de la Dra. Barreto".
+export function luviaGreeting(shortName: string): string {
+  const name = shortName.replace(/\s+/g, " ").trim();
+  if (!name) return "Hola, equipo:";
+  if (/^(dra\.?|doctora)\s/i.test(name)) return `Hola, equipo de la ${name}:`;
+  if (/^(dr\.?|doctor)\s/i.test(name)) return `Hola, equipo del ${name}:`;
+  return `Hola, equipo de ${name}:`;
+}
+
+// Body final del Email 1 de Luvia. La IA escribe solo los párrafos; el sistema pone el saludo al
+// equipo de la clínica (sustituye el "Hola," de la IA si lo puso) y añade, cada uno en su párrafo,
+// la CTA principal a luvia-ia.es (botón), el WhatsApp de ventas como alternativa (con el nombre de
+// la clínica ya escrito) y la firma. Si la IA firmó igualmente, se quita su firma.
 export function buildLuviaFinalBody(
   bodyText: string,
-  opts: { whatsappUrl: string; webUrl: string },
+  opts: { whatsappUrl: string; webUrl: string; shortName?: string },
 ): string {
   const lines = bodyText.trim().split("\n");
   while (lines.length && /^\s*(nico\b.*|luvia\s*[—–-].*|un saludo,?|saludos,?|)\s*$/i.test(lines[lines.length - 1])) {
     lines.pop();
   }
+  while (lines.length && /^\s*(hola\b[^.\n]{0,60}[,:]?|buen[oa]s\b[^.\n]{0,60}[,:]?|)\s*$/i.test(lines[0])) {
+    lines.shift();
+  }
   const body = lines.join("\n").trim();
   return [
-    body,
-    `Pruébala en luvia-ia.es: ${opts.webUrl}`,
-    `O escríbele por WhatsApp: ${opts.whatsappUrl}`,
+    `${luviaGreeting(opts.shortName ?? "")}\n${body}`,
+    `Probadla en luvia-ia.es: ${opts.webUrl}`,
+    `O escribidle por WhatsApp: ${opts.whatsappUrl}`,
     LUVIA_SIGNATURE,
   ].join("\n\n");
 }

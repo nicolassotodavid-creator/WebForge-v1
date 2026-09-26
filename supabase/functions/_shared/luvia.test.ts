@@ -1,6 +1,6 @@
 // node --experimental-strip-types supabase/functions/_shared/luvia.test.ts
 import {
-  isLuviaLead, luviaSiteState, buildLuviaOutreachPayload, buildLuviaFinalBody, pickLuviaReviews,
+  isLuviaLead, luviaSiteState, buildLuviaOutreachPayload, buildLuviaFinalBody, pickLuviaReviews, luviaGreeting,
   luviaShortName, luviaQuoteIssues, LUVIA_SIGNATURE,
 } from "./luvia.ts";
 import { luviaWhatsappUrl, isLuviaWhatsappUrl } from "./clickTracking.ts";
@@ -54,9 +54,13 @@ assertEq(pickLuviaReviews(null).length, 0, "pickLuviaReviews: sin raw_json → [
 // ── buildLuviaFinalBody ────────────────────────────────────────────────────
 const wa = luviaWhatsappUrl("Clínica X");
 const fb = buildLuviaFinalBody("Hola,\nPárrafo.\n\nNico\nLuvia — atención al cliente con IA.", {
-  whatsappUrl: wa, webUrl: "https://luvia-ia.es",
+  whatsappUrl: wa, webUrl: "https://luvia-ia.es", shortName: "Clínica X",
 });
-assertEq(fb.startsWith("Hola,\nPárrafo.\n\nPruébala en luvia-ia.es: https://luvia-ia.es\n\nO escríbele por WhatsApp: https://wa.me/34632217400?text="), true, "final body: quita la firma de la IA, web primero y WhatsApp después");
+assertEq(fb.startsWith("Hola, equipo de Clínica X:\nPárrafo.\n\nProbadla en luvia-ia.es: https://luvia-ia.es\n\nO escribidle por WhatsApp: https://wa.me/34632217400?text="), true, "final body: saludo al equipo, quita la firma de la IA, web primero y WhatsApp después");
+assertEq(luviaGreeting("Benaes"), "Hola, equipo de Benaes:", "saludo: equipo de la clínica");
+assertEq(luviaGreeting("Doctor Lluch"), "Hola, equipo del Doctor Lluch:", "saludo: Doctor → del");
+assertEq(luviaGreeting("Dra. Barreto"), "Hola, equipo de la Dra. Barreto:", "saludo: Dra. → de la");
+assertEq(buildLuviaFinalBody("Párrafo.", { whatsappUrl: wa, webUrl: "https://luvia-ia.es", shortName: "Benaes" }).startsWith("Hola, equipo de Benaes:\nPárrafo."), true, "final body: sin saludo de la IA también lo pone");
 
 assertEq(fb.endsWith(LUVIA_SIGNATURE), true, "final body: firma del sistema al final");
 assertEq(fb.split("Nico").length - 1, 1, "final body: una sola firma");
