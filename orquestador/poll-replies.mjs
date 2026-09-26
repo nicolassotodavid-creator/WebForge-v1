@@ -9,6 +9,7 @@
 // Env: ZOHO_CLIENT_ID/SECRET, ZOHO_REFRESH_TOKEN, ZOHO_DC, SUPABASE_URL, INBOUND_REPLY_SECRET.
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { execFile } from "node:child_process";
 
 const e = process.env;
 const DRY = process.argv.includes("--dry-run");
@@ -21,6 +22,21 @@ for (const k of ["ZOHO_CLIENT_ID", "ZOHO_CLIENT_SECRET", "ZOHO_REFRESH_TOKEN", "
 
 const state = existsSync(STATE) ? JSON.parse(readFileSync(STATE, "utf8")) : { done: {} };
 
+// Un fallo suelto (red caída) no molesta; 3 seguidos (~15 min) avisan con una notificación, como
+// mucho cada 6 h. Ocurre p. ej. si Zoho invalida el refresh token.
+function fail(msg) {
+  console.error(msg);
+  state.fails = (state.fails ?? 0) + 1;
+  if (state.fails >= 3 && Date.now() - (state.lastAlert ?? 0) > 6 * 3600 * 1000) {
+    state.lastAlert = Date.now();
+    execFile("osascript", ["-e", `display notification "${msg.replace(/["\\]/g, "")}" with title "poll-replies: no lee las respuestas de hola@"`]);
+  }
+  writeFileSync(STATE, JSON.stringify(state));
+  process.exit(1);
+}
+process.on("uncaughtException", (err) => fail(`Error: ${err.message}`));
+process.on("unhandledRejection", (err) => fail(`Error: ${err?.message ?? err}`));
+
 const tok = await (await fetch(`https://accounts.zoho.${e.ZOHO_DC}/oauth/v2/token`, {
   method: "POST",
   body: new URLSearchParams({
@@ -28,13 +44,13 @@ const tok = await (await fetch(`https://accounts.zoho.${e.ZOHO_DC}/oauth/v2/toke
     client_secret: e.ZOHO_CLIENT_SECRET, refresh_token: e.ZOHO_REFRESH_TOKEN,
   }),
 })).json();
-if (!tok.access_token) { console.error("Zoho no dio access_token:", tok.error); process.exit(1); }
+if (!tok.access_token) fail(`Zoho no dio access_token: ${tok.error}`);
 const h = { Authorization: `Zoho-oauthtoken ${tok.access_token}` };
 const api = `https://mail.zoho.${e.ZOHO_DC}/api`;
 
 const acc = await (await fetch(`${api}/accounts`, { headers: h })).json();
 const accountId = acc.data?.[0]?.accountId;
-if (!accountId) { console.error("Zoho: sin cuenta de correo"); process.exit(1); }
+if (!accountId) fail("Zoho: sin cuenta de correo");
 
 const list = await (await fetch(`${api}/accounts/${accountId}/messages/view?limit=200&sortBy=date&sortorder=false`, { headers: h })).json();
 const msgs = list.data ?? [];
@@ -61,5 +77,6 @@ for (const m of msgs) {
 
 // Poda del estado: solo lo que aún cae dentro de la ventana.
 for (const [id, at] of Object.entries(state.done)) if (at < since) delete state.done[id];
+state.fails = 0;
 if (!DRY) writeFileSync(STATE, JSON.stringify(state));
 console.log(`${DRY ? "[dry] " : ""}${msgs.length} leídos, ${nuevos} nuevos, ${casados} con lead.`);
