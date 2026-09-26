@@ -11,6 +11,7 @@ import { CONTACT_EMAIL, whatsappLink } from "@/lib/business";
 import { Reveal } from "@/components/Reveal";
 import { isOperatorDevice } from "@/hooks/useSession";
 import { categoryNoun, cleanBusinessName, domainHintFrom } from "@/lib/bookCopy";
+import VoiceAssistant, { openAssistant } from "@/components/VoiceAssistant";
 import "./book.css";
 
 const NICO_NAME = "Nico";
@@ -49,6 +50,12 @@ const FAQ: Array<{ q: string; a: string; onlyWithWebsite?: boolean }> = [
   { q: "¿Y si ya tengo web?", onlyWithWebsite: true, a: "Perfecto: la nueva puede sustituirla cuando tú quieras y yo me encargo del cambio. Está pensada para móvil, velocidad y Google, para que quien ya te busca te encuentre y te contacte todavía más fácil." },
   { q: "¿Hay cuotas mensuales?", a: "Ninguna. Es un pago único y la web es tuya para siempre: sin cuotas ni renovaciones." },
   { q: "¿Cuánto tarda en estar lista?", a: "La estructura ya está construida. En cuanto me confirmes, la adapto a tu negocio y está online en 48-72 horas." },
+];
+
+// Portada pública (home): webs reales ya hechas. Las capturas están en /public/showcase.
+const SHOWCASE = [
+  { name: "Farmacia AntonDeSoto", meta: "Farmacia · León", url: "https://web-farmacia-antondesoto-9334c4.lovable.app", img: "/showcase/farmacia.jpg" },
+  { name: "Adina Fica Studio", meta: "Masaje a domicilio", url: "https://adina-fica-studio.lovable.app", img: "/showcase/adina.jpg" },
 ];
 
 const Stars = ({ size = "text-lg" }: { size?: string }) => (
@@ -90,6 +97,7 @@ export default function Book({ home = false }: { home?: boolean } = {}) {
   const [reloadKey, setReloadKey] = useState(0);
 
   const [waSent, setWaSent] = useState(false);
+  const [showIdx, setShowIdx] = useState(0);
 
   useEffect(() => {
     if (home) {
@@ -177,13 +185,14 @@ export default function Book({ home = false }: { home?: boolean } = {}) {
   // ── datos derivados ──
   const city = info.city ?? "tu ciudad";
   const category = categoryNoun(info.category); // "taller", "empresa de reformas"… (nunca la categoría cruda de Maps)
-  const previewUrl = info.live_url ?? "#";
-  const screenshotUrl = info.preview_image_url;
+  const shown = home ? SHOWCASE[showIdx] : null;
+  const previewUrl = shown ? shown.url : info.live_url ?? "#";
+  const screenshotUrl = shown ? shown.img : info.preview_image_url;
   // Nota REAL de Google o nada: antes caía a "4.9" inventado si el lead no tenía nota, y decía
   // "los clientes hablan bien de ti" también a negocios con 3,8.
   const showRating = info.rating != null && info.rating >= 4.3 && (info.review_count ?? 0) >= 10;
   const rating = info.rating != null ? info.rating.toLocaleString("es-ES", { maximumFractionDigits: 1 }) : "";
-  const domainHint = domainHintFrom(businessName);
+  const domainHint = shown ? new URL(shown.url).host : domainHintFrom(businessName);
   const greeting = info.contact_name ? `Hola ${info.contact_name}, ` : "Hola, ";
   // Nunca decir que su web actual es mala (regla de templates.md): se plantea como oportunidad.
   const intro = info.has_website === false
@@ -222,7 +231,7 @@ export default function Book({ home = false }: { home?: boolean } = {}) {
           <div className="flex items-center gap-6">
             <a href="#incluye" className="hidden text-sm opacity-70 hover:opacity-100 lg:block">Qué incluye</a>
             <a href="#nico" className="hidden text-sm opacity-70 hover:opacity-100 lg:block">Sobre mí</a>
-            <a href="#contact" className="text-sm font-medium tracking-tight text-brick">Reservar propuesta →</a>
+            <a href="#contact" className="text-sm font-medium tracking-tight text-brick">{home ? "Contacto →" : "Reservar propuesta →"}</a>
           </div>
         </div>
       </nav>
@@ -239,24 +248,36 @@ export default function Book({ home = false }: { home?: boolean } = {}) {
                 <span className="size-1.5 rounded-full bg-brick lv-pulse-ring" />
               </span>
               <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">
-                Propuesta para {businessName} · {city}
+                {home ? "Webs para negocios locales" : `Propuesta para ${businessName} · ${city}`}
               </span>
             </div>
 
             <h1 className="font-serif text-[2.5rem] leading-[1.05] text-balance mb-5 sm:text-5xl sm:mb-6 lg:text-7xl">
-              He diseñado una nueva web para tu <span className="lv-text-gradient italic">{category}</span>.
+              {home
+                ? <>Tu negocio ya es bueno. Que tu <span className="lv-text-gradient italic">web</span> también lo sea.</>
+                : <>He diseñado una nueva web para tu <span className="lv-text-gradient italic">{category}</span>.</>}
             </h1>
 
             <p className="max-w-[44ch] text-[15px] leading-relaxed text-pretty opacity-80 mb-7 sm:text-base sm:mb-8 lg:text-lg">
-              {greeting}{intro} El tuyo me llamó la atención, así que me tomé la libertad de montarla. Si te gusta, es tuya.
+              {home
+                ? "Webs a medida para negocios locales. 397 € + IVA, un solo pago y sin cuotas. Online en 48-72 horas."
+                : <>{greeting}{intro} El tuyo me llamó la atención, así que me tomé la libertad de montarla. Si te gusta, es tuya.</>}
             </p>
 
             <div className="flex flex-col gap-2.5 mb-10 sm:flex-row sm:gap-3 sm:mb-12 lg:mb-0">
+              {home ? (
+                <button type="button" onClick={openAssistant}
+                  className="lv-shine-wrap group flex items-center justify-center gap-2 rounded-sm bg-ink px-5 py-3.5 text-sm font-medium text-paper ring-1 ring-ink transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-6">
+                  <span>Habla con mi asistente</span>
+                  <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+                </button>
+              ) : (
               <a href={previewUrl} target="_blank" rel="noopener noreferrer" onClick={() => trackLink("web", "hero")}
                 className="lv-shine-wrap group flex items-center justify-center gap-2 rounded-sm bg-ink px-5 py-3.5 text-sm font-medium text-paper ring-1 ring-ink transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-6">
                 <span>Ver la web completa</span>
                 <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
               </a>
+              )}
               <a href={waDefault} target="_blank" rel="noopener noreferrer" onClick={() => trackLink("whatsapp_dudas", "hero")}
                 className="flex items-center justify-center gap-2 rounded-sm border border-ink/15 px-5 py-3.5 text-sm font-medium transition-all duration-500 hover:bg-ink/5 hover:border-ink/30 sm:px-6">
                 Preguntar por WhatsApp
@@ -281,6 +302,17 @@ export default function Book({ home = false }: { home?: boolean } = {}) {
                 <span className="font-serif italic text-brick text-base lv-underline-grow pb-0.5">Abrir web completa →</span>
               </a>
             </div>
+            {home && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {SHOWCASE.map((w, i) => (
+                  <button key={w.name} type="button" onClick={() => setShowIdx(i)}
+                    className={`rounded-sm border px-3 py-2 text-left text-xs transition-colors ${i === showIdx ? "border-ink bg-ink text-paper" : "border-ink/15 hover:border-ink/40"}`}>
+                    <span className="block font-medium">{w.name}</span>
+                    <span className="block opacity-60">{w.meta}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </Reveal>
         </section>
 
@@ -398,7 +430,9 @@ export default function Book({ home = false }: { home?: boolean } = {}) {
             <p className="text-[10px] font-medium uppercase tracking-widest opacity-50 mb-3">Quién está detrás</p>
             <h2 className="font-serif text-3xl mb-4 lg:text-5xl">Soy {NICO_NAME}.</h2>
             <p className="text-[15px] leading-relaxed opacity-80 max-w-[52ch] text-pretty sm:text-sm lg:text-lg">
-              No trabajo en una agencia. Soy un autónomo que diseña webs para negocios locales. Construyo la web antes de presentarme — si te convence, hablamos. Si no, sin drama.
+              {home
+                ? "No trabajo en una agencia. Soy un autónomo que diseña webs para negocios locales. Hablas conmigo directamente."
+                : "No trabajo en una agencia. Soy un autónomo que diseña webs para negocios locales. Construyo la web antes de presentarme — si te convence, hablamos. Si no, sin drama."}
             </p>
           </Reveal>
         </section>
@@ -495,26 +529,29 @@ export default function Book({ home = false }: { home?: boolean } = {}) {
 
       {/* pb-24 en móvil: la barra fija de WhatsApp tapaba el pie */}
       <footer className="mx-auto max-w-6xl px-6 pt-12 pb-24 border-t border-ink/5 text-center lg:px-10 lg:pb-12">
-        <p className="text-[10px] font-medium uppercase tracking-widest opacity-40 italic">Hecho a mano por {NICO_NAME} para {businessName}</p>
+        <p className="text-[10px] font-medium uppercase tracking-widest opacity-40 italic">{home ? `Hecho a mano por ${NICO_NAME}` : `Hecho a mano por ${NICO_NAME} para ${businessName}`}</p>
         <a href="/aviso-legal" className="mt-3 inline-block text-[10px] opacity-40 underline underline-offset-2 hover:opacity-80">Aviso legal y privacidad</a>
       </footer>
 
+      {/* En la portada, el asistente de voz ocupa la esquina y el FAB/barra de WhatsApp sobran */}
+      {home && <VoiceAssistant />}
+
       {/* Desktop FAB */}
-      <a href={waDefault} target="_blank" rel="noopener noreferrer" onClick={() => trackLink("whatsapp_dudas", "flotante")}
+      {!home && <a href={waDefault} target="_blank" rel="noopener noreferrer" onClick={() => trackLink("whatsapp_dudas", "flotante")}
         className="fixed bottom-6 right-6 z-50 hidden size-14 items-center justify-center rounded-full bg-ink text-paper shadow-xl shadow-ink/30 ring-1 ring-ink transition-transform hover:scale-110 active:scale-95 lg:flex lg:size-16"
         aria-label="Hablar por WhatsApp">
         <WhatsAppIcon size={22} />
-      </a>
+      </a>}
 
       {/* Mobile sticky bar: WhatsApp */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-ink shadow-[0_-8px_32px_rgba(0,0,0,0.25)] lg:hidden">
+      {!home && <div className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-ink shadow-[0_-8px_32px_rgba(0,0,0,0.25)] lg:hidden">
         <button type="button" onClick={goToWhatsapp}
           className="flex flex-1 items-center justify-center gap-2 py-3.5 bg-[#25D366] text-white text-sm font-medium tracking-tight transition-transform active:scale-[0.98]"
           aria-label="Escribir por WhatsApp">
           <WhatsAppIcon size={20} />
           <span>Me interesa — WhatsApp</span>
         </button>
-      </div>
+      </div>}
     </div>
   );
 }
