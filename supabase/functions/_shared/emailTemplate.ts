@@ -21,6 +21,7 @@ const LUVIA_INK = "#1b1b1b";
 const LUVIA_SAGE = "#4c765a";
 const LUVIA_CREAM = "#f3efe8";
 const LUVIA_RUST = "#b4441c";
+const LUVIA_WEB_URL = "https://luvia-ia.es";
 const LUVIA_TEXT = `margin:0 0 14px;color:${LUVIA_INK};font-size:15px;line-height:1.55;`;
 
 // [LUVIA] Cuerpo con pinta de correo personal: texto a 15 px como el de Gmail, un mini banner con
@@ -38,15 +39,27 @@ const LUVIA_WA_LINE = /^(?:O\s+)?Escr[ií]bele por WhatsApp:\s*(https:\/\/wa\.me
 function luviaBanner(webUrl: string): string {
   const serif = "Georgia,'Times New Roman',serif";
   return `<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:24px 0 12px;"><tr>` +
-    `<td bgcolor="${LUVIA_CREAM}" style="background:${LUVIA_CREAM};border:1px solid #e6e0d4;border-radius:14px;padding:22px 24px 24px;">` +
+    `<td class="lv-card" bgcolor="${LUVIA_CREAM}" style="background:${LUVIA_CREAM};border:1px solid #e6e0d4;border-radius:14px;padding:22px 24px 24px;">` +
     `<p style="margin:0 0 14px;font-family:${serif};font-size:20px;line-height:1;color:${LUVIA_INK};">Luvia <span style="font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10px;font-weight:600;color:${LUVIA_SAGE};border:1px solid ${LUVIA_SAGE};border-radius:6px;padding:1px 4px;vertical-align:middle;">IA</span></p>` +
     `<p style="margin:0 0 8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${LUVIA_RUST};font-weight:600;">Recepcionista con IA para cl&iacute;nicas</p>` +
-    `<p style="margin:0 0 10px;font-family:${serif};font-size:26px;line-height:1.2;color:${LUVIA_INK};"><a href="${webUrl}" style="color:${LUVIA_INK};text-decoration:none;">Coge <em style="color:${LUVIA_SAGE};">cada llamada</em>. Agenda la cita.</a></p>` +
+    `<p class="lv-h" style="margin:0 0 10px;font-family:${serif};font-size:26px;line-height:1.2;color:${LUVIA_INK};"><a href="${webUrl}" style="color:${LUVIA_INK};text-decoration:none;">Coge <em style="color:${LUVIA_SAGE};">cada llamada</em>. Agenda la cita.</a></p>` +
     `<p style="margin:0 0 18px;font-size:14px;line-height:1.5;color:#57534e;"><a href="${webUrl}" style="color:#57534e;text-decoration:none;">H&aacute;blale ahora en la web y compru&eacute;balo: contesta en segundos, de d&iacute;a y de noche.</a></p>` +
-    `<table cellpadding="0" cellspacing="0" role="presentation"><tr>` +
-    `<td bgcolor="${LUVIA_SAGE}" style="background:${LUVIA_SAGE};border-radius:999px;">` +
+    `<table class="lv-btn" cellpadding="0" cellspacing="0" role="presentation"><tr>` +
+    `<td align="center" bgcolor="${LUVIA_SAGE}" style="background:${LUVIA_SAGE};border-radius:999px;">` +
     `<a href="${webUrl}" style="display:inline-block;padding:12px 24px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;line-height:1.2;">Pru&eacute;bala en luvia-ia.es &rarr;</a>` +
     `</td></tr></table>` +
+    `</td></tr></table>`;
+}
+
+// [LUVIA] Firma: barra verde a la izquierda, nombre, marca en serif y web + teléfono. El teléfono
+// va como texto (no wa.me): un wa.me sin ?text= lo capturaría el contador "wa" de las webs.
+function luviaSignature(): string {
+  const serif = "Georgia,'Times New Roman',serif";
+  return `<table cellpadding="0" cellspacing="0" role="presentation" style="margin:4px 0 0;"><tr>` +
+    `<td style="border-left:3px solid ${LUVIA_SAGE};padding:2px 0 2px 12px;">` +
+    `<p style="margin:0;font-size:15px;line-height:1.4;font-weight:600;color:${LUVIA_INK};">Nico</p>` +
+    `<p style="margin:0 0 4px;font-size:14px;line-height:1.4;color:#5f6368;"><span style="font-family:${serif};font-size:15px;color:${LUVIA_INK};">Luvia</span> &middot; recepcionista con IA para cl&iacute;nicas</p>` +
+    `<p style="margin:0;font-size:13px;line-height:1.4;color:#5f6368;"><a href="${LUVIA_WEB_URL}" style="color:${LUVIA_SAGE};text-decoration:none;font-weight:600;">luvia-ia.es</a> &middot; +34 632 21 74 00</p>` +
     `</td></tr></table>`;
 }
 
@@ -70,10 +83,8 @@ function luviaBodyToHtml(text: string): string {
         ctasDone = true;
         return ctas;
       }
-      // Firma "Nico / Luvia — …": la 2ª línea en gris y más pequeña.
-      if (lines.length === 2 && /^nico$/i.test(lines[0])) {
-        return `<p style="${LUVIA_TEXT}">${lines[0]}<br><span style="color:#5f6368;font-size:14px;">${lines[1]}</span></p>`;
-      }
+      // Firma "Nico / Luvia — …" → bloque de firma con barra verde, marca y contacto.
+      if (lines.length === 2 && /^nico$/i.test(lines[0])) return luviaSignature();
       return `<p style="${LUVIA_TEXT}">${lines.map(linkify).join("<br>")}</p>`;
     })
     .join("");
@@ -223,6 +234,14 @@ function luviaEmailHtml(o: {
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <meta name="color-scheme" content="light">
   <title>${o.subject}</title>
+  <style>
+    @media only screen and (max-width:480px) {
+      .lv-card { padding:18px 18px 20px !important; }
+      .lv-h { font-size:22px !important; }
+      .lv-btn { width:100% !important; }
+      .lv-btn a { display:block !important; text-align:center !important; }
+    }
+  </style>
 </head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,'Segoe UI',Roboto,Arial,Helvetica,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#ffffff;">
