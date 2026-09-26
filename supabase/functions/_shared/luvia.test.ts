@@ -56,8 +56,8 @@ const wa = luviaWhatsappUrl("Clínica X");
 const fb = buildLuviaFinalBody("Hola,\nPárrafo.\n\nNico\nLuvia — atención al cliente con IA.", {
   whatsappUrl: wa, webUrl: "https://luvia-ia.es",
 });
-assertEq(fb.startsWith("Hola,\nPárrafo.\n\nEscríbele por WhatsApp: https://wa.me/34632217400?text="), true, "final body: quita la firma de la IA y pone el botón");
-assertEq(fb.includes("\n\nHáblale por voz: https://luvia-ia.es\n\n"), true, "final body: enlace de voz en su párrafo");
+assertEq(fb.startsWith("Hola,\nPárrafo.\n\nPruébala en luvia-ia.es: https://luvia-ia.es\n\nO escríbele por WhatsApp: https://wa.me/34632217400?text="), true, "final body: quita la firma de la IA, web primero y WhatsApp después");
+
 assertEq(fb.endsWith(LUVIA_SIGNATURE), true, "final body: firma del sistema al final");
 assertEq(fb.split("Nico").length - 1, 1, "final body: una sola firma");
 assertEq(decodeURIComponent(wa.split("text=")[1]).includes("soy de Clínica X"), true, "whatsapp: lleva el nombre de la clínica");

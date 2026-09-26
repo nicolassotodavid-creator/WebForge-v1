@@ -154,11 +154,13 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
     clickTracking: { base: "https://www.nico-soto.es/r", leadId: lead, messageId: "m1" },
     brand: "luvia",
   });
-  assertIncludes(html, "Escribir a Luvia por WhatsApp", "luvia: botón de WhatsApp");
+  assertIncludes(html, "Pru&eacute;bala en luvia-ia.es &rarr;", "luvia: el botón (CTA principal) va a la web");
+  assertEq(html.indexOf("/lweb?") < html.indexOf("/lwa?"), true, "luvia: la web va delante del WhatsApp aunque el borrador viejo traiga el WhatsApp primero");
   assertExcludes(html, "#25D366", "luvia: botón en tinta de marca, no verde fosforito");
   assertExcludes(html, 'align="center"', "luvia: alineado a la izquierda, sin columna centrada");
   assertIncludes(html, "Nico<br><span", "luvia: 2ª línea de la firma en gris");
-  assertIncludes(html, "háblale por voz en luvia-ia.es", "luvia: enlace de voz");
+  assertIncludes(html, "o, si lo prefieres, <a", "luvia: WhatsApp como enlace secundario");
+  assertIncludes(html, "escr&iacute;bele por WhatsApp</a>", "luvia: texto del enlace de WhatsApp");
   assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lwa?m=m1&amp;c=email"`, "luvia: WhatsApp pasa por el contador");
   assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lweb?m=m1&amp;c=email"`, "luvia: voz pasa por el contador");
   assertExcludes(html, "wa.me/34632217400", "luvia: no queda el enlace directo al WhatsApp");

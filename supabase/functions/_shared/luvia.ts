@@ -103,8 +103,8 @@ export function buildLuviaOutreachPayload(lead: {
 export const LUVIA_SIGNATURE = "Nico\nLuvia — atención al cliente con IA";
 
 // Body final del Email 1 de Luvia. La IA escribe solo los párrafos; el sistema añade, cada uno en
-// su párrafo, el botón del WhatsApp de ventas (con el nombre de la clínica ya escrito), el enlace
-// para hablarle por voz en la web y la firma. Si la IA firmó igualmente, se quita su firma.
+// su párrafo, la CTA principal a luvia-ia.es (botón), el WhatsApp de ventas como alternativa (con
+// el nombre de la clínica ya escrito) y la firma. Si la IA firmó igualmente, se quita su firma.
 export function buildLuviaFinalBody(
   bodyText: string,
   opts: { whatsappUrl: string; webUrl: string },
@@ -116,8 +116,8 @@ export function buildLuviaFinalBody(
   const body = lines.join("\n").trim();
   return [
     body,
-    `Escríbele por WhatsApp: ${opts.whatsappUrl}`,
-    `Háblale por voz: ${opts.webUrl}`,
+    `Pruébala en luvia-ia.es: ${opts.webUrl}`,
+    `O escríbele por WhatsApp: ${opts.whatsappUrl}`,
     LUVIA_SIGNATURE,
   ].join("\n\n");
 }

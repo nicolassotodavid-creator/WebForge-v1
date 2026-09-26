@@ -20,28 +20,37 @@ export type EmailBrand = "webforge" | "luvia";
 const LUVIA_INK = "#1b1b1b";
 const LUVIA_TEXT = `margin:0 0 14px;color:${LUVIA_INK};font-size:15px;line-height:1.55;`;
 
-// [LUVIA] Cuerpo con pinta de correo personal: texto a 15 px como el de Gmail, botón sobrio en
-// tinta, la voz como enlace normal debajo y la 2ª línea de la firma en gris.
+// [LUVIA] Cuerpo con pinta de correo personal: texto a 15 px como el de Gmail, UN botón sobrio en
+// tinta a luvia-ia.es (la CTA principal: ver a Luvia y hablarle), el WhatsApp como enlace normal
+// debajo y la 2ª línea de la firma en gris. Los dos enlaces se pintan juntos donde aparezca el
+// primero y SIEMPRE con la web delante (los borradores viejos traen el WhatsApp primero).
+const LUVIA_WEB_LINE = /^(?:H[aá]blale por voz|Pru[eé]bala en luvia-ia\.es):\s*(https:\/\/luvia-ia\.es\S*)$/i;
+const LUVIA_WA_LINE = /^(?:O\s+)?Escr[ií]bele por WhatsApp:\s*(https:\/\/wa\.me\/\d+\?text=\S+)$/i;
+
 function luviaBodyToHtml(text: string): string {
   const linkify = (s: string) =>
     s.replace(/(https?:\/\/[^\s<]+)/g, `<a href="$1" style="color:${LUVIA_INK};text-decoration:underline;">$1</a>`);
-  return text
-    .split(/\n{2,}/)
-    .map((para) => {
-      const lines = para.split("\n").map((l) => l.trim()).filter(Boolean);
-      const one = lines.length === 1 ? lines[0] : "";
-      // CTA principal: el WhatsApp del asistente de ventas, con el primer mensaje escrito.
-      const wa = one.match(/^Escr[ií]bele por WhatsApp:\s*(https:\/\/wa\.me\/\d+\?text=\S+)$/i);
-      if (wa) {
-        return `<table cellpadding="0" cellspacing="0" role="presentation" style="margin:22px 0 10px;"><tr>` +
-          `<td bgcolor="${LUVIA_INK}" style="background:${LUVIA_INK};border-radius:8px;">` +
-          `<a href="${wa[1].replace(/&/g, "&amp;")}" style="display:inline-block;padding:12px 22px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;line-height:1.2;">Escribir a Luvia por WhatsApp &rarr;</a>` +
-          `</td></tr></table>`;
-      }
-      // CTA secundaria: hablar con ella por voz en la web.
-      const voz = one.match(/^H[aá]blale por voz:\s*(https:\/\/luvia-ia\.es\S*)$/i);
-      if (voz) {
-        return `<p style="margin:0 0 26px;color:#5f6368;font-size:14px;line-height:1.5;">o, si lo prefieres, <a href="${voz[1]}" style="color:${LUVIA_INK};text-decoration:underline;">háblale por voz en luvia-ia.es</a></p>`;
+  const paras = text.split(/\n{2,}/).map((p) => p.split("\n").map((l) => l.trim()).filter(Boolean));
+  const one = (lines: string[]) => (lines.length === 1 ? lines[0] : "");
+  const webUrl = paras.map((l) => one(l).match(LUVIA_WEB_LINE)?.[1]).find(Boolean);
+  const waUrl = paras.map((l) => one(l).match(LUVIA_WA_LINE)?.[1]).find(Boolean);
+  const ctas =
+    (webUrl
+      ? `<table cellpadding="0" cellspacing="0" role="presentation" style="margin:22px 0 10px;"><tr>` +
+        `<td bgcolor="${LUVIA_INK}" style="background:${LUVIA_INK};border-radius:8px;">` +
+        `<a href="${webUrl}" style="display:inline-block;padding:12px 22px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;line-height:1.2;">Pru&eacute;bala en luvia-ia.es &rarr;</a>` +
+        `</td></tr></table>`
+      : "") +
+    (waUrl
+      ? `<p style="margin:0 0 26px;color:#5f6368;font-size:14px;line-height:1.5;">${webUrl ? "o, si lo prefieres, " : ""}<a href="${waUrl.replace(/&/g, "&amp;")}" style="color:${LUVIA_INK};text-decoration:underline;">escr&iacute;bele por WhatsApp</a></p>`
+      : "");
+  let ctasDone = false;
+  return paras
+    .map((lines) => {
+      if (LUVIA_WEB_LINE.test(one(lines)) || LUVIA_WA_LINE.test(one(lines))) {
+        if (ctasDone) return "";
+        ctasDone = true;
+        return ctas;
       }
       // Firma "Nico / Luvia — …": la 2ª línea en gris y más pequeña.
       if (lines.length === 2 && /^nico$/i.test(lines[0])) {
