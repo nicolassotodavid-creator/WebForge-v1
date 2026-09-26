@@ -51,5 +51,6 @@ jobs:
             handoff-luvia \
             unsubscribe \
             resend-webhook \
+            simulador-voz-webhook \
             --project-ref khscikqchvjxyvoaruas \
             --use-api

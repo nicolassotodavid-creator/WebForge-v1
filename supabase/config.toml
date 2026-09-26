@@ -68,3 +68,8 @@ verify_jwt = false
 # Supabase; la función exige ?token=INBOUND_REPLY_SECRET. El botón "Respondió" entra con la sesión.
 [functions.mark-replied]
 verify_jwt = false
+
+# simulador-voz-webhook: lo llama ElevenLabs al acabar cada conversación del asistente de voz de las demos
+# del simulador, sin JWT de Supabase; la función verifica la firma HMAC con SIMULADOR_VOZ_WEBHOOK_SECRET.
+[functions.simulador-voz-webhook]
+verify_jwt = false
