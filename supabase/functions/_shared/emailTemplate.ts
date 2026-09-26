@@ -15,17 +15,38 @@ const DEFAULT_SENDER_IDENTITY = "David Nicolás Soto · diseño web (autónomo)"
 // Marca que firma el email. "luvia" = diseño propio de correo personal (ver luviaBodyToHtml).
 export type EmailBrand = "webforge" | "luvia";
 
-// [LUVIA] Tinta de marca de luvia-ia.es (--ink). El botón va en tinta, no en verde WhatsApp:
-// en un correo "escrito a mano" un botón fosforito con sombra grita newsletter.
+// [LUVIA] Tinta de marca de luvia-ia.es (--ink) para el texto.
 const LUVIA_INK = "#1b1b1b";
+// Paleta de luvia-ia.es: --sage-600 (verde de los botones), crema del hero y teja del antetítulo.
+const LUVIA_SAGE = "#4c765a";
+const LUVIA_CREAM = "#f3efe8";
+const LUVIA_RUST = "#b4441c";
 const LUVIA_TEXT = `margin:0 0 14px;color:${LUVIA_INK};font-size:15px;line-height:1.55;`;
 
-// [LUVIA] Cuerpo con pinta de correo personal: texto a 15 px como el de Gmail, UN botón sobrio en
-// tinta a luvia-ia.es (la CTA principal: ver a Luvia y hablarle), el WhatsApp como enlace normal
+// [LUVIA] Cuerpo con pinta de correo personal: texto a 15 px como el de Gmail, un mini banner con
+// la estética de luvia-ia.es y su botón a la web (la CTA principal: ver a Luvia y hablarle), el WhatsApp como enlace normal
 // debajo y la 2ª línea de la firma en gris. Los dos enlaces se pintan juntos donde aparezca el
 // primero y SIEMPRE con la web delante (los borradores viejos traen el WhatsApp primero).
 const LUVIA_WEB_LINE = /^(?:H[aá]blale por voz|Pru[eé]bala en luvia-ia\.es):\s*(https:\/\/luvia-ia\.es\S*)$/i;
 const LUVIA_WA_LINE = /^(?:O\s+)?Escr[ií]bele por WhatsApp:\s*(https:\/\/wa\.me\/\d+\?text=\S+)$/i;
+
+// [LUVIA] Mini banner con la estética de luvia-ia.es (crema, titular serif con "cada llamada" en
+// verde cursiva, antetítulo en teja, botón píldora verde). Todo HTML, sin imágenes: se ve igual con
+// las imágenes bloqueadas (Outlook, Zoho…). La serif de la web no carga en email → Georgia.
+function luviaBanner(webUrl: string): string {
+  const serif = "Georgia,'Times New Roman',serif";
+  return `<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:24px 0 12px;"><tr>` +
+    `<td bgcolor="${LUVIA_CREAM}" style="background:${LUVIA_CREAM};border:1px solid #e6e0d4;border-radius:14px;padding:22px 24px 24px;">` +
+    `<p style="margin:0 0 14px;font-family:${serif};font-size:20px;line-height:1;color:${LUVIA_INK};">Luvia <span style="font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10px;font-weight:600;color:${LUVIA_SAGE};border:1px solid ${LUVIA_SAGE};border-radius:6px;padding:1px 4px;vertical-align:middle;">IA</span></p>` +
+    `<p style="margin:0 0 8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${LUVIA_RUST};font-weight:600;">Recepcionista con IA para cl&iacute;nicas</p>` +
+    `<p style="margin:0 0 10px;font-family:${serif};font-size:26px;line-height:1.2;color:${LUVIA_INK};">Coge <em style="color:${LUVIA_SAGE};">cada llamada</em>. Agenda la cita.</p>` +
+    `<p style="margin:0 0 18px;font-size:14px;line-height:1.5;color:#57534e;">H&aacute;blale ahora en la web y compru&eacute;balo: contesta en segundos, de d&iacute;a y de noche.</p>` +
+    `<table cellpadding="0" cellspacing="0" role="presentation"><tr>` +
+    `<td bgcolor="${LUVIA_SAGE}" style="background:${LUVIA_SAGE};border-radius:999px;">` +
+    `<a href="${webUrl}" style="display:inline-block;padding:12px 24px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;line-height:1.2;">Pru&eacute;bala en luvia-ia.es &rarr;</a>` +
+    `</td></tr></table>` +
+    `</td></tr></table>`;
+}
 
 function luviaBodyToHtml(text: string): string {
   const linkify = (s: string) =>
@@ -35,12 +56,7 @@ function luviaBodyToHtml(text: string): string {
   const webUrl = paras.map((l) => one(l).match(LUVIA_WEB_LINE)?.[1]).find(Boolean);
   const waUrl = paras.map((l) => one(l).match(LUVIA_WA_LINE)?.[1]).find(Boolean);
   const ctas =
-    (webUrl
-      ? `<table cellpadding="0" cellspacing="0" role="presentation" style="margin:22px 0 10px;"><tr>` +
-        `<td bgcolor="${LUVIA_INK}" style="background:${LUVIA_INK};border-radius:8px;">` +
-        `<a href="${webUrl}" style="display:inline-block;padding:12px 22px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;line-height:1.2;">Pru&eacute;bala en luvia-ia.es &rarr;</a>` +
-        `</td></tr></table>`
-      : "") +
+    (webUrl ? luviaBanner(webUrl) : "") +
     (waUrl
       ? `<p style="margin:0 0 26px;color:#5f6368;font-size:14px;line-height:1.5;">${webUrl ? "o, si lo prefieres, " : ""}<a href="${waUrl.replace(/&/g, "&amp;")}" style="color:${LUVIA_INK};text-decoration:underline;">escr&iacute;bele por WhatsApp</a></p>`
       : "");
