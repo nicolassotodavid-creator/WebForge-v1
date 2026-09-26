@@ -41,7 +41,12 @@ const config = {
     conversation: { max_duration_seconds: 600 },
   },
   platform_settings: {
-    auth: { enable_auth: false, allowlist: [{ hostname: "presupuestos.nico-soto.es" }] },
+    // Sin require_origin_header, la allowlist solo frena a navegadores de otros dominios: un script sin Origin
+    // podía hablar con el agente (comprobado el 26-sep). Y las conversaciones se cobran a la cuenta, no a la
+    // clave, así que su tope de créditos no las protege: de ahí también el límite diario.
+    auth: { enable_auth: false, allowlist: [{ hostname: "presupuestos.nico-soto.es" }], require_origin_header: true },
+    call_limits: { agent_concurrency_limit: 5, daily_limit: 60, bursting_enabled: false },
+    summary_language: "es", // el resumen que llega en el aviso por email; por defecto sale en inglés
     // Textos del widget: los atributos del <elevenlabs-convai> (action-text…) no los aplica; van aquí.
     widget: {
       variant: "full", placement: "bottom-right",
