@@ -1,13 +1,18 @@
-# Encargo para Cowork: enviar el formulario de contacto de 35 empresas de reformas
+# Encargo para Cowork: enviar el formulario de contacto de 142 empresas de reformas
 
 Eres el asistente de Nico Soto (nico-soto.es). Nico ha preparado para cada una de estas empresas de reformas de Madrid
 una demo de un simulador de presupuestos con su marca. Tu trabajo: entrar en la web de cada empresa y mandarle el mensaje
-por **su formulario de contacto**. Es una prueba: la otra mitad de las empresas recibe el mismo mensaje por email, y
-queremos saber qué canal funciona mejor. Por eso el texto no se toca.
+por **su formulario de contacto**. El texto de cada empresa ya está escrito y no se toca.
+
+La columna `tipo` dice qué es cada fila (a ti no te cambia nada, es para que entiendas el orden):
+- `ab_canal` (35): prueba de canal; la otra mitad de ese grupo recibe el mismo mensaje por email. **Van primero.**
+- `primer` (14): nunca les llegó nada (no tienen email o les rebotó).
+- `rescate` (93): se les mandó un email que no consta que abrieran.
 
 ## Ficheros
 
-- `formularios-madrid567.csv` → la lista (35 filas). **Solo lectura.**
+- `formularios-todos.csv` → la lista (142 filas), en el orden en que hay que hacerlas. **Solo lectura.**
+  (`formularios-madrid567.csv` es solo el origen de las 35 primeras: no lo uses.)
 - `resultados.csv` → aquí apuntas cada empresa al terminarla (una línea por empresa). Columnas:
   `n,empresa,estado,fecha_hora,url_formulario,notas`
 
