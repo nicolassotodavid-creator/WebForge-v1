@@ -52,5 +52,6 @@ jobs:
             unsubscribe \
             resend-webhook \
             simulador-voz-webhook \
+            webs-voz-webhook \
             --project-ref khscikqchvjxyvoaruas \
             --use-api

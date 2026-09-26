@@ -73,3 +73,7 @@ verify_jwt = false
 # del simulador, sin JWT de Supabase; la función verifica la firma HMAC con SIMULADOR_VOZ_WEBHOOK_SECRET.
 [functions.simulador-voz-webhook]
 verify_jwt = false
+
+# webs-voz-webhook: post-call del asistente de voz de la portada nico-soto.es; firma HMAC con WEBS_VOZ_WEBHOOK_SECRET.
+[functions.webs-voz-webhook]
+verify_jwt = false
