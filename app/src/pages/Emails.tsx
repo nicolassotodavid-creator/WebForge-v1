@@ -36,7 +36,7 @@ type EmailRow = {
 const COLS =
   "id, lead_id, channel, subject, status, email_number, sent_at, opened_at, created_at, leads(name, email)";
 
-const TARGET_SHORT: Record<string, string> = { web: "Web", book: "Propuesta", wa: "WhatsApp" };
+const TARGET_SHORT: Record<string, string> = { web: "Web", book: "Propuesta", wa: "WhatsApp", home: "Portada" };
 
 /** Fecha + hora corta en es-ES ("21 jun, 14:32"). "—" si no hay fecha. */
 function fmtWhen(iso: string | null): string {

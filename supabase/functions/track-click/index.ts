@@ -5,7 +5,7 @@
 //
 //  1) Resuelve el destino EN EL SERVIDOR a partir del lead: web → última sites.live_url,
 //     book → BOOKING_BASE/<lead>, wa → wa.me/WHATSAPP_NUMBER, demo → presupuestos.nico-soto.es/demo/<s>
-//     ([SIMULADOR], host fijo). Nunca redirige a una URL que venga
+//     ([SIMULADOR], host fijo), home → APP_URL (portada de la marca). Nunca redirige a una URL que venga
 //     en el propio enlace (sin redirección abierta).
 //  2) Apunta `link_clicked` en events: destino, canal, mensaje y si parece automático (vista previa
 //     de WhatsApp, escáner del correo, HEAD o clic a <60 s del envío).
@@ -69,6 +69,8 @@ Deno.serve(async (req: Request) => {
       destination = bookUrl;
     } else if (target === "demo") {
       destination = demoUrl(url.searchParams.get("s"));
+    } else if (target === "home") {
+      destination = fallback;
     } else {
       const n = (Deno.env.get("WHATSAPP_NUMBER") ?? "").replace(/\D/g, "");
       destination = n.length >= 8 ? `https://wa.me/${n}` : null;

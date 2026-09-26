@@ -38,6 +38,7 @@ assertEq(clickUrl(BASE, LEAD, "wa", { channel: "whatsapp" }), `${BASE}/${LEAD}/w
 assertEq(parseClickPath(`/r/${LEAD}/book`), { leadId: LEAD, target: "book" }, "ruta pública /r");
 assertEq(parseClickPath(`/track-click/${LEAD}/wa/`), { leadId: LEAD, target: "wa" }, "ruta de la función con barra final");
 assertEq(parseClickPath(`/r/${LEAD.toUpperCase()}/WEB`), { leadId: LEAD, target: "web" }, "normaliza mayúsculas");
+assertEq(parseClickPath(`/r/${LEAD}/home`), { leadId: LEAD, target: "home" }, "portada de la marca");
 assertEq(parseClickPath(`/r/${LEAD}/evil`), null, "destino desconocido → null");
 assertEq(parseClickPath(`/r/${LEAD}/demo`), { leadId: LEAD, target: "demo" }, "destino demo del simulador");
 assertEq(demoUrl("cecever"), "https://presupuestos.nico-soto.es/demo/cecever", "demo con slug válido");

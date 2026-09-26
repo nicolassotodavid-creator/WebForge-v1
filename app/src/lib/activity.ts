@@ -39,6 +39,7 @@ const TARGET_LABEL: Record<string, string> = {
   web: "«Ver la web»",
   book: "«Ver la propuesta»",
   wa: "«Escríbeme por WhatsApp»",
+  home: "nico-soto.es",
 };
 
 // Tipos que no son actividad del prospecto de webs (auditorías del simulador, contabilidad, etc.).

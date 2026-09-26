@@ -5,7 +5,8 @@
 // nunca lleva la URL final, así que no hay redirección abierta. Puro y sin dependencias: lo
 // importan las Edge Functions (Deno) y el orquestador (Node).
 
-export type ClickTarget = "web" | "book" | "wa" | "demo";
+// home = portada de la marca (APP_URL), con webs reales hechas: para el email sin web construida.
+export type ClickTarget = "web" | "book" | "wa" | "demo" | "home";
 
 // [SIMULADOR] Demo del Home Estimator: el enlace lleva el slug (?s=), el host es FIJO, así que
 // tampoco hay redirección abierta. Devuelve null si el slug no es válido.
@@ -41,7 +42,7 @@ export function clickUrl(
 }
 
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
-const CLICK_PATH = new RegExp(`/(${UUID})/(web|book|wa|demo)/?$`, "i");
+const CLICK_PATH = new RegExp(`/(${UUID})/(web|book|wa|demo|home)/?$`, "i");
 
 // Acepta tanto /r/<lead>/<destino> como /track-click/<lead>/<destino> (la ruta que llega a la función).
 export function parseClickPath(pathname: string): { leadId: string; target: ClickTarget } | null {
