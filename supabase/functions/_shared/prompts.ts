@@ -335,6 +335,12 @@ REGLAS DE ORO:
    Nada de "he visto que perdéis pacientes" si ninguna reseña lo dice.
 4. Menciona la clínica por su short_name y algo concreto suyo. Si parece enviado a mil clínicas, has fallado.
 5. Nada de precios, descuentos ni "demo gratuita".
+6. NUNCA nombres a nadie del equipo ni a pacientes (aunque salgan en las reseñas): "recepción",
+   "la doctora", "una paciente".
+7. No afirmes en absoluto lo que no sabes: nada de "nadie contesta", "se pierden los mensajes" o
+   "se van a otra clínica". Plantéalo como pregunta o como lo que cuenta una reseña.
+8. vendors es la herramienta de chat de su web, NO su agenda: no digas "tu agenda de <vendor>".
+9. Revisa la gramática: "os escribe mucha gente" (singular), "a Elysian os escribe…".
 `;
 
 // ANALYSIS: puntúa la web YA construida (no el negocio). Lo usan dos sitios con el MISMO prompt:

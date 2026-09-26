@@ -27,6 +27,8 @@ import {
 } from "../_shared/outreachEmail1.ts";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
+// [LUVIA] Pocos emails y muy personalizados con sus reseñas: Haiku inventaba y nombraba al equipo.
+const LUVIA_MODEL = "claude-sonnet-4-6";
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -345,7 +347,7 @@ Deno.serve(async (req: Request) => {
           "content-type": "application/json",
         },
         body: JSON.stringify({
-          model: ANTHROPIC_MODEL,
+          model: luvia ? LUVIA_MODEL : ANTHROPIC_MODEL,
           max_tokens: 1200,
           system: [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }],
           messages,
@@ -455,7 +457,7 @@ Deno.serve(async (req: Request) => {
       subject: channel === "email" ? finalSubject : null,
       body: luvia ? finalBody : withWhatsappFooter(finalBody, Deno.env.get("WHATSAPP_NUMBER"), channel),
       status: "draft",
-      generated_by_model: ANTHROPIC_MODEL,
+      generated_by_model: luvia ? LUVIA_MODEL : ANTHROPIC_MODEL,
       email_number: 1,
     })
     .select()
