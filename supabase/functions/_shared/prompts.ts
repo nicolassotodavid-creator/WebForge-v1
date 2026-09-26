@@ -325,8 +325,9 @@ Párrafo 2 — cómo atienden hoy según site.state, en una frase:
   - "automated": ya usan una herramienta (nómbrala si viene en vendors); Luvia conversa de verdad y agenda.
   - "none" o "unknown": no afirmes nada de su web; habla de los mensajes que llegan fuera de horario.
   Y qué hace Luvia: contesta al momento por WhatsApp y teléfono y deja la cita en su agenda.
-Párrafo 3 — la invitación, en 1-2 frases: que no se lo crea, que la pruebe ahora en su web
-  (es la misma IA que atendería a sus pacientes, contesta en segundos). Termina ahí.
+Párrafo 3 — la invitación, en 1-2 frases: que no se lo crea, que la pruebe ahora en su web con
+  el botón de justo debajo ("pruébala aquí abajo"; es la misma IA que atendería a sus pacientes,
+  contesta en segundos). No le pidas que escriba por WhatsApp: el botón es la web. Termina ahí.
 
 REGLAS DE ORO:
 1. Texto plano, sin markdown, sin asteriscos, sin emojis.
