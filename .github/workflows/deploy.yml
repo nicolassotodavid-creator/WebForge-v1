@@ -53,5 +53,6 @@ jobs:
             resend-webhook \
             simulador-voz-webhook \
             webs-voz-webhook \
+            fincas-voz \
             --project-ref khscikqchvjxyvoaruas \
             --use-api

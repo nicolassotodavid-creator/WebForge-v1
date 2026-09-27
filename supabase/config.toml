@@ -77,3 +77,8 @@ verify_jwt = false
 # webs-voz-webhook: post-call del asistente de voz de la portada nico-soto.es; firma HMAC con WEBS_VOZ_WEBHOOK_SECRET.
 [functions.webs-voz-webhook]
 verify_jwt = false
+
+# fincas-voz: [FINCAS] herramientas y post-call del asistente de recepción para administradores de fincas.
+# Lo llama ElevenLabs sin JWT: las herramientas llevan x-fincas-token y el post-call la firma HMAC.
+[functions.fincas-voz]
+verify_jwt = false

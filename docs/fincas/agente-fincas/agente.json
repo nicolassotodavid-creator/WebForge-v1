@@ -1,0 +1,12 @@
+{
+  "tool_secret_id": "p07cOs5CYkU3xcKPIBj7",
+  "tool_ids": {
+    "avisar_guardia": "tool_8001m3gm28d4eb98ntrsa72vz1tj",
+    "registrar_incidencia": "tool_0101m3gm28w8f9drm9aevgbcjdwy"
+  },
+  "agent_id": "agent_1401m3gm297hf5pasr0yt5jgxwkk",
+  "post_call_webhook_id": "915eccfa5487423f826a4136a307e87b",
+  "llm": "claude-haiku-4-5",
+  "dominios": [],
+  "actualizado": "2026-09-27T05:10:29.037Z"
+}
