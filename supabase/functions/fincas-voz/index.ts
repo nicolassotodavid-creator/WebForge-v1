@@ -222,6 +222,21 @@ async function incidencia(b: Body): Promise<Response> {
   // Quita los null para no pisar lo que ya guardó avisar_guardia.
   const limpio = Object.fromEntries(Object.entries(campos).filter(([, v]) => v !== null));
 
+  // Sin nombre o teléfono reales no se registra: el LLM a veces llama antes de pedirlos y rellena "Por confirmar",
+  // y el gestor se queda sin forma de contactar. "no_facilitado" es la salida si el llamante se niega a darlos.
+  const relleno = (v: string | null) => !v || /confirm|pendiente|desconocid|sin nombre|^n\/?a$/i.test(v);
+  const faltan = [
+    ...(relleno(campos.nombre) && campos.nombre !== "no_facilitado" ? ["nombre"] : []),
+    ...((campos.telefono ?? "").replace(/\D/g, "").length < 9 && campos.telefono !== "no_facilitado" ? ["telefono"] : []),
+  ];
+  if (faltan.length) {
+    return json({
+      registrado: false,
+      faltan,
+      nota: `Todavía NO está registrado y no hay referencia. Pide ${faltan.join(" y ")} (el teléfono, confírmalo cifra a cifra) y vuelve a usar registrar_incidencia con todo. Si el llamante se niega a darlo, pon "no_facilitado" en ese campo.`,
+    });
+  }
+
   // Si ya avisó a guardia en esta llamada, completa esa misma incidencia (misma referencia).
   const ref = texto(b.referencia, 20);
   if (ref && conv) {
