@@ -1,0 +1,112 @@
+[
+  {
+    "empresa": "Chapa y Pintura Autocolor",
+    "lead_id": "77d005d5-3592-402b-ba24-dc4893e9f92a",
+    "to": "info@autocolormalaga.com",
+    "asunto": "Las reseñas de vuestra web son de 2017",
+    "http": 200,
+    "resend_id": "01a0df64-2aec-7246-9762-915e149b073a",
+    "message_id": "91e48321-2828-4b00-a708-91c2d5153857",
+    "error": null,
+    "at": "2026-09-26T20:24:38.965Z"
+  },
+  {
+    "empresa": "PREMIUMCAR",
+    "lead_id": "a9644758-877d-47aa-acae-6a7eadad9c78",
+    "to": "premiumcarmalaga@gmail.com",
+    "asunto": "Vuestras 123 reseñas no salen en la web",
+    "http": 200,
+    "resend_id": "01a0df64-32f2-706f-91f5-15fd05c13cee",
+    "message_id": "ef73f250-225e-4e32-93ef-0060c257c675",
+    "error": null,
+    "at": "2026-09-26T20:24:41.030Z"
+  },
+  {
+    "empresa": "Pintcar",
+    "lead_id": "b5013346-c1c2-4d04-ae4c-cff7ab9580ec",
+    "to": "pintcar@doltac.com",
+    "asunto": "El teléfono en la web de Pintcar",
+    "http": 200,
+    "resend_id": "01a0df64-3b46-711a-a01c-783c630d2a4f",
+    "message_id": "88923203-933b-4197-828a-59619914e605",
+    "error": null,
+    "at": "2026-09-26T20:24:43.155Z"
+  },
+  {
+    "empresa": "Leridauto",
+    "lead_id": "c65a3150-234e-4f2f-9617-a183c22b1d12",
+    "to": "tallereslerida@gmail.com",
+    "asunto": "Un 5,0 en Google que no sale en vuestra web",
+    "http": 200,
+    "resend_id": "01a0df64-4343-75d4-9aa9-6aaf8bd31ae9",
+    "message_id": "06b99bda-4a22-46b9-91ce-4bfddda984da",
+    "error": null,
+    "at": "2026-09-26T20:24:45.201Z"
+  },
+  {
+    "empresa": "Talleres Vicente Roig",
+    "lead_id": "6aad0d68-6082-4540-a3ea-f30bed33c582",
+    "to": "vicente@tallervroig.es",
+    "asunto": "La sección de noticias de vuestra web está vacía",
+    "http": 200,
+    "resend_id": "01a0df64-4b66-725d-b3dd-0fa605eaecbf",
+    "message_id": "d44bdd4f-660b-4107-bbe5-954d99a45f67",
+    "error": null,
+    "at": "2026-09-26T20:24:47.289Z"
+  },
+  {
+    "empresa": "Ferriemoción",
+    "lead_id": "5094dfa6-18cc-4c77-912f-199fd2cd158a",
+    "to": "ferriemocion@eurotaller.com",
+    "asunto": "Lo primero que se ve en vuestra web desde el móvil",
+    "http": 200,
+    "resend_id": "01a0df64-539a-72b8-af24-69f16ed59e3e",
+    "message_id": "db08b511-9fe5-45d8-8e7e-36861b7585da",
+    "error": null,
+    "at": "2026-09-26T20:24:49.382Z"
+  },
+  {
+    "empresa": "Autochiquero",
+    "lead_id": "800a4a62-e049-41ed-bde7-cde8e3996b91",
+    "to": "talleresaparicio@gmail.com",
+    "asunto": "Un enlace roto en vuestra web",
+    "http": 200,
+    "resend_id": "01a0df64-5bcb-76de-920a-c651bcd39f10",
+    "message_id": "716a5e9a-4656-4849-9049-48b8f7f16e50",
+    "error": null,
+    "at": "2026-09-26T20:24:51.480Z"
+  },
+  {
+    "empresa": "Auto Talleres Belenguer",
+    "lead_id": "fd460fdf-2205-436e-a01b-317f9122b15f",
+    "to": "autotalleresbelenguer@gmail.com",
+    "asunto": "En vuestra web no sale el horario",
+    "http": 200,
+    "resend_id": "01a0df64-63fb-7642-af6c-07dcc4e9b76a",
+    "message_id": "f4de2504-3c5b-4890-a724-3e081651b763",
+    "error": null,
+    "at": "2026-09-26T20:24:53.574Z"
+  },
+  {
+    "empresa": "Antón Autocenter",
+    "lead_id": "33fa4e32-e610-429b-82a0-cbe00540ce42",
+    "to": "antonautocenter@gmail.com",
+    "asunto": "Las noticias de vuestra web son de febrero de 2025",
+    "http": 200,
+    "resend_id": "01a0df64-6bc3-7576-986a-42a3b2543ef5",
+    "message_id": "55c7865d-230c-49d1-b9c7-c436bf6b355c",
+    "error": null,
+    "at": "2026-09-26T20:24:55.578Z"
+  },
+  {
+    "empresa": "Talleres Hector Motor",
+    "lead_id": "9b570729-6f1b-4fe0-b96f-9e3306c03dbb",
+    "to": "tallereshectormotor@gmail.com",
+    "asunto": "El blog de vuestra web se quedó en 2023",
+    "http": 200,
+    "resend_id": "01a0df64-736f-70e8-bb1b-70464126c0a3",
+    "message_id": "a8ff5d27-a5b4-4d93-b985-1e9f8909e7d9",
+    "error": null,
+    "at": "2026-09-26T20:24:57.535Z"
+  }
+]
