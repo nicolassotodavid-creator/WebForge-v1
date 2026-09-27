@@ -15,6 +15,7 @@ Con etiqueta, trabaja SOLO en ese producto: su código, su proyecto Lovable, su 
 | `[SIMULADOR]` | Home Estimator para empresas de reformas (59 €/mes) | Lovable `reform-wizard` (`4e13bf62…`) en `presupuestos.nico-soto.es`, `docs/prospeccion/` | MANUAL: Nico busca la empresa, pega el texto en su formulario y manda el enlace de la demo |
 | `[LUVIA]` | Clínicas de Luvia (handoff al CRM) | `handoff-luvia`, proyecto Supabase LUVIA CRM | Otro flujo, propio de Luvia |
 | `[FINCAS]` | Asistente de voz de recepción para administradores de fincas (demo "Administraciones Turia") | `docs/fincas/`, función `fincas-voz`, tabla `incidencias_fincas`, agente ElevenLabs de la cuenta de Luvia | Widget en una landing de Lovable |
+| `[ACADEMIAS]` | Prospección de academias de idiomas y refuerzo escolar en Valencia (solo investigación, sin producto ni envíos aún) | `academias-valencia/` (scripts Apify, `academias_valencia.csv`) | Por decidir. Nada en Supabase ni en el pipeline de WebForge |
 
 - **Sin etiqueta:** se hereda la última etiqueta usada en la conversación.
 - **"Reformas" NO sirve para distinguir:** hay empresas de reformas que son leads de `[WEBS]` y también prospectos de `[SIMULADOR]`. Si no hay etiqueta y el mensaje puede ser de los dos, pregunta "¿[WEBS] o [SIMULADOR]?" en una línea ANTES de investigar.
