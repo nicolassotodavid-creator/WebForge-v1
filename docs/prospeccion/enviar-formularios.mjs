@@ -1,6 +1,6 @@
 // [SIMULADOR] Envía el mensaje por el formulario de contacto de la web de cada empresa (lo mismo que el encargo de Cowork,
 // cowork-formularios/ENCARGO.md, pero con Playwright desde este Mac).
-// Uso: node docs/prospeccion/enviar-formularios.mjs [--seco] [--n 167,170] [--desde 0] [--limite 10]
+// Uso: node docs/prospeccion/enviar-formularios.mjs [--seco] [--n 167,170] [--desde 0] [--limite 10] [--paralelo 6]
 //   --seco  → rellena y hace captura, pero NO envía (para revisar el mapeo de campos).
 // Reglas del encargo: CAPTCHA visible (reCAPTCHA v2, hCaptcha, Turnstile, sumas) → no se toca, queda para Nico.
 // Newsletter/comerciales sin marcar; privacidad marcada; teléfono solo si es obligatorio. Nunca dos veces a la misma.
@@ -20,6 +20,7 @@ const arg = (k, d) => (process.argv.includes(k) ? process.argv[process.argv.inde
 const SOLO = arg("--n", "") ? new Set(arg("--n").split(",")) : null;
 const DESDE = Number(arg("--desde", 0));
 const LIMITE = Number(arg("--limite", 999));
+const PARALELO = Number(arg("--paralelo", 6));
 const CAPT = path.join(DIR, "capturas");
 fs.mkdirSync(CAPT, { recursive: true });
 
@@ -240,9 +241,9 @@ const ctx = await browser.newContext({
 });
 const filas = LISTA.filter((r) => (!SOLO || SOLO.has(r.n))).slice(DESDE, DESDE + LIMITE);
 const cuenta = {};
-for (const row of filas) {
-  if (hechos.has(row.n)) { console.log(`${row.n} ${row.empresa} · ya en resultados.csv, salto`); continue; }
-  if (!SECO && log.some((x) => x.n === row.n && x.estado === "enviado")) { console.log(`${row.n} ${row.empresa} · ya enviado según el log, salto`); continue; }
+async function procesar(row) {
+  if (hechos.has(row.n)) { console.log(`${row.n} ${row.empresa} · ya en resultados.csv, salto`); return; }
+  if (!SECO && log.some((x) => x.n === row.n && x.estado === "enviado")) { console.log(`${row.n} ${row.empresa} · ya enviado según el log, salto`); return; }
   const page = await ctx.newPage();
   const r = { n: row.n, empresa: row.empresa, web: row.web, seco: SECO, at: new Date().toISOString() };
   try {
@@ -279,5 +280,8 @@ for (const row of filas) {
     fs.appendFileSync(RES_F, [row.n, row.empresa, r.estado, fecha, r.url_formulario, r.nota || ""].map(csvCampo).join(",") + "\n");
   }
 }
+// Varias webs a la vez: casi todo el tiempo es esperar a que carguen.
+const cola = [...filas];
+await Promise.all(Array.from({ length: PARALELO }, async () => { while (cola.length) await procesar(cola.shift()); }));
 await browser.close();
 console.log("\nResumen:", cuenta);
