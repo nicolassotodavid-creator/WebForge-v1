@@ -1,0 +1,34 @@
+name: Aplicar 0027 decisor de compra (manual)
+
+# Aplica la migración 0027 a la BD de PRODUCCIÓN vía la Management API: añade a leads las columnas
+# business_decision_maker / decision_maker_name / decision_evidence / decision_confidence / phone_type /
+# contact_permission / contact_channel / sales_readiness ([LUVIA]: quién decide y por dónde llegarle).
+# Hace falta porque deploy.yml SOLO despliega funciones, NO aplica migraciones.
+# Idempotente: add column if not exists. NO escribe datos ni envía nada.
+# Botón: Actions → "Aplicar 0027 decisor de compra (manual)" → Run workflow.
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Aplicar migración 0027 (decisor de compra)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PROJECT_REF: khscikqchvjxyvoaruas
+        run: |
+          set -euo pipefail
+          Q="https://api.supabase.com/v1/projects/$PROJECT_REF/database/query"
+          post()      { curl -sS -X POST "$Q" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" --data @-; echo; }
+          post_file() { jq -Rs '{query:.}' < "$1" | post; }
+          post_sql()  { jq -n --arg q "$1" '{query:$q}' | post; }
+
+          echo "== 1) aplicar 0027 (columnas de decisor) =="
+          post_file supabase/migrations/0027_lead_decision_maker.sql
+
+          echo "== 2) verificar: columnas presentes =="
+          post_sql "select column_name, data_type from information_schema.columns where table_name = 'leads' and column_name in ('business_decision_maker','decision_maker_name','decision_evidence','decision_confidence','phone_type','contact_permission','contact_channel','sales_readiness') order by 1"

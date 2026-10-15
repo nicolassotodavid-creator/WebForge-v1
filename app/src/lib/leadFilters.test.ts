@@ -103,5 +103,17 @@ assertEq(
   "Pestaña 'Todos' con familia reformas: 4 (mismo predicado que la tabla)",
 );
 
+// [LUVIA] 0027: la pestaña "Listos" solo recoge sales_readiness = listo_para_contacto
+// (ni pendientes, ni descartados, ni leads sin revisar donde la columna es undefined/null).
+const readiness: Lead[] = [
+  lead({ sales_readiness: "listo_para_contacto" }),
+  lead({ sales_readiness: "pendiente_de_verificar" }),
+  lead({ sales_readiness: "descartado" }),
+  lead({ sales_readiness: null }),
+  lead({}),
+];
+assertEq(readiness.filter((l) => matchesView(l, "listos")).length, 1, "Pestaña 'Listos': solo listo_para_contacto");
+assertEq(readiness.filter((l) => matchesView(l, "all")).length, 5, "Pestaña 'Todos' no se ve afectada por la columna nueva");
+
 console.log(failures === 0 ? "\nTODO OK" : `\n${failures} FALLO(S)`);
 process.exit(failures === 0 ? 0 : 1);

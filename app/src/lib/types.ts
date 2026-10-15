@@ -71,7 +71,27 @@ export interface Lead {
   // (LUVIA_DEMO_BASE/demo/:id) que va en el email/WhatsApp; null = aún no preparada.
   luvia_demo_id?: string | null;
   luvia_demo_url?: string | null;
+  // Decisor de compra y vía de acceso (ver 0027_lead_decision_maker.sql). null = no revisado.
+  business_decision_maker?: DecisionRole | null;
+  decision_maker_name?: string | null;
+  decision_evidence?: string | null; // "URL — «cita real de la página» (reverificado fecha)"
+  decision_confidence?: DecisionConfidence | null;
+  phone_type?: PhoneType | null;
+  contact_permission?: ContactPermission | null;
+  contact_channel?: ContactChannel | null;
+  sales_readiness?: SalesReadiness | null;
 }
+
+export type DecisionRole = "propietario" | "administrador" | "gerente" | "director_medico" | "desconocido";
+export type DecisionConfidence = "confirmado" | "probable" | "sin_verificar";
+export type PhoneType = "movil_directo" | "centralita" | "desconocido";
+export type ContactPermission =
+  | "sin_consentimiento"
+  | "contacto_publicado" // publicado por la clínica para contacto profesional; NO es consentimiento publicitario
+  | "consentimiento_documentado"
+  | "baja";
+export type ContactChannel = "email" | "telefono" | "whatsapp" | "formulario";
+export type SalesReadiness = "listo_para_contacto" | "pendiente_de_verificar" | "descartado";
 
 export interface BriefService {
   name: string;

@@ -10,7 +10,8 @@ export type ViewFilter =
   | "noweb"
   | "chat"
   | "whatsapp"
-  | "simulador";
+  | "simulador"
+  | "listos"; // [LUVIA] sales_readiness = listo_para_contacto (ver 0027)
 
 /** Filtros que NO dependen de la pestaña de vista. */
 export interface LeadFilterState {
@@ -90,6 +91,8 @@ export function matchesView(
       return l.site_has_whatsapp === true;
     case "simulador":
       return simuladorIds.has(l.id);
+    case "listos":
+      return l.sales_readiness === "listo_para_contacto";
     case "all":
     default:
       return true;

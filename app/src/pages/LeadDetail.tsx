@@ -27,7 +27,18 @@ import { waLink, waNumber, waDisplay, phoneKind, whatsappOutreachText, whatsappL
 import { luviaSiteState, type LuviaSiteState } from "@/lib/luvia";
 import { trackedLink } from "@/lib/activity";
 import { LeadActivity } from "@/components/LeadActivity";
-import type { Brief, Lead, Site, OutreachMessage } from "@/lib/types";
+import type {
+  Brief,
+  Lead,
+  Site,
+  OutreachMessage,
+  DecisionRole,
+  DecisionConfidence,
+  PhoneType,
+  ContactPermission,
+  ContactChannel,
+  SalesReadiness,
+} from "@/lib/types";
 import { SITE_STATUS_LABELS } from "@/lib/types";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -90,6 +101,102 @@ const LUVIA_STATE_META: Record<LuviaSiteState, { label: string; className: strin
 function LuviaStateBadge({ lead }: { lead: Lead }) {
   const meta = LUVIA_STATE_META[luviaSiteState(lead)];
   return <Badge className={`border-transparent ${meta.className}`}>{meta.label}</Badge>;
+}
+
+// [LUVIA] 0027: quién decide la compra y por dónde se le llega. Reglas de cada valor:
+// orquestador/luvia-decisor.mjs. "Confirmado" = la prueba se reabrió y se vio nombre + cargo en
+// aviso legal o registro; el resto es "probable" aunque la fuente citada parezca buena.
+const READINESS_META: Record<SalesReadiness, { label: string; className: string }> = {
+  listo_para_contacto:    { label: "Listo para contacto",    className: "bg-green-100 text-green-800 hover:bg-green-100" },
+  pendiente_de_verificar: { label: "Pendiente de verificar", className: "bg-amber-100 text-amber-800 hover:bg-amber-100" },
+  descartado:             { label: "Descartado",             className: "bg-muted text-muted-foreground hover:bg-muted" },
+};
+const CONFIDENCE_META: Record<DecisionConfidence, { label: string; className: string }> = {
+  confirmado:   { label: "Confirmado",   className: "bg-green-100 text-green-800 hover:bg-green-100" },
+  probable:     { label: "Probable",     className: "bg-amber-100 text-amber-800 hover:bg-amber-100" },
+  sin_verificar: { label: "Sin verificar", className: "bg-muted text-muted-foreground hover:bg-muted" },
+};
+const ROLE_LABEL: Record<DecisionRole, string> = {
+  propietario: "Propietario/a",
+  administrador: "Administrador/a",
+  gerente: "Gerente",
+  director_medico: "Director/a médico (propiedad sin identificar)",
+  desconocido: "Desconocido",
+};
+const PHONE_LABEL: Record<PhoneType, string> = {
+  movil_directo: "Móvil directo",
+  centralita: "Centralita / línea de la clínica",
+  desconocido: "Desconocido",
+};
+const PERMISSION_LABEL: Record<ContactPermission, string> = {
+  sin_consentimiento: "Sin consentimiento",
+  contacto_publicado: "Contacto publicado por la clínica (no es consentimiento publicitario)",
+  consentimiento_documentado: "Consentimiento documentado",
+  baja: "Baja: no contactar",
+};
+const CHANNEL_LABEL: Record<ContactChannel, string> = {
+  email: "Email",
+  telefono: "Teléfono",
+  whatsapp: "WhatsApp",
+  formulario: "Formulario web",
+};
+
+function DecisionMakerCard({ lead }: { lead: Lead }) {
+  if (!lead.sales_readiness) return null; // lead no revisado (p.ej. todos los de webs)
+  const readiness = READINESS_META[lead.sales_readiness];
+  const confidence = lead.decision_confidence ? CONFIDENCE_META[lead.decision_confidence] : null;
+  const ev = (lead.decision_evidence ?? "").match(/^(https?:\/\/\S+)\s+—\s+([\s\S]*)$/);
+  const field = (label: string, value: ReactNode) => (
+    <div>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="text-sm">{value ?? "—"}</dd>
+    </div>
+  );
+  return (
+    <Card>
+      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+        <div>
+          <CardTitle className="text-lg">Decisor y contacto</CardTitle>
+          <CardDescription>Quién aprueba la compra y por dónde se le llega.</CardDescription>
+        </div>
+        <Badge className={`border-transparent ${readiness.className}`}>{readiness.label}</Badge>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <dl className="grid gap-3 sm:grid-cols-2">
+          {field("Decisor", lead.decision_maker_name)}
+          {field("Cargo", lead.business_decision_maker ? ROLE_LABEL[lead.business_decision_maker] : null)}
+          {field(
+            "Confianza",
+            confidence ? <Badge className={`border-transparent ${confidence.className}`}>{confidence.label}</Badge> : null,
+          )}
+          {field("Teléfono", lead.phone_type ? `${PHONE_LABEL[lead.phone_type]}${lead.phone ? ` · ${lead.phone}` : ""}` : null)}
+          {field("Permiso de contacto", lead.contact_permission ? PERMISSION_LABEL[lead.contact_permission] : null)}
+          {field("Canal", lead.contact_channel ? CHANNEL_LABEL[lead.contact_channel] : null)}
+        </dl>
+        {lead.decision_evidence && (
+          <div className="rounded-md border bg-muted/30 p-3 text-xs">
+            <p className="mb-1 font-medium text-muted-foreground">Prueba del cargo</p>
+            {ev ? (
+              <>
+                <a
+                  href={ev[1]}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mb-1 inline-flex items-center gap-1 break-all font-mono text-blue-600 hover:underline"
+                >
+                  <ExternalLink className="h-3 w-3 shrink-0" />
+                  {ev[1]}
+                </a>
+                <p className="leading-relaxed">{ev[2]}</p>
+              </>
+            ) : (
+              <p className="leading-relaxed">{lead.decision_evidence}</p>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function LeadDetail() {
@@ -1529,6 +1636,9 @@ export default function LeadDetail() {
           </CardContent>
         </Card>
       )}
+
+      {/* Decisor de compra y vía de acceso ([LUVIA], 0027). Solo se pinta si el lead fue revisado. */}
+      <DecisionMakerCard lead={lead} />
 
       {/* Demo de Luvia: monta el asistente cargado con los datos de la clínica, para mandar el
           link en frío (email/WhatsApp). Solo Luvia (no-admin). El operador revisa la demo antes

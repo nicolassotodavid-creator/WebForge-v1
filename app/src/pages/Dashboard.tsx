@@ -372,6 +372,7 @@ export default function Dashboard() {
       chat: base.filter((l) => matchesView(l, "chat")).length,
       whatsapp: base.filter((l) => matchesView(l, "whatsapp")).length,
       simulador: base.filter((l) => matchesView(l, "simulador", simuladorIds)).length,
+      listos: base.filter((l) => matchesView(l, "listos")).length,
     };
   }, [leads, filterState, simuladorIds]);
 
@@ -539,9 +540,15 @@ export default function Dashboard() {
         { key: "simulador", label: "Simulador" },
       ];
   // No-admin (Luvia) no tiene webs ni simulador: fuera esos chips. "Con WhatsApp" se queda.
-  const chips = allChips.filter(
+  const baseChips = allChips.filter(
     (c) => isAdmin || (c.key !== "noweb" && c.key !== "chat" && c.key !== "simulador"),
   );
+  // "Listos para contacto" ([LUVIA], 0027): solo aparece si ya hay leads con el decisor revisado,
+  // para no meter un chip siempre a 0 en las cuentas de webs.
+  const hasReadiness = leads.some((l) => l.sales_readiness != null);
+  const chips: typeof allChips = hasReadiness
+    ? [...baseChips, { key: "listos", label: "Listos para contacto" }]
+    : baseChips;
 
   // No-admin oculta 2 columnas (Web, Score), así que el colspan del estado vacío baja en 2.
   const colCount =
