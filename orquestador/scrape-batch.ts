@@ -15,13 +15,25 @@
 // Uso:
 //   npx tsx scrape-batch.ts --query "reformas integrales" --cities "Torrent,Paterna" --mode con-web
 //   npx tsx scrape-batch.ts --preset horta --query "reformas integrales" --min-reviews 8 --dry-run
+//   npx tsx scrape-batch.ts --query "medicina estética" --cities "Madrid,Sevilla" --owner luvia \
+//       --contacts --out /tmp/clinicas.json --dry-run
+//
+// --owner: dueño de los leads (admin por defecto = webs). `luvia` = cuenta marketing@luvia-ia.es.
+//   OJO: ingerir clínicas de Luvia SIN --owner luvia las mete como leads de webs y el orquestador
+//   les construiría una web (ver owner-scope.ts).
+// --contacts: el actor visita la web de cada ficha y trae emails/redes (más lento y más caro).
+// --out: guarda los candidatos (items crudos del actor) en un JSON para investigarlos después.
 import "./env.ts";
 
 const ACTOR = "compass~crawler-google-places";
 const APIFY_TOKEN = process.env.APIFY_TOKEN_2 ?? process.env.APIFY_TOKEN ?? "";
 const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
 const INGEST_SECRET = process.env.INGEST_WEBHOOK_SECRET ?? "";
-const OWNER = process.env.ADMIN_USER_ID ?? "";
+const ADMIN_OWNER = process.env.ADMIN_USER_ID ?? "";
+/** Alias de cuentas operadoras (auth.users del proyecto WebForge). */
+const OWNER_ALIASES: Record<string, string> = {
+  luvia: "e9536f1a-006b-497f-83a5-b3ffe6fb786d", // marketing@luvia-ia.es
+};
 
 /** Área metropolitana de València (l'Horta + Camp de Túria + Camp de Morvedre). */
 const PRESETS: Record<string, string[]> = {
@@ -45,6 +57,9 @@ interface Args {
   categoryRx: RegExp | null;
   concurrency: number;
   dryRun: boolean;
+  owner: string;
+  contacts: boolean;
+  out: string | null;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -77,6 +92,9 @@ function parseArgs(argv: string[]): Args {
     categoryRx: get("--category") ? new RegExp(get("--category")!, "i") : null,
     concurrency: Number(get("--concurrency") ?? 4),
     dryRun: argv.includes("--dry-run"),
+    owner: OWNER_ALIASES[get("--owner") ?? ""] ?? get("--owner") ?? ADMIN_OWNER,
+    contacts: argv.includes("--contacts"),
+    out: get("--out") ?? null,
   };
 }
 
@@ -144,7 +162,7 @@ async function scrapeOne(query: string, city: string, a: Args) {
     scrapeReviewsPersonalData: false,
     skipClosedPlaces: true,
     includeWebResults: false,
-    scrapeContacts: false,
+    scrapeContacts: a.contacts,
     scrapePlaceDetailPage: false,
     website: a.mode === "sin-web" ? "withoutWebsite" : "allPlaces",
   };
@@ -183,14 +201,14 @@ interface IngestResponse {
   errors?: unknown[];
 }
 
-async function ingest(leads: Item[]): Promise<{ inserted: number; upserted: number; errors: string[] }> {
+async function ingest(leads: Item[], owner: string): Promise<{ inserted: number; upserted: number; errors: string[] }> {
   const totals = { inserted: 0, upserted: 0, errors: [] as string[] };
   for (let i = 0; i < leads.length; i += 40) {
     const chunk = leads.slice(i, i + 40);
     const res = await fetch(`${SUPABASE_URL}/functions/v1/ingest-leads`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-ingest-secret": INGEST_SECRET },
-      body: JSON.stringify({ leads: chunk, source: "apify", owner: OWNER || undefined }),
+      body: JSON.stringify({ leads: chunk, source: "apify", owner: owner || undefined }),
     });
     const json = (await res.json().catch(() => ({}))) as IngestResponse;
     if (!res.ok) {
@@ -214,6 +232,7 @@ async function main() {
   console.log(
     `▶ ${pairs.length} barridos (${a.queries.length} término(s) × ${a.cities.length} ciudades) · ` +
       `modo ${a.mode} · max ${a.max}/barrido · rating ≥ ${a.minRating} · reseñas ≥ ${a.minReviews}` +
+      ` · owner ${a.owner === ADMIN_OWNER ? "admin (webs)" : a.owner}` + (a.contacts ? " · con contactos" : "") +
       (a.dryRun ? " · DRY-RUN" : ""),
   );
 
@@ -246,6 +265,12 @@ async function main() {
   const found = results.reduce((n, r) => n + r.found, 0);
   console.log(`\n∑ ${found} fichas scrapeadas → ${leads.length} candidatos únicos tras filtros.`);
 
+  if (a.out) {
+    const { writeFileSync } = await import("node:fs");
+    writeFileSync(a.out, JSON.stringify(leads, null, 2));
+    console.log(`💾 ${leads.length} candidatos guardados en ${a.out}`);
+  }
+
   if (a.dryRun) {
     for (const l of leads.slice(0, 60)) {
       console.log(`  · ${String(l["title"]).slice(0, 38).padEnd(40)} ${String(l["totalScore"] ?? "-").padStart(3)}★ ${String(l["reviewsCount"] ?? 0).padStart(4)} res · ${String(l["categoryName"] ?? "").slice(0, 22).padEnd(24)} ${String(l["website"] ?? "").slice(0, 40)}`);
@@ -254,7 +279,7 @@ async function main() {
     return;
   }
 
-  const r = await ingest(leads);
+  const r = await ingest(leads, a.owner);
   // OJO: `upserted` de ingest-leads = TODAS las fichas con google_place_id (altas + actualizaciones
   // de las que ya estaban); `inserted` son solo las que llegan sin place_id. No es "nuevos vs
   // existentes": el reparto real se ve en la DB por created_at.
