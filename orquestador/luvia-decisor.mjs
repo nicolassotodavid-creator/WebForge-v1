@@ -4,6 +4,7 @@
 //   node orquestador/luvia-decisor.mjs                 # revisa + re-verifica fuentes, escribe informe local (no toca la DB)
 //   node orquestador/luvia-decisor.mjs --no-verify     # sin abrir las fuentes (todo lo no verificado queda "probable")
 //   node orquestador/luvia-decisor.mjs --apply         # además PATCH a leads (requiere migración 0027 aplicada)
+//   node orquestador/luvia-decisor.mjs --fecha 2026-10-16   # otro lote (clinicas-luvia-investigacion-<fecha>.json)
 //
 // Entrada: docs/luvia/prospeccion/clinicas-luvia-investigacion-*.json + el CSV de las 50 (datos de
 // terceros: NO están en git). Salida: docs/luvia/prospeccion/decisor-revision-*.{json,csv} (tampoco).
@@ -16,7 +17,7 @@
 //    y ella es la única profesional. Cualquier otra línea de clínica = 'centralita'.
 //  - contact_permission: ninguna clínica ha dado consentimiento. 'contacto_publicado' = el canal está
 //    publicado por la clínica para contacto profesional (NO es consentimiento para publicidad).
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
@@ -26,7 +27,9 @@ const args = new Set(process.argv.slice(2));
 const VERIFY = !args.has("--no-verify");
 const APPLY = args.has("--apply");
 const DIR = resolve(root, "docs/luvia/prospeccion");
-const FECHA = "2026-10-15";
+// --fecha AAAA-MM-DD elige el lote (por defecto el de las 50 del 15-oct).
+const argv = process.argv.slice(2);
+const FECHA = argv.includes("--fecha") ? argv[argv.indexOf("--fecha") + 1] : "2026-10-15";
 
 // ---------- entorno ----------
 const env = {};
@@ -57,10 +60,16 @@ function parseCsv(text) {
   const [head, ...body] = rows;
   return body.filter((r) => r.length > 1).map((r) => Object.fromEntries(head.map((h, i) => [h, r[i] ?? ""])));
 }
-const csv = parseCsv(readFileSync(resolve(DIR, "clinicas-luvia-50-2026-10-15.csv"), "utf8"));
-const research = new Map(
-  JSON.parse(readFileSync(resolve(DIR, "clinicas-luvia-investigacion-2026-10-15.json"), "utf8")).map((x) => [x.placeId, x]),
-);
+const researchList = JSON.parse(readFileSync(resolve(DIR, `clinicas-luvia-investigacion-${FECHA}.json`), "utf8"));
+const research = new Map(researchList.map((x) => [x.placeId, x]));
+// El lote del 15-oct tiene CSV de seleccionadas; los siguientes solo el JSON (seleccionadas = con _rank).
+const csvFile = resolve(DIR, FECHA === "2026-10-15" ? "clinicas-luvia-50-2026-10-15.csv" : `clinicas-luvia-${FECHA}.csv`);
+const csv = existsSync(csvFile)
+  ? parseCsv(readFileSync(csvFile, "utf8"))
+  : researchList.filter((x) => x._rank != null).map((x) => ({
+    rank: x._rank, clase: x.clasificacion, clinica: x.nombre, ciudad: x.ciudad, google_place_id: x.placeId,
+    telefono_clinica: x.telefono_clinica, fuente_email_decisor: x.email_decisor?.fuente ?? "",
+  }));
 const pids = csv.map((r) => r.google_place_id);
 
 async function sb(path, init) {
