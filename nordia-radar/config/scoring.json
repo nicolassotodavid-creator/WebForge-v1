@@ -1,0 +1,82 @@
+{
+  "_nota": "Pesos y reglas del scoring 0-100. Solo puntúan señales con estado 'verificado'. Edita y vuelve a correr `node src/radar.mjs build`.",
+  "fecha_referencia": null,
+  "bloques": {
+    "contratacion": {
+      "max": 25,
+      "admin_reciente_meses": 6,
+      "admin_reciente": 25,
+      "admin_antigua_meses": 18,
+      "admin_antigua": 15,
+      "admin_sin_fecha": 15
+    },
+    "publicidad": {
+      "max": 20,
+      "activa": 20,
+      "reciente_no_activa": 10
+    },
+    "perfil": {
+      "max": 20,
+      "tamano": {
+        "ideal_min": 3,
+        "ideal_max": 5,
+        "ideal_confirmado": 15,
+        "ideal_estimado": 10,
+        "cercano_min": 2,
+        "cercano_max": 8,
+        "cercano_confirmado": 8,
+        "cercano_estimado": 5
+      },
+      "decisor_publico": 5
+    },
+    "carga_documental": {
+      "max": 15,
+      "por_especialidad": {
+        "extranjeria": 15,
+        "segunda oportunidad": 15,
+        "concursal": 15,
+        "laboral": 13,
+        "familia": 13,
+        "accidentes": 12,
+        "trafico": 12,
+        "penal": 12,
+        "bancario": 12,
+        "civil": 11,
+        "sucesiones": 11,
+        "herencias": 11,
+        "inmobiliario": 9,
+        "administrativo": 9,
+        "seguridad social": 12,
+        "incapacidad": 12,
+        "mercantil": 7,
+        "fiscal": 7,
+        "tributario": 7,
+        "propiedad intelectual": 5
+      }
+    },
+    "crecimiento": {
+      "max": 10,
+      "por_senal": {
+        "oficina": 5,
+        "incorporacion": 4,
+        "abogado": 4,
+        "otro": 2
+      },
+      "ventana_meses": 24,
+      "_sin_fecha": "Sin fecha no se sabe si es nuevo (p. ej. «tenemos 2 sedes»): puntúa como mucho esto.",
+      "sin_fecha": 2
+    },
+    "intencion": {
+      "max": 10,
+      "por_senal": {
+        "busca_software": 10,
+        "necesidad_tecnologica": 6,
+        "otro": 3
+      }
+    }
+  },
+  "estado_revision_por_defecto": "Pendiente revisión humana",
+  "entrega_max": 30,
+  "_portales_empleo": "Fuentes cuya evidencia hay que confirmar abriendo la oferta (anunciante y fecha) antes de contactar.",
+  "portales_empleo": ["infojobs", "indeed", "jooble", "jobeka", "jobtoday", "bebee", "glassdoor", "linkedin_via_buscador", "otro"]
+}

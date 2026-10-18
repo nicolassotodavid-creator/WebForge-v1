@@ -1,0 +1,6 @@
+# Datos de prospección (nombres de despachos y decisores): se quedan en local, no en git.
+data/research/
+data/cache/
+data/manual/*.csv
+!data/manual/*.example.csv
+out/
