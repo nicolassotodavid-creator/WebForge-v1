@@ -20,6 +20,7 @@ Con etiqueta, trabaja SOLO en ese producto: su código, su proyecto Lovable, su 
 - **Sin etiqueta:** se hereda la última etiqueta usada en la conversación.
 - **"Reformas" NO sirve para distinguir:** hay empresas de reformas que son leads de `[WEBS]` y también prospectos de `[SIMULADOR]`. Si no hay etiqueta y el mensaje puede ser de los dos, pregunta "¿[WEBS] o [SIMULADOR]?" en una línea ANTES de investigar.
 - Las reglas duras de abajo son de `[WEBS]`. No se aplican al simulador.
+- **`[LUVIA]` prospección (regla permanente):** toda investigación y campaña comercial de Luvia sigue `docs/luvia/prospeccion/METODO-EDITORIAL.md` (asunto real → apertura con hallazgo comprobable → un dolor en condicional → solo capacidades verificadas → una CTA sin enlaces → firma). Nada se envía ni se programa sin base legal documentada (LSSI art. 21).
 
 Reglas duras:
 - Secrets (ANTHROPIC_API_KEY, Resend, Stripe, OAuth Lovable, service key) SOLO en servidor. Nunca en el frontend.
