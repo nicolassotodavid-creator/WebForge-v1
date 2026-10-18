@@ -155,6 +155,21 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertIncludes(plain, "cada llamada</em>", "luvia sin página: titular genérico de siempre");
 }
 
+// ── [LUVIA] email fisio: banner «en camilla», en tú, y el contador lleva a /clinicas-fisioterapia ──
+{
+  const body = `Hola, Laura:\nTexto.\n\nPruébala en luvia-ia.es: https://luvia-ia.es/clinicas-fisioterapia\n\nO escríbele por WhatsApp: https://wa.me/34632217400?text=Hola\n\nNico\nLuvia — atención al cliente con IA`;
+  const lead = "9334c48a-0000-4000-8000-000000000001";
+  const html = renderEmail({ bodyText: body, brand: "luvia", clickTracking: { base: "https://www.nico-soto.es/r", leadId: lead, messageId: "m2" } });
+  assertIncludes(html, "est&aacute;s en camilla", "luvia fisio: titular de camilla");
+  assertIncludes(html, "para fisioterapia</p>", "luvia fisio: antetítulo fisio");
+  assertIncludes(html, "Pru&eacute;bala en luvia-ia.es", "luvia fisio: botón en tú");
+  assertExcludes(html, "Probadla", "luvia fisio: sin el vosotros del botón");
+  assertExcludes(html, "cada llamada</em>", "luvia fisio: sin el titular genérico");
+  assertExcludes(html, "oper&aacute;is", "luvia fisio: sin el titular capilar");
+  assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lweb?m=m2&amp;c=email"`, "luvia fisio: la página pasa por el contador");
+  assertExcludes(html, 'href="https://luvia-ia.es/clinicas-fisioterapia"', "luvia fisio: no queda enlace directo a la página");
+}
+
 // ── [LUVIA] email: botón de WhatsApp de ventas + voz, sin escaparate ni /book ──────────
 {
   const { luviaWhatsappUrl } = await import("./clickTracking.ts");
