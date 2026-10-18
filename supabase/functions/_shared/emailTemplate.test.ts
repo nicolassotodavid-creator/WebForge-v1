@@ -168,6 +168,12 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertExcludes(html, "oper&aacute;is", "luvia fisio: sin el titular capilar");
   assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lweb?m=m2&amp;c=email"`, "luvia fisio: la página pasa por el contador");
   assertExcludes(html, 'href="https://luvia-ia.es/clinicas-fisioterapia"', "luvia fisio: no queda enlace directo a la página");
+  assertIncludes(html, "si lo prefieres", "luvia fisio: WhatsApp en tú");
+  const vos = renderEmail({ bodyText: body.replace("Pruébala en", "Probadla en").replace("O escríbele", "O escribidle"), brand: "luvia" });
+  assertIncludes(vos, "est&aacute;is en camilla", "luvia fisio equipo: titular en vosotros");
+  assertIncludes(vos, "Probadla en luvia-ia.es &rarr;", "luvia fisio equipo: botón en vosotros");
+  assertIncludes(vos, "si lo prefer&iacute;s", "luvia fisio equipo: WhatsApp en vosotros");
+  assertExcludes(vos, "H&aacute;blale", "luvia fisio equipo: sin tú en el subtítulo");
 }
 
 // ── [LUVIA] email: botón de WhatsApp de ventas + voz, sin escaparate ni /book ──────────

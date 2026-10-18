@@ -37,28 +37,32 @@ const LUVIA_WA_LINE = /^(?:O\s+)?Escr[ií]b(?:ele|idle) por WhatsApp:\s*(https:\
 // Titular y subtítulo también enlazan a la web: quien pincha en la tarjeta en vez de en el botón
 // llega igual (mismo href → mismo contador lweb).
 // Variante capilar: si el enlace lleva a /clinicas-capilares, el banner habla de quirófano y horario.
-// Variante fisio (/clinicas-fisioterapia): el fisio está en camilla; en tú, porque suele ser uno solo.
+// Variante fisio (/clinicas-fisioterapia): el fisio está en camilla. En tú (suele ser uno solo), salvo
+// que el cuerpo hable de vosotros («Probadla en luvia-ia.es:», equipos de 3 o más).
 export function luviaIsFisio(webUrl: string | undefined): boolean {
   return /\/clinicas-fisioterapia\b/.test(webUrl ?? "");
 }
-function luviaBanner(webUrl: string): string {
+function luviaBanner(webUrl: string, vosotros = true): string {
   const serif = "Georgia,'Times New Roman',serif";
   const capilar = /\/clinicas-capilares\b/.test(webUrl);
   const fisio = luviaIsFisio(webUrl);
+  const tu = fisio && !vosotros;
   const eyebrow = capilar
     ? "Recepcionista con IA para cl&iacute;nicas capilares"
     : fisio ? "Recepcionista con IA para fisioterapia" : "Recepcionista con IA para cl&iacute;nicas";
   const headline = capilar
     ? `Mientras oper&aacute;is, <em style="color:${LUVIA_SAGE};">alguien contesta</em>.`
     : fisio
-    ? `Mientras est&aacute;s en camilla, <em style="color:${LUVIA_SAGE};">alguien contesta</em>.`
+    ? `Mientras ${tu ? "est&aacute;s" : "est&aacute;is"} en camilla, <em style="color:${LUVIA_SAGE};">alguien contesta</em>.`
     : `Coge <em style="color:${LUVIA_SAGE};">cada llamada</em>. Agenda la cita.`;
   const sub = capilar
     ? "Una cl&iacute;nica capilar est&aacute; cerrada el 74&nbsp;% de la semana. Habladle a Luvia en la web y calculad cu&aacute;nto os cuesta una consulta sin contestar."
-    : fisio
+    : tu
     ? "Quien contesta el WhatsApp suele ser quien est&aacute; tratando. H&aacute;blale a Luvia en la web y calcula cu&aacute;ntos pacientes se te escapan."
+    : fisio
+    ? "Quien contesta el WhatsApp suele ser quien est&aacute; tratando. Habladle a Luvia en la web y calculad cu&aacute;ntos pacientes se os escapan."
     : "Habladle ahora en la web y comprobadlo: contesta en segundos, de d&iacute;a y de noche.";
-  const cta = fisio ? "Pru&eacute;bala en luvia-ia.es &rarr;" : "Probadla en luvia-ia.es &rarr;";
+  const cta = tu ? "Pru&eacute;bala en luvia-ia.es &rarr;" : "Probadla en luvia-ia.es &rarr;";
   return `<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:24px 0 12px;"><tr>` +
     `<td class="lv-card" bgcolor="${LUVIA_CREAM}" style="background:${LUVIA_CREAM};border:1px solid #e6e0d4;border-radius:14px;padding:22px 24px 24px;">` +
     `<p style="margin:0 0 14px;font-family:${serif};font-size:20px;line-height:1;color:${LUVIA_INK};">Luvia <span style="font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10px;font-weight:600;color:${LUVIA_SAGE};border:1px solid ${LUVIA_SAGE};border-radius:6px;padding:1px 4px;vertical-align:middle;">IA</span></p>` +
@@ -91,10 +95,13 @@ function luviaBodyToHtml(text: string): string {
   const one = (lines: string[]) => (lines.length === 1 ? lines[0] : "");
   const webUrl = paras.map((l) => one(l).match(LUVIA_WEB_LINE)?.[1]).find(Boolean);
   const waUrl = paras.map((l) => one(l).match(LUVIA_WA_LINE)?.[1]).find(Boolean);
+  // Tratamiento del cuerpo: «Probadla en luvia-ia.es:» = vosotros; «Pruébala…» = tú (solo cambia el banner fisio).
+  const vosotros = !paras.some((l) => /^Pru[eé]bala en luvia-ia\.es:/i.test(one(l)));
+  const tu = luviaIsFisio(webUrl) && !vosotros;
   const ctas =
-    (webUrl ? luviaBanner(webUrl) : "") +
+    (webUrl ? luviaBanner(webUrl, vosotros) : "") +
     (waUrl
-      ? `<p style="margin:0 0 26px;color:#5f6368;font-size:14px;line-height:1.5;">${webUrl ? (luviaIsFisio(webUrl) ? "o, si lo prefieres, " : "o, si lo prefer&iacute;s, ") : ""}<a href="${waUrl.replace(/&/g, "&amp;")}" style="color:${LUVIA_INK};text-decoration:underline;">${luviaIsFisio(webUrl) ? "escr&iacute;bele" : "escribidle"} por WhatsApp</a></p>`
+      ? `<p style="margin:0 0 26px;color:#5f6368;font-size:14px;line-height:1.5;">${webUrl ? (tu ? "o, si lo prefieres, " : "o, si lo prefer&iacute;s, ") : ""}<a href="${waUrl.replace(/&/g, "&amp;")}" style="color:${LUVIA_INK};text-decoration:underline;">${tu ? "escr&iacute;bele" : "escribidle"} por WhatsApp</a></p>`
       : "");
   let ctasDone = false;
   return paras
