@@ -7,6 +7,7 @@ import {
   parseClickPath,
   demoUrl,
   trackEmailLinks,
+  luviaWebUrl,
 } from "./clickTracking.ts";
 
 let failures = 0;
@@ -86,6 +87,15 @@ assertEq(isTooSoonAfterSend(null, "2026-07-08T19:35:12Z"), false, "sin sent_at �
   assertEq(out.includes(`href="${unsub}"`), true, "el enlace de baja no se toca");
   assertEq(out.includes(`href="${web}"`), false, "no queda ningún enlace directo a la web");
 }
+
+// ── luviaWebUrl ──────────────────────────────────────────────────────────────
+assertEq(luviaWebUrl("Probadla en luvia-ia.es: https://luvia-ia.es/clinicas-capilares\n\nO escribidle"), "https://luvia-ia.es/clinicas-capilares", "página del email (capilar)");
+assertEq(luviaWebUrl("Probadla en luvia-ia.es: https://luvia-ia.es\n\nNico"), "https://luvia-ia.es", "portada sin ruta");
+assertEq(luviaWebUrl("Probadla: https://luvia-ia.es/"), "https://luvia-ia.es", "barra final → portada");
+assertEq(luviaWebUrl(null), "https://luvia-ia.es", "sin cuerpo → portada");
+assertEq(luviaWebUrl("https://luvia-ia.es.evil.com/x"), "https://luvia-ia.es", "otro host disfrazado → portada");
+assertEq(luviaWebUrl("https://luvia-ia.es@evil.com"), "https://luvia-ia.es", "userinfo → portada");
+assertEq(luviaWebUrl("https://luvia-ia.es/x?u=https://evil.com"), "https://luvia-ia.es", "query → portada (no se reenvía)");
 
 console.log(failures === 0 ? "\nOK" : `\n${failures} FALLO(S)`);
 if (failures) process.exit(1);

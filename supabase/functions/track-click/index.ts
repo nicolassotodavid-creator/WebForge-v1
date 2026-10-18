@@ -20,6 +20,7 @@ import {
   demoUrl,
   isLikelyBot,
   isLuviaWhatsappUrl,
+  luviaWebUrl,
   isTooSoonAfterSend,
   LUVIA_WEB,
   luviaWhatsappUrl,
@@ -81,7 +82,8 @@ Deno.serve(async (req: Request) => {
     } else if (target === "home") {
       destination = fallback;
     } else if (target === "lweb") {
-      destination = LUVIA_WEB;
+      // La misma página de luvia-ia.es que llevaba el email (p. ej. /clinicas-capilares); host fijo.
+      destination = luviaWebUrl((msgRes.data as { body?: string } | null)?.body);
     } else if (target === "lwa") {
       // El mismo enlace (con el nombre de la clínica ya escrito) que llevaba el email.
       const body = (msgRes.data as { body?: string } | null)?.body ?? "";

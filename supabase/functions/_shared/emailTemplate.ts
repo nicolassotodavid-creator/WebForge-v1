@@ -36,14 +36,23 @@ const LUVIA_WA_LINE = /^(?:O\s+)?Escr[ií]b(?:ele|idle) por WhatsApp:\s*(https:\
 // las imágenes bloqueadas (Outlook, Zoho…). La serif de la web no carga en email → Georgia.
 // Titular y subtítulo también enlazan a la web: quien pincha en la tarjeta en vez de en el botón
 // llega igual (mismo href → mismo contador lweb).
+// Variante capilar: si el enlace lleva a /clinicas-capilares, el banner habla de quirófano y horario.
 function luviaBanner(webUrl: string): string {
   const serif = "Georgia,'Times New Roman',serif";
+  const capilar = /\/clinicas-capilares\b/.test(webUrl);
+  const eyebrow = capilar ? "Recepcionista con IA para cl&iacute;nicas capilares" : "Recepcionista con IA para cl&iacute;nicas";
+  const headline = capilar
+    ? `Mientras oper&aacute;is, <em style="color:${LUVIA_SAGE};">alguien contesta</em>.`
+    : `Coge <em style="color:${LUVIA_SAGE};">cada llamada</em>. Agenda la cita.`;
+  const sub = capilar
+    ? "Una cl&iacute;nica capilar est&aacute; cerrada el 74&nbsp;% de la semana. Habladle a Luvia en la web y calculad cu&aacute;nto os cuesta una consulta sin contestar."
+    : "Habladle ahora en la web y comprobadlo: contesta en segundos, de d&iacute;a y de noche.";
   return `<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:24px 0 12px;"><tr>` +
     `<td class="lv-card" bgcolor="${LUVIA_CREAM}" style="background:${LUVIA_CREAM};border:1px solid #e6e0d4;border-radius:14px;padding:22px 24px 24px;">` +
     `<p style="margin:0 0 14px;font-family:${serif};font-size:20px;line-height:1;color:${LUVIA_INK};">Luvia <span style="font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:10px;font-weight:600;color:${LUVIA_SAGE};border:1px solid ${LUVIA_SAGE};border-radius:6px;padding:1px 4px;vertical-align:middle;">IA</span></p>` +
-    `<p style="margin:0 0 8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${LUVIA_RUST};font-weight:600;">Recepcionista con IA para cl&iacute;nicas</p>` +
-    `<p class="lv-h" style="margin:0 0 10px;font-family:${serif};font-size:26px;line-height:1.2;color:${LUVIA_INK};"><a href="${webUrl}" style="color:${LUVIA_INK};text-decoration:none;">Coge <em style="color:${LUVIA_SAGE};">cada llamada</em>. Agenda la cita.</a></p>` +
-    `<p style="margin:0 0 18px;font-size:14px;line-height:1.5;color:#57534e;"><a href="${webUrl}" style="color:#57534e;text-decoration:none;">Habladle ahora en la web y comprobadlo: contesta en segundos, de d&iacute;a y de noche.</a></p>` +
+    `<p style="margin:0 0 8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${LUVIA_RUST};font-weight:600;">${eyebrow}</p>` +
+    `<p class="lv-h" style="margin:0 0 10px;font-family:${serif};font-size:26px;line-height:1.2;color:${LUVIA_INK};"><a href="${webUrl}" style="color:${LUVIA_INK};text-decoration:none;">${headline}</a></p>` +
+    `<p style="margin:0 0 18px;font-size:14px;line-height:1.5;color:#57534e;"><a href="${webUrl}" style="color:#57534e;text-decoration:none;">${sub}</a></p>` +
     `<table class="lv-btn" cellpadding="0" cellspacing="0" role="presentation"><tr>` +
     `<td align="center" bgcolor="${LUVIA_SAGE}" style="background:${LUVIA_SAGE};border-radius:999px;">` +
     `<a href="${webUrl}" style="display:inline-block;padding:12px 24px;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;line-height:1.2;">Probadla en luvia-ia.es &rarr;</a>` +

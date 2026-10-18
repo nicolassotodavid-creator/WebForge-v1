@@ -29,6 +29,14 @@ export function isLuviaWhatsappUrl(u: string | null | undefined): boolean {
   return new RegExp(`^https://wa\\.me/${LUVIA_SALES_WHATSAPP}(\\?text=[^\\s"<>]*)?$`).test(u ?? "");
 }
 
+// [LUVIA] Página de luvia-ia.es a la que lleva el email (p. ej. /clinicas-capilares). Host FIJO y
+// ruta solo con minúsculas, cifras, guiones y barras: track-click la recupera del cuerpo del
+// mensaje sin abrir una redirección a otro sitio. Si no es válida, la portada.
+export function luviaWebUrl(fromBody: string | null | undefined): string {
+  const m = (fromBody ?? "").match(/https:\/\/luvia-ia\.es(\/[a-z0-9\-/]*)?(?=[\s"<>]|$)/);
+  return m ? `${LUVIA_WEB}${m[1] && m[1] !== "/" ? m[1] : ""}` : LUVIA_WEB;
+}
+
 // [SIMULADOR] Demo del Home Estimator: el enlace lleva el slug (?s=), el host es FIJO, así que
 // tampoco hay redirección abierta. Devuelve null si el slug no es válido.
 export const DEMO_BASE = "https://presupuestos.nico-soto.es/demo";

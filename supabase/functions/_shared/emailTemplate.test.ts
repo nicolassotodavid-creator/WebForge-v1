@@ -141,6 +141,20 @@ assertExcludes(bodyToHtml("Hola Ana,\nQué tal."), "<a ", "texto sin URL → sin
   assertIncludes(direct, `href="https://clinica-ana.web.app"`, "clics: sin base → enlaces directos");
 }
 
+// ── [LUVIA] email capilar: banner propio y el contador lleva a /clinicas-capilares ─────────
+{
+  const body = `Hola, Marina:\nTexto.\n\nProbadla en luvia-ia.es: https://luvia-ia.es/clinicas-capilares\n\nNico\nLuvia — atención al cliente con IA`;
+  const lead = "9334c48a-0000-4000-8000-000000000000";
+  const html = renderEmail({ bodyText: body, brand: "luvia", clickTracking: { base: "https://www.nico-soto.es/r", leadId: lead, messageId: "m1" } });
+  assertIncludes(html, "alguien contesta</em>", "luvia capilar: titular de quirófano");
+  assertIncludes(html, "cl&iacute;nicas capilares</p>", "luvia capilar: antetítulo capilar");
+  assertExcludes(html, "cada llamada</em>", "luvia capilar: sin el titular genérico");
+  assertIncludes(html, `href="https://www.nico-soto.es/r/${lead}/lweb?m=m1&amp;c=email"`, "luvia capilar: la página pasa por el contador");
+  assertExcludes(html, 'href="https://luvia-ia.es/clinicas-capilares"', "luvia capilar: no queda enlace directo a la página");
+  const plain = renderEmail({ bodyText: body.replace("/clinicas-capilares", ""), brand: "luvia" });
+  assertIncludes(plain, "cada llamada</em>", "luvia sin página: titular genérico de siempre");
+}
+
 // ── [LUVIA] email: botón de WhatsApp de ventas + voz, sin escaparate ni /book ──────────
 {
   const { luviaWhatsappUrl } = await import("./clickTracking.ts");
