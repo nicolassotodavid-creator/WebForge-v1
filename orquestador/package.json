@@ -18,7 +18,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "imapflow": "^1.7.8",
+    "mailparser": "^3.9.46"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

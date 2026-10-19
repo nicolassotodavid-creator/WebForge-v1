@@ -15,3 +15,5 @@ scripts/
 # poll-replies
 orquestador/.poll-replies-state.json
 orquestador/poll-replies.log
+# luvia-correo (buzón marketing@luvia-ia.es)
+orquestador/.luvia-correo-state.json
