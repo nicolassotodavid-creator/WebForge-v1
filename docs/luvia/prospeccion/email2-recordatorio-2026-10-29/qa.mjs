@@ -24,14 +24,18 @@ for (const m of todos) {
   if (!/^Hola, .+:/.test(m.body)) err.push("saludo");
   if (!m.subject?.startsWith("Re: ")) err.push("asunto sin Re:");
   for (const p of PROHIBIDOS) if (p.test(m.body)) err.push(`prohibido ${p}`);
-  if (/whatsapp/i.test(m.body) && !/Con WhatsApp todavía estamos en piloto/.test(m.body) && m.variante !== "B") err.push("habla de WhatsApp fuera de la variante B");
+  // El WhatsApp de la clínica puede salir en el hallazgo; lo que no puede es atribuírselo a Luvia (párrafo de solución).
+  const solucion = (m.body.split(/\n\n/)[3] ?? "").replace("Con WhatsApp todavía estamos en piloto.", "");
+  if (/whatsapp|instagram|tiktok/i.test(solucion)) err.push("la solución atribuye un canal a Luvia");
+  if (m.body.split(/\n\n/).length !== 6) err.push("no tiene 6 párrafos");
   if (vistos.email.has(m.email.toLowerCase())) err.push("email repetido");
   if (vistos.lead.has(m.lead_id)) err.push("lead repetido");
   vistos.email.add(m.email.toLowerCase()); vistos.lead.add(m.lead_id);
   m.palabras = palabras;
   if (err.length) fallos.push({ n: m.n, name: m.name, err });
 }
-const faltan = Array.from({ length: 168 }, (_, i) => i + 1).filter((n) => !todos.some((m) => m.n === n));
+// 167 elegibles: n del 2 al 168 (el n=1 era Clindent, un email 1 de [WEBS]; ver eligibles.sql).
+const faltan = Array.from({ length: 167 }, (_, i) => i + 2).filter((n) => !todos.some((m) => m.n === n));
 
 const conHtml = todos.map((m) => ({
   ...m,
@@ -39,10 +43,10 @@ const conHtml = todos.map((m) => ({
   html: renderEmail({ bodyText: `${m.body}\n\n${FIRMA}`, subject: m.subject, brand: "luvia" }),
 }));
 writeFileSync(new URL("borradores.src.json", dir), JSON.stringify(todos, null, 2));
-writeFileSync(new URL("borradores-168.json", dir), JSON.stringify(conHtml, null, 2));
+writeFileSync(new URL("borradores-167.json", dir), JSON.stringify(conHtml, null, 2));
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-writeFileSync(new URL("preview-168.html", dir), `<!doctype html><meta charset="utf-8"><title>Email 2 Luvia: vista previa</title>
+writeFileSync(new URL("preview-167.html", dir), `<!doctype html><meta charset="utf-8"><title>Email 2 Luvia: vista previa</title>
 <body style="margin:0;background:#eee;font-family:system-ui">` + conHtml.map((m) => `
 <section style="max-width:680px;margin:24px auto;background:#fff;border-radius:8px;overflow:hidden">
 <div style="padding:10px 16px;background:#f6f6f6;font-size:13px;color:#444">#${m.n} · ${esc(m.name)} · ${esc(m.email)} · variante ${m.variante} · ${m.palabras} palabras<br><b>${esc(m.subject)}</b></div>
